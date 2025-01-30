@@ -15,9 +15,13 @@ import {
   CardTitle,
   CardContent,
 } from "../components/ui/card";
-
-type SpeciesKey = "little" | "small" | "medium" | "large";
-type ShieldKey = "none" | "buckler" | "shield" | "large_shield";
+import {
+  SpeciesKey,
+  ShieldKey,
+  speciesOptions,
+  shieldOptions,
+  calculateEVForSkillLevel,
+} from "../utils/evCalculations";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -29,21 +33,6 @@ type DataPoint = {
   armourPenalty: number;
   finalEV: number;
 };
-
-// Move these outside the component
-const speciesOptions = {
-  little: { name: "아주 작은 크기 (스프리건, 펠리드)", factor: 4 },
-  small: { name: "작은 크기 (코볼드)", factor: 2 },
-  medium: { name: "중간 크기 (대부분의 종족)", factor: 0 },
-  large: { name: "큰 크기 (트롤, 나가 등)", factor: -2 },
-} as const;
-
-const shieldOptions = {
-  none: { name: "없음", encumbrance: 0 },
-  buckler: { name: "버클러", encumbrance: 5 },
-  shield: { name: "카이트 실드", encumbrance: 10 },
-  large_shield: { name: "타워 실드", encumbrance: 15 },
-} as const;
 
 // Add this type
 type ChartDataKey = keyof DataPoint;
@@ -61,60 +50,30 @@ const EVCalculator = () => {
   useEffect(() => {
     const calculateEV = () => {
       const newData = [];
-      const sizeFactor = speciesOptions[species].factor;
-      const baseEV = 10 + sizeFactor;
-      const shieldEncumbrance = shieldOptions[shield].encumbrance;
 
       // Calculate for dodging skill 0 to 27
       for (let dodge = 0; dodge <= 27; dodge += 0.1) {
-        // Calculate dodge bonus with armor penalty modifier
-        const armorPenaltyForDodge = armourER - 3;
-        let dodgeModifier = 1;
-
-        if (armorPenaltyForDodge > 0) {
-          if (armorPenaltyForDodge >= strength) {
-            dodgeModifier = strength / (armorPenaltyForDodge * 2);
-          } else {
-            dodgeModifier = 1 - armorPenaltyForDodge / (strength * 2);
-          }
-        }
-
-        // Calculate dodge bonus with two-step floor operation
-        // Step 1: Calculate and floor the base dodge bonus
-        const rawDodgeBonus = Math.floor(
-          (8 + dodge * dexterity * 0.8) / (20 - sizeFactor)
-        );
-
-        // Step 2: Apply modifier and floor again
-        const dodgeBonus = Math.floor(rawDodgeBonus * dodgeModifier);
-
-        // Calculate initial EV with dodge bonus
-        let currentEV = baseEV + dodgeBonus;
-
-        // Shield penalty: -2/5 * encumbrance^2 / (str + 5) * ((27 - shield_skill) / 27)
-        const shieldPenalty = Math.floor(
-          (((2 / 5) * Math.pow(shieldEncumbrance, 2)) / (strength + 5)) *
-            ((27 - shieldSkill) / 27)
-        );
-
-        // Armour penalty: -1/225 * encumbrance^2 * (90 - 2 × armour_skill) / (str + 3)
-        const armourPenalty = Math.floor(
-          ((1 / 225) * Math.pow(armourER, 2) * (90 - 2 * armourSkill)) /
-            (strength + 3)
-        );
-
-        // Apply penalties
-        currentEV = Math.max(1, currentEV - shieldPenalty - armourPenalty);
+        // Use the utility function for calculations
+        const result = calculateEVForSkillLevel({
+          dodgeSkill: dodge,
+          dexterity,
+          strength,
+          species,
+          shield,
+          armourER,
+          shieldSkill,
+          armourSkill,
+        });
 
         newData.push({
-          dodgeSkill: parseFloat(dodge.toFixed(1)), // 소수점 1자리 저장
-          baseEV,
-          rawDodgeBonus,
-          actualDodgeBonus: dodgeBonus,
-          dodgeModifier: parseFloat(dodgeModifier.toFixed(2)),
-          shieldPenalty,
-          armourPenalty,
-          finalEV: currentEV,
+          dodgeSkill: parseFloat(dodge.toFixed(1)),
+          baseEV: result.baseEV,
+          rawDodgeBonus: result.rawDodgeBonus,
+          actualDodgeBonus: result.actualDodgeBonus,
+          dodgeModifier: parseFloat(result.dodgeModifier.toFixed(2)),
+          shieldPenalty: result.shieldPenalty,
+          armourPenalty: result.armourPenalty,
+          finalEV: result.finalEV,
         });
       }
       setData(newData);
@@ -147,7 +106,7 @@ const EVCalculator = () => {
                 max="40"
                 value={dexterity}
                 onChange={(e) => setDexterity(Number(e.target.value))}
-                className="ml-2 p-1 border rounded w-20"
+                className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
           </div>
@@ -160,7 +119,7 @@ const EVCalculator = () => {
                 max="40"
                 value={strength}
                 onChange={(e) => setStrength(Number(e.target.value))}
-                className="ml-2 p-1 border rounded w-20"
+                className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
           </div>
@@ -174,7 +133,7 @@ const EVCalculator = () => {
                 step="0.1" // 추가
                 value={shieldSkill}
                 onChange={(e) => setShieldSkill(Number(e.target.value))}
-                className="ml-2 p-1 border rounded w-20"
+                className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
           </div>
@@ -188,7 +147,7 @@ const EVCalculator = () => {
                 step="0.1" // 추가
                 value={armourSkill}
                 onChange={(e) => setArmourSkill(Number(e.target.value))}
-                className="ml-2 p-1 border rounded w-20"
+                className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
           </div>
@@ -198,7 +157,7 @@ const EVCalculator = () => {
               <select
                 value={species}
                 onChange={(e) => setSpecies(e.target.value as SpeciesKey)}
-                className="ml-2 p-1 border rounded"
+                className="ml-2 p-1 border rounded text-gray-900 bg-white"
               >
                 {Object.entries(speciesOptions).map(([key, value]) => (
                   <option key={key} value={key}>
@@ -214,7 +173,7 @@ const EVCalculator = () => {
               <select
                 value={shield}
                 onChange={(e) => setShield(e.target.value as ShieldKey)}
-                className="ml-2 p-1 border rounded"
+                className="ml-2 p-1 border rounded text-gray-900 bg-white"
               >
                 {Object.entries(shieldOptions).map(([key, value]) => (
                   <option key={key} value={key}>
@@ -233,7 +192,7 @@ const EVCalculator = () => {
                 max="300"
                 value={armourER}
                 onChange={(e) => setArmourER(Number(e.target.value))}
-                className="ml-2 p-1 border rounded w-20"
+                className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
           </div>
