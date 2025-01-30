@@ -48,9 +48,9 @@ describe("EV Calculations", () => {
     expect(result.finalEV).toBe(25);
   });
 
-  test("3 - formicid, str 21, dex 19, tower shield, armour er 5, dodge skill 16.7, armour skill 8.0, shields skill 13.0", () => {
+  test("3 - formicid, str 21, dex 19, tower shield, armour er 5, dodge skill 9, armour skill 8, shields skill 13", () => {
     const result = calculateEVForSkillLevel({
-      dodgeSkill: 16.7,
+      dodgeSkill: 9,
       dexterity: 19,
       strength: 21,
       species: "medium",

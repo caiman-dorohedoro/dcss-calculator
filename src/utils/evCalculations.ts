@@ -52,21 +52,19 @@ export function calculateEVForSkillLevel(params: {
     }
   }
 
-  // Calculate dodge bonus with two-step floor operation
   const rawDodgeBonus = Math.floor(
     (8 + dodgeSkill * dexterity * 0.8) / (20 - sizeFactor)
   );
-
-  const actualDodgeBonus = Math.floor(rawDodgeBonus * dodgeModifier);
+  const modifiedDodgeBonus = rawDodgeBonus * dodgeModifier;
+  const actualDodgeBonus = Math.floor(modifiedDodgeBonus);
 
   // Calculate initial EV with dodge bonus
   let currentEV = baseEV + actualDodgeBonus;
 
   // Shield penalty
-  const shieldPenalty = Math.floor(
+  const shieldPenalty =
     (((2 / 5) * Math.pow(shieldEncumbrance, 2)) / (strength + 5)) *
-      ((27 - shieldSkill) / 27)
-  );
+    ((27 - shieldSkill) / 27);
 
   // Armour penalty
   const armourPenalty = Math.floor(
@@ -75,7 +73,8 @@ export function calculateEVForSkillLevel(params: {
   );
 
   // Apply penalties
-  currentEV = Math.max(1, currentEV - shieldPenalty - armourPenalty);
+  currentEV = baseEV + actualDodgeBonus - shieldPenalty - armourPenalty;
+  currentEV = Math.max(1, Math.floor(currentEV));
 
   return {
     baseEV,
