@@ -9,7 +9,12 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "../components/ui/card";
 
 type SpeciesKey = "little" | "small" | "medium" | "large";
 type ShieldKey = "none" | "buckler" | "shield" | "large_shield";
