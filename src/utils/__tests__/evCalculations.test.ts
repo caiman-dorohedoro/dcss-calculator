@@ -107,4 +107,34 @@ describe("EV Calculations", () => {
 
     expect(result.finalEV).toBe(6);
   });
+
+  test("7 - oni, str 40, dex 28, kite shield, armour er 0, dodge skill 15.7, armour skill 4.8, shields skill 10.3", () => {
+    const result = calculateEVForSkillLevel({
+      dodgeSkill: 15.7,
+      dexterity: 28,
+      strength: 40,
+      species: "large",
+      shield: "shield",
+      armourER: 0,
+      shieldSkill: 10.3,
+      armourSkill: 4.8,
+    });
+
+    expect(result.finalEV).toBe(23);
+  });
+
+  test("8 - oni, str 24, dex 15, tower shield, armour er 23, dodge skill 16.1, armour skill 15.9, shields skill 23.4", () => {
+    const result = calculateEVForSkillLevel({
+      dodgeSkill: 16.1,
+      dexterity: 15,
+      strength: 24,
+      species: "large",
+      shield: "large_shield",
+      armourER: 23,
+      shieldSkill: 23.4,
+      armourSkill: 15.9,
+    });
+
+    expect(result.finalEV).toBe(7);
+  });
 });
