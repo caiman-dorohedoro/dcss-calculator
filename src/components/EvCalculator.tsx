@@ -222,7 +222,7 @@ const EVCalculator = () => {
           <ResponsiveContainer width="100%" height={500}>
             <LineChart
               data={data}
-              margin={{ top: 5, right: 10, left: 0, bottom: 10 }}
+              margin={{ left: 0, right: 20, top: 20, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
@@ -233,7 +233,7 @@ const EVCalculator = () => {
                 }}
                 tickFormatter={(value) => value.toFixed(1)}
               />
-              <YAxis allowDecimals={false} />
+              <YAxis allowDecimals={false} width={30} />
               <Tooltip
                 formatter={(value, name: ChartDataKey) => {
                   const labels: Record<ChartDataKey, string> = {
