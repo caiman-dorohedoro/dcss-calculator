@@ -223,14 +223,7 @@ const EVCalculator = () => {
                   }}
                   tickFormatter={(value) => value.toFixed(1)}
                 />
-                <YAxis
-                  label={{
-                    value: "EV",
-                    angle: -90,
-                    position: "left",
-                  }}
-                  allowDecimals={false}
-                />
+                <YAxis allowDecimals={false} />
                 <Tooltip
                   formatter={(value, name: ChartDataKey) => {
                     const labels: Record<ChartDataKey, string> = {
