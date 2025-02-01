@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardHeader, CardContent } from "../components/ui/card";
+import { Input } from "../components/ui/input";
 import {
   SpeciesKey,
   ShieldKey,
@@ -61,10 +62,11 @@ const AttrInput = ({
   };
 
   return (
-    <div>
-      <label>{label}:</label>
-      <input
+    <div className="flex flex-row gap-2 items-center justify-center">
+      <label className="break-keep">{label}:</label>
+      <Input
         type="number"
+        className="w-16 h-7"
         min="0"
         max={type === "skill" ? "27" : undefined}
         step={type === "skill" ? "0.1" : undefined}
