@@ -1,4 +1,3 @@
-import "./App.css";
 import EVCalculator from "./components/EvCalculator";
 import ArmourCalculator from "./components/ArmourCalculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
