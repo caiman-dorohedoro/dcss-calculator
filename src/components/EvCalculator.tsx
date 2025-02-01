@@ -87,7 +87,7 @@ const AttrInput = ({
 const EVCalculator = () => {
   const [dexterity, setDexterity] = useState(10);
   const [strength, setStrength] = useState(10);
-  const [species, setSpecies] = useState<SpeciesKey>("medium");
+  const [species, setSpecies] = useState<SpeciesKey>("armataur");
   const [shield, setShield] = useState<ShieldKey>("none");
   const [armourER, setArmourER] = useState(0);
   const [shieldSkill, setShieldSkill] = useState(0);
@@ -180,7 +180,7 @@ const EVCalculator = () => {
             <SelectContent>
               {Object.entries(speciesOptions).map(([key, value]) => (
                 <SelectItem key={key} value={key}>
-                  {value.name}
+                  {value.name} ({value.size})
                 </SelectItem>
               ))}
             </SelectContent>
