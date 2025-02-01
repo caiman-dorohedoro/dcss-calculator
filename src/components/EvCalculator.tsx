@@ -256,27 +256,9 @@ const EVCalculator = () => {
                 layout="horizontal"
               />
               <Line
-                type="stepAfter"
-                dataKey="baseEV"
-                name="기본 EV"
-                dot={false}
-              />
-              <Line
                 type="monotone"
                 dataKey="finalEV"
                 name="최종 EV"
-                dot={false}
-              />
-              <Line
-                type="stepAfter"
-                dataKey="rawDodgeBonus"
-                name="기본 회피 보너스"
-                dot={false}
-              />
-              <Line
-                type="stepAfter"
-                dataKey="actualDodgeBonus"
-                name="실제 회피 보너스"
                 dot={false}
               />
               {shield !== "none" && (
