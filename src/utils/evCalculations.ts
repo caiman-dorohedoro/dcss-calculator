@@ -63,10 +63,10 @@ export const speciesOptions: Record<SpeciesKey, { name: string; size: Size }> =
 export type ShieldKey = "none" | "buckler" | "shield" | "large_shield";
 
 export const shieldOptions = {
-  none: { name: "없음", encumbrance: 0 },
-  buckler: { name: "버클러", encumbrance: 5 },
-  shield: { name: "카이트 실드", encumbrance: 10 },
-  large_shield: { name: "타워 실드", encumbrance: 15 },
+  none: { name: "none", encumbrance: 0 },
+  buckler: { name: "buckler", encumbrance: 5 },
+  shield: { name: "kite shield", encumbrance: 10 },
+  large_shield: { name: "tower shield", encumbrance: 15 },
 } as const;
 
 const sizeToNumber: Record<Size, number> = {
