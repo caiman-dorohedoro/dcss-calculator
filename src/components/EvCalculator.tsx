@@ -37,9 +37,6 @@ type DataPoint = {
   finalEV: number;
 };
 
-// Add this type
-type ChartDataKey = keyof DataPoint;
-
 const parseFloatInput = (value: number | string) => {
   const parsedValue = typeof value === "string" ? parseFloat(value) : value;
   if (!isNaN(parsedValue)) {
@@ -235,25 +232,31 @@ const EVCalculator = () => {
               />
               <YAxis allowDecimals={false} width={30} />
               <Tooltip
-                formatter={(value, name: ChartDataKey) => {
-                  const labels: Record<ChartDataKey, string> = {
-                    baseEV: "기본 EV",
-                    rawDodgeBonus: "기본 회피 보너스",
-                    actualDodgeBonus: "실제 회피 보너스",
-                    dodgeModifier: "회피 수정자",
-                    shieldPenalty: "방패 페널티",
-                    armourPenalty: "갑옷 페널티",
-                    finalEV: "최종 EV",
-                    dodgeSkill: "회피 스킬",
-                  };
-                  return [`${value}`, labels[name]];
+                formatter={(value) => {
+                  return [`${value}`, "EV"];
                 }}
-                labelFormatter={(value) => `회피 스킬 ${value}`}
+                labelFormatter={(value) => `Dodging Skill: ${value}`}
+                wrapperStyle={{
+                  backgroundColor: "hsl(var(--popover))",
+                  borderColor: "hsl(var(--border))",
+                  color: "hsl(var(--popover-foreground))",
+                  borderRadius: "calc(var(--radius) - 2px)",
+                }}
+                contentStyle={{
+                  backgroundColor: "hsl(var(--popover))",
+                  border: "none",
+                }}
+                itemStyle={{
+                  color: "hsl(var(--popover-foreground))",
+                }}
               />
               <Legend
                 verticalAlign="bottom"
                 align="center"
                 layout="horizontal"
+                wrapperStyle={{
+                  marginLeft: "-100px",
+                }}
               />
               <Line
                 type="monotone"

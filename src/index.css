@@ -85,3 +85,13 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Recharts 툴팁 스타일 */
+.recharts-tooltip-wrapper {
+  background-color: hsl(var(--popover));
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 2px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  color: hsl(var(--popover-foreground));
+  padding: 0.5rem;
+}
