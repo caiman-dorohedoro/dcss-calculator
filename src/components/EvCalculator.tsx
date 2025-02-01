@@ -9,12 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-} from "../components/ui/card";
+import { Card, CardHeader, CardContent } from "../components/ui/card";
 import {
   SpeciesKey,
   ShieldKey,
@@ -94,9 +89,6 @@ const EVCalculator = () => {
     <Card>
       <div>
         <CardHeader>
-          <CardTitle>EV 계산기</CardTitle>
-        </CardHeader>
-        <CardContent>
           <div>
             <div>
               <label>
@@ -201,6 +193,8 @@ const EVCalculator = () => {
               </label>
             </div>
           </div>
+        </CardHeader>
+        <CardContent>
           <div>
             <ResponsiveContainer width="100%" height={500}>
               <LineChart

@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { calculateAC } from "@/utils/acCalculations";
@@ -32,9 +32,6 @@ const ArmourCalculator = () => {
     <Card>
       <div>
         <CardHeader>
-          <CardTitle>Armour AC Calculator</CardTitle>
-        </CardHeader>
-        <CardContent>
           <div>
             <div>
               <Label htmlFor="base-ac">Base AC</Label>
@@ -56,11 +53,8 @@ const ArmourCalculator = () => {
               />
             </div>
           </div>
-
-          <div>
-            <p>Current AC: {calculateAC(baseAC, armourSkill).toFixed(2)}</p>
-          </div>
-
+        </CardHeader>
+        <CardContent>
           <div>
             <ResponsiveContainer width="100%" height={500}>
               <LineChart data={generateData()}>
