@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -10,86 +10,105 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { calculateAC } from "@/utils/acCalculations";
+import AttrInput from "./AttrInput";
 
 const ArmourCalculator = () => {
-  const [armourSkill, setArmourSkill] = useState(0);
   const [baseAC, setBaseAC] = useState(10);
+  const [data, setData] = useState<{ skill: number; ac: number }[]>([]);
+  const [acTicks, setAcTicks] = useState<number[]>([]);
 
-  const generateData = () => {
-    return Array.from({ length: 271 }, (_, i) => {
-      const skill = i / 10; // Convert index to 0.1 increments
-      return {
-        skill,
-        ac: calculateAC(baseAC, skill),
-      };
-    });
-  };
+  useEffect(() => {
+    const _calcAC = () => {
+      const newData: { skill: number; ac: number }[] = [];
+      const acChangePoints = new Set<number>();
+      let prevAC: number | null = null;
+
+      // 0부터 27까지 0.1 단위로 계산하면서 변화 지점 기록
+      for (let i = 0; i <= 270; i++) {
+        const skill = i / 10;
+        const currentAC = calculateAC(baseAC, skill);
+        newData.push({ skill, ac: currentAC });
+
+        // AC 값이 변경되는 지점에서만 틱 추가
+        if (currentAC !== prevAC) {
+          acChangePoints.add(skill);
+          prevAC = currentAC;
+        }
+      }
+
+      setData(newData);
+
+      // 틱 배열 생성 및 정렬
+      acChangePoints.add(0);
+      const ticks = Array.from(acChangePoints).sort((a, b) => a - b);
+
+      setAcTicks(ticks);
+    };
+
+    _calcAC();
+  }, [baseAC]);
 
   return (
     <Card>
-      <div>
-        <CardHeader>
-          <div>
-            <div>
-              <Label htmlFor="base-ac">Base AC</Label>
-              <Input
-                id="base-ac"
-                type="number"
-                value={baseAC}
-                onChange={(e) => setBaseAC(Number(e.target.value))}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="armour-skill">Armour Skill</Label>
-              <Input
-                id="armour-skill"
-                type="number"
-                value={armourSkill}
-                onChange={(e) => setArmourSkill(Number(e.target.value))}
-              />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <ResponsiveContainer width="100%" height={500}>
-              <LineChart data={generateData()}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="skill"
-                  label={{
-                    value: "Armour Skill",
-                    position: "bottom",
-                  }}
-                  tickFormatter={(value) => value.toFixed(1)}
-                />
-                <YAxis
-                  label={{
-                    value: "AC",
-                    angle: -90,
-                    position: "left",
-                  }}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  formatter={(value) => [`${value}`, "AC"]}
-                  labelFormatter={(value) => `Armour Skill ${value.toFixed(1)}`}
-                />
-                <Legend
-                  verticalAlign="bottom"
-                  align="center"
-                  layout="horizontal"
-                />
-                <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </div>
+      <CardHeader className="flex flex-col gap-2">
+        <div className="flex flex-row gap-2">
+          <AttrInput
+            label="Base AC"
+            type="number"
+            value={baseAC}
+            onChange={setBaseAC}
+          />
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={500}>
+          <LineChart
+            data={data}
+            margin={{ left: 0, right: 20, top: 20, bottom: 20 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="skill"
+              label={{
+                value: "Armour Skill",
+                position: "bottom",
+              }}
+              tickFormatter={(value) => value.toFixed(1)}
+              ticks={acTicks}
+              interval={0}
+              tick={{ fontSize: 12, angle: -45, textAnchor: "end" }}
+            />
+            <YAxis allowDecimals={false} width={30} />
+            <Tooltip
+              wrapperStyle={{
+                backgroundColor: "hsl(var(--popover))",
+                borderColor: "hsl(var(--border))",
+                color: "hsl(var(--popover-foreground))",
+                borderRadius: "calc(var(--radius) - 2px)",
+              }}
+              contentStyle={{
+                backgroundColor: "hsl(var(--popover))",
+                border: "none",
+              }}
+              itemStyle={{
+                color: "hsl(var(--popover-foreground))",
+              }}
+              formatter={(value) => [`${value}`, "AC"]}
+              labelFormatter={(value) => `Armour Skill ${value.toFixed(1)}`}
+            />
+            <Legend
+              verticalAlign="bottom"
+              align="center"
+              layout="horizontal"
+              wrapperStyle={{
+                marginLeft: "-100px",
+              }}
+            />
+            <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
     </Card>
   );
 };
