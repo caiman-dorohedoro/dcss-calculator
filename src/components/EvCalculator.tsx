@@ -233,7 +233,7 @@ const EVCalculator = () => {
               <XAxis
                 dataKey="dodgeSkill"
                 label={{
-                  value: "회피 스킬 레벨",
+                  value: "Dodging Skill Level",
                   position: "bottom",
                 }}
                 tickFormatter={(value) => value.toFixed(1)}
@@ -267,28 +267,7 @@ const EVCalculator = () => {
                   marginLeft: "-100px",
                 }}
               />
-              <Line
-                type="stepAfter"
-                dataKey="finalEV"
-                name="최종 EV"
-                dot={false}
-              />
-              {shield !== "none" && (
-                <Line
-                  type="stepAfter"
-                  dataKey="shieldPenalty"
-                  name="방패 페널티"
-                  dot={false}
-                />
-              )}
-              {armourER > 0 && (
-                <Line
-                  type="stepAfter"
-                  dataKey="armourPenalty"
-                  name="갑옷 페널티"
-                  dot={false}
-                />
-              )}
+              <Line type="stepAfter" dataKey="finalEV" name=" EV" dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
