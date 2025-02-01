@@ -32,6 +32,49 @@ type DataPoint = {
 // Add this type
 type ChartDataKey = keyof DataPoint;
 
+const parseFloatInput = (value: number | string) => {
+  const parsedValue = typeof value === "string" ? parseFloat(value) : value;
+  if (!isNaN(parsedValue)) {
+    return Math.floor(parsedValue * 10) / 10;
+  }
+  return 0;
+};
+
+const AttrInput = ({
+  label,
+  value,
+  type = "stat",
+  onChange,
+}: {
+  label: string;
+  value: number;
+  type: "stat" | "skill";
+  onChange: (value: number) => void;
+}) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue =
+      type === "skill"
+        ? parseFloatInput(e.target.value)
+        : Number(e.target.value);
+
+    onChange(newValue);
+  };
+
+  return (
+    <div>
+      <label>{label}:</label>
+      <input
+        type="number"
+        min="0"
+        max={type === "skill" ? "27" : undefined}
+        step={type === "skill" ? "0.1" : undefined}
+        value={value}
+        onChange={handleChange}
+      />
+    </div>
+  );
+};
+
 const EVCalculator = () => {
   const [dexterity, setDexterity] = useState(10);
   const [strength, setStrength] = useState(10);
@@ -89,70 +132,38 @@ const EVCalculator = () => {
     <Card>
       <div>
         <CardHeader>
+          <div className="flex flex-row gap-2">
+            <AttrInput
+              label="Str"
+              value={strength}
+              type="stat"
+              onChange={setStrength}
+            />
+            <AttrInput
+              label="Dex"
+              value={dexterity}
+              type="stat"
+              onChange={setDexterity}
+            />
+          </div>
+          <div className="flex flex-row gap-2">
+            <AttrInput
+              label="Shield Skill"
+              value={shieldSkill}
+              type="skill"
+              onChange={setShieldSkill}
+            />
+            <AttrInput
+              label="Armour Skill"
+              value={armourSkill}
+              type="skill"
+              onChange={setArmourSkill}
+            />
+          </div>
           <div>
             <div>
               <label>
-                민첩성(Dexterity):
-                <input
-                  type="number"
-                  min="1"
-                  max="40"
-                  value={dexterity}
-                  onChange={(e) => setDexterity(Number(e.target.value))}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                힘(Strength):
-                <input
-                  type="number"
-                  min="1"
-                  max="40"
-                  value={strength}
-                  onChange={(e) => setStrength(Number(e.target.value))}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                방패 스킬:
-                <input
-                  type="number"
-                  min="0"
-                  max="27"
-                  step="0.1"
-                  value={shieldSkill}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    if (!isNaN(value)) {
-                      setShieldSkill(Math.round(value * 10) / 10);
-                    }
-                  }}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                갑옷 스킬:
-                <input
-                  type="number"
-                  min="0"
-                  max="27"
-                  step="0.1"
-                  value={armourSkill}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    if (!isNaN(value)) {
-                      setArmourSkill(Math.round(value * 10) / 10);
-                    }
-                  }}
-                />
-              </label>
-            </div>
-            <div>
-              <label>
-                종족 크기:
+                Species:
                 <select
                   value={species}
                   onChange={(e) => setSpecies(e.target.value as SpeciesKey)}
@@ -167,7 +178,7 @@ const EVCalculator = () => {
             </div>
             <div>
               <label>
-                방패:
+                Shield:
                 <select
                   value={shield}
                   onChange={(e) => setShield(e.target.value as ShieldKey)}
@@ -182,7 +193,7 @@ const EVCalculator = () => {
             </div>
             <div>
               <label>
-                갑옷 ER(Encumbrance Rating):
+                Armour Encumbrance:
                 <input
                   type="number"
                   min="0"
