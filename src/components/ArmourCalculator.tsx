@@ -7,8 +7,9 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { calculateAC } from "@/utils/acCalculations";
@@ -28,64 +29,73 @@ const ArmourCalculator = () => {
   };
 
   return (
-    <Card className="p-6 my-4 max-w-4xl mx-auto">
-      <h2 className="text-lg font-semibold mb-4">Armour AC Calculator</h2>
+    <Card>
+      <div>
+        <CardHeader>
+          <CardTitle>Armour AC Calculator</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div>
+            <div>
+              <Label htmlFor="base-ac">Base AC</Label>
+              <Input
+                id="base-ac"
+                type="number"
+                value={baseAC}
+                onChange={(e) => setBaseAC(Number(e.target.value))}
+              />
+            </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="space-y-2">
-          <Label htmlFor="base-ac">Base AC</Label>
-          <Input
-            id="base-ac"
-            type="number"
-            value={baseAC}
-            onChange={(e) => setBaseAC(Number(e.target.value))}
-          />
-        </div>
+            <div>
+              <Label htmlFor="armour-skill">Armour Skill</Label>
+              <Input
+                id="armour-skill"
+                type="number"
+                value={armourSkill}
+                onChange={(e) => setArmourSkill(Number(e.target.value))}
+              />
+            </div>
+          </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="armour-skill">Armour Skill</Label>
-          <Input
-            id="armour-skill"
-            type="number"
-            value={armourSkill}
-            onChange={(e) => setArmourSkill(Number(e.target.value))}
-          />
-        </div>
+          <div>
+            <p>Current AC: {calculateAC(baseAC, armourSkill).toFixed(2)}</p>
+          </div>
+
+          <div>
+            <ResponsiveContainer width="100%" height={500}>
+              <LineChart data={generateData()}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="skill"
+                  label={{
+                    value: "Armour Skill",
+                    position: "bottom",
+                  }}
+                  tickFormatter={(value) => value.toFixed(1)}
+                />
+                <YAxis
+                  label={{
+                    value: "AC",
+                    angle: -90,
+                    position: "left",
+                  }}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  formatter={(value) => [`${value}`, "AC"]}
+                  labelFormatter={(value) => `Armour Skill ${value.toFixed(1)}`}
+                />
+                <Legend
+                  verticalAlign="bottom"
+                  align="center"
+                  layout="horizontal"
+                />
+                <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
       </div>
-
-      <p className="mb-4">
-        Current AC: {calculateAC(baseAC, armourSkill).toFixed(2)}
-      </p>
-
-      <LineChart
-        width={800}
-        height={400}
-        data={generateData()}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey="skill"
-          label={{ value: "Armour Skill", position: "bottom" }}
-        />
-        <YAxis />
-        <Tooltip />
-        <Legend
-          verticalAlign="bottom"
-          align="center"
-          layout="horizontal"
-          wrapperStyle={{
-            paddingTop: "30px",
-          }}
-        />
-        <Line
-          type="monotone"
-          dataKey="ac"
-          stroke="#8884d8"
-          name="AC"
-          dot={false}
-        />
-      </LineChart>
     </Card>
   );
 };
