@@ -18,6 +18,13 @@ import {
   shieldOptions,
   calculateEVForSkillLevel,
 } from "../utils/evCalculations";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -49,7 +56,7 @@ const AttrInput = ({
 }: {
   label: string;
   value: number;
-  type: "stat" | "skill";
+  type: "stat" | "skill" | "number";
   onChange: (value: number) => void;
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,164 +139,164 @@ const EVCalculator = () => {
 
   return (
     <Card>
-      <div>
-        <CardHeader>
-          <div className="flex flex-row gap-2">
+      <CardHeader className="flex flex-col gap-2">
+        <div className="flex flex-row gap-2">
+          <AttrInput
+            label="Str"
+            value={strength}
+            type="stat"
+            onChange={setStrength}
+          />
+          <AttrInput
+            label="Dex"
+            value={dexterity}
+            type="stat"
+            onChange={setDexterity}
+          />
+        </div>
+        <div className="flex flex-row gap-2">
+          <AttrInput
+            label="Shield Skill"
+            value={shieldSkill}
+            type="skill"
+            onChange={setShieldSkill}
+          />
+          <AttrInput
+            label="Armour Skill"
+            value={armourSkill}
+            type="skill"
+            onChange={setArmourSkill}
+          />
+        </div>
+        <label className="flex flex-row items-center gap-2">
+          Species:
+          <Select
+            value={species}
+            onValueChange={(value) => setSpecies(value as SpeciesKey)}
+          >
+            <SelectTrigger className="w-[200px] h-8">
+              <SelectValue placeholder="Species" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(speciesOptions).map(([key, value]) => (
+                <SelectItem key={key} value={key}>
+                  {value.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+        <label className="flex flex-row items-center gap-2">
+          Shield:
+          <Select
+            value={shield}
+            onValueChange={(value) => setShield(value as ShieldKey)}
+          >
+            <SelectTrigger className="w-[200px] h-8">
+              <SelectValue placeholder="Shield" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(shieldOptions).map(([key, value]) => (
+                <SelectItem key={key} value={key}>
+                  {value.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+        <div className="flex flex-row gap-2">
+          <label>
             <AttrInput
-              label="Str"
-              value={strength}
-              type="stat"
-              onChange={setStrength}
+              label="Armour Encumbrance"
+              value={armourER}
+              type="number"
+              onChange={setArmourER}
             />
-            <AttrInput
-              label="Dex"
-              value={dexterity}
-              type="stat"
-              onChange={setDexterity}
-            />
-          </div>
-          <div className="flex flex-row gap-2">
-            <AttrInput
-              label="Shield Skill"
-              value={shieldSkill}
-              type="skill"
-              onChange={setShieldSkill}
-            />
-            <AttrInput
-              label="Armour Skill"
-              value={armourSkill}
-              type="skill"
-              onChange={setArmourSkill}
-            />
-          </div>
-          <div>
-            <div>
-              <label>
-                Species:
-                <select
-                  value={species}
-                  onChange={(e) => setSpecies(e.target.value as SpeciesKey)}
-                >
-                  {Object.entries(speciesOptions).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div>
-              <label>
-                Shield:
-                <select
-                  value={shield}
-                  onChange={(e) => setShield(e.target.value as ShieldKey)}
-                >
-                  {Object.entries(shieldOptions).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
-            <div>
-              <label>
-                Armour Encumbrance:
-                <input
-                  type="number"
-                  min="0"
-                  max="300"
-                  value={armourER}
-                  onChange={(e) => setArmourER(Number(e.target.value))}
-                />
-              </label>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <ResponsiveContainer width="100%" height={500}>
-              <LineChart
-                data={data}
-                margin={{ top: 5, right: 10, left: 0, bottom: 10 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="dodgeSkill"
-                  label={{
-                    value: "회피 스킬 레벨",
-                    position: "bottom",
-                  }}
-                  tickFormatter={(value) => value.toFixed(1)}
-                />
-                <YAxis allowDecimals={false} />
-                <Tooltip
-                  formatter={(value, name: ChartDataKey) => {
-                    const labels: Record<ChartDataKey, string> = {
-                      baseEV: "기본 EV",
-                      rawDodgeBonus: "기본 회피 보너스",
-                      actualDodgeBonus: "실제 회피 보너스",
-                      dodgeModifier: "회피 수정자",
-                      shieldPenalty: "방패 페널티",
-                      armourPenalty: "갑옷 페널티",
-                      finalEV: "최종 EV",
-                      dodgeSkill: "회피 스킬",
-                    };
-                    return [`${value}`, labels[name]];
-                  }}
-                  labelFormatter={(value) => `회피 스킬 ${value}`}
-                />
-                <Legend
-                  verticalAlign="bottom"
-                  align="center"
-                  layout="horizontal"
-                />
+          </label>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div>
+          <ResponsiveContainer width="100%" height={500}>
+            <LineChart
+              data={data}
+              margin={{ top: 5, right: 10, left: 0, bottom: 10 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="dodgeSkill"
+                label={{
+                  value: "회피 스킬 레벨",
+                  position: "bottom",
+                }}
+                tickFormatter={(value) => value.toFixed(1)}
+              />
+              <YAxis allowDecimals={false} />
+              <Tooltip
+                formatter={(value, name: ChartDataKey) => {
+                  const labels: Record<ChartDataKey, string> = {
+                    baseEV: "기본 EV",
+                    rawDodgeBonus: "기본 회피 보너스",
+                    actualDodgeBonus: "실제 회피 보너스",
+                    dodgeModifier: "회피 수정자",
+                    shieldPenalty: "방패 페널티",
+                    armourPenalty: "갑옷 페널티",
+                    finalEV: "최종 EV",
+                    dodgeSkill: "회피 스킬",
+                  };
+                  return [`${value}`, labels[name]];
+                }}
+                labelFormatter={(value) => `회피 스킬 ${value}`}
+              />
+              <Legend
+                verticalAlign="bottom"
+                align="center"
+                layout="horizontal"
+              />
+              <Line
+                type="stepAfter"
+                dataKey="baseEV"
+                name="기본 EV"
+                dot={false}
+              />
+              <Line
+                type="monotone"
+                dataKey="finalEV"
+                name="최종 EV"
+                dot={false}
+              />
+              <Line
+                type="stepAfter"
+                dataKey="rawDodgeBonus"
+                name="기본 회피 보너스"
+                dot={false}
+              />
+              <Line
+                type="stepAfter"
+                dataKey="actualDodgeBonus"
+                name="실제 회피 보너스"
+                dot={false}
+              />
+              {shield !== "none" && (
                 <Line
                   type="stepAfter"
-                  dataKey="baseEV"
-                  name="기본 EV"
+                  dataKey="shieldPenalty"
+                  name="방패 페널티"
                   dot={false}
                 />
-                <Line
-                  type="monotone"
-                  dataKey="finalEV"
-                  name="최종 EV"
-                  dot={false}
-                />
+              )}
+              {armourER > 0 && (
                 <Line
                   type="stepAfter"
-                  dataKey="rawDodgeBonus"
-                  name="기본 회피 보너스"
+                  dataKey="armourPenalty"
+                  name="갑옷 페널티"
                   dot={false}
                 />
-                <Line
-                  type="stepAfter"
-                  dataKey="actualDodgeBonus"
-                  name="실제 회피 보너스"
-                  dot={false}
-                />
-                {shield !== "none" && (
-                  <Line
-                    type="stepAfter"
-                    dataKey="shieldPenalty"
-                    name="방패 페널티"
-                    dot={false}
-                  />
-                )}
-                {armourER > 0 && (
-                  <Line
-                    type="stepAfter"
-                    dataKey="armourPenalty"
-                    name="갑옷 페널티"
-                    dot={false}
-                  />
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </CardContent>
-      </div>
+              )}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
     </Card>
   );
 };
