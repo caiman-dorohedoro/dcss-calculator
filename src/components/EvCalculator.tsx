@@ -90,14 +90,16 @@ const EVCalculator = () => {
   const [shieldSkill, setShieldSkill] = useState(0);
   const [armourSkill, setArmourSkill] = useState(0);
   const [data, setData] = useState<DataPoint[]>([]);
+  const [evTicks, setEvTicks] = useState<number[]>([]);
 
   useEffect(() => {
     const calculateEV = () => {
       const newData = [];
+      const evChangePoints = new Set<number>();
 
+      let lastEV = 0;
       // Calculate for dodging skill 0 to 27
       for (let dodge = 0; dodge <= 27; dodge += 0.1) {
-        // Use the utility function for calculations
         const result = calculateEVForSkillLevel({
           dodgeSkill: dodge,
           dexterity,
@@ -108,6 +110,11 @@ const EVCalculator = () => {
           shieldSkill,
           armourSkill,
         });
+
+        if (result.finalEV !== lastEV && dodge < 27) {
+          evChangePoints.add(parseFloat(dodge.toFixed(1)));
+          lastEV = result.finalEV;
+        }
 
         newData.push({
           dodgeSkill: parseFloat(dodge.toFixed(1)),
@@ -121,6 +128,7 @@ const EVCalculator = () => {
         });
       }
       setData(newData);
+      setEvTicks(Array.from(evChangePoints));
     };
 
     calculateEV();
@@ -229,6 +237,7 @@ const EVCalculator = () => {
                   position: "bottom",
                 }}
                 tickFormatter={(value) => value.toFixed(1)}
+                ticks={evTicks}
               />
               <YAxis allowDecimals={false} width={30} />
               <Tooltip
@@ -259,7 +268,7 @@ const EVCalculator = () => {
                 }}
               />
               <Line
-                type="monotone"
+                type="stepAfter"
                 dataKey="finalEV"
                 name="최종 EV"
                 dot={false}
