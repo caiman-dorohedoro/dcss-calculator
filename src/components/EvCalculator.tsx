@@ -130,9 +130,14 @@ const EVCalculator = () => {
                 type="number"
                 min="0"
                 max="27"
-                step="0.1" // 추가
+                step="0.1"
                 value={shieldSkill}
-                onChange={(e) => setShieldSkill(Number(e.target.value))}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value)) {
+                    setShieldSkill(Math.round(value * 10) / 10);
+                  }
+                }}
                 className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
@@ -144,9 +149,14 @@ const EVCalculator = () => {
                 type="number"
                 min="0"
                 max="27"
-                step="0.1" // 추가
+                step="0.1"
                 value={armourSkill}
-                onChange={(e) => setArmourSkill(Number(e.target.value))}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value);
+                  if (!isNaN(value)) {
+                    setArmourSkill(Math.round(value * 10) / 10);
+                  }
+                }}
                 className="ml-2 p-1 border rounded w-20 text-gray-900 bg-white"
               />
             </label>
@@ -197,7 +207,7 @@ const EVCalculator = () => {
             </label>
           </div>
         </div>
-        <div className="h-[500px]">
+        <div className="h-[500px] overflow-x-auto">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={data}
