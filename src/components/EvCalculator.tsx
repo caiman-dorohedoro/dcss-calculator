@@ -186,33 +186,35 @@ const EVCalculator = () => {
             </SelectContent>
           </Select>
         </label>
-        <label className="flex flex-row items-center gap-2">
-          Shield:
-          <Select
-            value={shield}
-            onValueChange={(value) => setShield(value as ShieldKey)}
-          >
-            <SelectTrigger className="w-[200px] h-8">
-              <SelectValue placeholder="Shield" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(shieldOptions).map(([key, value]) => (
-                <SelectItem key={key} value={key}>
-                  {value.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </label>
-        <div className="flex flex-row gap-2">
-          <label>
-            <AttrInput
-              label="Armour Encumbrance"
-              value={armourER}
-              type="number"
-              onChange={setArmourER}
-            />
+        <div className="flex flex-row gap-4">
+          <label className="flex flex-row items-center gap-2">
+            Shield:
+            <Select
+              value={shield}
+              onValueChange={(value) => setShield(value as ShieldKey)}
+            >
+              <SelectTrigger className="w-[200px] h-8">
+                <SelectValue placeholder="Shield" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(shieldOptions).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </label>
+          <div className="flex flex-row gap-2">
+            <label>
+              <AttrInput
+                label="Armour Encumbrance"
+                value={armourER}
+                type="number"
+                onChange={setArmourER}
+              />
+            </label>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
