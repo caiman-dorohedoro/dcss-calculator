@@ -190,11 +190,13 @@ const EVCalculator = () => {
               <XAxis
                 dataKey="dodgeSkill"
                 label={{
-                  value: "Dodging Skill Level",
+                  value: "Dodging Skill",
                   position: "bottom",
+                  offset: 16,
                 }}
                 tickFormatter={(value) => value.toFixed(1)}
                 ticks={evTicks}
+                interval={0}
                 tick={(props) => (
                   <CustomTick {...props} ticks={evTicks} tickLimit={12} />
                 )}
@@ -225,6 +227,7 @@ const EVCalculator = () => {
                 layout="horizontal"
                 wrapperStyle={{
                   marginLeft: "-100px",
+                  marginBottom: "-10px",
                 }}
               />
               <Line type="stepAfter" dataKey="finalEV" name=" EV" dot={false} />

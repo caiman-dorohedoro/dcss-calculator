@@ -15,7 +15,7 @@ import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 
 const ArmourCalculator = () => {
-  const [baseAC, setBaseAC] = useState(10);
+  const [baseAC, setBaseAC] = useState(3);
   const [data, setData] = useState<{ skill: number; ac: number }[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
 
@@ -74,6 +74,7 @@ const ArmourCalculator = () => {
               label={{
                 value: "Armour Skill",
                 position: "bottom",
+                offset: 16,
               }}
               tickFormatter={(value) => value.toFixed(1)}
               ticks={acTicks}
@@ -104,6 +105,7 @@ const ArmourCalculator = () => {
               layout="horizontal"
               wrapperStyle={{
                 marginLeft: "-100px",
+                marginBottom: "-10px",
               }}
             />
             <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
