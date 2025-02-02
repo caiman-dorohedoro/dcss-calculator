@@ -20,8 +20,14 @@ export const useAcCalculatorState = () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
 
+  const resetState = () => {
+    setState(defaultState);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return {
     state,
     setState,
+    resetState,
   };
 };

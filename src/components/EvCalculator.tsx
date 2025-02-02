@@ -40,7 +40,7 @@ type DataPoint = {
 };
 
 const EVCalculator = () => {
-  const { state, setState } = useEvCalculatorState();
+  const { state, setState, resetState } = useEvCalculatorState();
   const [data, setData] = useState<DataPoint[]>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
 
@@ -97,23 +97,31 @@ const EVCalculator = () => {
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-row gap-2">
-          <AttrInput
-            label="Str"
-            value={state.strength}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, strength: value }))
-            }
-          />
-          <AttrInput
-            label="Dex"
-            value={state.dexterity}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, dexterity: value }))
-            }
-          />
+        <div className="flex justify-between items-center">
+          <div className="flex flex-row gap-2">
+            <AttrInput
+              label="Str"
+              value={state.strength}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, strength: value }))
+              }
+            />
+            <AttrInput
+              label="Dex"
+              value={state.dexterity}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, dexterity: value }))
+              }
+            />
+          </div>
+          <button
+            onClick={resetState}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Reset to Default
+          </button>
         </div>
         <div className="flex flex-row gap-2">
           <AttrInput

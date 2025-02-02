@@ -15,8 +15,8 @@ import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 import { useAcCalculatorState } from "@/hooks/useAcCalculatorState";
 
-const ArmourCalculator = () => {
-  const { state, setState } = useAcCalculatorState();
+const AcCalculator = () => {
+  const { state, setState, resetState } = useAcCalculatorState();
   const [data, setData] = useState<{ skill: number; ac: number }[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
 
@@ -54,15 +54,23 @@ const ArmourCalculator = () => {
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-row gap-2">
-          <AttrInput
-            label="Base AC"
-            type="number"
-            value={state.baseAC}
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, baseAC: value }))
-            }
-          />
+        <div className="flex justify-between items-center">
+          <div className="flex flex-row gap-2">
+            <AttrInput
+              label="Base AC"
+              type="number"
+              value={state.baseAC}
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, baseAC: value }))
+              }
+            />
+          </div>
+          <button
+            onClick={resetState}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Reset to Default
+          </button>
         </div>
       </CardHeader>
       <CardContent>
@@ -119,4 +127,4 @@ const ArmourCalculator = () => {
   );
 };
 
-export default ArmourCalculator;
+export default AcCalculator;
