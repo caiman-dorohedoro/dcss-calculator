@@ -13,9 +13,10 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { calculateAC } from "@/utils/acCalculations";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
+import { useArmourCalculatorState } from "@/hooks/useArmourCalculatorState";
 
 const ArmourCalculator = () => {
-  const [baseAC, setBaseAC] = useState(3);
+  const { state, setState } = useArmourCalculatorState();
   const [data, setData] = useState<{ skill: number; ac: number }[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
 
@@ -28,7 +29,7 @@ const ArmourCalculator = () => {
       // 0부터 27까지 0.1 단위로 계산하면서 변화 지점 기록
       for (let i = 0; i <= 270; i++) {
         const skill = i / 10;
-        const currentAC = calculateAC(baseAC, skill);
+        const currentAC = calculateAC(state.baseAC, skill);
         newData.push({ skill, ac: currentAC });
 
         // AC 값이 변경되는 지점에서만 틱 추가
@@ -48,7 +49,7 @@ const ArmourCalculator = () => {
     };
 
     _calcAC();
-  }, [baseAC]);
+  }, [state.baseAC]);
 
   return (
     <Card>
@@ -57,8 +58,10 @@ const ArmourCalculator = () => {
           <AttrInput
             label="Base AC"
             type="number"
-            value={baseAC}
-            onChange={setBaseAC}
+            value={state.baseAC}
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, baseAC: value }))
+            }
           />
         </div>
       </CardHeader>

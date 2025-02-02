@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
+import { useEvCalculatorState } from "@/hooks/useEvCalculatorState";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -39,13 +40,7 @@ type DataPoint = {
 };
 
 const EVCalculator = () => {
-  const [dexterity, setDexterity] = useState(10);
-  const [strength, setStrength] = useState(10);
-  const [species, setSpecies] = useState<SpeciesKey>("armataur");
-  const [shield, setShield] = useState<ShieldKey>("none");
-  const [armourER, setArmourER] = useState(0);
-  const [shieldSkill, setShieldSkill] = useState(0);
-  const [armourSkill, setArmourSkill] = useState(0);
+  const { state, setState } = useEvCalculatorState();
   const [data, setData] = useState<DataPoint[]>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
 
@@ -59,13 +54,13 @@ const EVCalculator = () => {
       for (let dodge = 0; dodge <= 27; dodge += 0.1) {
         const result = calculateEVForSkillLevel({
           dodgeSkill: dodge,
-          dexterity,
-          strength,
-          species,
-          shield,
-          armourER,
-          shieldSkill,
-          armourSkill,
+          dexterity: state.dexterity,
+          strength: state.strength,
+          species: state.species,
+          shield: state.shield,
+          armourER: state.armourER,
+          shieldSkill: state.shieldSkill,
+          armourSkill: state.armourSkill,
         });
 
         if (result.finalEV !== lastEV && dodge < 27) {
@@ -90,13 +85,13 @@ const EVCalculator = () => {
 
     calculateEV();
   }, [
-    dexterity,
-    strength,
-    species,
-    shield,
-    armourER,
-    shieldSkill,
-    armourSkill,
+    state.dexterity,
+    state.strength,
+    state.species,
+    state.shield,
+    state.armourER,
+    state.shieldSkill,
+    state.armourSkill,
   ]);
 
   return (
@@ -105,36 +100,46 @@ const EVCalculator = () => {
         <div className="flex flex-row gap-2">
           <AttrInput
             label="Str"
-            value={strength}
+            value={state.strength}
             type="stat"
-            onChange={setStrength}
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, strength: value }))
+            }
           />
           <AttrInput
             label="Dex"
-            value={dexterity}
+            value={state.dexterity}
             type="stat"
-            onChange={setDexterity}
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, dexterity: value }))
+            }
           />
         </div>
         <div className="flex flex-row gap-2">
           <AttrInput
             label="Shield Skill"
-            value={shieldSkill}
+            value={state.shieldSkill}
             type="skill"
-            onChange={setShieldSkill}
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, shieldSkill: value }))
+            }
           />
           <AttrInput
             label="Armour Skill"
-            value={armourSkill}
+            value={state.armourSkill}
             type="skill"
-            onChange={setArmourSkill}
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, armourSkill: value }))
+            }
           />
         </div>
         <label className="flex flex-row items-center gap-2">
           Species:
           <Select
-            value={species}
-            onValueChange={(value) => setSpecies(value as SpeciesKey)}
+            value={state.species}
+            onValueChange={(value) =>
+              setState((prev) => ({ ...prev, species: value }))
+            }
           >
             <SelectTrigger className="w-[200px] h-8">
               <SelectValue placeholder="Species" />
@@ -152,8 +157,10 @@ const EVCalculator = () => {
           <label className="flex flex-row items-center gap-2">
             Shield:
             <Select
-              value={shield}
-              onValueChange={(value) => setShield(value as ShieldKey)}
+              value={state.shield}
+              onValueChange={(value) =>
+                setState((prev) => ({ ...prev, shield: value }))
+              }
             >
               <SelectTrigger className="w-[200px] h-8">
                 <SelectValue placeholder="Shield" />
@@ -171,9 +178,11 @@ const EVCalculator = () => {
             <label>
               <AttrInput
                 label="Armour Encumbrance"
-                value={armourER}
+                value={state.armourER}
                 type="number"
-                onChange={setArmourER}
+                onChange={(value) =>
+                  setState((prev) => ({ ...prev, armourER: value }))
+                }
               />
             </label>
           </div>
