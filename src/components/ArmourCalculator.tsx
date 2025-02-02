@@ -11,39 +11,8 @@ import {
 } from "recharts";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { calculateAC } from "@/utils/acCalculations";
-import AttrInput from "./AttrInput";
-
-interface CustomTickProps {
-  x: number;
-  y: number;
-  payload: {
-    value: number;
-    coordinate: number;
-  };
-  visibleTicksCount?: number;
-}
-
-const CustomTick = ({ x, y, payload }: CustomTickProps) => {
-  if (!payload || typeof payload.value !== "number") {
-    return <g />;
-  }
-
-  return (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={10}
-        textAnchor="end"
-        transform="rotate(-45)"
-        fontSize={12}
-        fill="#666"
-      >
-        {payload.value.toFixed(1)}
-      </text>
-    </g>
-  );
-};
+import AttrInput from "@/components/AttrInput";
+import CustomTick from "@/components/chart/CustomTick";
 
 const ArmourCalculator = () => {
   const [baseAC, setBaseAC] = useState(10);
@@ -109,7 +78,7 @@ const ArmourCalculator = () => {
               tickFormatter={(value) => value.toFixed(1)}
               ticks={acTicks}
               interval={0}
-              tick={CustomTick}
+              tick={(props) => <CustomTick {...props} ticks={acTicks} />}
             />
             <YAxis allowDecimals={false} width={30} />
             <Tooltip

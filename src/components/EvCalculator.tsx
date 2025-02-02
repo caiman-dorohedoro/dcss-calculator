@@ -9,22 +9,23 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Card, CardHeader, CardContent } from "../components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
   SpeciesKey,
   ShieldKey,
   speciesOptions,
   shieldOptions,
   calculateEVForSkillLevel,
-} from "../utils/evCalculations";
+} from "@/utils/evCalculations";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import AttrInput from "./AttrInput";
+} from "@/components/ui/select";
+import AttrInput from "@/components/AttrInput";
+import CustomTick from "@/components/chart/CustomTick";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -194,6 +195,9 @@ const EVCalculator = () => {
                 }}
                 tickFormatter={(value) => value.toFixed(1)}
                 ticks={evTicks}
+                tick={(props) => (
+                  <CustomTick {...props} ticks={evTicks} tickLimit={12} />
+                )}
               />
               <YAxis allowDecimals={false} width={30} />
               <Tooltip
