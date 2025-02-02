@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
+import { SpeciesKey, ShieldKey } from "@/utils/evCalculations";
 
 const STORAGE_KEY = "evCalculator";
 
 interface EvCalculatorState {
   dexterity: number;
   strength: number;
-  species: string;
-  shield: string;
+  species: SpeciesKey;
+  shield: ShieldKey;
   armourER: number;
   shieldSkill: number;
   armourSkill: number;

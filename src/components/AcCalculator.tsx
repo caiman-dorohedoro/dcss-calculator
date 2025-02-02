@@ -13,10 +13,10 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { calculateAC } from "@/utils/acCalculations";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
-import { useArmourCalculatorState } from "@/hooks/useArmourCalculatorState";
+import { useAcCalculatorState } from "@/hooks/useAcCalculatorState";
 
 const ArmourCalculator = () => {
-  const { state, setState } = useArmourCalculatorState();
+  const { state, setState } = useAcCalculatorState();
   const [data, setData] = useState<{ skill: number; ac: number }[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
 

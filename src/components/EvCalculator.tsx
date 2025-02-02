@@ -11,11 +11,11 @@ import {
 } from "recharts";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
-  SpeciesKey,
-  ShieldKey,
   speciesOptions,
   shieldOptions,
   calculateEVForSkillLevel,
+  ShieldKey,
+  SpeciesKey,
 } from "@/utils/evCalculations";
 import {
   Select,
@@ -138,7 +138,7 @@ const EVCalculator = () => {
           <Select
             value={state.species}
             onValueChange={(value) =>
-              setState((prev) => ({ ...prev, species: value }))
+              setState((prev) => ({ ...prev, species: value as SpeciesKey }))
             }
           >
             <SelectTrigger className="w-[200px] h-8">
@@ -159,7 +159,7 @@ const EVCalculator = () => {
             <Select
               value={state.shield}
               onValueChange={(value) =>
-                setState((prev) => ({ ...prev, shield: value }))
+                setState((prev) => ({ ...prev, shield: value as ShieldKey }))
               }
             >
               <SelectTrigger className="w-[200px] h-8">

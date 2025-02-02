@@ -1,5 +1,5 @@
 import EVCalculator from "./components/EvCalculator";
-import ArmourCalculator from "./components/ArmourCalculator";
+import AcCalculator from "./components/AcCalculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 function App() {
@@ -8,13 +8,13 @@ function App() {
       <Tabs defaultValue="ev" className="w-full max-w-2xl">
         <TabsList className="w-full">
           <TabsTrigger value="ev">EV Calculator</TabsTrigger>
-          <TabsTrigger value="armour">Armour Calculator</TabsTrigger>
+          <TabsTrigger value="ac">AC Calculator</TabsTrigger>
         </TabsList>
         <TabsContent value="ev">
           <EVCalculator />
         </TabsContent>
-        <TabsContent value="armour">
-          <ArmourCalculator />
+        <TabsContent value="ac">
+          <AcCalculator />
         </TabsContent>
       </Tabs>
     </div>
