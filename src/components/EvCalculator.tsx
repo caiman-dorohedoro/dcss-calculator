@@ -97,6 +97,34 @@ const EVCalculator = () => {
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
+        <div className="flex flex-row justify-between items-center">
+          <label className="flex flex-row items-center gap-2 text-sm">
+            Species:
+            <Select
+              value={state.species}
+              onValueChange={(value) =>
+                setState((prev) => ({ ...prev, species: value as SpeciesKey }))
+              }
+            >
+              <SelectTrigger className="w-[200px] h-6">
+                <SelectValue placeholder="Species" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(speciesOptions).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name} ({value.size})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </label>
+          <button
+            onClick={resetState}
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Reset to Default
+          </button>
+        </div>
         <div className="flex justify-between items-center">
           <div className="flex flex-row gap-2">
             <AttrInput
@@ -116,12 +144,6 @@ const EVCalculator = () => {
               }
             />
           </div>
-          <button
-            onClick={resetState}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Reset to Default
-          </button>
         </div>
         <div className="flex flex-row gap-2">
           <AttrInput
@@ -141,28 +163,8 @@ const EVCalculator = () => {
             }
           />
         </div>
-        <label className="flex flex-row items-center gap-2">
-          Species:
-          <Select
-            value={state.species}
-            onValueChange={(value) =>
-              setState((prev) => ({ ...prev, species: value as SpeciesKey }))
-            }
-          >
-            <SelectTrigger className="w-[200px] h-8">
-              <SelectValue placeholder="Species" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.entries(speciesOptions).map(([key, value]) => (
-                <SelectItem key={key} value={key}>
-                  {value.name} ({value.size})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </label>
         <div className="flex flex-row gap-4">
-          <label className="flex flex-row items-center gap-2">
+          <label className="flex flex-row items-center gap-2 text-sm">
             Shield:
             <Select
               value={state.shield}
@@ -170,7 +172,7 @@ const EVCalculator = () => {
                 setState((prev) => ({ ...prev, shield: value as ShieldKey }))
               }
             >
-              <SelectTrigger className="w-[200px] h-8">
+              <SelectTrigger className="w-[160px] h-6">
                 <SelectValue placeholder="Shield" />
               </SelectTrigger>
               <SelectContent>
@@ -183,7 +185,7 @@ const EVCalculator = () => {
             </Select>
           </label>
           <div className="flex flex-row gap-2">
-            <label>
+            <label className="text-sm">
               <AttrInput
                 label="Armour Encumbrance"
                 value={state.armourER}
@@ -198,10 +200,10 @@ const EVCalculator = () => {
       </CardHeader>
       <CardContent>
         <div>
-          <ResponsiveContainer width="100%" height={500}>
+          <ResponsiveContainer width="100%" height={400}>
             <LineChart
               data={data}
-              margin={{ left: 0, right: 20, top: 20, bottom: 20 }}
+              margin={{ left: 0, right: 0, top: 10, bottom: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis

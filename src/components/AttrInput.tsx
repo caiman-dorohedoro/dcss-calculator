@@ -1,4 +1,5 @@
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 const parseFloatInput = (value: number | string) => {
   const parsedValue = typeof value === "string" ? parseFloat(value) : value;
@@ -7,6 +8,9 @@ const parseFloatInput = (value: number | string) => {
   }
   return 0;
 };
+
+const defaultWidth = "w-16";
+const skillWidth = "w-[72px]";
 
 const AttrInput = ({
   label,
@@ -30,10 +34,10 @@ const AttrInput = ({
 
   return (
     <div className="flex flex-row gap-2 items-center justify-center">
-      <label className="break-keep">{label}:</label>
+      <label className="break-keep text-sm">{label}:</label>
       <Input
         type="number"
-        className="w-16 h-7"
+        className={cn(defaultWidth, type === "skill" ? skillWidth : "", "h-6")}
         min="0"
         max={type === "skill" ? "27" : undefined}
         step={type === "skill" ? "0.1" : undefined}

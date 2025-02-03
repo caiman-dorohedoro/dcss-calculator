@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 :root {
-  font-family: monospace, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: "Courier New", monospace, system-ui, Avenir, Helvetica, Arial,
+    sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
