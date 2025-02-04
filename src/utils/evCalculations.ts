@@ -1,3 +1,5 @@
+import { ArmourKey, armourOptions } from "./acCalculations";
+
 export type SpeciesKey =
   | "armataur"
   | "barachi"
@@ -84,7 +86,7 @@ export function calculateEVForSkillLevel(params: {
   strength: number;
   species: SpeciesKey;
   shield: ShieldKey;
-  armourER: number;
+  armour: ArmourKey;
   shieldSkill: number;
   armourSkill: number;
 }) {
@@ -94,9 +96,9 @@ export function calculateEVForSkillLevel(params: {
     strength,
     species,
     shield,
-    armourER,
     shieldSkill,
     armourSkill,
+    armour,
   } = params;
 
   const sizeFactor = sizeToNumber[speciesOptions[species].size];
@@ -104,7 +106,7 @@ export function calculateEVForSkillLevel(params: {
   const shieldEncumbrance = shieldOptions[shield].encumbrance;
 
   // Calculate dodge bonus with armor penalty modifier
-  const armorPenaltyForDodge = armourER - 3;
+  const armorPenaltyForDodge = armourOptions[armour].encumbrance - 3;
   let dodgeModifier = 1;
 
   if (armorPenaltyForDodge > 0) {
@@ -131,7 +133,9 @@ export function calculateEVForSkillLevel(params: {
 
   // Armour penalty
   const armourPenalty = Math.floor(
-    ((1 / 225) * Math.pow(armourER, 2) * (90 - 2 * armourSkill)) /
+    ((1 / 225) *
+      Math.pow(armourOptions[armour].encumbrance, 2) *
+      (90 - 2 * armourSkill)) /
       (strength + 3)
   );
 

@@ -1,5 +1,4 @@
 import EVCalculator from "./components/EvCalculator";
-import AcCalculator from "./components/AcCalculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 function App() {
@@ -11,14 +10,10 @@ function App() {
           className="w-full gap-x-2"
           style={{ outline: "1px solid white", outlineOffset: "-4px" }}
         >
-          <TabsTrigger value="ev">EV Calculator</TabsTrigger>
-          <TabsTrigger value="ac">AC Calculator</TabsTrigger>
+          <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
         </TabsList>
         <TabsContent value="ev">
           <EVCalculator />
-        </TabsContent>
-        <TabsContent value="ac">
-          <AcCalculator />
         </TabsContent>
       </Tabs>
     </div>

@@ -17,6 +17,7 @@ import {
   ShieldKey,
   SpeciesKey,
 } from "@/utils/evCalculations";
+import { armourOptions, ArmourKey } from "@/utils/acCalculations";
 import {
   Select,
   SelectContent,
@@ -27,6 +28,7 @@ import {
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 import { useEvCalculatorState } from "@/hooks/useEvCalculatorState";
+import { calculateAC } from "@/utils/acCalculations";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -39,12 +41,45 @@ type DataPoint = {
   finalEV: number;
 };
 
+type ACDataPoint = {
+  armour: number;
+  ac: number;
+};
+
 const EVCalculator = () => {
   const { state, setState, resetState } = useEvCalculatorState();
   const [data, setData] = useState<DataPoint[]>([]);
+  const [acData, setAcData] = useState<ACDataPoint[]>([]);
+  const [acTicks, setAcTicks] = useState<number[]>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
 
   useEffect(() => {
+    const calcAc = () => {
+      const newData = [];
+      const acChangePoints = new Set<number>();
+
+      let lastAC = 0;
+      for (let armour = 0; armour <= 27; armour += 0.1) {
+        const currentAC = calculateAC(
+          armourOptions[state.armour].baseAC,
+          armour
+        );
+
+        if (currentAC !== lastAC && armour < 27) {
+          acChangePoints.add(armour);
+          lastAC = currentAC;
+        }
+
+        newData.push({
+          armour,
+          ac: currentAC,
+        });
+      }
+
+      setAcData(newData);
+      setAcTicks(Array.from(acChangePoints));
+    };
+
     const calculateEV = () => {
       const newData = [];
       const evChangePoints = new Set<number>();
@@ -58,7 +93,7 @@ const EVCalculator = () => {
           strength: state.strength,
           species: state.species,
           shield: state.shield,
-          armourER: state.armourER,
+          armour: state.armour,
           shieldSkill: state.shieldSkill,
           armourSkill: state.armourSkill,
         });
@@ -84,14 +119,15 @@ const EVCalculator = () => {
     };
 
     calculateEV();
+    calcAc();
   }, [
     state.dexterity,
     state.strength,
     state.species,
     state.shield,
-    state.armourER,
     state.shieldSkill,
     state.armourSkill,
+    state.armour,
   ]);
 
   return (
@@ -184,23 +220,31 @@ const EVCalculator = () => {
               </SelectContent>
             </Select>
           </label>
-          <div className="flex flex-row gap-2">
-            <label className="text-sm">
-              <AttrInput
-                label="Armour Encumbrance"
-                value={state.armourER}
-                type="number"
-                onChange={(value) =>
-                  setState((prev) => ({ ...prev, armourER: value }))
-                }
-              />
-            </label>
-          </div>
+          <label className="flex flex-row items-center gap-2 text-sm">
+            Armour:
+            <Select
+              value={state.armour}
+              onValueChange={(value) =>
+                setState((prev) => ({ ...prev, armour: value as ArmourKey }))
+              }
+            >
+              <SelectTrigger className="w-[160px] h-6">
+                <SelectValue placeholder="Armour" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(armourOptions).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </label>
         </div>
       </CardHeader>
       <CardContent>
         <div>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={350}>
             <LineChart
               data={data}
               margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
@@ -253,6 +297,54 @@ const EVCalculator = () => {
             </LineChart>
           </ResponsiveContainer>
         </div>
+        <ResponsiveContainer width="100%" height={350}>
+          <LineChart
+            data={acData}
+            margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="armour"
+              label={{
+                value: "Armour Skill",
+                position: "bottom",
+                offset: 16,
+              }}
+              tickFormatter={(value) => value.toFixed(1)}
+              ticks={acTicks}
+              interval={0}
+              tick={(props) => <CustomTick {...props} ticks={acTicks} />}
+            />
+            <YAxis allowDecimals={false} width={30} />
+            <Tooltip
+              wrapperStyle={{
+                backgroundColor: "hsl(var(--popover))",
+                borderColor: "hsl(var(--border))",
+                color: "hsl(var(--popover-foreground))",
+                borderRadius: "calc(var(--radius) - 2px)",
+              }}
+              contentStyle={{
+                backgroundColor: "hsl(var(--popover))",
+                border: "none",
+              }}
+              itemStyle={{
+                color: "hsl(var(--popover-foreground))",
+              }}
+              formatter={(value) => [`${value}`, "AC"]}
+              labelFormatter={(value) => `Armour Skill ${value.toFixed(1)}`}
+            />
+            <Legend
+              verticalAlign="bottom"
+              align="center"
+              layout="horizontal"
+              wrapperStyle={{
+                marginLeft: "-100px",
+                marginBottom: "-10px",
+              }}
+            />
+            <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
+          </LineChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );

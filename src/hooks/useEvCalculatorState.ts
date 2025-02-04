@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { SpeciesKey, ShieldKey } from "@/utils/evCalculations";
+import { ArmourKey } from "@/utils/acCalculations";
 
 const STORAGE_KEY = "evCalculator";
 
@@ -8,7 +9,7 @@ interface EvCalculatorState {
   strength: number;
   species: SpeciesKey;
   shield: ShieldKey;
-  armourER: number;
+  armour: ArmourKey;
   shieldSkill: number;
   armourSkill: number;
 }
@@ -18,7 +19,7 @@ const defaultState: EvCalculatorState = {
   strength: 10,
   species: "armataur",
   shield: "none",
-  armourER: 0,
+  armour: "robe",
   shieldSkill: 0,
   armourSkill: 0,
 };
