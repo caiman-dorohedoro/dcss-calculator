@@ -203,7 +203,7 @@ const EVCalculator = () => {
           <ResponsiveContainer width="100%" height={400}>
             <LineChart
               data={data}
-              margin={{ left: 0, right: 0, top: 10, bottom: 10 }}
+              margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
