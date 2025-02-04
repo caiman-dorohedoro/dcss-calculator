@@ -9,7 +9,7 @@ describe("EV Calculations", () => {
       strength: 10,
       species: "human",
       shield: "none",
-      armourER: 0,
+      armour: "robe",
       shieldSkill: 0,
       armourSkill: 0,
     });
@@ -25,7 +25,7 @@ describe("EV Calculations", () => {
       strength: 13,
       species: "coglin",
       shield: "none",
-      armourER: 0,
+      armour: "robe",
       shieldSkill: 0,
       armourSkill: 0,
     });
@@ -40,7 +40,7 @@ describe("EV Calculations", () => {
       strength: 10,
       species: "coglin",
       shield: "none",
-      armourER: 0,
+      armour: "robe",
       shieldSkill: 0,
       armourSkill: 0,
     });
@@ -55,7 +55,7 @@ describe("EV Calculations", () => {
       strength: 21,
       species: "formicid",
       shield: "large_shield",
-      armourER: 5,
+      armour: "acid_dragon",
       shieldSkill: 13,
       armourSkill: 8,
     });
@@ -70,7 +70,7 @@ describe("EV Calculations", () => {
       strength: 11,
       species: "coglin",
       shield: "none",
-      armourER: 5,
+      armour: "acid_dragon",
       shieldSkill: 0,
       armourSkill: 3,
     });
@@ -85,7 +85,7 @@ describe("EV Calculations", () => {
       strength: 11,
       species: "coglin",
       shield: "none",
-      armourER: 4,
+      armour: "leather_armour",
       shieldSkill: 0,
       armourSkill: 0.8,
     });
@@ -100,7 +100,7 @@ describe("EV Calculations", () => {
       strength: 27,
       species: "minotaur",
       shield: "large_shield",
-      armourER: 23,
+      armour: "golden_dragon",
       shieldSkill: 20.4,
       armourSkill: 15.2,
     });
@@ -115,7 +115,7 @@ describe("EV Calculations", () => {
       strength: 40,
       species: "oni",
       shield: "shield",
-      armourER: 0,
+      armour: "robe",
       shieldSkill: 10.3,
       armourSkill: 4.8,
     });
@@ -130,7 +130,7 @@ describe("EV Calculations", () => {
       strength: 24,
       species: "oni",
       shield: "large_shield",
-      armourER: 23,
+      armour: "golden_dragon",
       shieldSkill: 23.4,
       armourSkill: 15.9,
     });

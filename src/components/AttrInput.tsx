@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 const parseFloatInput = (value: number | string) => {
   const parsedValue = typeof value === "string" ? parseFloat(value) : value;
