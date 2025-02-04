@@ -1,4 +1,4 @@
-import EVCalculator from "./components/EvCalculator";
+import Calculator from "./components/Calculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
           <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
         </TabsList>
         <TabsContent value="ev">
-          <EVCalculator />
+          <Calculator />
         </TabsContent>
       </Tabs>
     </div>

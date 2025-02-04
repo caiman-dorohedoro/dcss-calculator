@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { SpeciesKey, ShieldKey } from "@/utils/evCalculations";
 import { ArmourKey } from "@/utils/acCalculations";
 
-const STORAGE_KEY = "evCalculator";
+const STORAGE_KEY = "calculator";
 
-interface EvCalculatorState {
+interface CalculatorState {
   dexterity: number;
   strength: number;
   species: SpeciesKey;
@@ -14,7 +14,7 @@ interface EvCalculatorState {
   armourSkill: number;
 }
 
-const defaultState: EvCalculatorState = {
+const defaultState: CalculatorState = {
   dexterity: 10,
   strength: 10,
   species: "armataur",
@@ -24,8 +24,8 @@ const defaultState: EvCalculatorState = {
   armourSkill: 0,
 };
 
-export const useEvCalculatorState = () => {
-  const [state, setState] = useState<EvCalculatorState>(() => {
+export const useCalculatorState = () => {
+  const [state, setState] = useState<CalculatorState>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : defaultState;
   });

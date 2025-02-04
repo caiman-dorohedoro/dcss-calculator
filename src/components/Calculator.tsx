@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
-import { useEvCalculatorState } from "@/hooks/useEvCalculatorState";
+import { useCalculatorState } from "@/hooks/useEvCalculatorState";
 import { calculateAC } from "@/utils/acCalculations";
 
 type DataPoint = {
@@ -46,8 +46,8 @@ type ACDataPoint = {
   ac: number;
 };
 
-const EVCalculator = () => {
-  const { state, setState, resetState } = useEvCalculatorState();
+const Calculator = () => {
+  const { state, setState, resetState } = useCalculatorState();
   const [data, setData] = useState<DataPoint[]>([]);
   const [acData, setAcData] = useState<ACDataPoint[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
@@ -350,4 +350,4 @@ const EVCalculator = () => {
   );
 };
 
-export default EVCalculator;
+export default Calculator;
