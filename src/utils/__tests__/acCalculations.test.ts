@@ -40,5 +40,17 @@ describe("AC Calculations", () => {
         armourSkill: 16.3,
       })
     ).toBe(19);
+
+    // https://cbro.berotato.org/morgue/ojifijod/morgue-ojifijod-20250201-121909.txt
+    expect(
+      mixedCalculations({
+        armour: "golden_dragon",
+        armourSkill: 27,
+        cloak: true,
+        gloves: true,
+        boots: true,
+        secondGloves: true,
+      })
+    ).toBe(35);
   });
 });

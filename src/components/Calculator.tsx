@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import {
   LineChart,
   Line,
@@ -55,12 +55,13 @@ type CalculatorProps = {
   setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
 };
 
-const checkboxKeys: Array<keyof CalculatorState> = [
-  "helmet",
-  "cloak",
-  "gloves",
-  "boots",
-  "barding",
+const checkboxKeys: Array<{ label: string; key: keyof CalculatorState }> = [
+  { label: "Helmet", key: "helmet" },
+  { label: "Cloak", key: "cloak" },
+  { label: "Gloves", key: "gloves" },
+  { label: "Boots", key: "boots" },
+  { label: "Barding", key: "barding" },
+  { label: "2nd Gloves", key: "secondGloves" },
 ];
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
@@ -83,6 +84,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           boots: state.boots,
           cloak: state.cloak,
           barding: state.barding,
+          secondGloves: state.secondGloves,
           armourSkill: armour,
         });
 
@@ -154,6 +156,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     state.boots,
     state.cloak,
     state.barding,
+    state.secondGloves,
   ]);
 
   const zeroBaseAC =
@@ -162,7 +165,8 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     !state.gloves &&
     !state.boots &&
     !state.cloak &&
-    !state.barding;
+    !state.barding &&
+    !state.secondGloves;
 
   return (
     <Card>
@@ -265,22 +269,21 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             }
           />
         </div>
-        <div className="flex flex-row gap-4 text-sm">
-          {checkboxKeys.map((key) => (
-            <label
-              htmlFor={key}
-              className="flex flex-row items-center gap-2"
-              key={key}
-            >
-              <Checkbox
-                checked={!!state[key]}
-                onCheckedChange={(checked) =>
-                  setState((prev) => ({ ...prev, [key]: !!checked }))
-                }
-                id={key}
-              />
-              {key.charAt(0).toUpperCase() + key.slice(1)}
-            </label>
+        <div className="flex flex-row gap-4 text-sm items-center">
+          {checkboxKeys.map(({ label, key }) => (
+            <Fragment key={key}>
+              <label htmlFor={key} className="flex flex-row items-center gap-2">
+                <Checkbox
+                  checked={!!state[key]}
+                  onCheckedChange={(checked) =>
+                    setState((prev) => ({ ...prev, [key]: !!checked }))
+                  }
+                  id={key}
+                />
+                {label}
+              </label>
+              {key === "boots" && <div className="h-3 w-px bg-gray-200"></div>}
+            </Fragment>
           ))}
         </div>
       </CardHeader>
@@ -339,7 +342,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer className="mt-4" width="100%" height={350}>
           <LineChart
             data={acData}
             margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
