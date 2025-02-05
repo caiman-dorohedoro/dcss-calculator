@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { SpeciesKey, ShieldKey } from "@/utils/evCalculations";
-import { ArmourKey, HeadgearKey } from "@/utils/acCalculations";
+import { ArmourKey } from "@/utils/acCalculations";
 
 const STORAGE_KEY = "calculator";
 
@@ -12,7 +12,7 @@ export interface CalculatorState {
   armour: ArmourKey;
   shieldSkill: number;
   armourSkill: number;
-  headgear?: HeadgearKey;
+  helmet?: boolean;
   gloves?: boolean;
   boots?: boolean;
   cloak?: boolean;
@@ -28,6 +28,12 @@ const defaultState: CalculatorState = {
   armour: "robe",
   shieldSkill: 0,
   armourSkill: 0,
+  helmet: false,
+  gloves: false,
+  boots: false,
+  cloak: false,
+  barding: false,
+  secondGloves: false,
 };
 
 export const useCalculatorState = () => {

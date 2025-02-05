@@ -73,7 +73,7 @@ export const calculateAC = (baseAC: number, skill: number): number => {
 
 type MixedCalculationsParams = {
   armour?: ArmourKey;
-  headgear?: HeadgearKey;
+  helmet?: boolean;
   gloves?: boolean;
   boots?: boolean;
   cloak?: boolean;
@@ -84,7 +84,7 @@ type MixedCalculationsParams = {
 
 export const mixedCalculations = ({
   armour,
-  headgear,
+  helmet,
   gloves,
   boots,
   cloak,
@@ -98,8 +98,8 @@ export const mixedCalculations = ({
     baseAC += armourOptions[armour].baseAC;
   }
 
-  if (headgear === "helmet") {
-    baseAC += headgearOptions[headgear].baseAC;
+  if (helmet) {
+    baseAC += headgearOptions.helmet.baseAC;
   }
 
   if (gloves) {

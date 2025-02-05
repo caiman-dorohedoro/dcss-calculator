@@ -1,13 +1,26 @@
+import { ArmourKey } from "@/utils/acCalculations";
 import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "acCalculator";
 
 interface AcCalculatorState {
-  baseAC: number;
+  armour: ArmourKey;
+  helmet: boolean;
+  gloves: boolean;
+  boots: boolean;
+  cloak: boolean;
+  barding: boolean;
+  secondGloves: boolean;
 }
 
 const defaultState: AcCalculatorState = {
-  baseAC: 3,
+  armour: "robe",
+  helmet: false,
+  gloves: false,
+  boots: false,
+  cloak: false,
+  barding: false,
+  secondGloves: false,
 };
 
 export const useAcCalculatorState = () => {

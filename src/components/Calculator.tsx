@@ -71,7 +71,7 @@ const Calculator = ({
       for (let armour = 0; armour <= 27; armour += 0.1) {
         const currentAC = mixedCalculations({
           armour: state.armour,
-          headgear: state.headgear,
+          helmet: state.helmet,
           gloves: state.gloves,
           boots: state.boots,
           cloak: state.cloak,
@@ -142,7 +142,7 @@ const Calculator = ({
     state.shieldSkill,
     state.armourSkill,
     state.armour,
-    state.headgear,
+    state.helmet,
     state.gloves,
     state.boots,
     state.cloak,
@@ -253,10 +253,11 @@ const Calculator = ({
         <div className="flex flex-row gap-4 text-sm">
           <label htmlFor="helmet" className="flex flex-row items-center gap-2">
             <Checkbox
+              checked={state.helmet}
               onCheckedChange={(checked) =>
                 setState((prev) => ({
                   ...prev,
-                  headgear: checked ? "helmet" : undefined,
+                  helmet: !!checked,
                 }))
               }
               id="helmet"
@@ -265,6 +266,7 @@ const Calculator = ({
           </label>
           <label htmlFor="cloak" className="flex flex-row items-center gap-2">
             <Checkbox
+              checked={state.cloak}
               onCheckedChange={(checked) =>
                 setState((prev) => ({ ...prev, cloak: !!checked }))
               }
@@ -274,6 +276,7 @@ const Calculator = ({
           </label>
           <label htmlFor="gloves" className="flex flex-row items-center gap-2">
             <Checkbox
+              checked={state.gloves}
               onCheckedChange={(checked) =>
                 setState((prev) => ({ ...prev, gloves: !!checked }))
               }
@@ -283,6 +286,7 @@ const Calculator = ({
           </label>
           <label htmlFor="boots" className="flex flex-row items-center gap-2">
             <Checkbox
+              checked={state.boots}
               onCheckedChange={(checked) =>
                 setState((prev) => ({ ...prev, boots: !!checked }))
               }
@@ -292,6 +296,7 @@ const Calculator = ({
           </label>
           <label htmlFor="barding" className="flex flex-row items-center gap-2">
             <Checkbox
+              checked={state.barding}
               onCheckedChange={(checked) =>
                 setState((prev) => ({ ...prev, barding: !!checked }))
               }

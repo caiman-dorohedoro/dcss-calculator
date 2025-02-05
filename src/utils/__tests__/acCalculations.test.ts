@@ -15,7 +15,6 @@ describe("AC Calculations", () => {
       mixedCalculations({
         armour: "plate",
         armourSkill: 27,
-        headgear: "hat",
         gloves: true,
         cloak: true,
         boots: true,
@@ -26,7 +25,6 @@ describe("AC Calculations", () => {
     expect(
       mixedCalculations({
         armour: "crystal_plate",
-        headgear: "hat",
         cloak: true,
         gloves: true,
         boots: true,
