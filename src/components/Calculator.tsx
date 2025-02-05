@@ -55,6 +55,14 @@ type CalculatorProps = {
   setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
 };
 
+const checkboxKeys: Array<keyof CalculatorState> = [
+  "helmet",
+  "cloak",
+  "gloves",
+  "boots",
+  "barding",
+];
+
 const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<DataPoint[]>([]);
   const [acData, setAcData] = useState<ACDataPoint[]>([]);
@@ -258,59 +266,22 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           />
         </div>
         <div className="flex flex-row gap-4 text-sm">
-          <label htmlFor="helmet" className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={state.helmet}
-              onCheckedChange={(checked) =>
-                setState((prev) => ({
-                  ...prev,
-                  helmet: !!checked,
-                }))
-              }
-              id="helmet"
-            />
-            Helmet
-          </label>
-          <label htmlFor="cloak" className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={state.cloak}
-              onCheckedChange={(checked) =>
-                setState((prev) => ({ ...prev, cloak: !!checked }))
-              }
-              id="cloak"
-            />
-            Cloak
-          </label>
-          <label htmlFor="gloves" className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={state.gloves}
-              onCheckedChange={(checked) =>
-                setState((prev) => ({ ...prev, gloves: !!checked }))
-              }
-              id="gloves"
-            />
-            Gloves
-          </label>
-          <label htmlFor="boots" className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={state.boots}
-              onCheckedChange={(checked) =>
-                setState((prev) => ({ ...prev, boots: !!checked }))
-              }
-              id="boots"
-            />
-            Boots
-          </label>
-          <label htmlFor="barding" className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={state.barding}
-              onCheckedChange={(checked) =>
-                setState((prev) => ({ ...prev, barding: !!checked }))
-              }
-              id="barding"
-            />
-            Barding
-          </label>
+          {checkboxKeys.map((key) => (
+            <label
+              htmlFor={key}
+              className="flex flex-row items-center gap-2"
+              key={key}
+            >
+              <Checkbox
+                checked={!!state[key]}
+                onCheckedChange={(checked) =>
+                  setState((prev) => ({ ...prev, [key]: !!checked }))
+                }
+                id={key}
+              />
+              {key.charAt(0).toUpperCase() + key.slice(1)}
+            </label>
+          ))}
         </div>
       </CardHeader>
       <CardContent>
