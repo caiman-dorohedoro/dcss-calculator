@@ -13,15 +13,10 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
   speciesOptions,
   shieldOptions,
-  calculateEVForSkillLevel,
   ShieldKey,
   SpeciesKey,
 } from "@/utils/evCalculations";
-import {
-  armourOptions,
-  ArmourKey,
-  mixedCalculations,
-} from "@/utils/acCalculations";
+import { armourOptions, ArmourKey } from "@/utils/acCalculations";
 import {
   Select,
   SelectContent,
@@ -39,22 +34,12 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
-
-type DataPoint = {
-  dodgeSkill: number;
-  baseEV: number;
-  rawDodgeBonus: number;
-  actualDodgeBonus: number;
-  dodgeModifier: number;
-  shieldPenalty: number;
-  armourPenalty: number;
-  finalEV: number;
-};
-
-type ACDataPoint = {
-  armour: number;
-  ac: number;
-};
+import {
+  calculateAcData,
+  calculateEvData,
+  calculateAcTicks,
+  calculateEvTicks,
+} from "@/utils/calculatorUtils";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -71,100 +56,19 @@ const checkboxKeys: Array<{ label: string; key: keyof CalculatorState }> = [
 ];
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
-  const [data, setData] = useState<DataPoint[]>([]);
-  const [acData, setAcData] = useState<ACDataPoint[]>([]);
+  const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
+  const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
 
   useEffect(() => {
-    const calcAc = () => {
-      const newData = [];
-      const acChangePoints = new Set<number>();
-
-      let lastAC = 0;
-      for (let armour = 0; armour <= 27; armour += 0.1) {
-        const currentAC = mixedCalculations({
-          species: state.species,
-          armour: state.armour,
-          helmet: state.helmet,
-          gloves: state.gloves,
-          boots: state.boots,
-          cloak: state.cloak,
-          barding: state.barding,
-          secondGloves: state.secondGloves,
-          armourSkill: armour,
-        });
-
-        if (currentAC !== lastAC && armour < 27) {
-          acChangePoints.add(armour);
-          lastAC = currentAC;
-        }
-
-        newData.push({
-          armour,
-          ac: currentAC,
-        });
-      }
-
-      setAcData(newData);
-      setAcTicks(Array.from(acChangePoints));
-    };
-
-    const calculateEV = () => {
-      const newData = [];
-      const evChangePoints = new Set<number>();
-
-      let lastEV = 0;
-      // Calculate for dodging skill 0 to 27
-      for (let dodge = 0; dodge <= 27; dodge += 0.1) {
-        const result = calculateEVForSkillLevel({
-          dodgeSkill: dodge,
-          dexterity: state.dexterity,
-          strength: state.strength,
-          species: state.species,
-          shield: state.shield,
-          armour: state.armour,
-          shieldSkill: state.shieldSkill,
-          armourSkill: state.armourSkill,
-        });
-
-        if (result.finalEV !== lastEV && dodge < 27) {
-          evChangePoints.add(parseFloat(dodge.toFixed(1)));
-          lastEV = result.finalEV;
-        }
-
-        newData.push({
-          dodgeSkill: parseFloat(dodge.toFixed(1)),
-          baseEV: result.baseEV,
-          rawDodgeBonus: result.rawDodgeBonus,
-          actualDodgeBonus: result.actualDodgeBonus,
-          dodgeModifier: parseFloat(result.dodgeModifier.toFixed(2)),
-          shieldPenalty: result.shieldPenalty,
-          armourPenalty: result.armourPenalty,
-          finalEV: result.finalEV,
-        });
-      }
-      setData(newData);
-      setEvTicks(Array.from(evChangePoints));
-    };
-
-    calculateEV();
-    calcAc();
-  }, [
-    state.dexterity,
-    state.strength,
-    state.species,
-    state.shield,
-    state.shieldSkill,
-    state.armourSkill,
-    state.armour,
-    state.helmet,
-    state.gloves,
-    state.boots,
-    state.cloak,
-    state.barding,
-    state.secondGloves,
-  ]);
+    const evData = calculateEvData(state);
+    setData(evData);
+    setEvTicks(calculateEvTicks(state));
+    const acData = calculateAcData(state);
+    setAcData(acData);
+    setAcTicks(calculateAcTicks(state));
+  }, [state]);
 
   const zeroBaseAC =
     state.armour === "none" &&
