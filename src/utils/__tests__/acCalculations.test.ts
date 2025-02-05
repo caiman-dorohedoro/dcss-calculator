@@ -13,6 +13,7 @@ describe("AC Calculations", () => {
     // https://crawl.akrasiac.org/rawdata/fnjp/morgue-fnjp-20250205-042438.txt
     expect(
       mixedCalculations({
+        species: "minotaur",
         armour: "plate",
         armourSkill: 27,
         gloves: true,
@@ -24,6 +25,7 @@ describe("AC Calculations", () => {
     // https://crawl.akrasiac.org/rawdata/fnjp/morgue-fnjp-20250205-042438.txt
     expect(
       mixedCalculations({
+        species: "minotaur",
         armour: "crystal_plate",
         cloak: true,
         gloves: true,
@@ -35,6 +37,7 @@ describe("AC Calculations", () => {
     // https://cbro.berotato.org/morgue/Shard1697/morgue-Shard1697-20250204-221626.txt
     expect(
       mixedCalculations({
+        species: "demonspawn",
         armour: "pearl_dragon",
         boots: true,
         armourSkill: 16.3,
@@ -44,6 +47,7 @@ describe("AC Calculations", () => {
     // https://cbro.berotato.org/morgue/ojifijod/morgue-ojifijod-20250201-121909.txt
     expect(
       mixedCalculations({
+        species: "formicid",
         armour: "golden_dragon",
         armourSkill: 27,
         cloak: true,
@@ -52,5 +56,17 @@ describe("AC Calculations", () => {
         secondGloves: true,
       })
     ).toBe(35);
+
+    // https://archive.nemelex.cards/morgue/AxeManiac/morgue-AxeManiac-20250202-074753.txt
+    expect(
+      mixedCalculations({
+        species: "armataur",
+        armour: "golden_dragon",
+        armourSkill: 27,
+        cloak: true,
+        gloves: true,
+        barding: true,
+      })
+    ).toBe(34);
   });
 });

@@ -1,3 +1,5 @@
+import { SpeciesKey } from "./evCalculations";
+
 export type ArmourKey =
   | "none"
   | "robe"
@@ -72,6 +74,7 @@ export const calculateAC = (baseAC: number, skill: number): number => {
 };
 
 type MixedCalculationsParams = {
+  species: SpeciesKey;
   armour?: ArmourKey;
   helmet?: boolean;
   gloves?: boolean;
@@ -83,6 +86,7 @@ type MixedCalculationsParams = {
 };
 
 export const mixedCalculations = ({
+  species,
   armour,
   helmet,
   gloves,
@@ -92,6 +96,7 @@ export const mixedCalculations = ({
   secondGloves,
   armourSkill,
 }: MixedCalculationsParams): number => {
+  const isDeformed = species === "armataur" || species === "naga";
   let baseAC = 0;
 
   if (armour) {
@@ -122,5 +127,8 @@ export const mixedCalculations = ({
     baseAC += miscellaneousOptions.gloves.baseAC;
   }
 
-  return calculateAC(baseAC, armourSkill);
+  return (
+    calculateAC(baseAC, armourSkill) -
+    (isDeformed && armour ? armourOptions[armour].baseAC * 0.5 : 0)
+  );
 };

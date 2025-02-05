@@ -78,6 +78,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
       let lastAC = 0;
       for (let armour = 0; armour <= 27; armour += 0.1) {
         const currentAC = mixedCalculations({
+          species: state.species,
           armour: state.armour,
           helmet: state.helmet,
           gloves: state.gloves,
