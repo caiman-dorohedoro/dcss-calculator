@@ -1,5 +1,5 @@
 import { Input } from "@/components/ui/input";
-import { cn } from "@/utils/cn";
+import { cn } from "@/lib/utils";
 
 const parseFloatInput = (value: number | string) => {
   const parsedValue = typeof value === "string" ? parseFloat(value) : value;
@@ -10,7 +10,7 @@ const parseFloatInput = (value: number | string) => {
 };
 
 const defaultWidth = "w-16";
-const skillWidth = "w-[72px]";
+const skillWidth = "w-[80px]";
 
 const AttrInput = ({
   label,

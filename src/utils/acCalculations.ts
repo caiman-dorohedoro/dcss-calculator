@@ -45,6 +45,82 @@ export const armourOptions = {
   golden_dragon: { name: "golden dragon scales", baseAC: 12, encumbrance: 23 },
 } as const;
 
+export type HeadgearKey = "helmet" | "hat";
+
+export const headgearOptions = {
+  helmet: { name: "helmet", baseAC: 1, encumbrance: 0 },
+  hat: { name: "hat", baseAC: 0, encumbrance: 0 },
+} as const;
+
+export type MiscellaneousKey =
+  | "boots"
+  | "cloak"
+  | "scarf"
+  | "gloves"
+  | "barding";
+
+export const miscellaneousOptions = {
+  boots: { name: "boots", baseAC: 1, encumbrance: 0 },
+  cloak: { name: "cloak", baseAC: 1, encumbrance: 0 },
+  scarf: { name: "scarf", baseAC: 0, encumbrance: 0 },
+  gloves: { name: "gloves", baseAC: 1, encumbrance: 0 },
+  barding: { name: "barding", baseAC: 4, encumbrance: -6 },
+} as const;
+
 export const calculateAC = (baseAC: number, skill: number): number => {
   return Math.floor(baseAC * (1 + skill / 22));
+};
+
+type MixedCalculationsParams = {
+  armour?: ArmourKey;
+  headgear?: HeadgearKey;
+  gloves?: boolean;
+  boots?: boolean;
+  cloak?: boolean;
+  barding?: boolean;
+  secondGloves?: boolean;
+  armourSkill: number;
+};
+
+export const mixedCalculations = ({
+  armour,
+  headgear,
+  gloves,
+  boots,
+  cloak,
+  barding,
+  secondGloves,
+  armourSkill,
+}: MixedCalculationsParams): number => {
+  let baseAC = 0;
+
+  if (armour) {
+    baseAC += armourOptions[armour].baseAC;
+  }
+
+  if (headgear === "helmet") {
+    baseAC += headgearOptions[headgear].baseAC;
+  }
+
+  if (gloves) {
+    baseAC += miscellaneousOptions.gloves.baseAC;
+  }
+
+  if (boots) {
+    baseAC += miscellaneousOptions.boots.baseAC;
+  }
+
+  if (cloak) {
+    baseAC += miscellaneousOptions.cloak.baseAC;
+  }
+
+  if (barding) {
+    baseAC += miscellaneousOptions.barding.baseAC;
+  }
+
+  if (secondGloves) {
+    baseAC += miscellaneousOptions.gloves.baseAC;
+  }
+
+  return calculateAC(baseAC, armourSkill);
 };

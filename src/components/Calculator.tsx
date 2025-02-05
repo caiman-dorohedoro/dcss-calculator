@@ -17,7 +17,11 @@ import {
   ShieldKey,
   SpeciesKey,
 } from "@/utils/evCalculations";
-import { armourOptions, ArmourKey } from "@/utils/acCalculations";
+import {
+  armourOptions,
+  ArmourKey,
+  mixedCalculations,
+} from "@/utils/acCalculations";
 import {
   Select,
   SelectContent,
@@ -27,8 +31,8 @@ import {
 } from "@/components/ui/select";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
-import { useCalculatorState } from "@/hooks/useEvCalculatorState";
-import { calculateAC } from "@/utils/acCalculations";
+import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { Checkbox } from "./ui/checkbox";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -46,8 +50,13 @@ type ACDataPoint = {
   ac: number;
 };
 
-const Calculator = () => {
-  const { state, setState, resetState } = useCalculatorState();
+const Calculator = ({
+  state,
+  setState,
+}: {
+  state: CalculatorState;
+  setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
+}) => {
   const [data, setData] = useState<DataPoint[]>([]);
   const [acData, setAcData] = useState<ACDataPoint[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
@@ -60,10 +69,15 @@ const Calculator = () => {
 
       let lastAC = 0;
       for (let armour = 0; armour <= 27; armour += 0.1) {
-        const currentAC = calculateAC(
-          armourOptions[state.armour].baseAC,
-          armour
-        );
+        const currentAC = mixedCalculations({
+          armour: state.armour,
+          headgear: state.headgear,
+          gloves: state.gloves,
+          boots: state.boots,
+          cloak: state.cloak,
+          barding: state.barding,
+          armourSkill: armour,
+        });
 
         if (currentAC !== lastAC && armour < 27) {
           acChangePoints.add(armour);
@@ -128,12 +142,17 @@ const Calculator = () => {
     state.shieldSkill,
     state.armourSkill,
     state.armour,
+    state.headgear,
+    state.gloves,
+    state.boots,
+    state.cloak,
+    state.barding,
   ]);
 
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex flex-row gap-4 items-center">
           <label className="flex flex-row items-center gap-2 text-sm">
             Species:
             <Select
@@ -154,52 +173,24 @@ const Calculator = () => {
               </SelectContent>
             </Select>
           </label>
-          <button
-            onClick={resetState}
-            className="text-sm text-muted-foreground hover:text-foreground"
-          >
-            Reset to Default
-          </button>
-        </div>
-        <div className="flex justify-between items-center">
-          <div className="flex flex-row gap-2">
-            <AttrInput
-              label="Str"
-              value={state.strength}
-              type="stat"
-              onChange={(value) =>
-                setState((prev) => ({ ...prev, strength: value }))
-              }
-            />
-            <AttrInput
-              label="Dex"
-              value={state.dexterity}
-              type="stat"
-              onChange={(value) =>
-                setState((prev) => ({ ...prev, dexterity: value }))
-              }
-            />
-          </div>
-        </div>
-        <div className="flex flex-row gap-2">
           <AttrInput
-            label="Shield Skill"
-            value={state.shieldSkill}
-            type="skill"
+            label="Str"
+            value={state.strength}
+            type="stat"
             onChange={(value) =>
-              setState((prev) => ({ ...prev, shieldSkill: value }))
+              setState((prev) => ({ ...prev, strength: value }))
             }
           />
           <AttrInput
-            label="Armour Skill"
-            value={state.armourSkill}
-            type="skill"
+            label="Dex"
+            value={state.dexterity}
+            type="stat"
             onChange={(value) =>
-              setState((prev) => ({ ...prev, armourSkill: value }))
+              setState((prev) => ({ ...prev, dexterity: value }))
             }
           />
         </div>
-        <div className="flex flex-row gap-4">
+        <div className="flex items-center flex-row gap-4">
           <label className="flex flex-row items-center gap-2 text-sm">
             Shield:
             <Select
@@ -220,6 +211,16 @@ const Calculator = () => {
               </SelectContent>
             </Select>
           </label>
+          <AttrInput
+            label="Shield Skill"
+            value={state.shieldSkill}
+            type="skill"
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, shieldSkill: value }))
+            }
+          />
+        </div>
+        <div className="flex flex-row gap-4">
           <label className="flex flex-row items-center gap-2 text-sm">
             Armour:
             <Select
@@ -228,7 +229,7 @@ const Calculator = () => {
                 setState((prev) => ({ ...prev, armour: value as ArmourKey }))
               }
             >
-              <SelectTrigger className="w-[160px] h-6">
+              <SelectTrigger className="min-w-[100px] gap-2 h-6">
                 <SelectValue placeholder="Armour" />
               </SelectTrigger>
               <SelectContent>
@@ -239,6 +240,64 @@ const Calculator = () => {
                 ))}
               </SelectContent>
             </Select>
+          </label>
+          <AttrInput
+            label="Armour Skill"
+            value={state.armourSkill}
+            type="skill"
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, armourSkill: value }))
+            }
+          />
+        </div>
+        <div className="flex flex-row gap-4 text-sm">
+          <label htmlFor="helmet" className="flex flex-row items-center gap-2">
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setState((prev) => ({
+                  ...prev,
+                  headgear: checked ? "helmet" : undefined,
+                }))
+              }
+              id="helmet"
+            />
+            Helmet
+          </label>
+          <label htmlFor="cloak" className="flex flex-row items-center gap-2">
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setState((prev) => ({ ...prev, cloak: !!checked }))
+              }
+              id="cloak"
+            />
+            Cloak
+          </label>
+          <label htmlFor="gloves" className="flex flex-row items-center gap-2">
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setState((prev) => ({ ...prev, gloves: !!checked }))
+              }
+              id="gloves"
+            />
+            Gloves
+          </label>
+          <label htmlFor="boots" className="flex flex-row items-center gap-2">
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setState((prev) => ({ ...prev, boots: !!checked }))
+              }
+              id="boots"
+            />
+            Boots
+          </label>
+          <label htmlFor="barding" className="flex flex-row items-center gap-2">
+            <Checkbox
+              onCheckedChange={(checked) =>
+                setState((prev) => ({ ...prev, barding: !!checked }))
+              }
+              id="barding"
+            />
+            Barding
           </label>
         </div>
       </CardHeader>
