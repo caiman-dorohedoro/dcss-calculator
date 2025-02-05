@@ -114,7 +114,7 @@ describe("EV Calculations", () => {
       dexterity: 28,
       strength: 40,
       species: "oni",
-      shield: "shield",
+      shield: "kite_shield",
       armour: "robe",
       shieldSkill: 10.3,
       armourSkill: 4.8,
