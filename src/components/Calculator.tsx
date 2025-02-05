@@ -50,13 +50,12 @@ type ACDataPoint = {
   ac: number;
 };
 
-const Calculator = ({
-  state,
-  setState,
-}: {
+type CalculatorProps = {
   state: CalculatorState;
   setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
-}) => {
+};
+
+const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<DataPoint[]>([]);
   const [acData, setAcData] = useState<ACDataPoint[]>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
