@@ -1,4 +1,5 @@
 import { ArmourKey, armourOptions } from "./acCalculations";
+import { ShieldKey, shieldOptions } from "./shCalculation";
 
 export type SpeciesKey =
   | "armataur"
@@ -61,15 +62,6 @@ export const speciesOptions: Record<SpeciesKey, { name: string; size: Size }> =
     vampire: { name: "Vampire", size: "medium" },
     vineStalker: { name: "Vine Stalker", size: "medium" },
   };
-
-export type ShieldKey = "none" | "buckler" | "kite_shield" | "large_shield";
-
-export const shieldOptions = {
-  none: { name: "none", encumbrance: 0 },
-  buckler: { name: "buckler", encumbrance: 5 },
-  kite_shield: { name: "kite shield", encumbrance: 10 },
-  large_shield: { name: "tower shield", encumbrance: 15 },
-} as const;
 
 const sizeToNumber: Record<Size, number> = {
   tiny: 2,

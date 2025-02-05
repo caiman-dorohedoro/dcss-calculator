@@ -10,12 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import {
-  speciesOptions,
-  shieldOptions,
-  ShieldKey,
-  SpeciesKey,
-} from "@/utils/evCalculations";
+import { speciesOptions, SpeciesKey } from "@/utils/evCalculations";
+import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
 import { armourOptions, ArmourKey } from "@/utils/acCalculations";
 import {
   Select,
