@@ -1,4 +1,5 @@
 export type ArmourKey =
+  | "none"
   | "robe"
   | "leather_armour"
   | "ring_mail"
@@ -20,6 +21,7 @@ export type ArmourKey =
   | "golden_dragon";
 
 export const armourOptions = {
+  none: { name: "none", baseAC: 0, encumbrance: 0 },
   robe: { name: "robe", baseAC: 2, encumbrance: 0 },
   leather_armour: { name: "leather armour", baseAC: 3, encumbrance: 4 },
   ring_mail: { name: "ring mail", baseAC: 5, encumbrance: 7 },

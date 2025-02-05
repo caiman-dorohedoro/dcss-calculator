@@ -149,6 +149,14 @@ const Calculator = ({
     state.barding,
   ]);
 
+  const zeroBaseAC =
+    state.armour === "none" &&
+    !state.helmet &&
+    !state.gloves &&
+    !state.boots &&
+    !state.cloak &&
+    !state.barding;
+
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
@@ -376,7 +384,7 @@ const Calculator = ({
               }}
               tickFormatter={(value) => value.toFixed(1)}
               ticks={acTicks}
-              interval={0}
+              interval={zeroBaseAC ? 270 : 0}
               tick={(props) => <CustomTick {...props} ticks={acTicks} />}
             />
             <YAxis allowDecimals={false} width={30} />
