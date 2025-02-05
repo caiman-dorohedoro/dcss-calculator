@@ -33,6 +33,12 @@ import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import { Checkbox } from "./ui/checkbox";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -289,106 +295,125 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={350}>
-          <LineChart
-            data={data}
-            margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="dodgeSkill"
-              label={{
-                value: "Dodging Skill",
-                position: "bottom",
-                offset: 16,
-              }}
-              tickFormatter={(value) => value.toFixed(1)}
-              ticks={evTicks}
-              interval={0}
-              tick={(props) => (
-                <CustomTick {...props} ticks={evTicks} tickLimit={12} />
-              )}
-            />
-            <YAxis allowDecimals={false} width={30} />
-            <Tooltip
-              formatter={(value) => {
-                return [`${value}`, "EV"];
-              }}
-              labelFormatter={(value) => `Dodging Skill: ${value}`}
-              wrapperStyle={{
-                backgroundColor: "hsl(var(--popover))",
-                borderColor: "hsl(var(--border))",
-                color: "hsl(var(--popover-foreground))",
-                borderRadius: "calc(var(--radius) - 2px)",
-              }}
-              contentStyle={{
-                backgroundColor: "hsl(var(--popover))",
-                border: "none",
-              }}
-              itemStyle={{
-                color: "hsl(var(--popover-foreground))",
-              }}
-            />
-            <Legend
-              verticalAlign="bottom"
-              align="center"
-              layout="horizontal"
-              wrapperStyle={{
-                marginLeft: "-100px",
-                marginBottom: "-10px",
-              }}
-            />
-            <Line type="stepAfter" dataKey="finalEV" name=" EV" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
-        <ResponsiveContainer className="mt-4" width="100%" height={350}>
-          <LineChart
-            data={acData}
-            margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="armour"
-              label={{
-                value: "Armour Skill",
-                position: "bottom",
-                offset: 16,
-              }}
-              tickFormatter={(value) => value.toFixed(1)}
-              ticks={acTicks}
-              interval={zeroBaseAC ? 270 : 0}
-              tick={(props) => <CustomTick {...props} ticks={acTicks} />}
-            />
-            <YAxis allowDecimals={false} width={30} />
-            <Tooltip
-              wrapperStyle={{
-                backgroundColor: "hsl(var(--popover))",
-                borderColor: "hsl(var(--border))",
-                color: "hsl(var(--popover-foreground))",
-                borderRadius: "calc(var(--radius) - 2px)",
-              }}
-              contentStyle={{
-                backgroundColor: "hsl(var(--popover))",
-                border: "none",
-              }}
-              itemStyle={{
-                color: "hsl(var(--popover-foreground))",
-              }}
-              formatter={(value) => [`${value}`, "AC"]}
-              labelFormatter={(value) => `Armour Skill ${value.toFixed(1)}`}
-            />
-            <Legend
-              verticalAlign="bottom"
-              align="center"
-              layout="horizontal"
-              wrapperStyle={{
-                marginLeft: "-100px",
-                marginBottom: "-10px",
-              }}
-            />
-            <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
-          </LineChart>
-        </ResponsiveContainer>
+        <Accordion type="multiple" defaultValue={["ev"]}>
+          <AccordionItem value="ev">
+            <AccordionTrigger>EV Calculator</AccordionTrigger>
+            <AccordionContent>
+              <ResponsiveContainer width="100%" height={350}>
+                <LineChart
+                  data={data}
+                  margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="dodgeSkill"
+                    label={{
+                      value: "Dodging Skill",
+                      position: "bottom",
+                      offset: 16,
+                    }}
+                    tickFormatter={(value) => value.toFixed(1)}
+                    ticks={evTicks}
+                    interval={0}
+                    tick={(props) => (
+                      <CustomTick {...props} ticks={evTicks} tickLimit={12} />
+                    )}
+                  />
+                  <YAxis allowDecimals={false} width={30} />
+                  <Tooltip
+                    formatter={(value) => {
+                      return [`${value}`, "EV"];
+                    }}
+                    labelFormatter={(value) => `Dodging Skill: ${value}`}
+                    wrapperStyle={{
+                      backgroundColor: "hsl(var(--popover))",
+                      borderColor: "hsl(var(--border))",
+                      color: "hsl(var(--popover-foreground))",
+                      borderRadius: "calc(var(--radius) - 2px)",
+                    }}
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--popover))",
+                      border: "none",
+                    }}
+                    itemStyle={{
+                      color: "hsl(var(--popover-foreground))",
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    align="center"
+                    layout="horizontal"
+                    wrapperStyle={{
+                      marginLeft: "-100px",
+                      marginBottom: "-10px",
+                    }}
+                  />
+                  <Line
+                    type="stepAfter"
+                    dataKey="finalEV"
+                    name=" EV"
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </AccordionContent>
+          </AccordionItem>
+          <AccordionItem value="ac">
+            <AccordionTrigger>AC Calculator</AccordionTrigger>
+            <AccordionContent>
+              <ResponsiveContainer className="mt-4" width="100%" height={350}>
+                <LineChart
+                  data={acData}
+                  margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="armour"
+                    label={{
+                      value: "Armour Skill",
+                      position: "bottom",
+                      offset: 16,
+                    }}
+                    tickFormatter={(value) => value.toFixed(1)}
+                    ticks={acTicks}
+                    interval={zeroBaseAC ? 270 : 0}
+                    tick={(props) => <CustomTick {...props} ticks={acTicks} />}
+                  />
+                  <YAxis allowDecimals={false} width={30} />
+                  <Tooltip
+                    wrapperStyle={{
+                      backgroundColor: "hsl(var(--popover))",
+                      borderColor: "hsl(var(--border))",
+                      color: "hsl(var(--popover-foreground))",
+                      borderRadius: "calc(var(--radius) - 2px)",
+                    }}
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--popover))",
+                      border: "none",
+                    }}
+                    itemStyle={{
+                      color: "hsl(var(--popover-foreground))",
+                    }}
+                    formatter={(value) => [`${value}`, "AC"]}
+                    labelFormatter={(value) =>
+                      `Armour Skill ${value.toFixed(1)}`
+                    }
+                  />
+                  <Legend
+                    verticalAlign="bottom"
+                    align="center"
+                    layout="horizontal"
+                    wrapperStyle={{
+                      marginLeft: "-100px",
+                      marginBottom: "-10px",
+                    }}
+                  />
+                  <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </CardContent>
     </Card>
   );
