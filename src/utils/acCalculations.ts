@@ -45,8 +45,6 @@ export const armourOptions = {
   golden_dragon: { name: "golden dragon scales", baseAC: 12, encumbrance: 23 },
 } as const;
 
-export type HeadgearKey = "helmet" | "hat";
-
 export const headgearOptions = {
   helmet: { name: "helmet", baseAC: 1, encumbrance: 0 },
   hat: { name: "hat", baseAC: 0, encumbrance: 0 },
