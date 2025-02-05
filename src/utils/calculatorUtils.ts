@@ -1,6 +1,7 @@
 import { calculateEVForSkillLevel } from "@/utils/evCalculations";
 import { mixedCalculations } from "@/utils/acCalculations";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { calculateSH } from "./shCalculation";
 
 type DataPoint = {
   dodgeSkill: number;
@@ -97,4 +98,42 @@ export const calculateEvTicks = (state: CalculatorState): number[] => {
   }
 
   return Array.from(evChangePoints);
+};
+
+export type SHDataPoint = {
+  shield: number;
+  sh: number;
+};
+
+export const calculateSHData = (state: CalculatorState): SHDataPoint[] => {
+  const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
+    (_, index) => {
+      const shield = index / 10;
+      return {
+        shield,
+        sh: calculateSH({
+          shield: state.shield,
+          shieldSkill: shield,
+          dexterity: state.dexterity,
+        }),
+      };
+    }
+  );
+
+  return result;
+};
+
+export const calculateShTicks = (state: CalculatorState): number[] => {
+  const shData = calculateSHData(state);
+  const shChangePoints = new Set<number>();
+
+  let lastSH = 0;
+  for (const dataPoint of shData) {
+    if (dataPoint.sh !== lastSH && dataPoint.shield < 27) {
+      shChangePoints.add(dataPoint.shield);
+      lastSH = dataPoint.sh;
+    }
+  }
+
+  return Array.from(shChangePoints);
 };
