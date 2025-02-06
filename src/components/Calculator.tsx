@@ -338,7 +338,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     }}
                     tickFormatter={(value) => value.toFixed(1)}
                     ticks={shTicks}
-                    interval={0}
+                    interval={state.shield === "none" ? 270 : 0}
                     tick={(props) => <CustomTick {...props} ticks={shTicks} />}
                   />
                   <YAxis allowDecimals={false} width={30} />

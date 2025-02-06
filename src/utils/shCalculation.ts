@@ -16,6 +16,10 @@ export const calculateSH = (params: SHCalculationParams) => {
   const { shield, shieldSkill, dexterity } = params;
   const baseSH = shieldOptions[shield].baseSH;
 
+  if (shield === "none") {
+    return 0;
+  }
+
   if (dexterity === 0) {
     return 0;
   }
