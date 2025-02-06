@@ -85,17 +85,40 @@ type RenderDotParams = {
   payload: ChartPayload;
 };
 
+const baseLeftOffset = 30;
+const minOffset = 10;
+const widthPerDigit = 8.3;
+
 const renderDot = (skillKey: keyof CalculatorState, currentSkill: number) => {
   const dotRenderer: LineDot = (params: RenderDotParams) => {
-    const { cx, cy, payload } = params;
+    const { cx, cy, payload, value } = params;
 
     const r = 2;
     const fillColor = "#fff";
 
     if (payload[skillKey] === currentSkill) {
+      const textWidth = value.toString().length * widthPerDigit;
+
+      let textCx = cx;
+
+      if (cx <= baseLeftOffset + minOffset + textWidth / 2) {
+        textCx += textWidth / 2 + minOffset - (cx - baseLeftOffset);
+      }
+
+      const textCy = cy + 15;
+
       return (
         <g key={params.key + params.name}>
           <circle cx={cx} cy={cy} r={r} fill={fillColor} stroke="white" />
+          <text
+            x={textCx}
+            y={textCy}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fill="white"
+          >
+            {value}
+          </text>
         </g>
       );
     }
