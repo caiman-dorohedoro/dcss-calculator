@@ -124,15 +124,14 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   const renderEvDot: LineDot = (params: RenderEvDotParams) => {
     const { cx, cy, payload } = params;
 
+    const r = 2;
+    const fillColor = "#fff";
+
     if (payload.dodgeSkill === state.dodgingSkill) {
       return (
-        <circle
-          key={params.key + params.name}
-          cx={cx}
-          cy={cy}
-          r={5}
-          fill="red"
-        />
+        <g key={params.key + params.name}>
+          <circle cx={cx} cy={cy} r={r} fill={fillColor} stroke="white" />
+        </g>
       );
     }
     return <g key={params.key + params.name} />;
