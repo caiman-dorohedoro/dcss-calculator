@@ -39,6 +39,7 @@ import {
   calculateShTicks,
 } from "@/utils/calculatorUtils";
 import renderDot from "./chart/SkillDotRenderer";
+import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -59,10 +60,6 @@ const skillKeys: Array<keyof CalculatorState> = [
   "shieldSkill",
   "dodgingSkill",
 ];
-
-const capitalizeFirstLetter = (string: string) => {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-};
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
