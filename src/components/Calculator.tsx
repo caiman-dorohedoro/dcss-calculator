@@ -85,9 +85,12 @@ type RenderDotParams = {
   payload: ChartPayload;
 };
 
-const baseLeftOffset = 30;
+const baseLeftPadding = 30;
 const baseTopOffset = 310;
+const baseLeftOffset = 612;
+
 const minLeftOffset = 7;
+const minRightOffset = 7;
 const minBottomOffset = 15;
 const widthPerDigit = 8.3;
 const heightDigit = 14;
@@ -105,8 +108,10 @@ const renderDot = (skillKey: keyof CalculatorState, currentSkill: number) => {
       let textCx = cx;
       let textCy = cy;
 
-      if (cx <= baseLeftOffset + minLeftOffset + textWidth / 2) {
-        textCx += textWidth / 2 + minLeftOffset - (cx - baseLeftOffset);
+      if (cx <= baseLeftPadding + minLeftOffset + textWidth / 2) {
+        textCx += textWidth / 2 + minLeftOffset - (cx - baseLeftPadding);
+      } else if (cx >= baseLeftOffset - minRightOffset - textWidth / 2) {
+        textCx += -textWidth / 2 - minRightOffset - (cx - baseLeftOffset);
       }
 
       if (cy >= baseTopOffset - minBottomOffset - heightDigit) {
@@ -433,7 +438,9 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     }}
                     tickFormatter={(value) => value.toFixed(1)}
                     ticks={shTicks}
-                    interval={state.shield === "none" ? 270 : 0}
+                    interval={
+                      state.shield === "none" || state.dexterity === 0 ? 270 : 0
+                    }
                     tick={(props) => <CustomTick {...props} ticks={shTicks} />}
                   />
                   <YAxis
