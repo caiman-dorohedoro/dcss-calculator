@@ -10,9 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { speciesOptions, SpeciesKey } from "@/utils/evCalculations";
-import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
-import { armourOptions, ArmourKey } from "@/utils/acCalculations";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -20,16 +18,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AttrInput from "@/components/AttrInput";
-import CustomTick from "@/components/chart/CustomTick";
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
-import { Checkbox } from "./ui/checkbox";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "./ui/accordion";
+} from "@/components/ui/accordion";
+import { speciesOptions, SpeciesKey } from "@/utils/evCalculations";
+import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
+import { armourOptions, ArmourKey } from "@/utils/acCalculations";
+import AttrInput from "@/components/AttrInput";
+import CustomTick from "@/components/chart/CustomTick";
+import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import {
   calculateAcData,
   calculateEvData,
@@ -38,7 +38,7 @@ import {
   calculateSHData,
   calculateShTicks,
 } from "@/utils/calculatorUtils";
-import renderDot from "./chart/SkillDotRenderer";
+import renderDot from "@/components/chart/SkillDotRenderer";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 
 type CalculatorProps = {
