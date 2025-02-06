@@ -38,6 +38,7 @@ import {
   calculateSHData,
   calculateShTicks,
 } from "@/utils/calculatorUtils";
+import { LineDot } from "recharts/types/cartesian/Line";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -61,6 +62,34 @@ const skillKeys: Array<keyof CalculatorState> = [
 
 const capitalizeFirstLetter = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
+type RenderEvDotParams = {
+  key: string;
+  r: number;
+  name: string;
+  stroke: string;
+  strokeWidth: number;
+  fill: string;
+  width: number;
+  height: number;
+  value: number;
+  dataKey: string;
+  cx: number;
+  cy: number;
+  index: number;
+  payload: PayloadData;
+};
+
+type PayloadData = {
+  dodgeSkill: number;
+  baseEV: number;
+  rawDodgeBonus: number;
+  actualDodgeBonus: number;
+  dodgeModifier: number;
+  shieldPenalty: number;
+  armourPenalty: number;
+  finalEV: number;
 };
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
@@ -91,6 +120,23 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     !state.cloak &&
     !state.barding &&
     !state.secondGloves;
+
+  const renderEvDot: LineDot = (params: RenderEvDotParams) => {
+    const { cx, cy, payload } = params;
+
+    if (payload.dodgeSkill === state.dodgingSkill) {
+      return (
+        <circle
+          key={params.key + params.name}
+          cx={cx}
+          cy={cy}
+          r={5}
+          fill="red"
+        />
+      );
+    }
+    return <g key={params.key + params.name} />;
+  };
 
   return (
     <Card>
@@ -269,7 +315,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     type="stepAfter"
                     dataKey="finalEV"
                     name=" EV"
-                    dot={false}
+                    dot={renderEvDot}
                   />
                 </LineChart>
               </ResponsiveContainer>
