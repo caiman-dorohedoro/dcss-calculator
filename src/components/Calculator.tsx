@@ -315,6 +315,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     dataKey="finalEV"
                     name=" EV"
                     dot={renderEvDot}
+                    isAnimationActive={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
