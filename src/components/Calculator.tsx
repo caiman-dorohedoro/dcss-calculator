@@ -86,8 +86,11 @@ type RenderDotParams = {
 };
 
 const baseLeftOffset = 30;
-const minOffset = 10;
+const baseTopOffset = 310;
+const minLeftOffset = 7;
+const minBottomOffset = 15;
 const widthPerDigit = 8.3;
+const heightDigit = 14;
 
 const renderDot = (skillKey: keyof CalculatorState, currentSkill: number) => {
   const dotRenderer: LineDot = (params: RenderDotParams) => {
@@ -100,12 +103,17 @@ const renderDot = (skillKey: keyof CalculatorState, currentSkill: number) => {
       const textWidth = value.toString().length * widthPerDigit;
 
       let textCx = cx;
+      let textCy = cy;
 
-      if (cx <= baseLeftOffset + minOffset + textWidth / 2) {
-        textCx += textWidth / 2 + minOffset - (cx - baseLeftOffset);
+      if (cx <= baseLeftOffset + minLeftOffset + textWidth / 2) {
+        textCx += textWidth / 2 + minLeftOffset - (cx - baseLeftOffset);
       }
 
-      const textCy = cy + 15;
+      if (cy >= baseTopOffset - minBottomOffset - heightDigit) {
+        textCy += -heightDigit - minBottomOffset - (cy - baseTopOffset);
+      } else {
+        textCy += heightDigit;
+      }
 
       return (
         <g key={params.key + params.name}>
