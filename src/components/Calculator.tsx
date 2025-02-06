@@ -53,6 +53,16 @@ const checkboxKeys: Array<{ label: string; key: keyof CalculatorState }> = [
   { label: "2nd Gloves", key: "secondGloves" },
 ];
 
+const skillKeys: Array<keyof CalculatorState> = [
+  "armourSkill",
+  "shieldSkill",
+  "dodgingSkill",
+];
+
+const capitalizeFirstLetter = (string: string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
   const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
@@ -123,6 +133,19 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             }
           />
         </div>
+        <div className="flex flex-row items-center gap-2">
+          {skillKeys.map((key) => (
+            <AttrInput
+              key={key}
+              label={capitalizeFirstLetter(key.replace("Skill", " Skill"))}
+              value={typeof state[key] === "number" ? state[key] : 0}
+              type="skill"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, [key]: value }))
+              }
+            />
+          ))}
+        </div>
         <div className="flex items-center flex-row gap-4">
           <label className="flex flex-row items-center gap-2 text-sm">
             Armour:
@@ -164,24 +187,6 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
               </SelectContent>
             </Select>
           </label>
-        </div>
-        <div className="flex flex-row gap-4">
-          <AttrInput
-            label="Armour Skill"
-            value={state.armourSkill}
-            type="skill"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, armourSkill: value }))
-            }
-          />
-          <AttrInput
-            label="Shield Skill"
-            value={state.shieldSkill}
-            type="skill"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, shieldSkill: value }))
-            }
-          />
         </div>
         <div className="flex flex-row gap-4 text-sm items-center">
           {checkboxKeys.map(({ label, key }) => (

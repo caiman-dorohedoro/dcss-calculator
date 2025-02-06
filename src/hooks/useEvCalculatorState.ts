@@ -13,6 +13,7 @@ export interface CalculatorState {
   armour: ArmourKey;
   shieldSkill: number;
   armourSkill: number;
+  dodgingSkill: number;
   helmet?: boolean;
   gloves?: boolean;
   boots?: boolean;
@@ -29,6 +30,7 @@ const defaultState: CalculatorState = {
   armour: "robe",
   shieldSkill: 0,
   armourSkill: 0,
+  dodgingSkill: 0,
   helmet: false,
   gloves: false,
   boots: false,
