@@ -4,7 +4,7 @@ import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import { calculateSH } from "./shCalculation";
 
 type DataPoint = {
-  dodgeSkill: number;
+  dodgingSkill: number;
   baseEV: number;
   rawDodgeBonus: number;
   actualDodgeBonus: number;
@@ -47,9 +47,9 @@ export const calculateAcData = (state: CalculatorState): ACDataPoint[] => {
 export const calculateEvData = (state: CalculatorState): DataPoint[] => {
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
-      const dodge = index / 10;
+      const dodgingSkill = index / 10;
       const calcResult = calculateEVForSkillLevel({
-        dodgeSkill: dodge,
+        dodgingSkill,
         dexterity: state.dexterity,
         strength: state.strength,
         species: state.species,
@@ -60,7 +60,7 @@ export const calculateEvData = (state: CalculatorState): DataPoint[] => {
       });
 
       return {
-        dodgeSkill: parseFloat(dodge.toFixed(1)),
+        dodgingSkill: parseFloat(dodgingSkill.toFixed(1)),
         ...calcResult,
         dodgeModifier: parseFloat(calcResult.dodgeModifier.toFixed(2)),
       };
@@ -91,8 +91,8 @@ export const calculateEvTicks = (state: CalculatorState): number[] => {
 
   let lastEV = 0;
   for (const dataPoint of evData) {
-    if (dataPoint.finalEV !== lastEV && dataPoint.dodgeSkill < 27) {
-      evChangePoints.add(dataPoint.dodgeSkill);
+    if (dataPoint.finalEV !== lastEV && dataPoint.dodgingSkill < 27) {
+      evChangePoints.add(dataPoint.dodgingSkill);
       lastEV = dataPoint.finalEV;
     }
   }

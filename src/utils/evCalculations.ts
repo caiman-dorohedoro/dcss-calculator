@@ -73,7 +73,7 @@ const sizeToNumber: Record<Size, number> = {
 };
 
 export function calculateEVForSkillLevel(params: {
-  dodgeSkill: number;
+  dodgingSkill: number;
   dexterity: number;
   strength: number;
   species: SpeciesKey;
@@ -83,7 +83,7 @@ export function calculateEVForSkillLevel(params: {
   armourSkill: number;
 }) {
   const {
-    dodgeSkill,
+    dodgingSkill,
     dexterity,
     strength,
     species,
@@ -110,7 +110,7 @@ export function calculateEVForSkillLevel(params: {
   }
 
   const rawDodgeBonus = Math.floor(
-    (8 + dodgeSkill * dexterity * 0.8) / (20 - sizeFactor)
+    (8 + dodgingSkill * dexterity * 0.8) / (20 - sizeFactor)
   );
   const modifiedDodgeBonus = rawDodgeBonus * dodgeModifier;
   const actualDodgeBonus = Math.floor(modifiedDodgeBonus);

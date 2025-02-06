@@ -64,7 +64,11 @@ const capitalizeFirstLetter = (string: string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 };
 
-type RenderEvDotParams = {
+type ChartPayload = {
+  [key: string]: number;
+};
+
+type RenderDotParams = {
   key: string;
   r: number;
   name: string;
@@ -78,18 +82,26 @@ type RenderEvDotParams = {
   cx: number;
   cy: number;
   index: number;
-  payload: PayloadData;
+  payload: ChartPayload;
 };
 
-type PayloadData = {
-  dodgeSkill: number;
-  baseEV: number;
-  rawDodgeBonus: number;
-  actualDodgeBonus: number;
-  dodgeModifier: number;
-  shieldPenalty: number;
-  armourPenalty: number;
-  finalEV: number;
+const renderDot = (skillKey: keyof CalculatorState, currentSkill: number) => {
+  const dotRenderer: LineDot = (params: RenderDotParams) => {
+    const { cx, cy, payload } = params;
+
+    const r = 2;
+    const fillColor = "#fff";
+
+    if (payload[skillKey] === currentSkill) {
+      return (
+        <g key={params.key + params.name}>
+          <circle cx={cx} cy={cy} r={r} fill={fillColor} stroke="white" />
+        </g>
+      );
+    }
+    return <g key={params.key + params.name} />;
+  };
+  return dotRenderer;
 };
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
@@ -120,22 +132,6 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     !state.cloak &&
     !state.barding &&
     !state.secondGloves;
-
-  const renderEvDot: LineDot = (params: RenderEvDotParams) => {
-    const { cx, cy, payload } = params;
-
-    const r = 2;
-    const fillColor = "#fff";
-
-    if (payload.dodgeSkill === state.dodgingSkill) {
-      return (
-        <g key={params.key + params.name}>
-          <circle cx={cx} cy={cy} r={r} fill={fillColor} stroke="white" />
-        </g>
-      );
-    }
-    return <g key={params.key + params.name} />;
-  };
 
   return (
     <Card>
@@ -263,7 +259,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis
-                    dataKey="dodgeSkill"
+                    dataKey="dodgingSkill"
                     label={{
                       value: "Dodging Skill",
                       position: "bottom",
@@ -314,7 +310,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     type="stepAfter"
                     dataKey="finalEV"
                     name=" EV"
-                    dot={renderEvDot}
+                    dot={renderDot("dodgingSkill", state.dodgingSkill)}
                     isAnimationActive={false}
                   />
                 </LineChart>
@@ -376,7 +372,13 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       marginBottom: "-10px",
                     }}
                   />
-                  <Line type="stepAfter" dataKey="ac" name="AC" dot={false} />
+                  <Line
+                    type="stepAfter"
+                    dataKey="ac"
+                    name="AC"
+                    dot={renderDot("armour", state.armourSkill)}
+                    isAnimationActive={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </AccordionContent>
@@ -436,7 +438,13 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       marginBottom: "-10px",
                     }}
                   />
-                  <Line type="stepAfter" dataKey="sh" name="SH" dot={false} />
+                  <Line
+                    type="stepAfter"
+                    dataKey="sh"
+                    name="SH"
+                    dot={renderDot("shield", state.shieldSkill)}
+                    isAnimationActive={false}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </AccordionContent>
