@@ -218,6 +218,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       value: "Dodging Skill",
                       position: "bottom",
                       offset: 16,
+                      style: { fill: "#eee" },
                     }}
                     tickFormatter={(value) => value.toFixed(1)}
                     ticks={evTicks}
@@ -226,7 +227,11 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       <CustomTick {...props} ticks={evTicks} tickLimit={12} />
                     )}
                   />
-                  <YAxis allowDecimals={false} width={30} />
+                  <YAxis
+                    allowDecimals={false}
+                    width={30}
+                    tick={{ fill: "#eee" }}
+                  />
                   <Tooltip
                     formatter={(value) => {
                       return [`${value}`, "EV"];
@@ -280,13 +285,18 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       value: "Armour Skill",
                       position: "bottom",
                       offset: 16,
+                      style: { fill: "#eee" },
                     }}
                     tickFormatter={(value) => value.toFixed(1)}
                     ticks={acTicks}
                     interval={zeroBaseAC ? 270 : 0}
                     tick={(props) => <CustomTick {...props} ticks={acTicks} />}
                   />
-                  <YAxis allowDecimals={false} width={30} />
+                  <YAxis
+                    allowDecimals={false}
+                    width={30}
+                    tick={{ fill: "#eee" }}
+                  />
                   <Tooltip
                     wrapperStyle={{
                       backgroundColor: "hsl(var(--popover))",
@@ -335,13 +345,18 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       value: "Shield Skill",
                       position: "bottom",
                       offset: 16,
+                      style: { fill: "#eee" },
                     }}
                     tickFormatter={(value) => value.toFixed(1)}
                     ticks={shTicks}
                     interval={state.shield === "none" ? 270 : 0}
                     tick={(props) => <CustomTick {...props} ticks={shTicks} />}
                   />
-                  <YAxis allowDecimals={false} width={30} />
+                  <YAxis
+                    allowDecimals={false}
+                    width={30}
+                    tick={{ fill: "#eee" }}
+                  />
                   <Tooltip
                     wrapperStyle={{
                       backgroundColor: "hsl(var(--popover))",

@@ -37,7 +37,7 @@ const CustomTick = ({
         textAnchor={textAnchor}
         transform={`rotate(${rotation})`}
         fontSize={fontSize}
-        fill="#666"
+        fill="#eee"
       >
         {payload.value.toFixed(1)}
       </text>
