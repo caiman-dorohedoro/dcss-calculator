@@ -125,36 +125,6 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
         </div>
         <div className="flex items-center flex-row gap-4">
           <label className="flex flex-row items-center gap-2 text-sm">
-            Shield:
-            <Select
-              value={state.shield}
-              onValueChange={(value) =>
-                setState((prev) => ({ ...prev, shield: value as ShieldKey }))
-              }
-            >
-              <SelectTrigger className="w-[160px] h-6">
-                <SelectValue placeholder="Shield" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(shieldOptions).map(([key, value]) => (
-                  <SelectItem key={key} value={key}>
-                    {value.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </label>
-          <AttrInput
-            label="Shield Skill"
-            value={state.shieldSkill}
-            type="skill"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, shieldSkill: value }))
-            }
-          />
-        </div>
-        <div className="flex flex-row gap-4">
-          <label className="flex flex-row items-center gap-2 text-sm">
             Armour:
             <Select
               value={state.armour}
@@ -174,12 +144,42 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
               </SelectContent>
             </Select>
           </label>
+          <label className="flex flex-row items-center gap-2 text-sm">
+            Shield:
+            <Select
+              value={state.shield}
+              onValueChange={(value) =>
+                setState((prev) => ({ ...prev, shield: value as ShieldKey }))
+              }
+            >
+              <SelectTrigger className="w-[160px] h-6">
+                <SelectValue placeholder="Shield" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(shieldOptions).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </label>
+        </div>
+        <div className="flex flex-row gap-4">
           <AttrInput
             label="Armour Skill"
             value={state.armourSkill}
             type="skill"
             onChange={(value) =>
               setState((prev) => ({ ...prev, armourSkill: value }))
+            }
+          />
+          <AttrInput
+            label="Shield Skill"
+            value={state.shieldSkill}
+            type="skill"
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, shieldSkill: value }))
             }
           />
         </div>
