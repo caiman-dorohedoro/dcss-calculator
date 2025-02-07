@@ -26,9 +26,10 @@ function calculateSpellPenalty({
     const baseEvPenalty = armourEvPenalty;
 
     let penalty = Math.floor(
-      (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
-        (5 * (strength + 3)) /
-        450
+      Math.floor(
+        (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
+          (5 * (strength + 3))
+      ) / 450
     );
 
     penalty *= 19;
@@ -41,13 +42,14 @@ function calculateSpellPenalty({
     const baseShieldPenalty = shieldEvPenalty;
 
     let penalty = Math.floor(
-      (2 *
-        baseShieldPenalty *
-        baseShieldPenalty *
-        (270 - shieldSkill * 10) *
-        SCALE) /
-        (25 + 5 * strength) /
-        270
+      Math.floor(
+        (2 *
+          baseShieldPenalty *
+          baseShieldPenalty *
+          (270 - shieldSkill * 10) *
+          SCALE) /
+          (25 + 5 * strength)
+      ) / 270
     );
 
     penalty *= 19;
@@ -57,7 +59,8 @@ function calculateSpellPenalty({
 
   // 최종 패널티 계산
   const totalPenalty = calculateArmourPenalty() + calculateShieldPenalty();
-  return Math.max(totalPenalty, 0) / SCALE;
+
+  return Math.floor(Math.max(totalPenalty, 0) / SCALE);
 }
 
 function tetrahedralNumber(n: number) {
@@ -340,7 +343,7 @@ describe("Spell Calculations", () => {
   });
 
   // https://crawl.akrasiac.org/rawdata/hammy3456/morgue-hammy3456-20250206-022444.txt
-  test("kite shield, 5 level hex/air silence", () => {
+  test("tower shield, 5 level hex/air spell (silence)", () => {
     const params = {
       playerStrength: 12,
       playerSpellcasting: 14,
@@ -357,5 +360,123 @@ describe("Spell Calculations", () => {
     const failureRate = rawSpellFail(params);
 
     expect(failureRate).toBe(2);
+  });
+
+  test("tower shield, 6 level conj/erth spell (Iron Shot) - same case as above", () => {
+    const params = {
+      playerStrength: 12,
+      playerSpellcasting: 14,
+      intelligence: 25,
+      conjurationSkill: 14,
+      secondSkill: 13,
+      spellDifficulty: 6 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 0 },
+      equippedShield: { encumbrance: 15 },
+      armourSkill: 0,
+      shieldSkill: 24.6,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(1);
+  });
+
+  test("tower shield, 2 level conj/air spell (static discharge) - same case as above", () => {
+    const params = {
+      playerStrength: 12,
+      playerSpellcasting: 14,
+      intelligence: 25,
+      conjurationSkill: 14,
+      secondSkill: 9,
+      spellDifficulty: 2 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 0 },
+      equippedShield: { encumbrance: 15 },
+      armourSkill: 0,
+      shieldSkill: 24.6,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(1);
+  });
+
+  // https://cbro.berotato.org/morgue/mroovka/morgue-mroovka-20250207-023701.txt
+  test("tower shield, 8 level conj/alchemy spell (Fulsome Fusillade)", () => {
+    const params = {
+      playerStrength: 29,
+      playerSpellcasting: 16,
+      intelligence: 43,
+      conjurationSkill: 20,
+      secondSkill: 19,
+      spellDifficulty: 8 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 0 },
+      equippedShield: { encumbrance: 15 },
+      armourSkill: 0,
+      shieldSkill: 15.2,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(3);
+  });
+
+  // https://underhound.eu/crawl/morgue/SayItsName/morgue-SayItsName-20250205-225207.txt
+  test("buckler, 8 level conj/earth spell (Lehudib's Crystal Spear)", () => {
+    const params = {
+      playerStrength: 8,
+      playerSpellcasting: 23.3,
+      intelligence: 34,
+      conjurationSkill: 14.3,
+      secondSkill: 25.8,
+      spellDifficulty: 8 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 0 },
+      equippedShield: { encumbrance: 5 },
+      armourSkill: 0,
+      shieldSkill: 19,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(1);
+  });
+
+  // https://crawl.dcss.io/crawl/morgue/AintCerebovvered/morgue-AintCerebovvered-20250204-194125.txt
+  test("tower shield, 9 level conj/air spell (Chaing Lightning)", () => {
+    const params = {
+      playerStrength: 18,
+      playerSpellcasting: 27,
+      intelligence: 10,
+      conjurationSkill: 26.5,
+      secondSkill: 27,
+      spellDifficulty: 9 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 0 },
+      equippedShield: { encumbrance: 15 },
+      armourSkill: 0,
+      shieldSkill: 27,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(4);
+  });
+
+  // https://crawl.dcss.io/crawl/morgue/slifty/morgue-slifty-20250201-052559.txt
+  test("kite shield, leather armour, 4 level tloc/air spell (Vhi's Electric Charge)", () => {
+    const params = {
+      playerStrength: 14,
+      playerSpellcasting: 10,
+      intelligence: 14,
+      conjurationSkill: 10,
+      secondSkill: 5,
+      spellDifficulty: 4 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 4 },
+      equippedShield: { encumbrance: 10 },
+      armourSkill: 24,
+      shieldSkill: 21,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(7);
   });
 });
