@@ -102,7 +102,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                 setState((prev) => ({ ...prev, species: value as SpeciesKey }))
               }
             >
-              <SelectTrigger className="w-[200px] h-6">
+              <SelectTrigger className="w-[180px] h-6">
                 <SelectValue placeholder="Species" />
               </SelectTrigger>
               <SelectContent>
@@ -128,6 +128,14 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             type="stat"
             onChange={(value) =>
               setState((prev) => ({ ...prev, dexterity: value }))
+            }
+          />
+          <AttrInput
+            label="Int"
+            value={state.dexterity}
+            type="stat"
+            onChange={(value) =>
+              setState((prev) => ({ ...prev, intelligence: value }))
             }
           />
         </div>

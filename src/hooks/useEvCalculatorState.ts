@@ -8,6 +8,7 @@ const STORAGE_KEY = "calculator";
 export interface CalculatorState {
   dexterity: number;
   strength: number;
+  intelligence: number;
   species: SpeciesKey;
   shield: ShieldKey;
   armour: ArmourKey;
@@ -25,6 +26,7 @@ export interface CalculatorState {
 const defaultState: CalculatorState = {
   dexterity: 10,
   strength: 10,
+  intelligence: 10,
   species: "armataur",
   shield: "none",
   armour: "robe",
