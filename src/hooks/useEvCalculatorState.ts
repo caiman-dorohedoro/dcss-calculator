@@ -89,30 +89,29 @@ export const isCalculatorStateKey = (
   return Object.keys(defaultState).includes(key);
 };
 
+const validateState = (state: unknown): state is CalculatorState => {
+  if (typeof state !== "object" || state === null) return false;
+  const defaultKeys = Object.keys(defaultState);
+  const stateKeys = Object.keys(state);
+
+  if (!defaultKeys.every((key) => stateKeys.includes(key))) {
+    return false;
+  }
+
+  if ("schoolSkills" in state) {
+    const schoolKeys = Object.keys(defaultState.schoolSkills!);
+    return schoolKeys.every(
+      (key) =>
+        key in (state as { schoolSkills: Record<string, unknown> }).schoolSkills
+    );
+  }
+
+  return true;
+};
+
 export const useCalculatorState = () => {
   const [state, setState] = useState<CalculatorState>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-
-    const validateState = (state: unknown): state is CalculatorState => {
-      if (typeof state !== "object" || state === null) return false;
-      const defaultKeys = Object.keys(defaultState);
-      const stateKeys = Object.keys(state);
-
-      if (!defaultKeys.every((key) => stateKeys.includes(key))) {
-        return false;
-      }
-
-      if ("schoolSkills" in state) {
-        const schoolKeys = Object.keys(defaultState.schoolSkills!);
-        return schoolKeys.every(
-          (key) =>
-            key in
-            (state as { schoolSkills: Record<string, unknown> }).schoolSkills
-        );
-      }
-
-      return true;
-    };
 
     if (saved) {
       try {
