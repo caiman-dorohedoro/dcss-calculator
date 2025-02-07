@@ -93,7 +93,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-row gap-4 items-center">
+        <div className="flex flex-row gap-4 items-center flex-wrap">
           <label className="flex flex-row items-center gap-2 text-sm">
             Species:
             <Select
@@ -139,7 +139,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             }
           />
         </div>
-        <div className="flex flex-row items-center gap-2">
+        <div className="flex flex-row items-center gap-2 flex-wrap">
           {skillKeys.map((key) => (
             <AttrInput
               key={key}
@@ -152,7 +152,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             />
           ))}
         </div>
-        <div className="flex items-center flex-row gap-4">
+        <div className="flex items-center flex-row gap-4 flex-wrap">
           <label className="flex flex-row items-center gap-2 text-sm">
             Armour:
             <Select
@@ -194,7 +194,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             </Select>
           </label>
         </div>
-        <div className="flex flex-row gap-4 text-sm items-center">
+        <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
           {checkboxKeys.map(({ label, key }) => (
             <Fragment key={key}>
               <label htmlFor={key} className="flex flex-row items-center gap-2">
