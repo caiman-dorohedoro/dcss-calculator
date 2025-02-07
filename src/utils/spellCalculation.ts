@@ -185,8 +185,7 @@ export function rawSpellFail({
   });
 
   // 주문 난이도별 기본 실패율
-  const difficultyByLevel = [0, 3, 15, 35, 70, 100, 150, 200, 260, 340];
-  chance += difficultyByLevel[spellDifficulty];
+  chance += spellDifficulties[spellDifficulty];
 
   // 최대값 제한
   chance = Math.min(chance, 210);
