@@ -1,3 +1,5 @@
+import { useIsMobile } from "@/hooks/useIsMobile";
+
 interface CustomTickProps {
   x: number;
   y: number;
@@ -14,11 +16,13 @@ const tickLimit = 12;
 const mobileTickLimit = 8;
 
 const CustomTick = ({ x, y, payload, ticks = [] }: CustomTickProps) => {
+  const isMobile = useIsMobile();
+
   if (!payload || typeof payload.value !== "number") {
     return <g />;
   }
 
-  const _tickLimit = window.innerWidth < 768 ? mobileTickLimit : tickLimit;
+  const _tickLimit = isMobile ? mobileTickLimit : tickLimit;
   const shouldRotate = ticks.length > _tickLimit;
 
   const fontSize = shouldRotate ? 12 : 14;
