@@ -2,14 +2,14 @@ import { describe, expect, test } from "@jest/globals";
 import { calculateSpellFailureRate } from "../spellCalculation";
 
 describe("Spell Calculations", () => {
-  test("should calculate spell success correctly", () => {
+  test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 4.5,
       intelligence: 25,
       spellSkills: [
         { name: "conjuration", skill: 5.3 },
-        { name: "fire", skill: 0 },
+        { name: "alchemy", skill: 0 },
       ],
       spellDifficulty: 4,
       armour: "robe",
@@ -21,14 +21,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(28);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 2", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 4.8,
       intelligence: 25,
       spellSkills: [
         { name: "conjuration", skill: 5.4 },
-        { name: "fire", skill: 0.8 },
+        { name: "alchemy", skill: 0.8 },
       ],
       spellDifficulty: 4,
       armour: "robe",
@@ -40,14 +40,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(24);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 3", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 6.2,
       intelligence: 31,
       spellSkills: [
         { name: "conjuration", skill: 6.3 },
-        { name: "fire", skill: 3.2 },
+        { name: "alchemy", skill: 3.2 },
       ],
       spellDifficulty: 4,
       armour: "robe",
@@ -59,14 +59,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(7);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 4", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 9.2,
       intelligence: 32,
       spellSkills: [
         { name: "conjuration", skill: 7.2 },
-        { name: "fire", skill: 4.3 },
+        { name: "alchemy", skill: 4.3 },
       ],
       spellDifficulty: 4,
       armour: "robe",
@@ -78,14 +78,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(3);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("leather armour, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 9.2,
       intelligence: 32,
       spellSkills: [
         { name: "conjuration", skill: 7.2 },
-        { name: "fire", skill: 4.3 },
+        { name: "alchemy", skill: 4.3 },
       ],
       spellDifficulty: 4,
       armour: "leather_armour",
@@ -97,14 +97,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(5);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("chain mail, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 9.2,
       intelligence: 32,
       spellSkills: [
         { name: "conjuration", skill: 7.2 },
-        { name: "fire", skill: 4.3 },
+        { name: "alchemy", skill: 4.3 },
       ],
       spellDifficulty: 4,
       armour: "chain_mail",
@@ -116,14 +116,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(100);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("ring mail, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 9.2,
       intelligence: 32,
       spellSkills: [
         { name: "conjuration", skill: 7.2 },
-        { name: "fire", skill: 4.3 },
+        { name: "alchemy", skill: 4.3 },
       ],
       spellDifficulty: 4,
       armour: "ring_mail",
@@ -135,14 +135,14 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(19);
   });
 
-  test("should calculate spell success correctly", () => {
+  test("robe, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
       spellcastingSkill: 10.3,
       intelligence: 34,
       spellSkills: [
         { name: "conjuration", skill: 8 },
-        { name: "fire", skill: 5 },
+        { name: "alchemy", skill: 5 },
       ],
       spellDifficulty: 4,
       armour: "robe",
@@ -155,13 +155,13 @@ describe("Spell Calculations", () => {
   });
 
   // https://archive.nemelex.cards/morgue/caiman/morgue-caiman-20250131-054317.txt
-  test("should calculate spell success correctly", () => {
+  test("leather armour, 3 level hex/fire spell (Dazzling Flash)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 13,
       spellcastingSkill: 7,
       intelligence: 13,
       spellSkills: [
-        { name: "conjuration", skill: 8 },
+        { name: "hexes", skill: 8 },
         { name: "fire", skill: 4 },
       ],
       spellDifficulty: 3,
@@ -175,14 +175,14 @@ describe("Spell Calculations", () => {
   });
 
   // https://archive.nemelex.cards/morgue/caiman/morgue-caiman-20250126-091458.txt
-  test("should calculate spell success correctly", () => {
+  test("storm dragon scales, kite shield, 4 level tloc/air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 41,
       spellcastingSkill: 15,
       intelligence: 9,
       spellSkills: [
-        { name: "conjuration", skill: 14 },
-        { name: "fire", skill: 6 },
+        { name: "translocations", skill: 14 },
+        { name: "air", skill: 6 },
       ],
       spellDifficulty: 4,
       armour: "storm_dragon",
