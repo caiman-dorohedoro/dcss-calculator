@@ -701,4 +701,4 @@ export const spells = [
     level: 9,
     schools: ["Earth"],
   },
-];
+] as const;

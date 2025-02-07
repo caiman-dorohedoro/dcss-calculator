@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { SpeciesKey } from "@/utils/evCalculations";
 import { ShieldKey } from "@/utils/shCalculation";
 import { ArmourKey } from "@/utils/acCalculations";
+import { SpellName } from "@/utils/spellCalculation";
 
 const STORAGE_KEY = "calculator";
 
@@ -21,6 +22,19 @@ export interface CalculatorState {
   cloak?: boolean;
   barding?: boolean;
   secondGloves?: boolean;
+  // spell mode
+  spellMode?: boolean;
+  targetSpell?: SpellName;
+  translocation?: number;
+  fire?: number;
+  ice?: number;
+  earth?: number;
+  air?: number;
+  necromancy?: number;
+  conjuration?: number;
+  alchemy?: number;
+  hexes?: number;
+  summoning?: number;
 }
 
 const defaultState: CalculatorState = {
@@ -39,6 +53,25 @@ const defaultState: CalculatorState = {
   cloak: false,
   barding: false,
   secondGloves: false,
+  //
+  spellMode: false,
+  targetSpell: "Apportation",
+  translocation: 0,
+  fire: 0,
+  ice: 0,
+  earth: 0,
+  air: 0,
+  necromancy: 0,
+  conjuration: 0,
+  alchemy: 0,
+  hexes: 0,
+  summoning: 0,
+};
+
+export const isCalculatorStateKey = (
+  key: string
+): key is keyof CalculatorState => {
+  return Object.keys(defaultState).includes(key);
 };
 
 export const useCalculatorState = () => {

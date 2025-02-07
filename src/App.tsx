@@ -1,6 +1,8 @@
 import Calculator from "./components/Calculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useCalculatorState } from "./hooks/useEvCalculatorState";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "./components/ui/label";
 
 function App() {
   const { state, setState, resetState } = useCalculatorState();
@@ -13,6 +15,16 @@ function App() {
           className="w-full gap-x-2 relative"
           style={{ outline: "1px solid white", outlineOffset: "-4px" }}
         >
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-x-2">
+            <Switch
+              id="spell-mode"
+              checked={state.spellMode}
+              onCheckedChange={(checked) =>
+                setState((prev) => ({ ...prev, spellMode: checked }))
+              }
+            />
+            <Label htmlFor="spell-mode">Spell Mode</Label>
+          </div>
           <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
           <button
             onClick={resetState}

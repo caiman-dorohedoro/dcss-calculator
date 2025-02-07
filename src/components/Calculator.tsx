@@ -29,7 +29,10 @@ import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
 import { armourOptions, ArmourKey } from "@/utils/acCalculations";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import {
+  CalculatorState,
+  isCalculatorStateKey,
+} from "@/hooks/useEvCalculatorState";
 import {
   calculateAcData,
   calculateEvData,
@@ -40,6 +43,8 @@ import {
 } from "@/utils/calculatorUtils";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
+import { spells } from "@/data/spells";
+import { SpellName } from "@/utils/spellCalculation";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -194,23 +199,91 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             </Select>
           </label>
         </div>
-        <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
-          {checkboxKeys.map(({ label, key }) => (
-            <Fragment key={key}>
-              <label htmlFor={key} className="flex flex-row items-center gap-2">
-                <Checkbox
-                  checked={!!state[key]}
-                  onCheckedChange={(checked) =>
-                    setState((prev) => ({ ...prev, [key]: !!checked }))
-                  }
-                  id={key}
-                />
-                {label}
-              </label>
-              {key === "boots" && <div className="h-3 w-px bg-gray-200"></div>}
-            </Fragment>
-          ))}
-        </div>
+        {!state.spellMode && (
+          <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
+            {checkboxKeys.map(({ label, key }) => (
+              <Fragment key={key}>
+                <label
+                  htmlFor={key}
+                  className="flex flex-row items-center gap-2"
+                >
+                  <Checkbox
+                    checked={!!state[key]}
+                    onCheckedChange={(checked) =>
+                      setState((prev) => ({ ...prev, [key]: !!checked }))
+                    }
+                    id={key}
+                  />
+                  {label}
+                </label>
+                {key === "boots" && (
+                  <div className="h-3 w-px bg-gray-200"></div>
+                )}
+              </Fragment>
+            ))}
+          </div>
+        )}
+        {state.spellMode && <div className="h-px w-full bg-gray-200"></div>}
+        {state.spellMode && (
+          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
+            Spell:
+            <Select
+              value={state.targetSpell}
+              onValueChange={(value) =>
+                setState((prev) => ({
+                  ...prev,
+                  targetSpell: value as SpellName,
+                }))
+              }
+            >
+              <SelectTrigger className="min-w-[160px] h-6 w-auto gap-2">
+                <SelectValue placeholder="Apportation" />
+              </SelectTrigger>
+              <SelectContent>
+                {spells.map((spell) => (
+                  <SelectItem key={spell.name} value={spell.name}>
+                    {spell.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+        {state.spellMode && (
+          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
+            {spells
+              .find((spell) => spell.name === state.targetSpell)
+              ?.schools.map((schoolName) => {
+                const lowerCaseSchoolName = schoolName.toLowerCase();
+
+                if (!isCalculatorStateKey(lowerCaseSchoolName)) {
+                  console.log("is not a key", lowerCaseSchoolName);
+                  return null;
+                }
+
+                if (typeof state[lowerCaseSchoolName] !== "number") {
+                  console.log("is not a number", lowerCaseSchoolName);
+                  console.log(state[lowerCaseSchoolName]);
+                  return null;
+                }
+
+                return (
+                  <AttrInput
+                    key={lowerCaseSchoolName}
+                    label={schoolName}
+                    value={state[lowerCaseSchoolName]}
+                    type="skill"
+                    onChange={(value) =>
+                      setState((prev) => ({
+                        ...prev,
+                        [lowerCaseSchoolName]: value,
+                      }))
+                    }
+                  />
+                );
+              })}
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <Accordion type="multiple" defaultValue={["ev"]}>
