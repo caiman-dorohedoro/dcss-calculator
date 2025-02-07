@@ -25,13 +25,6 @@ const spellDifficulties = {
   9: 340,
 };
 
-type CalculateArmourPenaltyParams = {
-  armourEvPenalty: number;
-  armourSkill: number;
-  strength: number;
-  SCALE: number;
-};
-
 function tetrahedralNumber(n: number) {
   return Math.floor((n * (n + 1) * (n + 2)) / 6);
 }
@@ -53,6 +46,13 @@ function getTrueFailRate(rawFail: number) {
   }
   return (outcomes - tetrahedralNumber(300 - target)) / outcomes;
 }
+
+type CalculateArmourPenaltyParams = {
+  armourEvPenalty: number;
+  armourSkill: number;
+  strength: number;
+  SCALE: number;
+};
 
 // 갑옷 패널티 계산
 function calculateArmourPenalty({
@@ -107,19 +107,21 @@ function calculateShieldPenalty({
   return Math.max(penalty, 0);
 }
 
-function calculateSpellPenalty({
-  strength,
-  armourSkill,
-  armourEvPenalty,
-  shieldSkill,
-  shieldEvPenalty,
-}: {
+type armourShieldSpellPenaltyParams = {
   strength: number;
   armourSkill: number;
   armourEvPenalty: number;
   shieldSkill: number;
   shieldEvPenalty: number;
-}) {
+};
+
+function calculateArmourShieldSpellPenalty({
+  strength,
+  armourSkill,
+  armourEvPenalty,
+  shieldSkill,
+  shieldEvPenalty,
+}: armourShieldSpellPenaltyParams) {
   const SCALE = 100;
 
   const totalPenalty =
@@ -176,7 +178,7 @@ export function rawSpellFail({
   chance -= intelligence * 2;
 
   // 방어구/방패 페널티 계산
-  chance += calculateSpellPenalty({
+  chance += calculateArmourShieldSpellPenalty({
     strength: strength,
     armourSkill,
     armourEvPenalty: equippedArmour.encumbrance,
