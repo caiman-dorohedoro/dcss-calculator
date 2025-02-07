@@ -1,9 +1,13 @@
+type SpellSkill = {
+  name: string;
+  skill: number;
+};
+
 export type SpellCalculationParams = {
   strength: number;
   spellcastingSkill: number;
   intelligence: number;
-  conjurationSkill: number;
-  secondSkill: number;
+  spellSkills: SpellSkill[];
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   equippedArmour: { encumbrance: number };
   equippedShield: { encumbrance: number };
@@ -153,8 +157,7 @@ function rawSpellFail({
   spellDifficulty,
   equippedArmour,
   equippedShield,
-  conjurationSkill,
-  secondSkill,
+  spellSkills,
   spellcastingSkill,
   armourSkill,
   shieldSkill,
@@ -163,9 +166,9 @@ function rawSpellFail({
   let chance = 60;
 
   // 주문 기술력 계산
-  const skillCount = 2; // conjuration + fire
+  const skillCount = spellSkills.length;
   const skillPowerAverage = Math.floor(
-    (conjurationSkill * 200 + secondSkill * 200) / skillCount
+    spellSkills.reduce((acc, skill) => acc + skill.skill * 200, 0) / skillCount
   );
   const spellPower = Math.floor(
     ((skillPowerAverage + spellcastingSkill * 50) * 6) / 100
