@@ -24,3 +24,146 @@ const spellDifficulties = {
 };
 
 export type SpellDifficultyLevel = keyof typeof spellDifficulties;
+
+function calculateSpellPenalty({
+  strength,
+  armourSkill,
+  armourEvPenalty,
+  shieldSkill,
+  shieldEvPenalty,
+}: {
+  strength: number;
+  armourSkill: number;
+  armourEvPenalty: number;
+  shieldSkill: number;
+  shieldEvPenalty: number;
+}) {
+  const SCALE = 100;
+
+  // 갑옷 패널티 계산
+  function calculateArmourPenalty() {
+    const baseEvPenalty = armourEvPenalty;
+
+    let penalty = Math.floor(
+      Math.floor(
+        (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
+          (5 * (strength + 3))
+      ) / 450
+    );
+
+    penalty *= 19;
+
+    return Math.max(penalty, 0);
+  }
+
+  // 방패 패널티 계산
+  function calculateShieldPenalty() {
+    const baseShieldPenalty = shieldEvPenalty;
+
+    let penalty = Math.floor(
+      Math.floor(
+        (2 *
+          baseShieldPenalty *
+          baseShieldPenalty *
+          (270 - shieldSkill * 10) *
+          SCALE) /
+          (25 + 5 * strength)
+      ) / 270
+    );
+
+    penalty *= 19;
+
+    return Math.max(penalty, 0);
+  }
+
+  // 최종 패널티 계산
+  const totalPenalty = calculateArmourPenalty() + calculateShieldPenalty();
+
+  return Math.floor(Math.max(totalPenalty, 0) / SCALE);
+}
+
+function tetrahedralNumber(n: number) {
+  return Math.floor((n * (n + 1) * (n + 2)) / 6);
+}
+
+function getTrueFailRate(rawFail: number) {
+  const outcomes = 101 * 101 * 100; // 총 가능한 결과의 수
+  const target = rawFail * 3;
+
+  if (target <= 100) {
+    return tetrahedralNumber(target) / outcomes;
+  }
+  if (target <= 200) {
+    return (
+      (tetrahedralNumber(target) -
+        2 * tetrahedralNumber(target - 101) -
+        tetrahedralNumber(target - 100)) /
+      outcomes
+    );
+  }
+  return (outcomes - tetrahedralNumber(300 - target)) / outcomes;
+}
+
+function failureRateToInt(fail: number) {
+  if (fail <= 0) return 0;
+  else if (fail >= 100) return Math.floor((fail + 100) / 2);
+  else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
+}
+
+export function rawSpellFail({
+  playerStrength,
+  playerSpellcasting,
+  intelligence,
+  conjurationSkill,
+  secondSkill,
+  spellDifficulty,
+  equippedArmour,
+  equippedShield,
+  armourSkill,
+  shieldSkill,
+}: SpellCalculationParams) {
+  // 기본 실패율 60%에서 시작
+  let chance = 60;
+
+  // 주문 기술력 계산
+  const skillCount = 2; // conjuration + fire
+  const skillPowerAverage = Math.floor(
+    (conjurationSkill * 200 + secondSkill * 200) / skillCount
+  );
+  const spellPower = Math.floor(
+    ((skillPowerAverage + playerSpellcasting * 50) * 6) / 100
+  );
+
+  // 주문력으로 실패율 감소
+  chance -= spellPower;
+
+  // 지능으로 실패율 감소
+  chance -= intelligence * 2;
+
+  // 방어구/방패 페널티 계산
+  chance += calculateSpellPenalty({
+    strength: playerStrength,
+    armourSkill,
+    armourEvPenalty: equippedArmour.encumbrance,
+    shieldSkill,
+    shieldEvPenalty: equippedShield.encumbrance,
+  });
+
+  // 주문 난이도별 기본 실패율
+  const difficultyByLevel = [0, 3, 15, 35, 70, 100, 150, 200, 260, 340];
+  chance += difficultyByLevel[spellDifficulty];
+
+  // 최대값 제한
+  chance = Math.min(chance, 210);
+
+  // 3차 다항식을 통한 실패율 계산
+  const chance2 = Math.max(
+    Math.floor((((chance + 426) * chance + 82670) * chance + 7245398) / 262144),
+    0
+  );
+
+  // 최종 실패율은 0-100% 사이
+  const failRate = Math.min(Math.max(chance2, 0), 100);
+
+  return failureRateToInt(failRate);
+}
