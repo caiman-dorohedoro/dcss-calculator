@@ -11,6 +11,8 @@ export type SpellCalculationParams = {
   shieldSkill: number;
 };
 
+export type SpellDifficultyLevel = keyof typeof spellDifficulties;
+
 const spellDifficulties = {
   1: 3,
   2: 15,
@@ -23,64 +25,12 @@ const spellDifficulties = {
   9: 340,
 };
 
-export type SpellDifficultyLevel = keyof typeof spellDifficulties;
-
-function calculateSpellPenalty({
-  strength,
-  armourSkill,
-  armourEvPenalty,
-  shieldSkill,
-  shieldEvPenalty,
-}: {
-  strength: number;
-  armourSkill: number;
+type CalculateArmourPenaltyParams = {
   armourEvPenalty: number;
-  shieldSkill: number;
-  shieldEvPenalty: number;
-}) {
-  const SCALE = 100;
-
-  // 갑옷 패널티 계산
-  function calculateArmourPenalty() {
-    const baseEvPenalty = armourEvPenalty;
-
-    let penalty = Math.floor(
-      Math.floor(
-        (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
-          (5 * (strength + 3))
-      ) / 450
-    );
-
-    penalty *= 19;
-
-    return Math.max(penalty, 0);
-  }
-
-  // 방패 패널티 계산
-  function calculateShieldPenalty() {
-    const baseShieldPenalty = shieldEvPenalty;
-
-    let penalty = Math.floor(
-      Math.floor(
-        (2 *
-          baseShieldPenalty *
-          baseShieldPenalty *
-          (270 - shieldSkill * 10) *
-          SCALE) /
-          (25 + 5 * strength)
-      ) / 270
-    );
-
-    penalty *= 19;
-
-    return Math.max(penalty, 0);
-  }
-
-  // 최종 패널티 계산
-  const totalPenalty = calculateArmourPenalty() + calculateShieldPenalty();
-
-  return Math.floor(Math.max(totalPenalty, 0) / SCALE);
-}
+  armourSkill: number;
+  strength: number;
+  SCALE: number;
+};
 
 function tetrahedralNumber(n: number) {
   return Math.floor((n * (n + 1) * (n + 2)) / 6);
@@ -102,6 +52,91 @@ function getTrueFailRate(rawFail: number) {
     );
   }
   return (outcomes - tetrahedralNumber(300 - target)) / outcomes;
+}
+
+// 갑옷 패널티 계산
+function calculateArmourPenalty({
+  armourEvPenalty,
+  armourSkill,
+  strength,
+  SCALE,
+}: CalculateArmourPenaltyParams) {
+  const baseEvPenalty = armourEvPenalty;
+
+  let penalty = Math.floor(
+    Math.floor(
+      (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
+        (5 * (strength + 3))
+    ) / 450
+  );
+
+  penalty *= 19;
+
+  return Math.max(penalty, 0);
+}
+
+type CalculateShieldPenaltyParams = {
+  shieldEvPenalty: number;
+  shieldSkill: number;
+  strength: number;
+  SCALE: number;
+};
+
+// 방패 패널티 계산
+function calculateShieldPenalty({
+  shieldEvPenalty,
+  shieldSkill,
+  strength,
+  SCALE,
+}: CalculateShieldPenaltyParams) {
+  const baseShieldPenalty = shieldEvPenalty;
+
+  let penalty = Math.floor(
+    Math.floor(
+      (2 *
+        baseShieldPenalty *
+        baseShieldPenalty *
+        (270 - shieldSkill * 10) *
+        SCALE) /
+        (25 + 5 * strength)
+    ) / 270
+  );
+
+  penalty *= 19;
+
+  return Math.max(penalty, 0);
+}
+
+function calculateSpellPenalty({
+  strength,
+  armourSkill,
+  armourEvPenalty,
+  shieldSkill,
+  shieldEvPenalty,
+}: {
+  strength: number;
+  armourSkill: number;
+  armourEvPenalty: number;
+  shieldSkill: number;
+  shieldEvPenalty: number;
+}) {
+  const SCALE = 100;
+
+  const totalPenalty =
+    calculateArmourPenalty({
+      armourEvPenalty,
+      armourSkill,
+      strength,
+      SCALE,
+    }) +
+    calculateShieldPenalty({
+      shieldEvPenalty,
+      shieldSkill,
+      strength,
+      SCALE,
+    });
+
+  return Math.floor(Math.max(totalPenalty, 0) / SCALE);
 }
 
 function failureRateToInt(fail: number) {
