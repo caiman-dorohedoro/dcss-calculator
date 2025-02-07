@@ -332,4 +332,44 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(7);
   });
+
+  // https://cbro.berotato.org/morgue/slitherrr/morgue-slitherrr-20250130-190843.txt
+  test("naga, tower shield, pearl dragon scales, barding, 7 level ice/necr spell (Rimeblight)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 34,
+      spellcastingSkill: 20.3,
+      intelligence: 49,
+      spellSkills: [
+        { name: "ice", skill: 27 },
+        { name: "necromancy", skill: 12 },
+      ],
+      spellDifficulty: 7,
+      armour: "pearl_dragon",
+      shield: "tower_shield",
+      armourSkill: 18,
+      shieldSkill: 27,
+    });
+
+    expect(failureRate).toBe(1);
+  });
+
+  // https://crawl.akrasiac.org/rawdata/modargo/morgue-modargo-20250114-190932.txt
+  test("naga, tower shield, robe, barding, 9 level Conj/Air spell (Chain Lightning)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 17,
+      spellcastingSkill: 15,
+      intelligence: 23,
+      spellSkills: [
+        { name: "conjuration", skill: 24.1 },
+        { name: "air", skill: 25 },
+      ],
+      spellDifficulty: 9,
+      armour: "robe",
+      shield: "tower_shield",
+      armourSkill: 8,
+      shieldSkill: 22.8,
+    });
+
+    expect(failureRate).toBe(22);
+  });
 });
