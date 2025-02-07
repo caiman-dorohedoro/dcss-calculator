@@ -392,4 +392,21 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(2);
   });
+
+  // https://crawl.akrasiac.org/rawdata/DarkXAngel/morgue-DarkXAngel-20240926-042247.txt
+  test("naga, tower shield, ring mail, barding, 6 level Alch spell (Eringya's Noxious Bog)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 12,
+      spellcastingSkill: 16,
+      intelligence: 52,
+      spellSkills: [{ name: "alchemy", skill: 10 }],
+      spellDifficulty: 6,
+      armour: "ring_mail",
+      shield: "tower_shield",
+      armourSkill: 5,
+      shieldSkill: 16,
+    });
+
+    expect(failureRate).toBe(9);
+  });
 });
