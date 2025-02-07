@@ -1,6 +1,6 @@
 export type SpellCalculationParams = {
-  playerStrength: number;
-  playerSpellcasting: number;
+  strength: number;
+  spellcastingSkill: number;
   intelligence: number;
   conjurationSkill: number;
   secondSkill: number;
@@ -146,14 +146,14 @@ function failureRateToInt(fail: number) {
 }
 
 export function rawSpellFail({
-  playerStrength,
-  playerSpellcasting,
+  strength,
   intelligence,
-  conjurationSkill,
-  secondSkill,
   spellDifficulty,
   equippedArmour,
   equippedShield,
+  conjurationSkill,
+  secondSkill,
+  spellcastingSkill,
   armourSkill,
   shieldSkill,
 }: SpellCalculationParams) {
@@ -166,7 +166,7 @@ export function rawSpellFail({
     (conjurationSkill * 200 + secondSkill * 200) / skillCount
   );
   const spellPower = Math.floor(
-    ((skillPowerAverage + playerSpellcasting * 50) * 6) / 100
+    ((skillPowerAverage + spellcastingSkill * 50) * 6) / 100
   );
 
   // 주문력으로 실패율 감소
@@ -177,7 +177,7 @@ export function rawSpellFail({
 
   // 방어구/방패 페널티 계산
   chance += calculateSpellPenalty({
-    strength: playerStrength,
+    strength: strength,
     armourSkill,
     armourEvPenalty: equippedArmour.encumbrance,
     shieldSkill,
