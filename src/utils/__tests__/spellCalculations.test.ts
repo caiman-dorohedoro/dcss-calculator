@@ -342,7 +342,8 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(4);
   });
 
-  // https://crawl.akrasiac.org/rawdata/hammy3456/morgue-hammy3456-20250206-022444.txt
+  // https://crawl.akrasiac.org/rawdata/hammy3456/morgue-hammy3456-20250206-022444.txt ==> 0.27 버전이었음
+  // WIZARD 모드로 실행하니 다른 수치가 나와서 고침..
   test("tower shield, 5 level hex/air spell (silence)", () => {
     const params = {
       playerStrength: 12,
@@ -359,7 +360,7 @@ describe("Spell Calculations", () => {
 
     const failureRate = rawSpellFail(params);
 
-    expect(failureRate).toBe(2);
+    expect(failureRate).toBe(3);
   });
 
   test("tower shield, 6 level conj/erth spell (Iron Shot) - same case as above", () => {
@@ -378,7 +379,7 @@ describe("Spell Calculations", () => {
 
     const failureRate = rawSpellFail(params);
 
-    expect(failureRate).toBe(1);
+    expect(failureRate).toBe(2);
   });
 
   test("tower shield, 2 level conj/air spell (static discharge) - same case as above", () => {
