@@ -3,6 +3,13 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useCalculatorState } from "./hooks/useEvCalculatorState";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "./components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./components/ui/tooltip";
+import { TriangleAlert } from "lucide-react";
 
 function App() {
   const { state, setState, resetState } = useCalculatorState();
@@ -23,7 +30,32 @@ function App() {
                 setState((prev) => ({ ...prev, spellMode: checked }))
               }
             />
-            <Label htmlFor="spell-mode">Spell Mode</Label>
+            <TooltipProvider>
+              <Tooltip delayDuration={400}>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-x-2">
+                    <Label
+                      htmlFor="spell-mode"
+                      className="hover:cursor-pointer text-muted-foreground hover:text-foreground"
+                    >
+                      Spell Mode
+                    </Label>
+                    <TriangleAlert className="h-4 w-4 hover:text-white hover:cursor-pointer" />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent
+                  align="start"
+                  className="bg-white text-black rounded-none max-w-48"
+                >
+                  <div className="text-base font-semibold">
+                    Under Construction
+                  </div>
+                  <p className="text-sm">
+                    Currently Only One School Spell is Supported
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
           <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
           <button
