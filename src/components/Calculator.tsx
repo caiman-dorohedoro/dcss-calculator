@@ -270,7 +270,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             <AttrInput
               label="Spellcasting"
               value={state.spellcasting ?? 0}
-              type="stat"
+              type="skill"
               onChange={(value) =>
                 setState((prev) => ({ ...prev, spellcasting: value }))
               }
@@ -369,7 +369,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       align="center"
                       layout="horizontal"
                       wrapperStyle={{
-                        marginLeft: "-120px",
+                        marginLeft: "-150px",
                         marginBottom: "-10px",
                       }}
                     />
