@@ -25,6 +25,7 @@ export interface CalculatorState {
   // spell mode
   spellMode?: boolean;
   targetSpell?: SpellName;
+  spellCasting?: number;
   translocation?: number;
   fire?: number;
   ice?: number;
@@ -55,7 +56,8 @@ const defaultState: CalculatorState = {
   secondGloves: false,
   //
   spellMode: false,
-  targetSpell: "Apportation",
+  targetSpell: "Airstrike",
+  spellCasting: 0,
   translocation: 0,
   fire: 0,
   ice: 0,

@@ -226,27 +226,39 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
         {state.spellMode && <div className="h-px w-full bg-gray-200"></div>}
         {state.spellMode && (
           <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
-            Spell:
-            <Select
-              value={state.targetSpell}
-              onValueChange={(value) =>
-                setState((prev) => ({
-                  ...prev,
-                  targetSpell: value as SpellName,
-                }))
+            <div className="flex flex-row items-center gap-2">
+              Spell:
+              <Select
+                value={state.targetSpell}
+                onValueChange={(value) =>
+                  setState((prev) => ({
+                    ...prev,
+                    targetSpell: value as SpellName,
+                  }))
+                }
+              >
+                <SelectTrigger className="min-w-[160px] h-6 w-auto gap-2">
+                  <SelectValue placeholder="Apportation" />
+                </SelectTrigger>
+                <SelectContent>
+                  {spells
+                    .toSorted((a, b) => a.name.localeCompare(b.name))
+                    .map((spell) => (
+                      <SelectItem key={spell.name} value={spell.name}>
+                        {spell.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <AttrInput
+              label="Spellcasting"
+              value={state.spellCasting ?? 0}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, spellCasting: value }))
               }
-            >
-              <SelectTrigger className="min-w-[160px] h-6 w-auto gap-2">
-                <SelectValue placeholder="Apportation" />
-              </SelectTrigger>
-              <SelectContent>
-                {spells.map((spell) => (
-                  <SelectItem key={spell.name} value={spell.name}>
-                    {spell.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            />
           </div>
         )}
         {state.spellMode && (
