@@ -3,17 +3,18 @@ import { ArmourKey, armourOptions } from "./acCalculations";
 import { ShieldKey, shieldOptions } from "./shCalculation";
 
 export type SpellName = (typeof spells)[number]["name"];
+export type SpellSchool = (typeof spells)[number]["schools"][number];
 
-type SpellSkill = {
-  name: string;
-  skill: number;
+type SchoolSkills = {
+  [key in SpellSchool]?: number;
 };
 
 export type SpellCalculationParams = {
   strength: number;
-  spellcastingSkill: number;
+  spellcasting: number;
   intelligence: number;
-  spellSkills: SpellSkill[];
+  targetSpell: SpellName;
+  schoolSkills: SchoolSkills;
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   armour: ArmourKey;
   shield: ShieldKey;
@@ -157,14 +158,24 @@ function failureRateToInt(fail: number) {
   else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
 }
 
+export const getSpellSchools = (targetSpell: SpellName) => {
+  const spell = spells.find((spell) => spell.name === targetSpell);
+  if (!spell) {
+    throw new Error("Spell not found");
+  }
+
+  return spell.schools;
+};
+
 function rawSpellFail({
   strength,
   intelligence,
   spellDifficulty,
   armour,
   shield,
-  spellSkills,
-  spellcastingSkill,
+  targetSpell,
+  schoolSkills,
+  spellcasting,
   armourSkill,
   shieldSkill,
 }: SpellCalculationParams) {
@@ -172,12 +183,18 @@ function rawSpellFail({
   let chance = 60;
 
   // 주문 기술력 계산
-  const skillCount = spellSkills.length;
+  const spellSchools = getSpellSchools(targetSpell);
+  const spellSchoolSkills = spellSchools
+    .map((school) => schoolSkills[school])
+    .filter((skill) => skill !== undefined);
+
   const skillPowerAverage = Math.floor(
-    spellSkills.reduce((acc, skill) => acc + skill.skill * 200, 0) / skillCount
+    spellSchoolSkills.reduce((acc, skill) => acc + skill * 200, 0) /
+      spellSchools.length
   );
+
   const spellPower = Math.floor(
-    ((skillPowerAverage + spellcastingSkill * 50) * 6) / 100
+    ((skillPowerAverage + spellcasting * 50) * 6) / 100
   );
 
   // 주문력으로 실패율 감소

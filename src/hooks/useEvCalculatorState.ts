@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { SpeciesKey } from "@/utils/evCalculations";
 import { ShieldKey } from "@/utils/shCalculation";
 import { ArmourKey } from "@/utils/acCalculations";
-import { SpellName } from "@/utils/spellCalculation";
+import { SpellName, SpellSchool } from "@/utils/spellCalculation";
 
 const STORAGE_KEY = "calculator";
 
@@ -24,8 +24,9 @@ export interface CalculatorState {
   secondGloves?: boolean;
   // spell mode
   spellMode?: boolean;
+  schoolSkills?: Record<SpellSchool, number>;
   targetSpell?: SpellName;
-  spellCasting?: number;
+  spellcasting?: number;
   translocation?: number;
   fire?: number;
   ice?: number;
@@ -56,8 +57,20 @@ const defaultState: CalculatorState = {
   secondGloves: false,
   //
   spellMode: false,
+  schoolSkills: {
+    Translocation: 0,
+    Fire: 0,
+    Ice: 0,
+    Conjuration: 0,
+    Necromancy: 0,
+    Earth: 0,
+    Air: 0,
+    Hexes: 0,
+    Alchemy: 0,
+    Summoning: 0,
+  },
   targetSpell: "Airstrike",
-  spellCasting: 0,
+  spellcasting: 0,
   translocation: 0,
   fire: 0,
   ice: 0,
@@ -79,7 +92,40 @@ export const isCalculatorStateKey = (
 export const useCalculatorState = () => {
   const [state, setState] = useState<CalculatorState>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : defaultState;
+
+    const validateState = (state: unknown): state is CalculatorState => {
+      if (typeof state !== "object" || state === null) return false;
+      const defaultKeys = Object.keys(defaultState);
+      const stateKeys = Object.keys(state);
+
+      if (!defaultKeys.every((key) => stateKeys.includes(key))) {
+        return false;
+      }
+
+      if ("schoolSkills" in state) {
+        const schoolKeys = Object.keys(defaultState.schoolSkills!);
+        return schoolKeys.every(
+          (key) =>
+            key in
+            (state as { schoolSkills: Record<string, unknown> }).schoolSkills
+        );
+      }
+
+      return true;
+    };
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (validateState(parsed)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error("Invalid saved state", e);
+      }
+    }
+
+    return defaultState;
   });
 
   useEffect(() => {

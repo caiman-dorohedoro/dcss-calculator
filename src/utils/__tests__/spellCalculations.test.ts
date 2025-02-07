@@ -5,12 +5,13 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 4.5,
+      spellcasting: 4.5,
       intelligence: 25,
-      spellSkills: [
-        { name: "conjuration", skill: 5.3 },
-        { name: "alchemy", skill: 0 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 5.3,
+        Alchemy: 0,
+      },
       spellDifficulty: 4,
       armour: "robe",
       shield: "none",
@@ -24,12 +25,13 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 2", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 4.8,
+      spellcasting: 4.8,
       intelligence: 25,
-      spellSkills: [
-        { name: "conjuration", skill: 5.4 },
-        { name: "alchemy", skill: 0.8 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 5.4,
+        Alchemy: 0.8,
+      },
       spellDifficulty: 4,
       armour: "robe",
       shield: "none",
@@ -43,12 +45,13 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 3", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 6.2,
+      spellcasting: 6.2,
       intelligence: 31,
-      spellSkills: [
-        { name: "conjuration", skill: 6.3 },
-        { name: "alchemy", skill: 3.2 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 6.3,
+        Alchemy: 3.2,
+      },
       spellDifficulty: 4,
       armour: "robe",
       shield: "none",
@@ -62,12 +65,13 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 4", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 9.2,
+      spellcasting: 9.2,
       intelligence: 32,
-      spellSkills: [
-        { name: "conjuration", skill: 7.2 },
-        { name: "alchemy", skill: 4.3 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 7.2,
+        Alchemy: 4.3,
+      },
       spellDifficulty: 4,
       armour: "robe",
       shield: "none",
@@ -81,12 +85,13 @@ describe("Spell Calculations", () => {
   test("leather armour, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 9.2,
+      spellcasting: 9.2,
       intelligence: 32,
-      spellSkills: [
-        { name: "conjuration", skill: 7.2 },
-        { name: "alchemy", skill: 4.3 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 7.2,
+        Alchemy: 4.3,
+      },
       spellDifficulty: 4,
       armour: "leather_armour",
       shield: "none",
@@ -100,12 +105,13 @@ describe("Spell Calculations", () => {
   test("chain mail, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 9.2,
+      spellcasting: 9.2,
       intelligence: 32,
-      spellSkills: [
-        { name: "conjuration", skill: 7.2 },
-        { name: "alchemy", skill: 4.3 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 7.2,
+        Alchemy: 4.3,
+      },
       spellDifficulty: 4,
       armour: "chain_mail",
       shield: "none",
@@ -119,12 +125,13 @@ describe("Spell Calculations", () => {
   test("ring mail, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 9.2,
+      spellcasting: 9.2,
       intelligence: 32,
-      spellSkills: [
-        { name: "conjuration", skill: 7.2 },
-        { name: "alchemy", skill: 4.3 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 7.2,
+        Alchemy: 4.3,
+      },
       spellDifficulty: 4,
       armour: "ring_mail",
       shield: "none",
@@ -138,12 +145,13 @@ describe("Spell Calculations", () => {
   test("robe, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 4,
-      spellcastingSkill: 10.3,
+      spellcasting: 10.3,
       intelligence: 34,
-      spellSkills: [
-        { name: "conjuration", skill: 8 },
-        { name: "alchemy", skill: 5 },
-      ],
+      targetSpell: "Fulminant Prism",
+      schoolSkills: {
+        Conjuration: 8,
+        Alchemy: 5,
+      },
       spellDifficulty: 4,
       armour: "robe",
       shield: "none",
@@ -158,12 +166,13 @@ describe("Spell Calculations", () => {
   test("leather armour, 3 level hex/fire spell (Dazzling Flash)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 13,
-      spellcastingSkill: 7,
+      spellcasting: 7,
       intelligence: 13,
-      spellSkills: [
-        { name: "hexes", skill: 8 },
-        { name: "fire", skill: 4 },
-      ],
+      targetSpell: "Dazzling Flash",
+      schoolSkills: {
+        Hexes: 8,
+        Fire: 4,
+      },
       spellDifficulty: 3,
       armour: "leather_armour",
       shield: "none",
@@ -178,12 +187,13 @@ describe("Spell Calculations", () => {
   test("storm dragon scales, kite shield, 4 level tloc/air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 41,
-      spellcastingSkill: 15,
+      spellcasting: 15,
       intelligence: 9,
-      spellSkills: [
-        { name: "translocations", skill: 14 },
-        { name: "air", skill: 6 },
-      ],
+      targetSpell: "Vhi's Electric Charge",
+      schoolSkills: {
+        Translocation: 14,
+        Air: 6,
+      },
       spellDifficulty: 4,
       armour: "storm_dragon",
       shield: "kite_shield",
@@ -199,12 +209,13 @@ describe("Spell Calculations", () => {
   test("tower shield, 5 level hex/air spell (silence)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 12,
-      spellcastingSkill: 14,
+      spellcasting: 14,
       intelligence: 25,
-      spellSkills: [
-        { name: "hex", skill: 8 },
-        { name: "air", skill: 9 },
-      ],
+      targetSpell: "Silence",
+      schoolSkills: {
+        Hexes: 8,
+        Air: 9,
+      },
       spellDifficulty: 5,
       armour: "robe",
       shield: "tower_shield",
@@ -215,34 +226,37 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(3);
   });
 
-  test("tower shield, 6 level conj/erth spell (Iron Shot) - same case as above", () => {
-    const failureRate = calculateSpellFailureRate({
-      strength: 12,
-      spellcastingSkill: 14,
-      intelligence: 25,
-      spellSkills: [
-        { name: "conjuration", skill: 14 },
-        { name: "earth", skill: 13 },
-      ],
-      spellDifficulty: 6,
-      armour: "robe",
-      shield: "tower_shield",
-      armourSkill: 0,
-      shieldSkill: 24.6,
-    });
+  // deprecated Spell
+  // test("tower shield, 6 level conj/erth spell (Iron Shot) - same case as above", () => {
+  //   const failureRate = calculateSpellFailureRate({
+  //     strength: 12,
+  //     spellcasting: 14,
+  //     intelligence: 25,
+  //     targetSpell: "Iron Shot",
+  //     schoolSkills: {
+  //       Conjuration: 14,
+  //       Earth: 13,
+  //     },
+  //     spellDifficulty: 6,
+  //     armour: "robe",
+  //     shield: "tower_shield",
+  //     armourSkill: 0,
+  //     shieldSkill: 24.6,
+  //   });
 
-    expect(failureRate).toBe(2);
-  });
+  //   expect(failureRate).toBe(2);
+  // });
 
   test("tower shield, 2 level conj/air spell (static discharge) - same case as above", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 12,
-      spellcastingSkill: 14,
+      spellcasting: 14,
       intelligence: 25,
-      spellSkills: [
-        { name: "conjuration", skill: 14 },
-        { name: "air", skill: 9 },
-      ],
+      targetSpell: "Static Discharge",
+      schoolSkills: {
+        Conjuration: 14,
+        Air: 9,
+      },
       spellDifficulty: 2,
       armour: "robe",
       shield: "tower_shield",
@@ -257,12 +271,13 @@ describe("Spell Calculations", () => {
   test("tower shield, 8 level conj/alchemy spell (Fulsome Fusillade)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 29,
-      spellcastingSkill: 16,
+      spellcasting: 16,
       intelligence: 43,
-      spellSkills: [
-        { name: "conjuration", skill: 20 },
-        { name: "alchemy", skill: 19 },
-      ],
+      targetSpell: "Fulsome Fusillade",
+      schoolSkills: {
+        Conjuration: 20,
+        Alchemy: 19,
+      },
       spellDifficulty: 8,
       armour: "robe",
       shield: "tower_shield",
@@ -277,12 +292,13 @@ describe("Spell Calculations", () => {
   test("buckler, 8 level conj/earth spell (Lehudib's Crystal Spear)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 8,
-      spellcastingSkill: 23.3,
+      spellcasting: 23.3,
       intelligence: 34,
-      spellSkills: [
-        { name: "conjuration", skill: 14.3 },
-        { name: "earth", skill: 25.8 },
-      ],
+      targetSpell: "Lehudib's Crystal Spear",
+      schoolSkills: {
+        Conjuration: 14.3,
+        Earth: 25.8,
+      },
       spellDifficulty: 8,
       armour: "robe",
       shield: "buckler",
@@ -294,15 +310,16 @@ describe("Spell Calculations", () => {
   });
 
   // https://crawl.dcss.io/crawl/morgue/AintCerebovvered/morgue-AintCerebovvered-20250204-194125.txt
-  test("tower shield, 9 level conj/air spell (Chaing Lightning)", () => {
+  test("tower shield, 9 level conj/air spell (Chain Lightning)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 18,
-      spellcastingSkill: 27,
+      spellcasting: 27,
       intelligence: 10,
-      spellSkills: [
-        { name: "conjuration", skill: 26.5 },
-        { name: "air", skill: 27 },
-      ],
+      targetSpell: "Chain Lightning",
+      schoolSkills: {
+        Conjuration: 26.5,
+        Air: 27,
+      },
       spellDifficulty: 9,
       armour: "robe",
       shield: "tower_shield",
@@ -317,12 +334,13 @@ describe("Spell Calculations", () => {
   test("kite shield, leather armour, 4 level tloc/air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 14,
-      spellcastingSkill: 10,
+      spellcasting: 10,
       intelligence: 14,
-      spellSkills: [
-        { name: "translocations", skill: 10 },
-        { name: "air", skill: 5 },
-      ],
+      targetSpell: "Vhi's Electric Charge",
+      schoolSkills: {
+        Translocation: 10,
+        Air: 5,
+      },
       spellDifficulty: 4,
       armour: "leather_armour",
       shield: "kite_shield",
@@ -337,12 +355,13 @@ describe("Spell Calculations", () => {
   test("naga, tower shield, pearl dragon scales, barding, 7 level ice/necr spell (Rimeblight)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 34,
-      spellcastingSkill: 20.3,
+      spellcasting: 20.3,
       intelligence: 49,
-      spellSkills: [
-        { name: "ice", skill: 27 },
-        { name: "necromancy", skill: 12 },
-      ],
+      targetSpell: "Rimeblight",
+      schoolSkills: {
+        Ice: 27,
+        Necromancy: 12,
+      },
       spellDifficulty: 7,
       armour: "pearl_dragon",
       shield: "tower_shield",
@@ -357,12 +376,13 @@ describe("Spell Calculations", () => {
   test("naga, tower shield, robe, barding, 9 level Conj/Air spell (Chain Lightning)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 17,
-      spellcastingSkill: 15,
+      spellcasting: 15,
       intelligence: 23,
-      spellSkills: [
-        { name: "conjuration", skill: 24.1 },
-        { name: "air", skill: 25 },
-      ],
+      targetSpell: "Chain Lightning",
+      schoolSkills: {
+        Conjuration: 24.1,
+        Air: 25,
+      },
       spellDifficulty: 9,
       armour: "robe",
       shield: "tower_shield",
@@ -377,12 +397,13 @@ describe("Spell Calculations", () => {
   test("naga, kite shield, plate armour, barding, 4 level Tloc/Air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 21,
-      spellcastingSkill: 18,
+      spellcasting: 18,
       intelligence: 51,
-      spellSkills: [
-        { name: "translocations", skill: 8 },
-        { name: "air", skill: 8 },
-      ],
+      targetSpell: "Vhi's Electric Charge",
+      schoolSkills: {
+        Translocation: 8,
+        Air: 8,
+      },
       spellDifficulty: 4,
       armour: "plate",
       shield: "kite_shield",
@@ -397,9 +418,12 @@ describe("Spell Calculations", () => {
   test("naga, tower shield, ring mail, barding, 6 level Alch spell (Eringya's Noxious Bog)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 12,
-      spellcastingSkill: 16,
+      spellcasting: 16,
       intelligence: 52,
-      spellSkills: [{ name: "alchemy", skill: 10 }],
+      targetSpell: "Eringya's Noxious Bog",
+      schoolSkills: {
+        Alchemy: 10,
+      },
       spellDifficulty: 6,
       armour: "ring_mail",
       shield: "tower_shield",

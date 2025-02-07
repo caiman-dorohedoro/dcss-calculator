@@ -40,6 +40,7 @@ import {
   calculateEvTicks,
   calculateSHData,
   calculateShTicks,
+  calculateSFData,
 } from "@/utils/calculatorUtils";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
@@ -70,9 +71,15 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
   const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [shData, setShData] = useState<ReturnType<typeof calculateSHData>>([]);
+  const [splFailRateData, setSplFailRateData] = useState<
+    ReturnType<typeof calculateSFData>
+  >([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
   const [shTicks, setShTicks] = useState<number[]>([]);
+  // const [spellFailureRateTicks, setSpellFailureRateTicks] = useState<number[]>(
+  //   []
+  // );
 
   useEffect(() => {
     const evData = calculateEvData(state);
@@ -84,6 +91,8 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     const shData = calculateSHData(state);
     setShData(shData);
     setShTicks(calculateShTicks(state));
+    const spellFailureRate = calculateSFData(state);
+    setSplFailRateData(spellFailureRate);
   }, [state]);
 
   const zeroBaseAC =
@@ -253,10 +262,10 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             </div>
             <AttrInput
               label="Spellcasting"
-              value={state.spellCasting ?? 0}
+              value={state.spellcasting ?? 0}
               type="stat"
               onChange={(value) =>
-                setState((prev) => ({ ...prev, spellCasting: value }))
+                setState((prev) => ({ ...prev, spellcasting: value }))
               }
             />
           </div>
@@ -269,13 +278,10 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                 const lowerCaseSchoolName = schoolName.toLowerCase();
 
                 if (!isCalculatorStateKey(lowerCaseSchoolName)) {
-                  console.log("is not a key", lowerCaseSchoolName);
                   return null;
                 }
 
                 if (typeof state[lowerCaseSchoolName] !== "number") {
-                  console.log("is not a number", lowerCaseSchoolName);
-                  console.log(state[lowerCaseSchoolName]);
                   return null;
                 }
 
@@ -299,6 +305,73 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
       </CardHeader>
       <CardContent>
         <Accordion type="multiple" defaultValue={["ev"]}>
+          {state.spellMode && (
+            <AccordionItem value="sf">
+              <AccordionTrigger>Spell Failure Rate Calculator</AccordionTrigger>
+              <AccordionContent>
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart
+                    data={splFailRateData}
+                    margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="skillAverage"
+                      label={{
+                        value: "Skill Average",
+                        position: "bottom",
+                        offset: 16,
+                        style: { fill: "#eee" },
+                      }}
+                      tickFormatter={(value) => value.toFixed(1)}
+                      ticks={evTicks}
+                      interval={0}
+                      //  tick={(props) => <CustomTick {...props} ticks={evTicks} />}
+                    />
+                    <YAxis
+                      allowDecimals={false}
+                      width={30}
+                      tick={{ fill: "#eee" }}
+                    />
+                    <Tooltip
+                      formatter={(value) => {
+                        return [`${value}`, "Spell Failure Rate"];
+                      }}
+                      labelFormatter={(value) => `Skill Average: ${value}`}
+                      wrapperStyle={{
+                        backgroundColor: "hsl(var(--popover))",
+                        borderColor: "hsl(var(--border))",
+                        color: "hsl(var(--popover-foreground))",
+                        borderRadius: "calc(var(--radius) - 2px)",
+                      }}
+                      contentStyle={{
+                        backgroundColor: "hsl(var(--popover))",
+                        border: "none",
+                      }}
+                      itemStyle={{
+                        color: "hsl(var(--popover-foreground))",
+                      }}
+                    />
+                    <Legend
+                      verticalAlign="bottom"
+                      align="center"
+                      layout="horizontal"
+                      wrapperStyle={{
+                        marginLeft: "-100px",
+                        marginBottom: "-10px",
+                      }}
+                    />
+                    <Line
+                      type="stepAfter"
+                      dataKey="spellFailureRate"
+                      name=" Spell Failure Rate"
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </AccordionContent>
+            </AccordionItem>
+          )}
           <AccordionItem value="ev">
             <AccordionTrigger>EV Calculator</AccordionTrigger>
             <AccordionContent>

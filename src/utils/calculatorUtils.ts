@@ -2,6 +2,12 @@ import { calculateEVForSkillLevel } from "@/utils/evCalculations";
 import { mixedCalculations } from "@/utils/acCalculations";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import { calculateSH } from "./shCalculation";
+import {
+  calculateSpellFailureRate,
+  getSpellSchools,
+  SpellSchool,
+} from "./spellCalculation";
+import { spells } from "@/data/spells";
 
 type DataPoint = {
   dodgingSkill: number;
@@ -136,4 +142,60 @@ export const calculateShTicks = (state: CalculatorState): number[] => {
   }
 
   return Array.from(shChangePoints);
+};
+
+export type SpellFailureRateDataPoint = {
+  skillAverage: number;
+  spellFailureRate: number;
+};
+
+export const calculateSFData = (
+  state: CalculatorState
+): SpellFailureRateDataPoint[] => {
+  const spellDifficulty = spells.find(
+    (spell) => spell.name === state.targetSpell
+  )?.level;
+
+  if (spellDifficulty === undefined) {
+    throw new Error("Spell difficulty not found");
+  }
+
+  const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
+    (_, index) => {
+      if (state.targetSpell === undefined) {
+        throw new Error("Target spell not found");
+      }
+
+      if (state.schoolSkills === undefined) {
+        throw new Error("School skills not found");
+      }
+
+      const skillAverage = index / 10;
+      const spellSchools = getSpellSchools(state.targetSpell);
+      const schoolSkills = spellSchools.reduce((acc, school) => {
+        acc[school] = skillAverage / spellSchools.length;
+        return acc;
+      }, {} as Record<SpellSchool, number>);
+
+      const spellFailureRate = calculateSpellFailureRate({
+        strength: state.strength,
+        intelligence: state.intelligence,
+        spellcasting: state.spellcasting ?? 0,
+        targetSpell: state.targetSpell,
+        schoolSkills: schoolSkills,
+        spellDifficulty,
+        armour: state.armour,
+        shield: state.shield,
+        armourSkill: state.armourSkill,
+        shieldSkill: state.shieldSkill,
+      });
+
+      return {
+        skillAverage,
+        spellFailureRate,
+      };
+    }
+  );
+
+  return result;
 };
