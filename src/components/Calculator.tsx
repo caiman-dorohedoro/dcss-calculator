@@ -234,9 +234,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     tickFormatter={(value) => value.toFixed(1)}
                     ticks={evTicks}
                     interval={0}
-                    tick={(props) => (
-                      <CustomTick {...props} ticks={evTicks} tickLimit={12} />
-                    )}
+                    tick={(props) => <CustomTick {...props} ticks={evTicks} />}
                   />
                   <YAxis
                     allowDecimals={false}

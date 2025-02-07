@@ -6,7 +6,7 @@ function App() {
   const { state, setState, resetState } = useCalculatorState();
 
   return (
-    <div className="p-4 flex items-center justify-center w-screen">
+    <div className="p-1 md:p-4 flex items-center justify-center w-screen">
       <Tabs defaultValue="ev" className="w-full max-w-2xl">
         {/* outline: none이 inline style로 적용되어 있어 className이 아닌 style attr를 통해 덮어씌운다 */}
         <TabsList
@@ -18,7 +18,8 @@ function App() {
             onClick={resetState}
             className="text-sm text-muted-foreground hover:text-foreground absolute right-8"
           >
-            Reset to Default
+            <span className="hidden md:block">Reset to Default</span>
+            <span className="block md:hidden">Reset</span>
           </button>
         </TabsList>
         <TabsContent value="ev">

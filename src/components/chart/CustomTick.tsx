@@ -10,18 +10,16 @@ interface CustomTickProps {
   tickLimit?: number;
 }
 
-const CustomTick = ({
-  x,
-  y,
-  payload,
-  ticks = [],
-  tickLimit = 11,
-}: CustomTickProps) => {
+const tickLimit = 12;
+const mobileTickLimit = 8;
+
+const CustomTick = ({ x, y, payload, ticks = [] }: CustomTickProps) => {
   if (!payload || typeof payload.value !== "number") {
     return <g />;
   }
 
-  const shouldRotate = ticks.length > tickLimit;
+  const _tickLimit = window.innerWidth < 768 ? mobileTickLimit : tickLimit;
+  const shouldRotate = ticks.length > _tickLimit;
 
   const fontSize = shouldRotate ? 12 : 14;
   const rotation = shouldRotate ? -45 : 0;
