@@ -313,7 +313,10 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
       <CardContent>
         <Accordion
           type="multiple"
-          defaultValue={state.spellMode ? ["sf"] : ["ev"]}
+          value={state.accordionValue}
+          onValueChange={(value) =>
+            setState((prev) => ({ ...prev, accordionValue: value }))
+          }
         >
           {state.spellMode && (
             <AccordionItem value="sf">

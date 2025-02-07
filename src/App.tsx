@@ -10,9 +10,18 @@ import {
   TooltipTrigger,
 } from "./components/ui/tooltip";
 import { TriangleAlert } from "lucide-react";
+import { useEffect } from "react";
 
 function App() {
   const { state, setState, resetState } = useCalculatorState();
+
+  useEffect(() => {
+    if (state.spellMode) {
+      setState((prev) => ({ ...prev, accordionValue: ["sf"] }));
+    } else {
+      setState((prev) => ({ ...prev, accordionValue: ["ev"] }));
+    }
+  }, [state.spellMode, setState]);
 
   return (
     <div className="p-1 md:p-4 flex items-center justify-center w-screen">

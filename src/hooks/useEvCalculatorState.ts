@@ -7,6 +7,8 @@ import { SpellName, SpellSchool } from "@/utils/spellCalculation";
 const STORAGE_KEY = "calculator";
 
 export interface CalculatorState {
+  accordionValue: string[];
+  //
   dexterity: number;
   strength: number;
   intelligence: number;
@@ -40,6 +42,7 @@ export interface CalculatorState {
 }
 
 const defaultState: CalculatorState = {
+  accordionValue: ["ev"],
   dexterity: 10,
   strength: 10,
   intelligence: 10,
