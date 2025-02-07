@@ -137,7 +137,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           />
           <AttrInput
             label="Int"
-            value={state.dexterity}
+            value={state.intelligence}
             type="stat"
             onChange={(value) =>
               setState((prev) => ({ ...prev, intelligence: value }))
