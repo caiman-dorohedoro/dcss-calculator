@@ -5,6 +5,7 @@ import { calculateSH } from "./shCalculation";
 import {
   calculateSpellFailureRate,
   getSpellSchools,
+  SpellName,
   SpellSchool,
 } from "./spellCalculation";
 import { spells } from "@/data/spells";
@@ -144,14 +145,14 @@ export const calculateShTicks = (state: CalculatorState): number[] => {
   return Array.from(shChangePoints);
 };
 
-export type SpellFailureRateDataPoint = {
-  skillAverage: number;
+export type FristSchoolSFDataPoint = {
+  spellSkill: number;
   spellFailureRate: number;
 };
 
-export const calculateSFData = (
+export const calculateFirstSFData = (
   state: CalculatorState
-): SpellFailureRateDataPoint[] => {
+): FristSchoolSFDataPoint[] => {
   const spellDifficulty = spells.find(
     (spell) => spell.name === state.targetSpell
   )?.level;
@@ -160,20 +161,28 @@ export const calculateSFData = (
     throw new Error("Spell difficulty not found");
   }
 
+  if (state.targetSpell === undefined) {
+    throw new Error("Target spell not found");
+  }
+  const spellSchools = getSpellSchools(state.targetSpell);
+
+  const [firstSchool] = spellSchools.toSorted((a, b) => a.localeCompare(b));
+
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
-      if (state.targetSpell === undefined) {
-        throw new Error("Target spell not found");
-      }
-
       if (state.schoolSkills === undefined) {
         throw new Error("School skills not found");
       }
 
-      const skillAverage = index / 10;
-      const spellSchools = getSpellSchools(state.targetSpell);
+      const spellSchools = getSpellSchools(state.targetSpell as SpellName);
       const schoolSkills = spellSchools.reduce((acc, school) => {
-        acc[school] = skillAverage / spellSchools.length;
+        if (school === firstSchool) {
+          acc[school] = index / 10;
+        } else {
+          acc[school] = (state.schoolSkills as Record<SpellSchool, number>)[
+            school
+          ];
+        }
         return acc;
       }, {} as Record<SpellSchool, number>);
 
@@ -181,7 +190,7 @@ export const calculateSFData = (
         strength: state.strength,
         intelligence: state.intelligence,
         spellcasting: state.spellcasting ?? 0,
-        targetSpell: state.targetSpell,
+        targetSpell: state.targetSpell as SpellName,
         schoolSkills: schoolSkills,
         spellDifficulty,
         armour: state.armour,
@@ -191,11 +200,33 @@ export const calculateSFData = (
       });
 
       return {
-        skillAverage,
+        spellSkill: index / 10,
         spellFailureRate,
       };
     }
   );
 
   return result;
+};
+
+export const calculateSFTicks = (state: CalculatorState): number[] => {
+  const sfData = calculateFirstSFData(state);
+  const sfChangePoints = new Set<number>();
+
+  const fibo = [1, 2, 3, 5, 8, 13, 21];
+  let lastSpellFailureRate = 0;
+  for (const dataPoint of sfData) {
+    if (
+      dataPoint.spellFailureRate <= 34 &&
+      dataPoint.spellSkill < 27 &&
+      fibo.includes(dataPoint.spellFailureRate)
+    ) {
+      if (dataPoint.spellFailureRate !== lastSpellFailureRate) {
+        sfChangePoints.add(dataPoint.spellSkill);
+        lastSpellFailureRate = dataPoint.spellFailureRate;
+      }
+    }
+  }
+
+  return Array.from(sfChangePoints);
 };

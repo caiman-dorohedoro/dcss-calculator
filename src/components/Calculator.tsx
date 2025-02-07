@@ -40,12 +40,14 @@ import {
   calculateEvTicks,
   calculateSHData,
   calculateShTicks,
-  calculateSFData,
+  calculateFirstSFData,
+  calculateSFTicks,
 } from "@/utils/calculatorUtils";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { spells } from "@/data/spells";
 import { SpellName } from "@/utils/spellCalculation";
+import CustomSpellTick from "./chart/CustomSpellTick";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -71,28 +73,33 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
   const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [shData, setShData] = useState<ReturnType<typeof calculateSHData>>([]);
-  const [splFailRateData, setSplFailRateData] = useState<
-    ReturnType<typeof calculateSFData>
-  >([]);
+  const [sfData, setSFData] = useState<ReturnType<typeof calculateFirstSFData>>(
+    []
+  );
   const [acTicks, setAcTicks] = useState<number[]>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
   const [shTicks, setShTicks] = useState<number[]>([]);
-  // const [spellFailureRateTicks, setSpellFailureRateTicks] = useState<number[]>(
-  //   []
-  // );
+  const [sfTicks, setSfTicks] = useState<number[]>([]);
+
+  const firstSchool = spells.find((spell) => spell.name === state.targetSpell)
+    ?.schools[0];
 
   useEffect(() => {
     const evData = calculateEvData(state);
     setData(evData);
     setEvTicks(calculateEvTicks(state));
+
     const acData = calculateAcData(state);
     setAcData(acData);
     setAcTicks(calculateAcTicks(state));
+
     const shData = calculateSHData(state);
     setShData(shData);
     setShTicks(calculateShTicks(state));
-    const spellFailureRate = calculateSFData(state);
-    setSplFailRateData(spellFailureRate);
+
+    const firstSFData = calculateFirstSFData(state);
+    setSFData(firstSFData);
+    setSfTicks(calculateSFTicks(state));
   }, [state]);
 
   const zeroBaseAC =
@@ -304,29 +311,32 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
         )}
       </CardHeader>
       <CardContent>
-        <Accordion type="multiple" defaultValue={["ev"]}>
+        <Accordion
+          type="multiple"
+          defaultValue={state.spellMode ? ["sf"] : ["ev"]}
+        >
           {state.spellMode && (
             <AccordionItem value="sf">
               <AccordionTrigger>Spell Failure Rate Calculator</AccordionTrigger>
               <AccordionContent>
                 <ResponsiveContainer width="100%" height={350}>
                   <LineChart
-                    data={splFailRateData}
+                    data={sfData}
                     margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
-                      dataKey="skillAverage"
+                      dataKey="spellSkill"
                       label={{
-                        value: "Skill Average",
+                        value: `${firstSchool} Skill`,
                         position: "bottom",
                         offset: 16,
                         style: { fill: "#eee" },
                       }}
                       tickFormatter={(value) => value.toFixed(1)}
-                      ticks={evTicks}
+                      ticks={sfTicks}
                       interval={0}
-                      //  tick={(props) => <CustomTick {...props} ticks={evTicks} />}
+                      tick={CustomSpellTick}
                     />
                     <YAxis
                       allowDecimals={false}
@@ -335,9 +345,11 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     />
                     <Tooltip
                       formatter={(value) => {
-                        return [`${value}`, "Spell Failure Rate"];
+                        return [`${value}%`, "Spell Failure Rate"];
                       }}
-                      labelFormatter={(value) => `Skill Average: ${value}`}
+                      labelFormatter={(value) =>
+                        `${firstSchool} Skill: ${value}`
+                      }
                       wrapperStyle={{
                         backgroundColor: "hsl(var(--popover))",
                         borderColor: "hsl(var(--border))",
@@ -357,7 +369,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       align="center"
                       layout="horizontal"
                       wrapperStyle={{
-                        marginLeft: "-100px",
+                        marginLeft: "-120px",
                         marginBottom: "-10px",
                       }}
                     />
@@ -366,6 +378,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       dataKey="spellFailureRate"
                       name=" Spell Failure Rate"
                       isAnimationActive={false}
+                      dot={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
