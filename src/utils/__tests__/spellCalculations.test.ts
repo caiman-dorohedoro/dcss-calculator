@@ -25,10 +25,11 @@ function calculateSpellPenalty({
   function calculateArmourPenalty() {
     const baseEvPenalty = armourEvPenalty;
 
-    let penalty =
+    let penalty = Math.floor(
       (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
-      (5 * (strength + 3)) /
-      450;
+        (5 * (strength + 3)) /
+        450
+    );
 
     penalty *= 19;
 
@@ -39,14 +40,15 @@ function calculateSpellPenalty({
   function calculateShieldPenalty() {
     const baseShieldPenalty = shieldEvPenalty;
 
-    let penalty =
+    let penalty = Math.floor(
       (2 *
         baseShieldPenalty *
         baseShieldPenalty *
         (270 - shieldSkill * 10) *
         SCALE) /
-      (25 + 5 * strength) /
-      270;
+        (25 + 5 * strength) /
+        270
+    );
 
     penalty *= 19;
 
@@ -83,7 +85,7 @@ function getTrueFailRate(rawFail: number) {
 function failureRateToInt(fail: number) {
   if (fail <= 0) return 0;
   else if (fail >= 100) return Math.floor((fail + 100) / 2);
-  else return Math.max(1, Math.trunc(100 * getTrueFailRate(fail)));
+  else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
 }
 
 function rawSpellFail({
@@ -103,11 +105,12 @@ function rawSpellFail({
 
   // 주문 기술력 계산
   const skillCount = 2; // conjuration + fire
-  const spellPower =
-    (((conjurationSkill * 200 + secondSkill * 200) / skillCount +
-      playerSpellcasting * 50) *
-      6) /
-    100;
+  const skillPowerAverage = Math.floor(
+    (conjurationSkill * 200 + secondSkill * 200) / skillCount
+  );
+  const spellPower = Math.floor(
+    ((skillPowerAverage + playerSpellcasting * 50) * 6) / 100
+  );
 
   // 주문력으로 실패율 감소
   chance -= spellPower;
@@ -334,5 +337,25 @@ describe("Spell Calculations", () => {
     const failureRate = rawSpellFail(params);
 
     expect(failureRate).toBe(4);
+  });
+
+  // https://crawl.akrasiac.org/rawdata/hammy3456/morgue-hammy3456-20250206-022444.txt
+  test("kite shield, 5 level hex/air silence", () => {
+    const params = {
+      playerStrength: 12,
+      playerSpellcasting: 14,
+      intelligence: 25,
+      conjurationSkill: 8,
+      secondSkill: 9,
+      spellDifficulty: 5 as SpellDifficultyLevel,
+      equippedArmour: { encumbrance: 0 },
+      equippedShield: { encumbrance: 15 },
+      armourSkill: 0,
+      shieldSkill: 24.6,
+    };
+
+    const failureRate = rawSpellFail(params);
+
+    expect(failureRate).toBe(2);
   });
 });
