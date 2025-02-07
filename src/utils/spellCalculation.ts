@@ -1,3 +1,6 @@
+import { ArmourKey, armourOptions } from "./acCalculations";
+import { ShieldKey, shieldOptions } from "./shCalculation";
+
 type SpellSkill = {
   name: string;
   skill: number;
@@ -9,8 +12,8 @@ export type SpellCalculationParams = {
   intelligence: number;
   spellSkills: SpellSkill[];
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-  equippedArmour: { encumbrance: number };
-  equippedShield: { encumbrance: number };
+  armour: ArmourKey;
+  shield: ShieldKey;
   armourSkill: number;
   shieldSkill: number;
 };
@@ -52,7 +55,7 @@ function getTrueFailRate(rawFail: number) {
 }
 
 type CalculateArmourPenaltyParams = {
-  armourEvPenalty: number;
+  armour: ArmourKey;
   armourSkill: number;
   strength: number;
   SCALE: number;
@@ -60,12 +63,12 @@ type CalculateArmourPenaltyParams = {
 
 // 갑옷 패널티 계산
 function calculateArmourPenalty({
-  armourEvPenalty,
+  armour,
   armourSkill,
   strength,
   SCALE,
 }: CalculateArmourPenaltyParams) {
-  const baseEvPenalty = armourEvPenalty;
+  const baseEvPenalty = armourOptions[armour].encumbrance;
 
   let penalty = Math.floor(
     Math.floor(
@@ -80,7 +83,7 @@ function calculateArmourPenalty({
 }
 
 type CalculateShieldPenaltyParams = {
-  shieldEvPenalty: number;
+  shield: ShieldKey;
   shieldSkill: number;
   strength: number;
   SCALE: number;
@@ -88,12 +91,12 @@ type CalculateShieldPenaltyParams = {
 
 // 방패 패널티 계산
 function calculateShieldPenalty({
-  shieldEvPenalty,
+  shield,
   shieldSkill,
   strength,
   SCALE,
 }: CalculateShieldPenaltyParams) {
-  const baseShieldPenalty = shieldEvPenalty;
+  const baseShieldPenalty = shieldOptions[shield].encumbrance;
 
   let penalty = Math.floor(
     Math.floor(
@@ -114,29 +117,29 @@ function calculateShieldPenalty({
 type armourShieldSpellPenaltyParams = {
   strength: number;
   armourSkill: number;
-  armourEvPenalty: number;
+  armour: ArmourKey;
   shieldSkill: number;
-  shieldEvPenalty: number;
+  shield: ShieldKey;
 };
 
 function calculateArmourShieldSpellPenalty({
   strength,
   armourSkill,
-  armourEvPenalty,
+  armour,
   shieldSkill,
-  shieldEvPenalty,
+  shield,
 }: armourShieldSpellPenaltyParams) {
   const SCALE = 100;
 
   const totalPenalty =
     calculateArmourPenalty({
-      armourEvPenalty,
+      armour,
       armourSkill,
       strength,
       SCALE,
     }) +
     calculateShieldPenalty({
-      shieldEvPenalty,
+      shield,
       shieldSkill,
       strength,
       SCALE,
@@ -155,8 +158,8 @@ function rawSpellFail({
   strength,
   intelligence,
   spellDifficulty,
-  equippedArmour,
-  equippedShield,
+  armour,
+  shield,
   spellSkills,
   spellcastingSkill,
   armourSkill,
@@ -184,9 +187,9 @@ function rawSpellFail({
   chance += calculateArmourShieldSpellPenalty({
     strength: strength,
     armourSkill,
-    armourEvPenalty: equippedArmour.encumbrance,
+    armour,
     shieldSkill,
-    shieldEvPenalty: equippedShield.encumbrance,
+    shield,
   });
 
   // 주문 난이도별 기본 실패율
