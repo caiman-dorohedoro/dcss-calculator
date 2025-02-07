@@ -372,4 +372,24 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(22);
   });
+
+  // https://crawl.akrasiac.org/rawdata/backstreet/morgue-backstreet-20241227-085307.txt
+  test("naga, kite shield, plate armour, barding, 4 level Tloc/Air spell (Vhi's Electric Charge)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 21,
+      spellcastingSkill: 18,
+      intelligence: 51,
+      spellSkills: [
+        { name: "translocations", skill: 8 },
+        { name: "air", skill: 8 },
+      ],
+      spellDifficulty: 4,
+      armour: "plate",
+      shield: "kite_shield",
+      armourSkill: 15,
+      shieldSkill: 15,
+    });
+
+    expect(failureRate).toBe(2);
+  });
 });
