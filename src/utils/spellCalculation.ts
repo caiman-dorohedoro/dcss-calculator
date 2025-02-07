@@ -147,7 +147,7 @@ function failureRateToInt(fail: number) {
   else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
 }
 
-export function rawSpellFail({
+function rawSpellFail({
   strength,
   intelligence,
   spellDifficulty,
@@ -201,5 +201,11 @@ export function rawSpellFail({
   // 최종 실패율은 0-100% 사이
   const failRate = Math.min(Math.max(chance2, 0), 100);
 
-  return failureRateToInt(failRate);
+  return failRate;
 }
+
+export const calculateSpellFailureRate = (params: SpellCalculationParams) => {
+  const failRate = rawSpellFail(params);
+
+  return failureRateToInt(failRate);
+};

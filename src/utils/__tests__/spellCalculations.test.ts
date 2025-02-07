@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { rawSpellFail } from "../spellCalculation";
+import { calculateSpellFailureRate } from "../spellCalculation";
 import { SpellDifficultyLevel } from "../spellCalculation";
 
 describe("Spell Calculations", () => {
@@ -17,7 +17,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(28);
   });
@@ -36,7 +36,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(24);
   });
@@ -55,7 +55,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(7);
   });
@@ -74,7 +74,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(3);
   });
@@ -93,7 +93,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(5);
   });
@@ -112,7 +112,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(100);
   });
@@ -131,7 +131,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(19);
   });
@@ -150,7 +150,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(1);
   });
@@ -170,7 +170,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 0,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(4);
   });
@@ -190,7 +190,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 18,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(4);
   });
@@ -211,7 +211,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 24.6,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(3);
   });
@@ -230,7 +230,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 24.6,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(2);
   });
@@ -249,7 +249,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 24.6,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(1);
   });
@@ -269,7 +269,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 15.2,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(3);
   });
@@ -289,7 +289,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 19,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(1);
   });
@@ -309,7 +309,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 27,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(4);
   });
@@ -329,7 +329,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 21,
     };
 
-    const failureRate = rawSpellFail(params);
+    const failureRate = calculateSpellFailureRate(params);
 
     expect(failureRate).toBe(7);
   });
