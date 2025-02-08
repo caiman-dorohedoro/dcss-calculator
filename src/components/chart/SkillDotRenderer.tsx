@@ -32,7 +32,10 @@ const minBottomOffset = 15;
 const widthPerDigit = 8.3;
 const heightDigit = 14;
 
-const renderDot = (skillKey: keyof CalculatorState, currentSkill: number) => {
+const renderDot = (
+  skillKey: keyof CalculatorState | "spellSkill",
+  currentSkill: number
+) => {
   const dotRenderer: LineDot = (params: RenderDotParams) => {
     const { cx, cy, payload, value } = params;
 

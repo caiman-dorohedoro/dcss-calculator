@@ -31,7 +31,7 @@ import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 import {
   CalculatorState,
-  isCalculatorStateKey,
+  isSchoolSkillKey,
 } from "@/hooks/useEvCalculatorState";
 import {
   calculateAcData,
@@ -40,13 +40,17 @@ import {
   calculateEvTicks,
   calculateSHData,
   calculateShTicks,
-  calculateFirstSFData,
+  calculateAvgSFData,
   calculateSFTicks,
 } from "@/utils/calculatorUtils";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { spells } from "@/data/spells";
-import { SpellName } from "@/utils/spellCalculation";
+import {
+  getSpellSchools,
+  SpellName,
+  SpellSchool,
+} from "@/utils/spellCalculation";
 import CustomSpellTick from "./chart/CustomSpellTick";
 
 type CalculatorProps = {
@@ -73,7 +77,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
   const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [shData, setShData] = useState<ReturnType<typeof calculateSHData>>([]);
-  const [sfData, setSFData] = useState<ReturnType<typeof calculateFirstSFData>>(
+  const [sfData, setSFData] = useState<ReturnType<typeof calculateAvgSFData>>(
     []
   );
   const [acTicks, setAcTicks] = useState<number[]>([]);
@@ -83,6 +87,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
 
   const firstSchool = spells.find((spell) => spell.name === state.targetSpell)
     ?.schools[0];
+  const spellSchools = getSpellSchools(state.targetSpell as SpellName);
 
   useEffect(() => {
     const evData = calculateEvData(state);
@@ -97,7 +102,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     setShData(shData);
     setShTicks(calculateShTicks(state));
 
-    const firstSFData = calculateFirstSFData(state);
+    const firstSFData = calculateAvgSFData(state);
     setSFData(firstSFData);
     setSfTicks(calculateSFTicks(state));
   }, [state]);
@@ -268,7 +273,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
               </Select>
             </div>
             <AttrInput
-              label="Spellcasting"
+              label="Spellcasting Skill"
               value={state.spellcasting ?? 0}
               type="skill"
               onChange={(value) =>
@@ -282,26 +287,29 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             {spells
               .find((spell) => spell.name === state.targetSpell)
               ?.schools.map((schoolName) => {
-                const lowerCaseSchoolName = schoolName.toLowerCase();
+                // const lowerCaseSchoolName = schoolName.toLowerCase();
 
-                if (!isCalculatorStateKey(lowerCaseSchoolName)) {
+                if (!isSchoolSkillKey(schoolName)) {
                   return null;
                 }
 
-                if (typeof state[lowerCaseSchoolName] !== "number") {
+                if (typeof state.schoolSkills?.[schoolName] !== "number") {
                   return null;
                 }
 
                 return (
                   <AttrInput
-                    key={lowerCaseSchoolName}
-                    label={schoolName}
-                    value={state[lowerCaseSchoolName]}
+                    key={schoolName}
+                    label={`${schoolName}`}
+                    value={state.schoolSkills?.[schoolName] ?? 0}
                     type="skill"
                     onChange={(value) =>
                       setState((prev) => ({
                         ...prev,
-                        [lowerCaseSchoolName]: value,
+                        schoolSkills: {
+                          ...prev.schoolSkills,
+                          [schoolName]: value === undefined ? 0 : value,
+                        } as Record<SpellSchool, number>,
                       }))
                     }
                   />
@@ -331,7 +339,10 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                     <XAxis
                       dataKey="spellSkill"
                       label={{
-                        value: `${firstSchool} Skill`,
+                        value:
+                          spellSchools.length > 1
+                            ? "Skill Average"
+                            : `${firstSchool} Skill`,
                         position: "bottom",
                         offset: 16,
                         style: { fill: "#eee" },
@@ -381,7 +392,18 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       dataKey="spellFailureRate"
                       name=" Spell Failure Rate"
                       isAnimationActive={false}
-                      dot={false}
+                      dot={renderDot(
+                        "spellSkill",
+                        Number(
+                          (
+                            spellSchools.reduce(
+                              (acc, school) =>
+                                acc + (state.schoolSkills?.[school] ?? 0),
+                              0
+                            ) / spellSchools.length
+                          ).toFixed(1)
+                        )
+                      )}
                     />
                   </LineChart>
                 </ResponsiveContainer>

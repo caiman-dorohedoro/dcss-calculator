@@ -29,16 +29,6 @@ export interface CalculatorState {
   schoolSkills?: Record<SpellSchool, number>;
   targetSpell?: SpellName;
   spellcasting?: number;
-  translocation?: number;
-  fire?: number;
-  ice?: number;
-  earth?: number;
-  air?: number;
-  necromancy?: number;
-  conjuration?: number;
-  alchemy?: number;
-  hexes?: number;
-  summoning?: number;
 }
 
 const defaultState: CalculatorState = {
@@ -74,22 +64,12 @@ const defaultState: CalculatorState = {
   },
   targetSpell: "Airstrike",
   spellcasting: 0,
-  translocation: 0,
-  fire: 0,
-  ice: 0,
-  earth: 0,
-  air: 0,
-  necromancy: 0,
-  conjuration: 0,
-  alchemy: 0,
-  hexes: 0,
-  summoning: 0,
 };
 
-export const isCalculatorStateKey = (
+export const isSchoolSkillKey = (
   key: string
-): key is keyof CalculatorState => {
-  return Object.keys(defaultState).includes(key);
+): key is keyof typeof defaultState.schoolSkills => {
+  return Object.keys(defaultState.schoolSkills!).includes(key);
 };
 
 const validateState = (state: unknown): state is CalculatorState => {

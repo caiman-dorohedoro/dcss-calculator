@@ -150,7 +150,7 @@ export type FristSchoolSFDataPoint = {
   spellFailureRate: number;
 };
 
-export const calculateFirstSFData = (
+export const calculateAvgSFData = (
   state: CalculatorState
 ): FristSchoolSFDataPoint[] => {
   const spellDifficulty = spells.find(
@@ -166,23 +166,15 @@ export const calculateFirstSFData = (
   }
   const spellSchools = getSpellSchools(state.targetSpell);
 
-  const [firstSchool] = spellSchools.toSorted((a, b) => a.localeCompare(b));
-
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       if (state.schoolSkills === undefined) {
         throw new Error("School skills not found");
       }
 
-      const spellSchools = getSpellSchools(state.targetSpell as SpellName);
       const schoolSkills = spellSchools.reduce((acc, school) => {
-        if (school === firstSchool) {
-          acc[school] = index / 10;
-        } else {
-          acc[school] = (state.schoolSkills as Record<SpellSchool, number>)[
-            school
-          ];
-        }
+        acc[school] = index / 10;
+
         return acc;
       }, {} as Record<SpellSchool, number>);
 
@@ -210,7 +202,7 @@ export const calculateFirstSFData = (
 };
 
 export const calculateSFTicks = (state: CalculatorState): number[] => {
-  const sfData = calculateFirstSFData(state);
+  const sfData = calculateAvgSFData(state);
   const sfChangePoints = new Set<number>();
 
   const fibo = [1, 2, 3, 5, 8, 13, 21];
