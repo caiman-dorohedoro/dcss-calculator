@@ -323,6 +323,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
               label="A ring of wizardry"
               value={state.wizardry ?? 0}
               type="number"
+              max={10}
               onChange={(value) =>
                 setState((prev) => ({ ...prev, wizardry: value }))
               }
