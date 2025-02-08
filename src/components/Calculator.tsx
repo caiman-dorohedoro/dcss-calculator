@@ -317,6 +317,18 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
               })}
           </div>
         )}
+        {state.spellMode && (
+          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
+            <AttrInput
+              label="A ring of wizardry"
+              value={state.wizardry ?? 0}
+              type="number"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, wizardry: value }))
+              }
+            />
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <Accordion

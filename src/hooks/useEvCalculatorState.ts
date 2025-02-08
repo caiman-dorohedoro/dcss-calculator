@@ -29,6 +29,7 @@ export interface CalculatorState {
   schoolSkills?: Record<SpellSchool, number>;
   targetSpell?: SpellName;
   spellcasting?: number;
+  wizardry?: number;
 }
 
 const defaultState: CalculatorState = {
@@ -64,6 +65,7 @@ const defaultState: CalculatorState = {
   },
   targetSpell: "Airstrike",
   spellcasting: 0,
+  wizardry: 0,
 };
 
 export const isSchoolSkillKey = (
