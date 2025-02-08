@@ -3,12 +3,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useCalculatorState } from "./hooks/useEvCalculatorState";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "./components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
 
 function App() {
@@ -45,19 +39,6 @@ function App() {
             >
               Spell<span className="hidden md:inline"> Mode</span>
             </Label>
-            <Popover>
-              <PopoverTrigger>
-                <TriangleAlert className="h-4 w-4 hover:text-white hover:cursor-pointer" />
-              </PopoverTrigger>
-              <PopoverContent className="bg-white text-black rounded-none max-w-56 p-1">
-                <div className="text-base font-semibold">
-                  Under Construction
-                </div>
-                <p className="text-sm">
-                  Currently Only One School Spell is Supported
-                </p>
-              </PopoverContent>
-            </Popover>
           </div>
           <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
           <button
