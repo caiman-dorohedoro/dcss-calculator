@@ -12,24 +12,29 @@ const parseFloatInput = (value: number | string) => {
 const defaultWidth = "w-16";
 const skillWidth = "w-[80px]";
 
+type AttrInputProps = {
+  label: string;
+  value: number;
+  type: "stat" | "skill" | "number";
+  max?: number;
+  onChange: (value: number) => void;
+};
+
 const AttrInput = ({
   label,
   value,
   type = "stat",
+  max,
   onChange,
-}: {
-  label: string;
-  value: number;
-  type: "stat" | "skill" | "number";
-  onChange: (value: number) => void;
-}) => {
+}: AttrInputProps) => {
+  const maxValue = max !== undefined ? max : type === "skill" ? 27 : undefined;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue =
       type === "skill"
         ? parseFloatInput(e.target.value)
         : Number(e.target.value);
 
-    onChange(newValue);
+    onChange(maxValue !== undefined ? Math.min(newValue, maxValue) : newValue);
   };
 
   return (
@@ -39,7 +44,7 @@ const AttrInput = ({
         type="number"
         className={cn(defaultWidth, type === "skill" ? skillWidth : "", "h-6")}
         min="0"
-        max={type === "skill" ? "27" : undefined}
+        max={maxValue}
         step={type === "skill" ? "0.1" : undefined}
         value={value}
         onChange={handleChange}
