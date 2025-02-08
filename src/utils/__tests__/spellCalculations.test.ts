@@ -477,4 +477,27 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(28);
   });
+
+  // 개인 플레이 도중
+  test("deep elf, robe, wucad mu, 7 level Fire/Earth spell (Hellfire Mortar)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 6,
+      spellcasting: 23.7,
+      intelligence: 33,
+      targetSpell: "Hellfire Mortar",
+      schoolSkills: {
+        Fire: 3,
+        Earth: 11,
+      },
+      spellDifficulty: 7,
+      armour: "robe",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 5,
+      wizardry: 1,
+      channelling: true,
+    });
+
+    expect(failureRate).toBe(26);
+  });
 });

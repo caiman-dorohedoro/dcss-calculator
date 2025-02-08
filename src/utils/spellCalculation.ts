@@ -21,6 +21,7 @@ export type SpellCalculationParams = {
   armourSkill: number;
   shieldSkill: number;
   wizardry?: number;
+  channelling?: boolean;
 };
 
 export type SpellDifficultyLevel = keyof typeof spellDifficulties;
@@ -190,6 +191,7 @@ function rawSpellFail({
   armourSkill,
   shieldSkill,
   wizardry = 0,
+  channelling = false,
 }: SpellCalculationParams) {
   // 기본 실패율 60%에서 시작
   let chance = 60;
@@ -235,6 +237,10 @@ function rawSpellFail({
     Math.floor((((chance + 426) * chance + 82670) * chance + 7245398) / 262144),
     0
   );
+
+  if (channelling) {
+    chance2 += 10;
+  }
 
   chance2 = applyWizardryBoost(chance2, wizardry);
 
