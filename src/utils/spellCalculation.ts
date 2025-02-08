@@ -20,6 +20,7 @@ export type SpellCalculationParams = {
   shield: ShieldKey;
   armourSkill: number;
   shieldSkill: number;
+  wizardry?: number;
 };
 
 export type SpellDifficultyLevel = keyof typeof spellDifficulties;
@@ -167,6 +168,16 @@ export const getSpellSchools = (targetSpell: SpellName) => {
   return spell.schools;
 };
 
+const applyWizardryBoost = (chance: number, wizardry: number) => {
+  let failReduce = 100;
+
+  if (wizardry > 0) {
+    failReduce = Math.floor((failReduce * 6) / (7 + wizardry));
+  }
+
+  return Math.floor((chance * failReduce) / 100);
+};
+
 function rawSpellFail({
   strength,
   intelligence,
@@ -178,6 +189,7 @@ function rawSpellFail({
   spellcasting,
   armourSkill,
   shieldSkill,
+  wizardry = 0,
 }: SpellCalculationParams) {
   // 기본 실패율 60%에서 시작
   let chance = 60;
@@ -219,10 +231,12 @@ function rawSpellFail({
   chance = Math.min(chance, 210);
 
   // 3차 다항식을 통한 실패율 계산
-  const chance2 = Math.max(
+  let chance2 = Math.max(
     Math.floor((((chance + 426) * chance + 82670) * chance + 7245398) / 262144),
     0
   );
+
+  chance2 = applyWizardryBoost(chance2, wizardry);
 
   // 최종 실패율은 0-100% 사이
   const failRate = Math.min(Math.max(chance2, 0), 100);

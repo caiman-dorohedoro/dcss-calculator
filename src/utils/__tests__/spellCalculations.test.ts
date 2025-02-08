@@ -433,4 +433,48 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(9);
   });
+
+  // 개인 플레이 도중
+  test("deep elf, steam dragon scales, buckler, 4 level Summoning/Air spell (Summon Lightning Spire)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 4,
+      spellcasting: 18,
+      intelligence: 29,
+      targetSpell: "Summon Lightning Spire",
+      schoolSkills: {
+        Summoning: 3,
+        Air: 4,
+      },
+      spellDifficulty: 4,
+      armour: "steam_dragon",
+      shield: "buckler",
+      armourSkill: 0,
+      shieldSkill: 4.7,
+      wizardry: 1,
+    });
+
+    expect(failureRate).toBe(2);
+  });
+
+  // WIZ 모드 테스트
+  test("white draconian, tower shield, 8 level Conj/Earth spell (Lehudib's Crystal Spear)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 12,
+      spellcasting: 14,
+      intelligence: 25,
+      targetSpell: "Lehudib's Crystal Spear",
+      schoolSkills: {
+        Conjuration: 14,
+        Earth: 13,
+      },
+      spellDifficulty: 8,
+      armour: "robe",
+      shield: "tower_shield",
+      armourSkill: 0,
+      shieldSkill: 24.6,
+      wizardry: 2,
+    });
+
+    expect(failureRate).toBe(28);
+  });
 });
