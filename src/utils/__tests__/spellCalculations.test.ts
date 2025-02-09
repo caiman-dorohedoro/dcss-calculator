@@ -495,7 +495,7 @@ describe("Spell Calculations", () => {
       armourSkill: 0,
       shieldSkill: 5,
       wizardry: 1,
-      channelling: true,
+      channel: true,
     });
 
     expect(failureRate).toBe(26);

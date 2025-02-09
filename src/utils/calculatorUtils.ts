@@ -190,6 +190,7 @@ export const calculateAvgSFData = (
         armourSkill: state.armourSkill,
         shieldSkill: state.shieldSkill,
         wizardry: state.wizardry,
+        channel: state.channel,
       });
 
       return {

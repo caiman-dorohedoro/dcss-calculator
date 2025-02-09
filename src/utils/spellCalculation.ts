@@ -21,7 +21,7 @@ export type SpellCalculationParams = {
   armourSkill: number;
   shieldSkill: number;
   wizardry?: number;
-  channelling?: boolean;
+  channel?: boolean;
 };
 
 export type SpellDifficultyLevel = keyof typeof spellDifficulties;
@@ -191,7 +191,7 @@ function rawSpellFail({
   armourSkill,
   shieldSkill,
   wizardry = 0,
-  channelling = false,
+  channel = false,
 }: SpellCalculationParams) {
   // 기본 실패율 60%에서 시작
   let chance = 60;
@@ -238,7 +238,7 @@ function rawSpellFail({
     0
   );
 
-  if (channelling) {
+  if (channel) {
     chance2 += 10;
   }
 

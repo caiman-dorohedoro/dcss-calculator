@@ -318,9 +318,9 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           </div>
         )}
         {state.spellMode && (
-          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
+          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start border-t border-gray-700 pt-2">
             <AttrInput
-              label="A ring of wizardry"
+              label="wizardry"
               value={state.wizardry ?? 0}
               type="number"
               max={10}
@@ -328,6 +328,16 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                 setState((prev) => ({ ...prev, wizardry: value }))
               }
             />
+            <div className="flex flex-row items-center gap-2">
+              <Checkbox
+                id="channel"
+                checked={state.channel}
+                onCheckedChange={(checked) =>
+                  setState((prev) => ({ ...prev, channel: !!checked }))
+                }
+              />
+              <label htmlFor="channel">Channel</label>
+            </div>
           </div>
         )}
       </CardHeader>
