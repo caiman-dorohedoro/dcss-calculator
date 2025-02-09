@@ -169,12 +169,14 @@ try {
   }
 
   const parsedSpells = parseSpellData(spellDataSection);
+  const sortedSpells = parsedSpells.sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
 
-  // 결과를 파일로 저장
-  fs.writeFileSync("parsed-spells.json", JSON.stringify(parsedSpells, null, 2));
-
-  console.log("Total spells parsed:", parsedSpells.length);
-  console.log("First spell:", JSON.stringify(parsedSpells[0], null, 2));
+  fs.writeFileSync(
+    "src/data/parsed-spells.json",
+    JSON.stringify(sortedSpells, null, 2)
+  );
 } catch (error) {
   console.error("Failed to process spell data:", error);
   process.exit(1);
