@@ -1,5 +1,20 @@
 import fs from "fs";
 
+type SpellData_PROTO = {
+  id: string;
+  name: string;
+  schools: string[];
+  flags: string[];
+  level: number;
+  power: number;
+  range: {
+    min: number;
+    max: number;
+  };
+  noise: number;
+  tile: string;
+};
+
 function extractSpellData(fileContent: string) {
   try {
     // 시작 부분을 찾을 때 더 유연하게 검색
@@ -45,52 +60,8 @@ function extractSpellData(fileContent: string) {
   }
 }
 
-/**
- * 
- * @param spellDataSection   {
-    "id": "SPELL_POISONOUS_CLOUD",
-    "name": "Poisonous Cloud",
-    "schools": [
-      "conjuration",
-      "alchemy",
-      "air"
-    ],
-    "flags": [
-      "target",
-      "area",
-      "needs_tracer",
-      "cloud",
-      "monster"
-    ],
-    "level": 5,
-    "power": 200,
-    "range": {
-      "min": 5,
-      "max": 5
-    },
-    "noise": 2,
-    "tile": "TILEG_POISONOUS_CLOUD"
-  }
- * @returns 
- */
-
-type SpellData = {
-  id: string;
-  name: string;
-  schools: string[];
-  flags: string[];
-  level: number;
-  power: number;
-  range: {
-    min: number;
-    max: number;
-  };
-  noise: number;
-  tile: string;
-};
-
 function parseSpellData(spellDataSection: string) {
-  const spells: SpellData[] = [];
+  const spells: SpellData_PROTO[] = [];
   // 각각의 spell 블록을 매칭하는 정규식
   const spellRegex = /{\s*SPELL_[^}]+}/g;
 
@@ -156,7 +127,6 @@ function parseFlags(flagsStr: string) {
     .filter((f) => f !== "none");
 }
 
-// 메인 실행 부분
 try {
   const fileContent = fs.readFileSync(
     "src/data/spl-data.trunk.20240209.h",
