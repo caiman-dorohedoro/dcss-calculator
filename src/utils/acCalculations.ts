@@ -129,6 +129,6 @@ export const mixedCalculations = ({
 
   return (
     calculateAC(baseAC, armourSkill) -
-    (isDeformed && armour ? armourOptions[armour].baseAC * 0.5 : 0)
+    (isDeformed && armour ? Math.floor(armourOptions[armour].baseAC * 0.5) : 0)
   );
 };

@@ -68,5 +68,38 @@ describe("AC Calculations", () => {
         barding: true,
       })
     ).toBe(34);
+
+    // 개인 플레이중
+    expect(
+      mixedCalculations({
+        species: "armataur",
+        armour: "troll_leather",
+        armourSkill: 11.9,
+      })
+    ).toBe(3);
+
+    // 이거 틀리게 나오는데, serpent talisman을 어떻게 손으로 들고 있는거지?
+    // // https://underhound.eu/crawl/morgue/Ge0ff/morgue-Ge0ff-20240125-133758.txt
+    // expect(
+    //   mixedCalculations({
+    //     species: "armataur",
+    //     armour: "troll_leather",
+    //     armourSkill: 12.6,
+    //     gloves: true,
+    //     barding: true,
+    //     cloak: true,
+    //   })
+    // ).toBe(12);
+
+    // https://crawl.akrasiac.org/rawdata/kerplink/morgue-kerplink-20250209-042353.txt
+    expect(
+      mixedCalculations({
+        species: "armataur",
+        armour: "acid_dragon",
+        armourSkill: 26.5,
+        gloves: true,
+        barding: true,
+      })
+    ).toBe(21);
   });
 });
