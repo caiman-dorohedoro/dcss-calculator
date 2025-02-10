@@ -501,7 +501,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(26);
   });
 
-  // 개인 플레이 도중
+  // 개인 플레이 도중, 그래프에 10이라고 나와서 테스트
   test("formicid, leather armour, kite shield, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
     const failureRate = calculateSpellFailureRate({
       strength: 26,
