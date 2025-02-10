@@ -249,17 +249,33 @@ const extractSpellData = (fileContent: string) => {
 }
 
 const getOnlyPlayerSpells = (parsedSpells: SpellData_PROTO[]) => {
-  const monsterExcludedSpells = parsedSpells.filter(spell => !spell.flags.includes("monster"));
-  const monsterAndwandSpellExcludedSpells = monsterExcludedSpells.filter(spell => !Object.values(wandSpells).includes(spell.id));
-  const playerNonbookSpellExcludedSpells = monsterAndwandSpellExcludedSpells.filter(spell => !playerNonbookSpells.includes(spell.id));
+  const result = parsedSpells
+    .filter(spell => !spell.flags.includes("monster") && !spell.flags.includes(" monster")) // Glaciate flag 오타 반영
+    .filter(spell => !spell.flags.includes("testing"))
+    .filter(spell => !Object.values(wandSpells).includes(spell.id))
+    .filter(spell => !playerNonbookSpells.includes(spell.id));
 
-  return playerNonbookSpellExcludedSpells;
+  return result;
 }
 
 const writeOuputFiles = (spells: SpellData_PROTO[]) => {
   if (process.env.NODE_ENV === "test") {
     return
   }
+
+  // 검수를 위해 학파별로 그룹화
+  // const sortedSpells = spells.sort((a, b) => a.level - b.level);
+  // const groupedBySchool = sortedSpells.reduce((acc, spell) => {
+  //   spell.schools.forEach(school => {
+  //     acc[school] = [...(acc[school] || []), spell];
+  //   });
+  //   return acc;
+  // }, {} as Record<string, SpellData_PROTO[]>);
+
+  // fs.writeFileSync(
+  //   `src/data/grouped-by-school.json`,
+  //   JSON.stringify(groupedBySchool, null, 2)
+  // );
 
   fs.writeFileSync(
     `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`,
