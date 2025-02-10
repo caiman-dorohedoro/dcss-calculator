@@ -320,7 +320,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
         {state.spellMode && (
           <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start border-t border-gray-700 pt-2">
             <AttrInput
-              label="wizardry"
+              label="ring of wizardry"
               value={state.wizardry ?? 0}
               type="number"
               max={10}
@@ -336,7 +336,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                   setState((prev) => ({ ...prev, channel: !!checked }))
                 }
               />
-              <label htmlFor="channel">Channel</label>
+              <label htmlFor="channel">channel</label>
             </div>
             <AttrInput
               label="wild magic (mutation)"
