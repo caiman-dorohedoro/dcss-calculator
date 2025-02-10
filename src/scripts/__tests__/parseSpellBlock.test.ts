@@ -80,7 +80,7 @@ describe("parseSpellBlock", () => {
     expect(parsedSpell?.level).toBe(3);
   });
 
-  test("", () => {
+  test("comment in flags", () => {
     const spell = `{
     SPELL_CONFUSING_TOUCH, "Confusing Touch",
     spschool::hexes,
@@ -101,5 +101,28 @@ describe("parseSpellBlock", () => {
     expect(parsedSpell?.schools).toStrictEqual(["hexes"]);
     expect(parsedSpell?.flags).toStrictEqual(["selfench", "WL_check"]);
     expect(parsedSpell?.level).toBe(3);
+  });
+
+  test("comment in name", () => {
+    const spell = `{
+    SPELL_SUMMON_DRAGON, "Summon Dragon", // see also, SPELL_DRAGON_CALL
+    spschool::summoning,
+    spflag::mons_abjure | spflag::monster,
+    9,
+    200,
+    -1, -1,
+    0,
+    TILEG_SUMMON_DRAGON,
+},
+`;
+
+    const parsedSpell = parseSpellBlock(spell);
+
+    expect(parsedSpell).toBeDefined();
+    expect(parsedSpell?.id).toBe("SPELL_SUMMON_DRAGON");
+    expect(parsedSpell?.name).toBe("Summon Dragon");
+    expect(parsedSpell?.schools).toStrictEqual(["summoning"]);
+    expect(parsedSpell?.flags).toStrictEqual(["mons_abjure", "monster"]);
+    expect(parsedSpell?.level).toBe(9);
   });
 });
