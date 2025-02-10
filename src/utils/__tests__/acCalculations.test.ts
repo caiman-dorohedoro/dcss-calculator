@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { calculateAC, mixedCalculations } from "../acCalculation";
+import { calculateAC, calculateMixedAC } from "../acCalculation";
 
 describe("AC Calculations", () => {
   test("calculateAC", () => {
@@ -12,7 +12,7 @@ describe("AC Calculations", () => {
   test("mixedCalculations", () => {
     // https://crawl.akrasiac.org/rawdata/fnjp/morgue-fnjp-20250205-042438.txt
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "minotaur",
         armour: "plate",
         armourSkill: 27,
@@ -24,7 +24,7 @@ describe("AC Calculations", () => {
 
     // https://crawl.akrasiac.org/rawdata/fnjp/morgue-fnjp-20250205-042438.txt
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "minotaur",
         armour: "crystal_plate",
         cloak: true,
@@ -36,7 +36,7 @@ describe("AC Calculations", () => {
 
     // https://cbro.berotato.org/morgue/Shard1697/morgue-Shard1697-20250204-221626.txt
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "demonspawn",
         armour: "pearl_dragon",
         boots: true,
@@ -46,7 +46,7 @@ describe("AC Calculations", () => {
 
     // https://cbro.berotato.org/morgue/ojifijod/morgue-ojifijod-20250201-121909.txt
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "formicid",
         armour: "golden_dragon",
         armourSkill: 27,
@@ -59,7 +59,7 @@ describe("AC Calculations", () => {
 
     // https://archive.nemelex.cards/morgue/AxeManiac/morgue-AxeManiac-20250202-074753.txt
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "armataur",
         armour: "golden_dragon",
         armourSkill: 27,
@@ -71,7 +71,7 @@ describe("AC Calculations", () => {
 
     // 개인 플레이중
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "armataur",
         armour: "troll_leather",
         armourSkill: 11.9,
@@ -93,7 +93,7 @@ describe("AC Calculations", () => {
 
     // https://crawl.akrasiac.org/rawdata/kerplink/morgue-kerplink-20250209-042353.txt
     expect(
-      mixedCalculations({
+      calculateMixedAC({
         species: "armataur",
         armour: "acid_dragon",
         armourSkill: 26.5,

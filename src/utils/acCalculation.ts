@@ -30,7 +30,7 @@ type MixedCalculationsParams = {
   armourSkill: number;
 };
 
-export const mixedCalculations = ({
+export const calculateMixedAC = ({
   species,
   armour,
   helmet,

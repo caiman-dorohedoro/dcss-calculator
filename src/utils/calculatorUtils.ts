@@ -1,5 +1,5 @@
 import { calculateEV } from "@/utils/evCalculation";
-import { mixedCalculations } from "@/utils/acCalculation";
+import { calculateMixedAC } from "@/utils/acCalculation";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import { calculateSH } from "./shCalculation";
 import {
@@ -33,7 +33,7 @@ export const calculateAcData = (state: CalculatorState): ACDataPoint[] => {
 
       return {
         armour,
-        ac: mixedCalculations({
+        ac: calculateMixedAC({
           species: state.species,
           armour: state.armour,
           helmet: state.helmet,
