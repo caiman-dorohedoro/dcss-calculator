@@ -31,8 +31,6 @@ import CustomSpellTick from "@/components/chart/CustomSpellTick";
 import SpellModeHeader from "@/components/SpellModeHeader";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import {
-  calculateAcData,
-  calculateAcTicks,
   calculateSHData,
   calculateShTicks,
   calculateAvgSFData,
@@ -49,6 +47,7 @@ import {
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { SpellName } from "@/types/spell.ts";
 import EVChart from "./chart/EvChart";
+import ACChart from "./chart/ACChart";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -80,12 +79,10 @@ const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState }> = [
 ];
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
-  const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [shData, setShData] = useState<ReturnType<typeof calculateSHData>>([]);
   const [sfData, setSFData] = useState<ReturnType<typeof calculateAvgSFData>>(
     []
   );
-  const [acTicks, setAcTicks] = useState<number[]>([]);
   const [shTicks, setShTicks] = useState<number[]>([]);
   const [sfTicks, setSfTicks] = useState<number[]>([]);
 
@@ -94,10 +91,6 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   const spellSchools = getSpellSchools(state.targetSpell as SpellName);
 
   useEffect(() => {
-    const acData = calculateAcData(state);
-    setAcData(acData);
-    setAcTicks(calculateAcTicks(state));
-
     const shData = calculateSHData(state);
     setShData(shData);
     setShTicks(calculateShTicks(state));
@@ -106,15 +99,6 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
     setSFData(firstSFData);
     setSfTicks(calculateSFTicks(state));
   }, [state]);
-
-  const zeroBaseAC =
-    state.armour === "none" &&
-    !state.helmet &&
-    !state.gloves &&
-    !state.boots &&
-    !state.cloak &&
-    !state.barding &&
-    !state.secondGloves;
 
   return (
     <Card>
@@ -353,67 +337,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           <AccordionItem value="ac">
             <AccordionTrigger>AC Calculator</AccordionTrigger>
             <AccordionContent>
-              <ResponsiveContainer className="mt-4" width="100%" height={350}>
-                <LineChart
-                  data={acData}
-                  margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="armour"
-                    label={{
-                      value: "Armour Skill",
-                      position: "bottom",
-                      offset: 16,
-                      style: { fill: "#eee" },
-                    }}
-                    tickFormatter={(value) => value.toFixed(1)}
-                    ticks={acTicks}
-                    interval={zeroBaseAC ? 270 : 0}
-                    tick={(props) => <CustomTick {...props} ticks={acTicks} />}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    width={30}
-                    tick={{ fill: "#eee" }}
-                  />
-                  <Tooltip
-                    wrapperStyle={{
-                      backgroundColor: "hsl(var(--popover))",
-                      borderColor: "hsl(var(--border))",
-                      color: "hsl(var(--popover-foreground))",
-                      borderRadius: "calc(var(--radius) - 2px)",
-                    }}
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--popover))",
-                      border: "none",
-                    }}
-                    itemStyle={{
-                      color: "hsl(var(--popover-foreground))",
-                    }}
-                    formatter={(value) => [`${value}`, "AC"]}
-                    labelFormatter={(value) =>
-                      `Armour Skill ${value.toFixed(1)}`
-                    }
-                  />
-                  <Legend
-                    verticalAlign="bottom"
-                    align="center"
-                    layout="horizontal"
-                    wrapperStyle={{
-                      marginLeft: "-100px",
-                      marginBottom: "-10px",
-                    }}
-                  />
-                  <Line
-                    type="stepAfter"
-                    dataKey="ac"
-                    name="AC"
-                    dot={renderDot("armour", state.armourSkill)}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <ACChart state={state} />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="sh">
