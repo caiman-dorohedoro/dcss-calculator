@@ -1,12 +1,6 @@
-import { spells } from "@/data/spells";
+import {spells} from "@/data/spells";
 import {ArmourKey, armourOptions, ShieldKey, shieldOptions} from "@/types/equipment.ts";
-
-export type SpellName = (typeof spells)[number]["name"];
-export type SpellSchool = (typeof spells)[number]["schools"][number];
-
-type SchoolSkills = {
-  [key in SpellSchool]?: number;
-};
+import {SchoolSkills, SpellName} from "@/types/spell.ts";
 
 export type SpellCalculationParams = {
   strength: number;
@@ -23,8 +17,6 @@ export type SpellCalculationParams = {
   channel?: boolean;
   wildMagic?: number;
 };
-
-export type SpellDifficultyLevel = keyof typeof spellDifficulties;
 
 const spellDifficulties = {
   1: 3,

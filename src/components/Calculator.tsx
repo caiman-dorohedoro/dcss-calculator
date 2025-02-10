@@ -44,12 +44,13 @@ import {
 } from "@/utils/calculatorUtils";
 import {
   getSpellSchools,
-  SpellName,
-  SpellSchool,
+
+
 } from "@/utils/spellCalculation";
 import { spells } from "@/data/spells";
 import {ArmourKey, armourOptions, ShieldKey, shieldOptions} from "@/types/equipment.ts";
 import {SpeciesKey, speciesOptions} from "@/types/species.ts";
+import {SpellName, SpellSchool} from "@/types/spell.ts";
 
 type CalculatorProps = {
   state: CalculatorState;

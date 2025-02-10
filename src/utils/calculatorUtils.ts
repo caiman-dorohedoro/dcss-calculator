@@ -5,10 +5,11 @@ import { calculateSH } from "./shCalculation";
 import {
   calculateSpellFailureRate,
   getSpellSchools,
-  SpellName,
-  SpellSchool,
+
+
 } from "./spellCalculation";
 import { spells } from "@/data/spells";
+import {SpellName, SpellSchool} from "@/types/spell.ts";
 
 type DataPoint = {
   dodgingSkill: number;
