@@ -31,6 +31,7 @@ export interface CalculatorState {
   spellcasting?: number;
   wizardry?: number;
   channel?: boolean;
+  wildMagic?: number;
 }
 
 const defaultState: CalculatorState = {
@@ -68,6 +69,7 @@ const defaultState: CalculatorState = {
   spellcasting: 0,
   wizardry: 0,
   channel: false,
+  wildMagic: 0,
 };
 
 export const isSchoolSkillKey = (

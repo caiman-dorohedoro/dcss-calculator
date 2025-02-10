@@ -22,6 +22,7 @@ export type SpellCalculationParams = {
   shieldSkill: number;
   wizardry?: number;
   channel?: boolean;
+  wildMagic?: number;
 };
 
 export type SpellDifficultyLevel = keyof typeof spellDifficulties;
@@ -192,6 +193,7 @@ function rawSpellFail({
   shieldSkill,
   wizardry = 0,
   channel = false,
+  wildMagic = 0,
 }: SpellCalculationParams) {
   // 기본 실패율 60%에서 시작
   let chance = 60;
@@ -237,6 +239,10 @@ function rawSpellFail({
     Math.floor((((chance + 426) * chance + 82670) * chance + 7245398) / 262144),
     0
   );
+
+  if (wildMagic > 0) {
+    chance2 += wildMagic * 4;
+  }
 
   if (channel) {
     chance2 += 10;

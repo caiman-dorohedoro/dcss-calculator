@@ -338,6 +338,15 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
               />
               <label htmlFor="channel">Channel</label>
             </div>
+            <AttrInput
+              label="wild magic (mutation)"
+              value={state.wildMagic ?? 0}
+              type="number"
+              max={3}
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, wildMagic: value }))
+              }
+            />
           </div>
         )}
       </CardHeader>

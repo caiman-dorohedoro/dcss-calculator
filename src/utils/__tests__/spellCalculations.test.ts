@@ -500,4 +500,47 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(26);
   });
+
+  // 개인 플레이 도중
+  test("formicid, leather armour, kite shield, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 26,
+      spellcasting: 5,
+      intelligence: 28,
+      targetSpell: "Dimensional Bullseye",
+      schoolSkills: {
+        Hexes: 9,
+        Translocation: 4.7,
+      },
+      spellDifficulty: 4,
+      armour: "leather_armour",
+      shield: "kite_shield",
+      armourSkill: 0,
+      shieldSkill: 4,
+    });
+
+    expect(failureRate).toBe(9);
+  });
+
+  // 개인 플레이 도중
+  test("formicid, leather armour, kite shield, wild magic 1, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 27,
+      spellcasting: 5,
+      intelligence: 29,
+      targetSpell: "Dimensional Bullseye",
+      schoolSkills: {
+        Hexes: 9.2,
+        Translocation: 5.1,
+      },
+      spellDifficulty: 4,
+      armour: "leather_armour",
+      shield: "kite_shield",
+      armourSkill: 0,
+      shieldSkill: 4,
+      wildMagic: 1,
+    });
+
+    expect(failureRate).toBe(12);
+  });
 });
