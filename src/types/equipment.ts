@@ -55,3 +55,16 @@ export const shieldOptions = {
   kite_shield: {name: "kite shield", encumbrance: 10, baseSH: 8},
   tower_shield: {name: "tower shield", encumbrance: 15, baseSH: 13},
 } as const;
+
+export const headgearOptions = {
+  helmet: {name: "helmet", baseAC: 1, encumbrance: 0},
+  hat: {name: "hat", baseAC: 0, encumbrance: 0},
+} as const;
+
+export const miscellaneousOptions = {
+  boots: {name: "boots", baseAC: 1, encumbrance: 0},
+  cloak: {name: "cloak", baseAC: 1, encumbrance: 0},
+  scarf: {name: "scarf", baseAC: 0, encumbrance: 0},
+  gloves: {name: "gloves", baseAC: 1, encumbrance: 0},
+  barding: {name: "barding", baseAC: 4, encumbrance: -6},
+} as const;

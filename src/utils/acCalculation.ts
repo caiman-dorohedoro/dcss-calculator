@@ -1,18 +1,5 @@
-import { ArmourKey, armourOptions } from "@/types/equipment.ts";
+import {ArmourKey, armourOptions, headgearOptions, miscellaneousOptions} from "@/types/equipment.ts";
 import {SpeciesKey} from "@/types/species.ts";
-
-export const headgearOptions = {
-  helmet: { name: "helmet", baseAC: 1, encumbrance: 0 },
-  hat: { name: "hat", baseAC: 0, encumbrance: 0 },
-} as const;
-
-export const miscellaneousOptions = {
-  boots: { name: "boots", baseAC: 1, encumbrance: 0 },
-  cloak: { name: "cloak", baseAC: 1, encumbrance: 0 },
-  scarf: { name: "scarf", baseAC: 0, encumbrance: 0 },
-  gloves: { name: "gloves", baseAC: 1, encumbrance: 0 },
-  barding: { name: "barding", baseAC: 4, encumbrance: -6 },
-} as const;
 
 export const calculateAC = (baseAC: number, skill: number): number => {
   return Math.floor(baseAC * (1 + skill / 22));

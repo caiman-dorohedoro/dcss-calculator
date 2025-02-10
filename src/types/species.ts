@@ -1,5 +1,3 @@
-import {Size} from "@/utils/evCalculation.ts";
-
 export type SpeciesKey =
     | "armataur"
     | "barachi"
@@ -28,6 +26,8 @@ export type SpeciesKey =
     | "troll"
     | "vampire"
     | "vineStalker";
+
+export type Size = "tiny" | "little" | "small" | "medium" | "large" | "giant";
 
 export const speciesOptions: Record<SpeciesKey, { name: string; size: Size }> =
     {
