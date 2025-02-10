@@ -426,15 +426,15 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                       isAnimationActive={false}
                       dot={renderDot(
                         "spellSkill",
-                        Number(
-                          (
-                            spellSchools.reduce(
-                              (acc, school) =>
-                                acc + (state.schoolSkills?.[school] ?? 0),
-                              0
-                            ) / spellSchools.length
-                          ).toFixed(1)
-                        )
+                        Math.round(
+                          spellSchools.reduce(
+                            (acc, school) =>
+                              acc + (state.schoolSkills?.[school] ?? 0) * 200,
+                            0
+                          ) /
+                            spellSchools.length /
+                            20
+                        ) / 10
                       )}
                     />
                   </LineChart>
