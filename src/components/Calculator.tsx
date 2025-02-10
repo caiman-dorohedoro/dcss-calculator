@@ -28,10 +28,8 @@ import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import CustomSpellTick from "@/components/chart/CustomSpellTick";
-import {
-  CalculatorState,
-  isSchoolSkillKey,
-} from "@/hooks/useEvCalculatorState";
+import SpellModeHeader from "@/components/SpellModeHeader";
+import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import {
   calculateAcData,
   calculateEvData,
@@ -42,15 +40,16 @@ import {
   calculateAvgSFData,
   calculateSFTicks,
 } from "@/utils/calculatorUtils";
-import {
-  getSpellSchools,
-
-
-} from "@/utils/spellCalculation";
+import { getSpellSchools } from "@/utils/spellCalculation";
 import { spells } from "@/data/spells";
-import {ArmourKey, armourOptions, ShieldKey, shieldOptions} from "@/types/equipment.ts";
-import {SpeciesKey, speciesOptions} from "@/types/species.ts";
-import {SpellName, SpellSchool} from "@/types/spell.ts";
+import {
+  ArmourKey,
+  armourOptions,
+  ShieldKey,
+  shieldOptions,
+} from "@/types/equipment.ts";
+import { SpeciesKey, speciesOptions } from "@/types/species.ts";
+import { SpellName } from "@/types/spell.ts";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -252,110 +251,8 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
             ))}
           </div>
         )}
-        {state.spellMode && <div className="h-px w-full bg-gray-200"></div>}
         {state.spellMode && (
-          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
-            <div className="flex flex-row items-center gap-2">
-              Spell:
-              <Select
-                value={state.targetSpell}
-                onValueChange={(value) =>
-                  setState((prev) => ({
-                    ...prev,
-                    targetSpell: value as SpellName,
-                  }))
-                }
-              >
-                <SelectTrigger className="min-w-[160px] h-6 w-auto gap-2">
-                  <SelectValue placeholder="Apportation" />
-                </SelectTrigger>
-                <SelectContent>
-                  {spells
-                    .toSorted((a, b) => a.name.localeCompare(b.name))
-                    .map((spell) => (
-                      <SelectItem key={spell.name} value={spell.name}>
-                        {spell.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <AttrInput
-              label="Spellcasting Skill"
-              value={state.spellcasting ?? 0}
-              type="skill"
-              onChange={(value) =>
-                setState((prev) => ({ ...prev, spellcasting: value }))
-              }
-            />
-          </div>
-        )}
-        {state.spellMode && (
-          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
-            {spells
-              .find((spell) => spell.name === state.targetSpell)
-              ?.schools.map((schoolName) => {
-                // const lowerCaseSchoolName = schoolName.toLowerCase();
-
-                if (!isSchoolSkillKey(schoolName)) {
-                  return null;
-                }
-
-                if (typeof state.schoolSkills?.[schoolName] !== "number") {
-                  return null;
-                }
-
-                return (
-                  <AttrInput
-                    key={schoolName}
-                    label={`${schoolName}`}
-                    value={state.schoolSkills?.[schoolName] ?? 0}
-                    type="skill"
-                    onChange={(value) =>
-                      setState((prev) => ({
-                        ...prev,
-                        schoolSkills: {
-                          ...prev.schoolSkills,
-                          [schoolName]: value === undefined ? 0 : value,
-                        } as Record<SpellSchool, number>,
-                      }))
-                    }
-                  />
-                );
-              })}
-          </div>
-        )}
-        {state.spellMode && (
-          <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start border-t border-gray-700 pt-2">
-            <AttrInput
-              label="ring of wizardry"
-              value={state.wizardry ?? 0}
-              type="number"
-              max={10}
-              onChange={(value) =>
-                setState((prev) => ({ ...prev, wizardry: value }))
-              }
-            />
-            <div className="flex flex-row items-center gap-2">
-              <Checkbox
-                id="channel"
-                checked={state.channel}
-                onCheckedChange={(checked) =>
-                  setState((prev) => ({ ...prev, channel: !!checked }))
-                }
-              />
-              <label htmlFor="channel">channel</label>
-            </div>
-            <AttrInput
-              label="wild magic (mutation)"
-              value={state.wildMagic ?? 0}
-              type="number"
-              max={3}
-              onChange={(value) =>
-                setState((prev) => ({ ...prev, wildMagic: value }))
-              }
-            />
-          </div>
+          <SpellModeHeader state={state} setState={setState} />
         )}
       </CardHeader>
       <CardContent>
