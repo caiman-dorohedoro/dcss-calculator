@@ -24,9 +24,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { speciesOptions, SpeciesKey } from "@/utils/evCalculations";
+import { speciesOptions, SpeciesKey } from "@/utils/evCalculation";
 import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
-import { armourOptions, ArmourKey } from "@/utils/acCalculations";
+import { armourOptions, ArmourKey } from "@/utils/acCalculation";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
 import {

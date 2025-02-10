@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { calculateAC, mixedCalculations } from "../acCalculations";
+import { calculateAC, mixedCalculations } from "../acCalculation";
 
 describe("AC Calculations", () => {
   test("calculateAC", () => {

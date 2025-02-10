@@ -1,4 +1,4 @@
-import { ArmourKey, armourOptions } from "./acCalculations";
+import { ArmourKey, armourOptions } from "./acCalculation";
 import { ShieldKey, shieldOptions } from "./shCalculation";
 
 export type SpeciesKey =
@@ -72,7 +72,7 @@ const sizeToNumber: Record<Size, number> = {
   giant: 12,
 };
 
-export function calculateEVForSkillLevel(params: {
+export function calculateEV(params: {
   dodgingSkill: number;
   dexterity: number;
   strength: number;

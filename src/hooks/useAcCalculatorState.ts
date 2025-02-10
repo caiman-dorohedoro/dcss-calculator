@@ -1,4 +1,4 @@
-import { ArmourKey } from "@/utils/acCalculations";
+import { ArmourKey } from "@/utils/acCalculation";
 import { useState, useEffect } from "react";
 
 const STORAGE_KEY = "acCalculator";

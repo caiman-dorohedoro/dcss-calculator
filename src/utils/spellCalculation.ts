@@ -1,5 +1,5 @@
 import { spells } from "@/data/spells";
-import { ArmourKey, armourOptions } from "./acCalculations";
+import { ArmourKey, armourOptions } from "./acCalculation";
 import { ShieldKey, shieldOptions } from "./shCalculation";
 
 export type SpellName = (typeof spells)[number]["name"];

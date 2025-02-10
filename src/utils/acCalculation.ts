@@ -1,4 +1,4 @@
-import { SpeciesKey } from "./evCalculations";
+import { SpeciesKey } from "./evCalculation";
 
 export type ArmourKey =
   | "none"

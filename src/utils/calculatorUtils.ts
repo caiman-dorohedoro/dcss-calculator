@@ -1,5 +1,5 @@
-import { calculateEVForSkillLevel } from "@/utils/evCalculations";
-import { mixedCalculations } from "@/utils/acCalculations";
+import { calculateEV } from "@/utils/evCalculation";
+import { mixedCalculations } from "@/utils/acCalculation";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import { calculateSH } from "./shCalculation";
 import {
@@ -55,7 +55,7 @@ export const calculateEvData = (state: CalculatorState): DataPoint[] => {
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const dodgingSkill = index / 10;
-      const calcResult = calculateEVForSkillLevel({
+      const calcResult = calculateEV({
         dodgingSkill,
         dexterity: state.dexterity,
         strength: state.strength,
