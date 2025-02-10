@@ -44,7 +44,6 @@ import {
   calculateSFTicks,
 } from "@/utils/calculatorUtils";
 import renderDot from "@/components/chart/SkillDotRenderer";
-import capitalizeFirstLetter from "@/utils/capitalizeFirstLetter";
 import { spells } from "@/data/spells";
 import {
   getSpellSchools,
