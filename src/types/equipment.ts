@@ -46,3 +46,12 @@ export const armourOptions = {
   shadow_dragon: { name: "shadow dragon scales", baseAC: 11, encumbrance: 15 },
   golden_dragon: { name: "golden dragon scales", baseAC: 12, encumbrance: 23 },
 } as const;
+
+export type ShieldKey = "none" | "buckler" | "kite_shield" | "tower_shield";
+
+export const shieldOptions = {
+  none: {name: "none", encumbrance: 0, baseSH: 0},
+  buckler: {name: "buckler", encumbrance: 5, baseSH: 3},
+  kite_shield: {name: "kite shield", encumbrance: 10, baseSH: 8},
+  tower_shield: {name: "tower shield", encumbrance: 15, baseSH: 13},
+} as const;

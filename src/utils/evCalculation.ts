@@ -1,5 +1,4 @@
-import {ShieldKey, shieldOptions} from "./shCalculation";
-import {ArmourKey, armourOptions} from "@/types/equipment.ts";
+import {ArmourKey, armourOptions, ShieldKey, shieldOptions} from "@/types/equipment.ts";
 import {SpeciesKey, speciesOptions} from "@/types/species.ts";
 
 export type Size = "tiny" | "little" | "small" | "medium" | "large" | "giant";
