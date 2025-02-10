@@ -31,7 +31,7 @@ const wandSpells = {
 }
 
 const playerNonbookSpells = [
-  "SPELL_THUNDERBOLT",  
+  "SPELL_THUNDERBOLT",
   "SPELL_PHANTOM_MIRROR",
   "SPELL_TREMORSTONE",
   "SPELL_GRAVITAS",
@@ -50,7 +50,7 @@ const playerNonbookSpells = [
   "SPELL_MUD_BREATH",
 ]
 
-const extractSpellData = (fileContent: string) => {
+const parseSpellDataHeader = (fileContent: string) => {
   try {
     // 시작 부분을 찾을 때 더 유연하게 검색
     const startMarker = "spelldata[] =";
@@ -96,44 +96,44 @@ const extractSpellData = (fileContent: string) => {
 }
 
 export const parseSpellBlock = (spellBlock: string): SpellData_PROTO | undefined => {
-    // AXED_SPELL 체크
-    if (spellBlock.includes("AXED_SPELL")) {
-      return; // skip this iteration
-    }
+  // AXED_SPELL 체크
+  if (spellBlock.includes("AXED_SPELL")) {
+    return; // skip this iteration
+  }
 
-    try {
-      // 중괄호와 앞뒤 공백 제거
-      const cleanBlock = spellBlock.replace(/^{\s*|\s*}$/g, "");
-      // 각 줄을 배열로 분리
-      const lines = cleanBlock
-        .split("\n")
-        .map(line => line.split("//")[0].trim()) // 주석 제거
-        .join("")
-        .split(",")
-        .map(line => line.trim())
-        .filter(line => line !== ""); // 빈 문자열 제거
+  try {
+    // 중괄호와 앞뒤 공백 제거
+    const cleanBlock = spellBlock.replace(/^{\s*|\s*}$/g, "");
+    // 각 줄을 배열로 분리
+    const lines = cleanBlock
+      .split("\n")
+      .map(line => line.split("//")[0].trim()) // 주석 제거
+      .join("")
+      .split(",")
+      .map(line => line.trim())
+      .filter(line => line !== ""); // 빈 문자열 제거
 
-      if (lines.length < 9) return; // 유효하지 않은 데이터는 건너뛰기
+    if (lines.length < 9) return; // 유효하지 않은 데이터는 건너뛰기
 
-      const spell = {
-        id: lines[0].trim(),
-        name: extractSpellName(lines[1]),
-        schools: parseSchools(lines[2]),
-        flags: parseFlags(lines[3]),
-        level: parseInt(lines[4]) || 0,
-        power: parseInt(lines[5]) || 0,
-        range: {
-          min: parseInt(lines[6]) || -1,
-          max: parseInt(lines[7]) || -1,
-        },
-        noise: parseInt(lines[8]) || 0,
-        tile: lines[9] ? lines[9].trim() : "",
-      };
+    const spell = {
+      id: lines[0].trim(),
+      name: extractSpellName(lines[1]),
+      schools: parseSchools(lines[2]),
+      flags: parseFlags(lines[3]),
+      level: parseInt(lines[4]) || 0,
+      power: parseInt(lines[5]) || 0,
+      range: {
+        min: parseInt(lines[6]) || -1,
+        max: parseInt(lines[7]) || -1,
+      },
+      noise: parseInt(lines[8]) || 0,
+      tile: lines[9] ? lines[9].trim() : "",
+    };
 
-      return spell;
-    } catch (error) {
-      console.error("Error parsing spell block:", spellBlock, error);
-    }
+    return spell;
+  } catch (error) {
+    console.error("Error parsing spell block:", spellBlock, error);
+  }
 }
 
 const parseSpellData = (spellDataSection: string) => {
@@ -233,33 +233,60 @@ const makeTypeDefinition = (sets: {
 `;
 };
 
-try {
-  const fileContent = fs.readFileSync(
-    "src/data/spl-data.trunk.20240209.h",
-    "utf8"
-  );
-  const spellDataSection = extractSpellData(fileContent);
-
+const extractSpellData = (fileContent: string) => {
+  const spellDataSection = parseSpellDataHeader(fileContent);
   if (!spellDataSection) {
     throw new Error("Failed to extract spell data section");
   }
 
   const parsedSpells = parseSpellData(spellDataSection);
-  
+
+  return parsedSpells;
+}
+
+const getOnlyPlayerSpells = (parsedSpells: SpellData_PROTO[]) => {
   const monsterExcludedSpells = parsedSpells.filter(spell => !spell.flags.includes("monster"));
   const monsterAndwandSpellExcludedSpells = monsterExcludedSpells.filter(spell => !Object.values(wandSpells).includes(spell.id));
   const playerNonbookSpellExcludedSpells = monsterAndwandSpellExcludedSpells.filter(spell => !playerNonbookSpells.includes(spell.id));
-  
+
+  return playerNonbookSpellExcludedSpells;
+}
+
+const writeOuputFiles = (spells: SpellData_PROTO[]) => {
+  if (process.env.NODE_ENV === "test") {
+    return
+  }
+
   fs.writeFileSync(
-    "src/data/parsed-spells-no-wand-and-monster-and-player-nonbook.json",
-    JSON.stringify(playerNonbookSpellExcludedSpells, null, 2)
+    "src/data/player-spells.json",
+    JSON.stringify(spells, null, 2)
   );
-  
-  const sets = extractSets("src/data/parsed-spells.json");
-  const typeDefinition = makeTypeDefinition(sets);
+}
+
+const writeTypeDefinition = (typeDefinition: string) => {
+  if (process.env.NODE_ENV === "test") {
+    return
+  }
 
   fs.writeFileSync("src/data/extracted-spell-types.d.ts", typeDefinition);
-} catch (error) {
-  console.error("Failed to process spell data:", error);
-  process.exit(1);
 }
+
+const main = () => {
+  try {
+    const fileContent = fs.readFileSync(
+      "src/data/spl-data.trunk.20240209.h",
+      "utf8"
+    );
+
+    const parsedSpells = extractSpellData(fileContent);
+
+    writeOuputFiles(getOnlyPlayerSpells(parsedSpells));
+
+    writeTypeDefinition(makeTypeDefinition(extractSets("src/data/parsed-spells.json")));
+  } catch (error) {
+    console.error("Failed to process spell data:", error);
+    process.exit(1);
+  }
+}
+
+main();

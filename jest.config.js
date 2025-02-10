@@ -1,6 +1,9 @@
 export default {
   preset: "ts-jest",
   testEnvironment: "node",
+  testEnvironmentOptions: {
+    NODE_ENV: "test",
+  },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "^(\\.{1,2}/.*)\\.js$": "$1",
