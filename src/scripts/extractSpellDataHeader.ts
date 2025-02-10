@@ -105,7 +105,13 @@ export const parseSpellBlock = (spellBlock: string): SpellData_PROTO | undefined
       // 중괄호와 앞뒤 공백 제거
       const cleanBlock = spellBlock.replace(/^{\s*|\s*}$/g, "");
       // 각 줄을 배열로 분리
-      const lines = cleanBlock.split(",").map((line) => line.trim());
+      const lines = cleanBlock
+        .split("\n")
+        .map(line => line.split("//")[0].trim()) // 주석 제거
+        .join("")
+        .split(",")
+        .map(line => line.trim())
+        .filter(line => line !== ""); // 빈 문자열 제거
 
       if (lines.length < 9) return; // 유효하지 않은 데이터는 건너뛰기
 
