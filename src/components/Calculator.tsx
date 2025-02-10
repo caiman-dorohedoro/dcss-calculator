@@ -32,7 +32,6 @@ import {
   CalculatorState,
   isSchoolSkillKey,
 } from "@/hooks/useEvCalculatorState";
-import { speciesOptions, SpeciesKey } from "@/utils/evCalculation";
 import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
 import {
   calculateAcData,
@@ -51,6 +50,7 @@ import {
 } from "@/utils/spellCalculation";
 import { spells } from "@/data/spells";
 import { ArmourKey, armourOptions } from "@/types/equipment.ts";
+import {SpeciesKey, speciesOptions} from "@/types/species.ts";
 
 type CalculatorProps = {
   state: CalculatorState;

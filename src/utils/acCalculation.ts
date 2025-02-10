@@ -1,5 +1,5 @@
-import { SpeciesKey } from "./evCalculation";
 import { ArmourKey, armourOptions } from "@/types/equipment.ts";
+import {SpeciesKey} from "@/types/species.ts";
 
 export const headgearOptions = {
   helmet: { name: "helmet", baseAC: 1, encumbrance: 0 },
