@@ -24,15 +24,17 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { speciesOptions, SpeciesKey } from "@/utils/evCalculation";
-import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
-import { armourOptions, ArmourKey } from "@/utils/acCalculation";
 import AttrInput from "@/components/AttrInput";
 import CustomTick from "@/components/chart/CustomTick";
+import renderDot from "@/components/chart/SkillDotRenderer";
+import CustomSpellTick from "@/components/chart/CustomSpellTick";
 import {
   CalculatorState,
   isSchoolSkillKey,
 } from "@/hooks/useEvCalculatorState";
+import { speciesOptions, SpeciesKey } from "@/utils/evCalculation";
+import { shieldOptions, ShieldKey } from "@/utils/shCalculation";
+import { armourOptions, ArmourKey } from "@/utils/acCalculation";
 import {
   calculateAcData,
   calculateEvData,
@@ -43,14 +45,12 @@ import {
   calculateAvgSFData,
   calculateSFTicks,
 } from "@/utils/calculatorUtils";
-import renderDot from "@/components/chart/SkillDotRenderer";
-import { spells } from "@/data/spells";
 import {
   getSpellSchools,
   SpellName,
   SpellSchool,
 } from "@/utils/spellCalculation";
-import CustomSpellTick from "./chart/CustomSpellTick";
+import { spells } from "@/data/spells";
 
 type CalculatorProps = {
   state: CalculatorState;
