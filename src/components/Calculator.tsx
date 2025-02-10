@@ -29,6 +29,8 @@ import CustomTick from "@/components/chart/CustomTick";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import CustomSpellTick from "@/components/chart/CustomSpellTick";
 import SpellModeHeader from "@/components/SpellModeHeader";
+import EVChart from "@/components/chart/EvChart";
+import ACChart from "@/components/chart/ACChart";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import {
   calculateSHData,
@@ -46,8 +48,6 @@ import {
 } from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { SpellName } from "@/types/spell.ts";
-import EVChart from "./chart/EvChart";
-import ACChart from "./chart/ACChart";
 
 type CalculatorProps = {
   state: CalculatorState;
