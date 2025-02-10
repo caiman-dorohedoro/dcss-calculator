@@ -1,5 +1,9 @@
 import * as fs from "fs";
 
+const SPELL_DATA_FILE_NAME = `spl-data.trunk.20240209.h`;
+const EXTRACTED_SPELL_DATA_FILE_NAME = "player-spells.json";
+const EXTRACTED_SPELL_TYPES_FILE_NAME = "player-spells.d.ts";
+
 type SpellData_PROTO = {
   id: string;
   name: string;
@@ -258,7 +262,7 @@ const writeOuputFiles = (spells: SpellData_PROTO[]) => {
   }
 
   fs.writeFileSync(
-    "src/data/player-spells.json",
+    `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`,
     JSON.stringify(spells, null, 2)
   );
 }
@@ -268,13 +272,13 @@ const writeTypeDefinition = (typeDefinition: string) => {
     return
   }
 
-  fs.writeFileSync("src/data/extracted-spell-types.d.ts", typeDefinition);
+  fs.writeFileSync(`src/data/${EXTRACTED_SPELL_TYPES_FILE_NAME}`, typeDefinition);
 }
 
 const main = () => {
   try {
     const fileContent = fs.readFileSync(
-      "src/data/spl-data.trunk.20240209.h",
+      `src/data/${SPELL_DATA_FILE_NAME}`,
       "utf8"
     );
 
@@ -282,7 +286,7 @@ const main = () => {
 
     writeOuputFiles(getOnlyPlayerSpells(parsedSpells));
 
-    writeTypeDefinition(makeTypeDefinition(extractSets("src/data/parsed-spells.json")));
+    writeTypeDefinition(makeTypeDefinition(extractSets(`src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`)));
   } catch (error) {
     console.error("Failed to process spell data:", error);
     process.exit(1);
