@@ -1,5 +1,5 @@
-import { ArmourKey, armourOptions } from "./acCalculation";
 import { ShieldKey, shieldOptions } from "./shCalculation";
+import { ArmourKey, armourOptions } from "@/types/equipment.ts";
 
 export type SpeciesKey =
   | "armataur"

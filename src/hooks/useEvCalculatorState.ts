@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { SpeciesKey } from "@/utils/evCalculation";
 import { ShieldKey } from "@/utils/shCalculation";
-import { ArmourKey } from "@/utils/acCalculation";
 import { SpellName, SpellSchool } from "@/utils/spellCalculation";
+import { ArmourKey } from "@/types/equipment.ts";
 
 const STORAGE_KEY = "calculator";
 

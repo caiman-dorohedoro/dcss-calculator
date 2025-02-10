@@ -1,6 +1,6 @@
 import { spells } from "@/data/spells";
-import { ArmourKey, armourOptions } from "./acCalculation";
 import { ShieldKey, shieldOptions } from "./shCalculation";
+import { ArmourKey, armourOptions } from "@/types/equipment.ts";
 
 export type SpellName = (typeof spells)[number]["name"];
 export type SpellSchool = (typeof spells)[number]["schools"][number];

@@ -1,5 +1,5 @@
-import { ArmourKey } from "@/utils/acCalculation";
 import { useState, useEffect } from "react";
+import { ArmourKey } from "@/types/equipment.ts";
 
 const STORAGE_KEY = "acCalculator";
 
