@@ -67,10 +67,19 @@ const checkboxKeys: Array<{ label: string; key: keyof CalculatorState }> = [
   { label: "2nd Gloves", key: "secondGloves" },
 ];
 
-const skillKeys: Array<keyof CalculatorState> = [
-  "armourSkill",
-  "shieldSkill",
-  "dodgingSkill",
+const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState }> = [
+  {
+    label: "Armour Skill",
+    key: "armourSkill",
+  },
+  {
+    label: "Shield Skill",
+    key: "shieldSkill",
+  },
+  {
+    label: "Dodging Skill",
+    key: "dodgingSkill",
+  },
 ];
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
@@ -166,10 +175,10 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           />
         </div>
         <div className="flex flex-row items-center gap-2 flex-wrap">
-          {skillKeys.map((key) => (
+          {skillAttrKeys.map(({ label, key }) => (
             <AttrInput
               key={key}
-              label={capitalizeFirstLetter(key.replace("Skill", " Skill"))}
+              label={label}
               value={typeof state[key] === "number" ? state[key] : 0}
               type="skill"
               onChange={(value) =>
