@@ -394,7 +394,11 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
                         return [`${value}%`, "Spell Failure Rate"];
                       }}
                       labelFormatter={(value) =>
-                        `${firstSchool} Skill: ${value}`
+                        `${
+                          spellSchools.length > 1
+                            ? "Skill Average"
+                            : `${firstSchool} Skill`
+                        }: ${value}`
                       }
                       wrapperStyle={{
                         backgroundColor: "hsl(var(--popover))",
