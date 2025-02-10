@@ -1,15 +1,10 @@
 import { calculateEV } from "@/utils/evCalculation";
 import { calculateMixedAC } from "@/utils/acCalculation";
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateSH } from "./shCalculation";
-import {
-  calculateSpellFailureRate,
-  getSpellSchools,
-
-
-} from "./spellCalculation";
+import { calculateSpellFailureRate, getSpellSchools } from "./spellCalculation";
 import { spells } from "@/data/spells";
-import {SpellName, SpellSchool} from "@/types/spell.ts";
+import { SpellName, SpellSchool } from "@/types/spell.ts";
 
 type DataPoint = {
   dodgingSkill: number;

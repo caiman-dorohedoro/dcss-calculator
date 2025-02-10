@@ -20,7 +20,7 @@ import EVChart from "@/components/chart/EvChart";
 import ACChart from "@/components/chart/ACChart";
 import SHChart from "@/components/chart/SHChart";
 import SFChart from "@/components/chart/SFChart";
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { CalculatorState } from "@/hooks/useCalculatorState";
 import {
   ArmourKey,
   armourOptions,

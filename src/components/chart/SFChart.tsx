@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import CustomSpellTick from "@/components/chart/CustomSpellTick";
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateAvgSFData, calculateSFTicks } from "@/utils/calculatorUtils";
 import { getSpellSchools } from "@/utils/spellCalculation";
 import { spells } from "@/data/spells";

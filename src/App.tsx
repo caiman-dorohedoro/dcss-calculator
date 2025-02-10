@@ -1,6 +1,6 @@
 import Calculator from "./components/Calculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useCalculatorState } from "./hooks/useEvCalculatorState";
+import { useCalculatorState } from "./hooks/useCalculatorState";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "./components/ui/label";
 import { useEffect } from "react";

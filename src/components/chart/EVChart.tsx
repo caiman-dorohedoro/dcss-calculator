@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import CustomTick from "@/components/chart/CustomTick";
 import renderDot from "@/components/chart/SkillDotRenderer";
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateEvData, calculateEvTicks } from "@/utils/calculatorUtils";
 
 type EVChartProps = {

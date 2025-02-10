@@ -7,10 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AttrInput from "@/components/AttrInput";
-import {
-  CalculatorState,
-  isSchoolSkillKey,
-} from "@/hooks/useEvCalculatorState";
+import { CalculatorState, isSchoolSkillKey } from "@/hooks/useCalculatorState";
 import { spells } from "@/data/spells";
 import { SpellName, SpellSchool } from "@/types/spell.ts";
 

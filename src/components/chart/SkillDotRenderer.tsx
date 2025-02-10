@@ -1,4 +1,4 @@
-import { CalculatorState } from "@/hooks/useEvCalculatorState";
+import { CalculatorState } from "@/hooks/useCalculatorState";
 import { LineDot } from "recharts/types/cartesian/Line";
 
 type ChartPayload = {
