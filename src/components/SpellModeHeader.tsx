@@ -14,12 +14,12 @@ import {
 import { spells } from "@/data/spells";
 import { SpellName, SpellSchool } from "@/types/spell.ts";
 
-type CalculatorProps = {
+type SpellModeHeaderProps = {
   state: CalculatorState;
   setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
 };
 
-const SpellModeHeader = ({ state, setState }: CalculatorProps) => {
+const SpellModeHeader = ({ state, setState }: SpellModeHeaderProps) => {
   return (
     <>
       <div className="h-px w-full bg-gray-200"></div>
