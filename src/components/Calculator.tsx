@@ -32,9 +32,7 @@ import SpellModeHeader from "@/components/SpellModeHeader";
 import { CalculatorState } from "@/hooks/useEvCalculatorState";
 import {
   calculateAcData,
-  calculateEvData,
   calculateAcTicks,
-  calculateEvTicks,
   calculateSHData,
   calculateShTicks,
   calculateAvgSFData,
@@ -50,6 +48,7 @@ import {
 } from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { SpellName } from "@/types/spell.ts";
+import EVChart from "./chart/EvChart";
 
 type CalculatorProps = {
   state: CalculatorState;
@@ -81,14 +80,12 @@ const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState }> = [
 ];
 
 const Calculator = ({ state, setState }: CalculatorProps) => {
-  const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
   const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [shData, setShData] = useState<ReturnType<typeof calculateSHData>>([]);
   const [sfData, setSFData] = useState<ReturnType<typeof calculateAvgSFData>>(
     []
   );
   const [acTicks, setAcTicks] = useState<number[]>([]);
-  const [evTicks, setEvTicks] = useState<number[]>([]);
   const [shTicks, setShTicks] = useState<number[]>([]);
   const [sfTicks, setSfTicks] = useState<number[]>([]);
 
@@ -97,10 +94,6 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
   const spellSchools = getSpellSchools(state.targetSpell as SpellName);
 
   useEffect(() => {
-    const evData = calculateEvData(state);
-    setData(evData);
-    setEvTicks(calculateEvTicks(state));
-
     const acData = calculateAcData(state);
     setAcData(acData);
     setAcTicks(calculateAcTicks(state));
@@ -354,67 +347,7 @@ const Calculator = ({ state, setState }: CalculatorProps) => {
           <AccordionItem value="ev">
             <AccordionTrigger>EV Calculator</AccordionTrigger>
             <AccordionContent>
-              <ResponsiveContainer width="100%" height={350}>
-                <LineChart
-                  data={data}
-                  margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis
-                    dataKey="dodgingSkill"
-                    label={{
-                      value: "Dodging Skill",
-                      position: "bottom",
-                      offset: 16,
-                      style: { fill: "#eee" },
-                    }}
-                    tickFormatter={(value) => value.toFixed(1)}
-                    ticks={evTicks}
-                    interval={0}
-                    tick={(props) => <CustomTick {...props} ticks={evTicks} />}
-                  />
-                  <YAxis
-                    allowDecimals={false}
-                    width={30}
-                    tick={{ fill: "#eee" }}
-                  />
-                  <Tooltip
-                    formatter={(value) => {
-                      return [`${value}`, "EV"];
-                    }}
-                    labelFormatter={(value) => `Dodging Skill: ${value}`}
-                    wrapperStyle={{
-                      backgroundColor: "hsl(var(--popover))",
-                      borderColor: "hsl(var(--border))",
-                      color: "hsl(var(--popover-foreground))",
-                      borderRadius: "calc(var(--radius) - 2px)",
-                    }}
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--popover))",
-                      border: "none",
-                    }}
-                    itemStyle={{
-                      color: "hsl(var(--popover-foreground))",
-                    }}
-                  />
-                  <Legend
-                    verticalAlign="bottom"
-                    align="center"
-                    layout="horizontal"
-                    wrapperStyle={{
-                      marginLeft: "-100px",
-                      marginBottom: "-10px",
-                    }}
-                  />
-                  <Line
-                    type="stepAfter"
-                    dataKey="finalEV"
-                    name=" EV"
-                    dot={renderDot("dodgingSkill", state.dodgingSkill)}
-                    isAnimationActive={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <EVChart state={state} />
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="ac">
