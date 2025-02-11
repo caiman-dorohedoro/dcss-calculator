@@ -62,18 +62,20 @@ const getSkillPower = (
   schoolSkills: SchoolSkills,
   spellCasting: number
 ) => {
+  let power = 0;
+
   const spellSchools = getSpellSchools(targetSpell);
   const spellSchoolSkills = spellSchools
     .map((school) => schoolSkills[school])
     .filter((skill) => skill !== undefined);
 
-  return (
-    Math.floor(
-      spellSchoolSkills.reduce((acc, skill) => acc + skill * 200, 0) /
-        spellSchools.length
-    ) +
-    spellCasting * 50
-  );
+  for (const skill of spellSchoolSkills) {
+    power += skill * 200;
+  }
+
+  power = Math.floor(power / spellSchoolSkills.length);
+
+  return power + spellCasting * 50;
 };
 
 type CalculateArmourPenaltyParams = {
