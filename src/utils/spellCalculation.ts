@@ -1,6 +1,11 @@
-import {spells} from "@/data/spells";
-import {ArmourKey, armourOptions, ShieldKey, shieldOptions} from "@/types/equipment.ts";
-import {SchoolSkills, SpellName} from "@/types/spell.ts";
+import { spells } from "@/data/spells";
+import {
+  ArmourKey,
+  armourOptions,
+  ShieldKey,
+  shieldOptions,
+} from "@/types/equipment.ts";
+import { SchoolSkills, SpellName } from "@/types/spell.ts";
 
 export type SpellCalculationParams = {
   strength: number;
@@ -51,6 +56,25 @@ function getTrueFailRate(rawFail: number) {
   }
   return (outcomes - tetrahedralNumber(300 - target)) / outcomes;
 }
+
+const getSkillPower = (
+  targetSpell: SpellName,
+  schoolSkills: SchoolSkills,
+  spellCasting: number
+) => {
+  const spellSchools = getSpellSchools(targetSpell);
+  const spellSchoolSkills = spellSchools
+    .map((school) => schoolSkills[school])
+    .filter((skill) => skill !== undefined);
+
+  return (
+    Math.floor(
+      spellSchoolSkills.reduce((acc, skill) => acc + skill * 200, 0) /
+        spellSchools.length
+    ) +
+    spellCasting * 50
+  );
+};
 
 type CalculateArmourPenaltyParams = {
   armour: ArmourKey;
@@ -190,18 +214,8 @@ function rawSpellFail({
   let chance = 60;
 
   // 주문 기술력 계산
-  const spellSchools = getSpellSchools(targetSpell);
-  const spellSchoolSkills = spellSchools
-    .map((school) => schoolSkills[school])
-    .filter((skill) => skill !== undefined);
-
-  const skillPowerAverage = Math.floor(
-    spellSchoolSkills.reduce((acc, skill) => acc + skill * 200, 0) /
-      spellSchools.length
-  );
-
   const spellPower = Math.floor(
-    ((skillPowerAverage + spellcasting * 50) * 6) / 100
+    (getSkillPower(targetSpell, schoolSkills, spellcasting) * 6) / 100
   );
 
   // 주문력으로 실패율 감소
