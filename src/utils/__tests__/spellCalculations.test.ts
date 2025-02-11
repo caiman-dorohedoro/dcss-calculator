@@ -543,4 +543,24 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(12);
   });
+
+  // 개인 플레이 도중
+  test("formicid, leather armour, tower shield, 9 level Ice spell (Polar Vortex)", () => {
+    const failureRate = calculateSpellFailureRate({
+      strength: 29,
+      spellcasting: 13,
+      intelligence: 34,
+      targetSpell: "Polar Vortex",
+      schoolSkills: {
+        Ice: 22.7,
+      },
+      spellDifficulty: 9,
+      armour: "leather_armour",
+      shield: "tower_shield",
+      armourSkill: 10,
+      shieldSkill: 25.6,
+    });
+
+    expect(failureRate).toBe(21);
+  });
 });
