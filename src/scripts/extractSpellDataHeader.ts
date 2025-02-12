@@ -232,12 +232,11 @@ const makeTypeDefinition = (sets: {
     flag.replace(/(\r\n|\n|\r)/gm, "").trim()
   );
 
-  return `
-  export type SpellName = ${names.map((name) => `"${name}"`).join(" | ")};
-  export type SpellSchool = ${schools
-    .map((school) => `"${school}"`)
+  return `export type SpellName = ${names
+    .map((name) => `"${name}"`)
     .join(" | ")};
-  export type SpellFlag = ${flags.map((flag) => `"${flag}"`).join(" | ")};
+export type SpellSchool = ${schools.map((school) => `"${school}"`).join(" | ")};
+export type SpellFlag = ${flags.map((flag) => `"${flag}"`).join(" | ")};
 `;
 };
 

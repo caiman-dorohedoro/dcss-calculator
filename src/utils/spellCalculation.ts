@@ -1,18 +1,26 @@
-import { spells } from "@/data/spells";
 import {
   ArmourKey,
   armourOptions,
   ShieldKey,
   shieldOptions,
 } from "@/types/equipment.ts";
-import { SchoolSkills, SpellName } from "@/types/spell.ts";
+import { GameVersion } from "@/types/game";
+import {
+  VersionedSchoolSkillLevels,
+  VersionedSpellDatum,
+  VersionedSpellName,
+  VersionedSpellSchool,
+} from "@/types/spells";
+import spells032 from "@/data/generated-spells.0.32.json" assert { type: "json" };
+import spellsTrunk from "@/data/generated-spells.trunk.json" assert { type: "json" };
 
-export type SpellCalculationParams = {
+export type SpellCalculationParams<V extends GameVersion> = {
+  version: GameVersion;
   strength: number;
   spellcasting: number;
   intelligence: number;
-  targetSpell: SpellName;
-  schoolSkills: SchoolSkills;
+  targetSpell: VersionedSpellName<V>;
+  schoolSkills: VersionedSchoolSkillLevels<V>;
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   armour: ArmourKey;
   shield: ShieldKey;
@@ -57,14 +65,15 @@ function getTrueFailRate(rawFail: number) {
   return (outcomes - tetrahedralNumber(300 - target)) / outcomes;
 }
 
-const getSkillPower = (
-  targetSpell: SpellName,
-  schoolSkills: SchoolSkills,
+const getSkillPower = <V extends GameVersion>(
+  version: GameVersion,
+  targetSpell: VersionedSpellName<V>,
+  schoolSkills: VersionedSchoolSkillLevels<V>,
   spellCasting: number
 ) => {
   let power = 0;
 
-  const spellSchools = getSpellSchools(targetSpell);
+  const spellSchools = getSpellSchools<V>(version, targetSpell);
   const spellSchoolSkills = spellSchools
     .map((school) => schoolSkills[school])
     .filter((skill) => skill !== undefined);
@@ -174,8 +183,20 @@ function failureRateToInt(fail: number) {
   else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
 }
 
-export const getSpellSchools = (targetSpell: SpellName) => {
-  const spell = spells.find((spell) => spell.name === targetSpell);
+export const getSpellSchools = <V extends GameVersion>(
+  version: GameVersion,
+  targetSpell: VersionedSpellName<V>
+): VersionedSpellSchool<V>[] => {
+  const spellData =
+    version === "0.32"
+      ? (spells032 as VersionedSpellDatum<"0.32">[] as VersionedSpellDatum<V>[])
+      : (spellsTrunk as VersionedSpellDatum<"trunk">[] as VersionedSpellDatum<V>[]);
+
+  if (!spellData) {
+    throw new Error("spellData is undefined");
+  }
+
+  const spell = spellData.find((spell) => spell.name === targetSpell);
   if (!spell) {
     throw new Error("Spell not found");
   }
@@ -193,7 +214,8 @@ const applyWizardryBoost = (chance: number, wizardry: number) => {
   return Math.floor((chance * failReduce) / 100);
 };
 
-function rawSpellFail({
+function rawSpellFail<V extends GameVersion>({
+  version,
   strength,
   intelligence,
   spellDifficulty,
@@ -207,17 +229,27 @@ function rawSpellFail({
   wizardry = 0,
   channel = false,
   wildMagic = 0,
-}: SpellCalculationParams) {
+}: SpellCalculationParams<V>) {
   // 기본 실패율 60%에서 시작
   let chance = 60;
 
   // 주문 기술력 계산
   const spellPower = Math.floor(
-    (getSkillPower(targetSpell, schoolSkills, spellcasting) * 6) / 100
+    (getSkillPower<V>(version, targetSpell, schoolSkills, spellcasting) * 6) /
+      100
   );
+
+  console.log({
+    spellPower,
+  });
 
   // 주문력으로 실패율 감소
   chance -= spellPower;
+
+  console.log({
+    context: "after spell power",
+    chance,
+  });
 
   // 지능으로 실패율 감소
   chance -= intelligence * 2;
@@ -231,11 +263,26 @@ function rawSpellFail({
     shield,
   });
 
+  console.log({
+    context: "after armour/shield penalty",
+    chance,
+  });
+
   // 주문 난이도별 기본 실패율
   chance += spellDifficulties[spellDifficulty];
 
+  console.log({
+    context: "after spell difficulty",
+    chance,
+  });
+
   // 최대값 제한
   chance = Math.min(chance, 210);
+
+  console.log({
+    context: "after max",
+    chance,
+  });
 
   // 3차 다항식을 통한 실패율 계산
   let chance2 = Math.max(
@@ -261,7 +308,9 @@ function rawSpellFail({
   return failRate;
 }
 
-export const calculateSpellFailureRate = (params: SpellCalculationParams) => {
+export const calculateSpellFailureRate = <V extends GameVersion>(
+  params: SpellCalculationParams<V>
+) => {
   const failRate = rawSpellFail(params);
 
   return failureRateToInt(failRate);

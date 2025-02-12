@@ -13,9 +13,12 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/data/*": ["src/data/*"],
+      "@/types/*": ["src/types/*"]
     },
     "types": ["jest", "node"]
   },
