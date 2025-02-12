@@ -13,6 +13,7 @@ const getStorageKey = (version: GameVersion) => {
 export interface CalculatorState<V extends GameVersion> {
   version: GameVersion;
   accordionValue: string[];
+  accordionOrder: string[];
   //
   dexterity: number;
   strength: number;
@@ -42,6 +43,7 @@ export interface CalculatorState<V extends GameVersion> {
 const defaultStateTrunk: CalculatorState<"trunk"> = {
   version: "trunk",
   accordionValue: ["ev"],
+  accordionOrder: ["sf", "ev", "ac", "sh"],
   dexterity: 10,
   strength: 10,
   intelligence: 10,
@@ -82,6 +84,7 @@ const defaultStateTrunk: CalculatorState<"trunk"> = {
 const defaultState032: CalculatorState<"0.32"> = {
   version: "0.32",
   accordionValue: ["ev"],
+  accordionOrder: ["sf", "ev", "ac", "sh"],
   dexterity: 10,
   strength: 10,
   intelligence: 10,

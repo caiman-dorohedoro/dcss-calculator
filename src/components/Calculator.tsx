@@ -8,12 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import AttrInput from "@/components/AttrInput";
 import SpellModeHeader from "@/components/SpellModeHeader";
 import EVChart from "@/components/chart/EVChart";
@@ -29,6 +24,22 @@ import {
 } from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { GameVersion } from "@/types/game";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -64,6 +75,74 @@ const Calculator = <V extends GameVersion>({
         key: "dodgingSkill",
       },
     ];
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  // 기본 아이템 순서 정의
+  const defaultAccordionItems = [
+    ...(state.spellMode
+      ? [
+          {
+            id: "sf",
+            title: "Spell Failure Rate Calculator",
+            content: <SFChart state={state} />,
+          },
+        ]
+      : []),
+    {
+      id: "ev",
+      title: "EV Calculator",
+      content: <EVChart state={state} />,
+    },
+    {
+      id: "ac",
+      title: "AC Calculator",
+      content: <ACChart state={state} />,
+    },
+    {
+      id: "sh",
+      title: "SH Calculator",
+      content: <SHChart state={state} />,
+    },
+  ];
+
+  // 상태의 accordionOrder에 따라 아이템 순서 정렬
+  const accordionItems = [...defaultAccordionItems].sort((a, b) => {
+    const aIndex = state.accordionOrder.indexOf(a.id);
+    const bIndex = state.accordionOrder.indexOf(b.id);
+
+    // 새로운 아이템(상태에 없는 아이템)은 마지막에 배치
+    if (aIndex === -1) return 1;
+    if (bIndex === -1) return -1;
+
+    return aIndex - bIndex;
+  });
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over) return;
+    if (active.id === over.id) return;
+
+    const oldIndex = accordionItems.findIndex(
+      (item) => item.id === String(active.id)
+    );
+    const newIndex = accordionItems.findIndex(
+      (item) => item.id === String(over.id)
+    );
+
+    const newItems = arrayMove(accordionItems, oldIndex, newIndex);
+
+    setState((prev) => ({
+      ...prev,
+      accordionOrder: newItems.map((item) => item.id),
+    }));
+  };
 
   return (
     <Card>
@@ -205,32 +284,25 @@ const Calculator = <V extends GameVersion>({
             setState((prev) => ({ ...prev, accordionValue: value }))
           }
         >
-          {state.spellMode && (
-            <AccordionItem value="sf">
-              <AccordionTrigger>Spell Failure Rate Calculator</AccordionTrigger>
-              <AccordionContent>
-                <SFChart state={state} />
-              </AccordionContent>
-            </AccordionItem>
-          )}
-          <AccordionItem value="ev">
-            <AccordionTrigger>EV Calculator</AccordionTrigger>
-            <AccordionContent>
-              <EVChart state={state} />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="ac">
-            <AccordionTrigger>AC Calculator</AccordionTrigger>
-            <AccordionContent>
-              <ACChart state={state} />
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="sh">
-            <AccordionTrigger>SH Calculator</AccordionTrigger>
-            <AccordionContent>
-              <SHChart state={state} />
-            </AccordionContent>
-          </AccordionItem>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={accordionItems}
+              strategy={verticalListSortingStrategy}
+            >
+              {accordionItems.map((item) => (
+                <SortableAccordionItem
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  content={item.content}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         </Accordion>
       </CardContent>
     </Card>
