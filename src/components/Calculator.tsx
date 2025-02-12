@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/accordion";
 import AttrInput from "@/components/AttrInput";
 import SpellModeHeader from "@/components/SpellModeHeader";
-import EVChart from "@/components/chart/EvChart";
+import EVChart from "@/components/chart/EVChart";
 import ACChart from "@/components/chart/ACChart";
 import SHChart from "@/components/chart/SHChart";
 import SFChart from "@/components/chart/SFChart";
