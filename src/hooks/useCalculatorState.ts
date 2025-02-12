@@ -31,7 +31,6 @@ export interface CalculatorState<V extends GameVersion> {
   barding?: boolean;
   secondGloves?: boolean;
   // spell mode
-  spellMode?: boolean;
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;
   spellcasting?: number;
@@ -60,7 +59,6 @@ const defaultStateTrunk: CalculatorState<"trunk"> = {
   barding: false,
   secondGloves: false,
   //
-  spellMode: false,
   schoolSkills: {
     translocation: 0,
     fire: 0,
@@ -100,7 +98,6 @@ const defaultState032: CalculatorState<"0.32"> = {
   cloak: false,
   barding: false,
   //
-  spellMode: false,
   schoolSkills: {
     translocation: 0,
     fire: 0,
@@ -209,16 +206,19 @@ export const useCalculatorState = <V extends GameVersion>() => {
   const changeVersion = (version: GameVersion) => {
     const saved = localStorage.getItem(getStorageKey(version));
 
-    if (saved) {
-      setState((state) => ({
-        spellMode: state.spellMode,
-        ...(JSON.parse(saved) as CalculatorState<V>),
-      }));
-    } else {
-      setState((state) => ({
-        spellMode: state.spellMode,
-        ...(getDefaultState<V>(version) as CalculatorState<V>),
-      }));
+    if (!saved) {
+      setState(getDefaultState<V>(version) as CalculatorState<V>);
+      return;
+    }
+
+    try {
+      if (validateState(JSON.parse(saved))) {
+        setState(JSON.parse(saved) as CalculatorState<V>);
+      } else {
+        setState(getDefaultState<V>(version) as CalculatorState<V>);
+      }
+    } catch {
+      setState(getDefaultState<V>(version) as CalculatorState<V>);
     }
   };
 

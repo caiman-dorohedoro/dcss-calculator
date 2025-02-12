@@ -52,7 +52,7 @@ export function SortableAccordionItem({
         >
           <GripVertical className="h-4 w-4" />
         </div>
-        <AccordionTrigger className="flex-1">{title}</AccordionTrigger>
+        <AccordionTrigger headerClassName="grow">{title}</AccordionTrigger>
       </div>
       <AccordionContent>{content}</AccordionContent>
     </AccordionItem>

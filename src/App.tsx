@@ -1,9 +1,6 @@
 import Calculator from "@/components/Calculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useCalculatorState } from "@/hooks/useCalculatorState";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -16,14 +13,6 @@ import { GameVersion, gameVersions } from "@/types/game";
 function App() {
   const { state, setState, resetState, changeVersion } = useCalculatorState();
 
-  useEffect(() => {
-    if (state.spellMode) {
-      setState((prev) => ({ ...prev, accordionValue: ["sf"] }));
-    } else {
-      setState((prev) => ({ ...prev, accordionValue: ["ev"] }));
-    }
-  }, [state.spellMode, setState]);
-
   return (
     <div className="p-1 md:p-4 flex items-center justify-center w-screen">
       <Tabs defaultValue="ev" className="w-full max-w-2xl">
@@ -33,25 +22,11 @@ function App() {
           style={{ outline: "1px solid white", outlineOffset: "-4px" }}
         >
           <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-x-2">
-            <Switch
-              id="spell-mode"
-              checked={state.spellMode}
-              onCheckedChange={(checked) =>
-                setState((prev) => ({ ...prev, spellMode: checked }))
-              }
-            />
-
-            <Label
-              htmlFor="spell-mode"
-              className="hover:cursor-pointer text-muted-foreground hover:text-foreground"
-            >
-              Spell<span className="hidden md:inline"> Mode</span>
-            </Label>
             <Select
               value={state.version}
               onValueChange={(value) => changeVersion(value as GameVersion)}
             >
-              <SelectTrigger className="h-5 w-20">
+              <SelectTrigger className="h-5 w-[150px]">
                 <SelectValue placeholder="Version" />
               </SelectTrigger>
               <SelectContent>

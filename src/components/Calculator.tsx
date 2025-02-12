@@ -85,15 +85,11 @@ const Calculator = <V extends GameVersion>({
 
   // 기본 아이템 순서 정의
   const defaultAccordionItems = [
-    ...(state.spellMode
-      ? [
-          {
-            id: "sf",
-            title: "Spell Failure Rate Calculator",
-            content: <SFChart state={state} />,
-          },
-        ]
-      : []),
+    {
+      id: "sf",
+      title: "Spell Failure Rate Calculator",
+      content: <SFChart state={state} />,
+    },
     {
       id: "ev",
       title: "EV Calculator",
@@ -248,33 +244,24 @@ const Calculator = <V extends GameVersion>({
             </Select>
           </label>
         </div>
-        {!state.spellMode && (
-          <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
-            {checkboxKeys.map(({ label, key }) => (
-              <Fragment key={key}>
-                <label
-                  htmlFor={key}
-                  className="flex flex-row items-center gap-2"
-                >
-                  <Checkbox
-                    checked={!!state[key]}
-                    onCheckedChange={(checked) =>
-                      setState((prev) => ({ ...prev, [key]: !!checked }))
-                    }
-                    id={key}
-                  />
-                  {label}
-                </label>
-                {key === "boots" && (
-                  <div className="h-3 w-px bg-gray-200"></div>
-                )}
-              </Fragment>
-            ))}
-          </div>
-        )}
-        {state.spellMode && (
-          <SpellModeHeader state={state} setState={setState} />
-        )}
+        <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
+          {checkboxKeys.map(({ label, key }) => (
+            <Fragment key={key}>
+              <label htmlFor={key} className="flex flex-row items-center gap-2">
+                <Checkbox
+                  checked={!!state[key]}
+                  onCheckedChange={(checked) =>
+                    setState((prev) => ({ ...prev, [key]: !!checked }))
+                  }
+                  id={key}
+                />
+                {label}
+              </label>
+              {key === "boots" && <div className="h-3 w-px bg-gray-200"></div>}
+            </Fragment>
+          ))}
+        </div>
+        <SpellModeHeader state={state} setState={setState} />
       </CardHeader>
       <CardContent>
         <Accordion
