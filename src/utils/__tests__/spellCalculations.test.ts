@@ -561,6 +561,6 @@ describe("Spell Calculations", () => {
       shieldSkill: 25.6,
     });
 
-    expect(failureRate).toBe(21);
+    expect(failureRate).toBe(21); // 게임 화면상으로는 21
   });
 });
