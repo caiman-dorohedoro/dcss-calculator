@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { Accordion } from "@/components/ui/accordion";
 import AttrInput from "@/components/AttrInput";
-import SpellModeHeader from "@/components/SpellModeHeader";
 import EVChart from "@/components/chart/EVChart";
 import ACChart from "@/components/chart/ACChart";
 import SHChart from "@/components/chart/SHChart";
@@ -88,7 +87,7 @@ const Calculator = <V extends GameVersion>({
     {
       id: "sf",
       title: "Spell Failure Rate Calculator",
-      content: <SFChart state={state} />,
+      content: <SFChart state={state} setState={setState} />,
     },
     {
       id: "ev",
@@ -261,7 +260,6 @@ const Calculator = <V extends GameVersion>({
             </Fragment>
           ))}
         </div>
-        <SpellModeHeader state={state} setState={setState} />
       </CardHeader>
       <CardContent>
         <Accordion

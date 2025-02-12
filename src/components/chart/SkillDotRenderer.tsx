@@ -23,7 +23,7 @@ type RenderDotParams = {
   payload: ChartPayload;
 };
 
-const baseLeftPadding = 30;
+const baseLeftPadding = 40;
 const baseTopOffset = 310;
 const baseLeftOffset = 612;
 

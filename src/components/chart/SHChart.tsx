@@ -33,7 +33,7 @@ const SHChart = <V extends GameVersion>({ state }: SHChartProps<V>) => {
     <ResponsiveContainer className="mt-4" width="100%" height={350}>
       <LineChart
         data={shData}
-        margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
+        margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis

@@ -24,8 +24,7 @@ const SpellModeHeader = <V extends GameVersion>({
   const spells = getSpellData<V>(state.version);
 
   return (
-    <>
-      <div className="h-px w-full bg-gray-200"></div>
+    <div className="flex flex-col gap-2 pl-2 pr-4 pb-4">
       <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
         <div className="flex flex-row items-center gap-2">
           Spell:
@@ -114,7 +113,7 @@ const SpellModeHeader = <V extends GameVersion>({
           }
         />
       </div>
-    </>
+    </div>
   );
 };
 

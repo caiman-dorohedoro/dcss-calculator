@@ -41,7 +41,7 @@ export interface CalculatorState<V extends GameVersion> {
 
 const defaultStateTrunk: CalculatorState<"trunk"> = {
   version: "trunk",
-  accordionValue: ["ev"],
+  accordionValue: ["sf"],
   accordionOrder: ["sf", "ev", "ac", "sh"],
   dexterity: 10,
   strength: 10,
@@ -81,7 +81,7 @@ const defaultStateTrunk: CalculatorState<"trunk"> = {
 
 const defaultState032: CalculatorState<"0.32"> = {
   version: "0.32",
-  accordionValue: ["ev"],
+  accordionValue: ["sf"],
   accordionOrder: ["sf", "ev", "ac", "sh"],
   dexterity: 10,
   strength: 10,

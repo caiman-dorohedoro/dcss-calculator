@@ -33,7 +33,7 @@ const EVChart = <V extends GameVersion>({ state }: EVChartProps<V>) => {
     <ResponsiveContainer width="100%" height={350}>
       <LineChart
         data={data}
-        margin={{ left: 0, right: 10, top: 10, bottom: 10 }}
+        margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis

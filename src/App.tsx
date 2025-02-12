@@ -26,7 +26,7 @@ function App() {
               value={state.version}
               onValueChange={(value) => changeVersion(value as GameVersion)}
             >
-              <SelectTrigger className="h-5 w-[150px]">
+              <SelectTrigger className="h-5 w-[120px] border-[#999] text-white">
                 <SelectValue placeholder="Version" />
               </SelectTrigger>
               <SelectContent>
