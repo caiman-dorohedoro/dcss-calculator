@@ -1,8 +1,19 @@
 import * as fs from "fs";
 
-const SPELL_DATA_FILE_NAME = `spl-data.trunk.20240209.h`;
-const EXTRACTED_SPELL_DATA_FILE_NAME = "player-spells.json";
-const EXTRACTED_SPELL_TYPES_FILE_NAME = "player-spells.d.ts";
+const SPELL_DATA_FILE_NAME = `spl-data.0.32.h`;
+const SPELL_DATA_PATH = `src/data/${SPELL_DATA_FILE_NAME}`;
+const EXTRACTED_SPELL_DATA_FILE_NAME = "generated-spells.0.32.json";
+const EXTRACTED_SPELL_TYPES_FILE_NAME = "generated-spells.0.32.d.ts";
+const EXTRACTED_SPELL_DATA_PATH = `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`;
+const EXTRACTED_SPELL_TYPES_PATH = `src/types/${EXTRACTED_SPELL_TYPES_FILE_NAME}`;
+
+// trunk
+const TRUNK_SPELL_DATA_FILE_NAME = `spl-data.trunk.20240209.h`;
+const TRUNK_SPELL_DATA_PATH = `src/data/${TRUNK_SPELL_DATA_FILE_NAME}`;
+const TRUNK_EXTRACTED_SPELL_DATA_FILE_NAME = "generated-spells.trunk.json";
+const TRUNK_EXTRACTED_SPELL_TYPES_FILE_NAME = "generated-spells.trunk.d.ts";
+const TRUNK_EXTRACTED_SPELL_DATA_PATH = `src/data/${TRUNK_EXTRACTED_SPELL_DATA_FILE_NAME}`;
+const TRUNK_EXTRACTED_SPELL_TYPES_PATH = `src/types/${TRUNK_EXTRACTED_SPELL_TYPES_FILE_NAME}`;
 
 type SpellData_PROTO = {
   id: string;
@@ -32,7 +43,7 @@ const wandSpells = {
   WAND_MINDBURST: "SPELL_MINDBURST",
   WAND_ROOTS: "SPELL_FASTROOT",
   WAND_WARPING: "SPELL_WARP_SPACE",
-}
+};
 
 const playerNonbookSpells = [
   "SPELL_THUNDERBOLT",
@@ -52,7 +63,7 @@ const playerNonbookSpells = [
   "SPELL_CAUSTIC_BREATH",
   "SPELL_GALVANIC_BREATH",
   "SPELL_MUD_BREATH",
-]
+];
 
 const parseSpellDataHeader = (fileContent: string) => {
   try {
@@ -97,9 +108,11 @@ const parseSpellDataHeader = (fileContent: string) => {
     console.error("Error extracting spell data:", error);
     throw error; // 에러를 다시 던져서 호출하는 쪽에서 처리할 수 있게 함
   }
-}
+};
 
-export const parseSpellBlock = (spellBlock: string): SpellData_PROTO | undefined => {
+export const parseSpellBlock = (
+  spellBlock: string
+): SpellData_PROTO | undefined => {
   // AXED_SPELL 체크
   if (spellBlock.includes("AXED_SPELL")) {
     return; // skip this iteration
@@ -111,11 +124,11 @@ export const parseSpellBlock = (spellBlock: string): SpellData_PROTO | undefined
     // 각 줄을 배열로 분리
     const lines = cleanBlock
       .split("\n")
-      .map(line => line.split("//")[0].trim()) // 주석 제거
+      .map((line) => line.split("//")[0].trim()) // 주석 제거
       .join("")
       .split(",")
-      .map(line => line.trim())
-      .filter(line => line !== ""); // 빈 문자열 제거
+      .map((line) => line.trim())
+      .filter((line) => line !== ""); // 빈 문자열 제거
 
     if (lines.length < 9) return; // 유효하지 않은 데이터는 건너뛰기
 
@@ -138,7 +151,7 @@ export const parseSpellBlock = (spellBlock: string): SpellData_PROTO | undefined
   } catch (error) {
     console.error("Error parsing spell block:", spellBlock, error);
   }
-}
+};
 
 const parseSpellData = (spellDataSection: string) => {
   const spells: [] = [];
@@ -148,15 +161,15 @@ const parseSpellData = (spellDataSection: string) => {
   const matches = spellDataSection.match(spellRegex);
   if (!matches) return spells;
 
-  const result = matches.map(parseSpellBlock).filter(p => p !== undefined);
+  const result = matches.map(parseSpellBlock).filter((p) => p !== undefined);
 
   return result;
-}
+};
 
 const extractSpellName = (nameStr: string) => {
   const matches = nameStr.match(/"([^"]+)"/);
   return matches ? matches[1] : nameStr.trim();
-}
+};
 
 const parseSchools = (schoolsStr: string) => {
   if (!schoolsStr) return [];
@@ -164,7 +177,7 @@ const parseSchools = (schoolsStr: string) => {
     .split("|")
     .map((s) => s.trim().replace("spschool::", ""))
     .filter((s) => s !== "none");
-}
+};
 
 const parseFlags = (flagsStr: string) => {
   if (!flagsStr) return [];
@@ -172,7 +185,7 @@ const parseFlags = (flagsStr: string) => {
     .split("|")
     .map((f) => f.trim().replace("spflag::", ""))
     .filter((f) => f !== "none");
-}
+};
 
 const extractSets = (filePath: string) => {
   const fileContent = fs.readFileSync(filePath, "utf8");
@@ -204,7 +217,7 @@ const extractSets = (filePath: string) => {
     uniqueSchools,
     uniqueFlags,
   };
-}
+};
 
 const makeTypeDefinition = (sets: {
   uniqueNames: Set<string>;
@@ -212,28 +225,19 @@ const makeTypeDefinition = (sets: {
   uniqueFlags: Set<string>;
 }) => {
   const names = Array.from(sets.uniqueNames);
-  const schools = Array.from(sets.uniqueSchools).map(school => school.replace(/(\r\n|\n|\r)/gm, "").trim());
-  const flags = Array.from(sets.uniqueFlags).map(flag => flag.replace(/(\r\n|\n|\r)/gm, "").trim());
+  const schools = Array.from(sets.uniqueSchools).map((school) =>
+    school.replace(/(\r\n|\n|\r)/gm, "").trim()
+  );
+  const flags = Array.from(sets.uniqueFlags).map((flag) =>
+    flag.replace(/(\r\n|\n|\r)/gm, "").trim()
+  );
 
   return `
   export type SpellName = ${names.map((name) => `"${name}"`).join(" | ")};
-  export type School = ${schools.map((school) => `"${school}"`).join(" | ")};
-  export type Flag = ${flags.map((flag) => `"${flag}"`).join(" | ")};
-
-  export type SpellData = {
-    id: string;
-    name: SpellName;
-    schools: School[];
-    flags: Flag[];
-    level: number;
-    power: number;
-    range: {
-      min: number;
-      max: number;
-    };
-    noise: number;
-    tile: string;
-  };
+  export type SpellSchool = ${schools
+    .map((school) => `"${school}"`)
+    .join(" | ")};
+  export type SpellFlag = ${flags.map((flag) => `"${flag}"`).join(" | ")};
 `;
 };
 
@@ -246,67 +250,71 @@ const extractSpellData = (fileContent: string) => {
   const parsedSpells = parseSpellData(spellDataSection);
 
   return parsedSpells;
-}
+};
 
 const getOnlyPlayerSpells = (parsedSpells: SpellData_PROTO[]) => {
   const result = parsedSpells
-    .filter(spell => !spell.flags.includes("monster") && !spell.flags.includes(" monster")) // Glaciate flag 오타 반영
-    .filter(spell => !spell.flags.includes("testing"))
-    .filter(spell => !Object.values(wandSpells).includes(spell.id))
-    .filter(spell => !playerNonbookSpells.includes(spell.id));
+    .filter(
+      (spell) =>
+        !spell.flags.includes("monster") && !spell.flags.includes(" monster")
+    ) // Glaciate flag 오타 반영
+    .filter((spell) => !spell.flags.includes("testing"))
+    .filter((spell) => !Object.values(wandSpells).includes(spell.id))
+    .filter((spell) => !playerNonbookSpells.includes(spell.id));
 
   return result;
-}
+};
 
-const writeOuputFiles = (spells: SpellData_PROTO[]) => {
+const writeOuputFiles = (
+  spells: SpellData_PROTO[],
+  extractedSpellDataPath: string
+) => {
   if (process.env.NODE_ENV === "test") {
-    return
+    return;
   }
 
-  // 검수를 위해 학파별로 그룹화
-  // const sortedSpells = spells.sort((a, b) => a.level - b.level);
-  // const groupedBySchool = sortedSpells.reduce((acc, spell) => {
-  //   spell.schools.forEach(school => {
-  //     acc[school] = [...(acc[school] || []), spell];
-  //   });
-  //   return acc;
-  // }, {} as Record<string, SpellData_PROTO[]>);
+  fs.writeFileSync(extractedSpellDataPath, JSON.stringify(spells, null, 2));
+};
 
-  // fs.writeFileSync(
-  //   `src/data/grouped-by-school.json`,
-  //   JSON.stringify(groupedBySchool, null, 2)
-  // );
-
-  fs.writeFileSync(
-    `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`,
-    JSON.stringify(spells, null, 2)
-  );
-}
-
-const writeTypeDefinition = (typeDefinition: string) => {
+const writeTypeDefinition = (
+  typeDefinition: string,
+  extractedSpellTypesPath: string
+) => {
   if (process.env.NODE_ENV === "test") {
-    return
+    return;
   }
 
-  fs.writeFileSync(`src/data/${EXTRACTED_SPELL_TYPES_FILE_NAME}`, typeDefinition);
-}
+  fs.writeFileSync(extractedSpellTypesPath, typeDefinition);
+};
 
-const main = () => {
+const extract = (
+  spellDataPath: string,
+  extractedSpellDataPath: string,
+  extractedSpellTypesPath: string
+) => {
   try {
-    const fileContent = fs.readFileSync(
-      `src/data/${SPELL_DATA_FILE_NAME}`,
-      "utf8"
-    );
+    const fileContent = fs.readFileSync(spellDataPath, "utf8");
 
     const parsedSpells = extractSpellData(fileContent);
 
-    writeOuputFiles(getOnlyPlayerSpells(parsedSpells));
+    writeOuputFiles(getOnlyPlayerSpells(parsedSpells), extractedSpellDataPath);
 
-    writeTypeDefinition(makeTypeDefinition(extractSets(`src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`)));
+    writeTypeDefinition(
+      makeTypeDefinition(extractSets(extractedSpellDataPath)),
+      extractedSpellTypesPath
+    );
   } catch (error) {
     console.error("Failed to process spell data:", error);
     process.exit(1);
   }
-}
+};
 
-main();
+// extract trunk
+extract(
+  TRUNK_SPELL_DATA_PATH,
+  TRUNK_EXTRACTED_SPELL_DATA_PATH,
+  TRUNK_EXTRACTED_SPELL_TYPES_PATH
+);
+
+// extract 0.32
+extract(SPELL_DATA_PATH, EXTRACTED_SPELL_DATA_PATH, EXTRACTED_SPELL_TYPES_PATH);
