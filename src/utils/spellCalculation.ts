@@ -94,16 +94,14 @@ function calculateArmourPenalty({
 }: CalculateArmourPenaltyParams) {
   const baseEvPenalty = armourOptions[armour].encumbrance;
 
-  let penalty = Math.floor(
+  const penalty = Math.floor(
     Math.floor(
       (2 * baseEvPenalty * baseEvPenalty * (450 - armourSkill * 10) * SCALE) /
         (5 * (strength + 3))
     ) / 450
   );
 
-  penalty *= 19;
-
-  return Math.max(penalty, 0);
+  return Math.max(penalty * 19, 0);
 }
 
 type CalculateShieldPenaltyParams = {
@@ -122,7 +120,7 @@ function calculateShieldPenalty({
 }: CalculateShieldPenaltyParams) {
   const baseShieldPenalty = shieldOptions[shield].encumbrance;
 
-  let penalty = Math.floor(
+  const penalty = Math.floor(
     Math.floor(
       (2 *
         baseShieldPenalty *
@@ -133,9 +131,7 @@ function calculateShieldPenalty({
     ) / 270
   );
 
-  penalty *= 19;
-
-  return Math.max(penalty, 0);
+  return Math.max(penalty * 19, 0);
 }
 
 type armourShieldSpellPenaltyParams = {
@@ -255,7 +251,9 @@ function rawSpellFail({
     chance2 += 10;
   }
 
-  chance2 = applyWizardryBoost(chance2, wizardry);
+  if (wizardry > 0) {
+    chance2 = applyWizardryBoost(chance2, wizardry);
+  }
 
   // 최종 실패율은 0-100% 사이
   const failRate = Math.min(Math.max(chance2, 0), 100);
