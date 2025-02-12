@@ -183,14 +183,17 @@ function failureRateToInt(fail: number) {
   else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
 }
 
+export const getSpellData = <V extends GameVersion>(version: GameVersion) => {
+  return version === "0.32"
+    ? (spells032 as VersionedSpellDatum<"0.32">[] as VersionedSpellDatum<V>[])
+    : (spellsTrunk as VersionedSpellDatum<"trunk">[] as VersionedSpellDatum<V>[]);
+};
+
 export const getSpellSchools = <V extends GameVersion>(
   version: GameVersion,
-  targetSpell: VersionedSpellName<V>
+  targetSpell?: VersionedSpellName<V>
 ): VersionedSpellSchool<V>[] => {
-  const spellData =
-    version === "0.32"
-      ? (spells032 as VersionedSpellDatum<"0.32">[] as VersionedSpellDatum<V>[])
-      : (spellsTrunk as VersionedSpellDatum<"trunk">[] as VersionedSpellDatum<V>[]);
+  const spellData = getSpellData<V>(version);
 
   if (!spellData) {
     throw new Error("spellData is undefined");
@@ -239,17 +242,8 @@ function rawSpellFail<V extends GameVersion>({
       100
   );
 
-  console.log({
-    spellPower,
-  });
-
   // 주문력으로 실패율 감소
   chance -= spellPower;
-
-  console.log({
-    context: "after spell power",
-    chance,
-  });
 
   // 지능으로 실패율 감소
   chance -= intelligence * 2;
@@ -263,26 +257,11 @@ function rawSpellFail<V extends GameVersion>({
     shield,
   });
 
-  console.log({
-    context: "after armour/shield penalty",
-    chance,
-  });
-
   // 주문 난이도별 기본 실패율
   chance += spellDifficulties[spellDifficulty];
 
-  console.log({
-    context: "after spell difficulty",
-    chance,
-  });
-
   // 최대값 제한
   chance = Math.min(chance, 210);
-
-  console.log({
-    context: "after max",
-    chance,
-  });
 
   // 3차 다항식을 통한 실패율 계산
   let chance2 = Math.max(

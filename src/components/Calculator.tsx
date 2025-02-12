@@ -28,37 +28,43 @@ import {
   shieldOptions,
 } from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
+import { GameVersion } from "@/types/game";
 
-type CalculatorProps = {
-  state: CalculatorState;
-  setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
+type CalculatorProps<V extends GameVersion> = {
+  state: CalculatorState<V>;
+  setState: React.Dispatch<React.SetStateAction<CalculatorState<V>>>;
 };
 
-const checkboxKeys: Array<{ label: string; key: keyof CalculatorState }> = [
-  { label: "Helmet", key: "helmet" },
-  { label: "Cloak", key: "cloak" },
-  { label: "Gloves", key: "gloves" },
-  { label: "Boots", key: "boots" },
-  { label: "Barding", key: "barding" },
-  { label: "2nd Gloves", key: "secondGloves" },
-];
+const Calculator = <V extends GameVersion>({
+  state,
+  setState,
+}: CalculatorProps<V>) => {
+  const checkboxKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
+    [
+      { label: "Helmet", key: "helmet" },
+      { label: "Cloak", key: "cloak" },
+      { label: "Gloves", key: "gloves" },
+      { label: "Boots", key: "boots" },
+      { label: "Barding", key: "barding" },
+      { label: "2nd Gloves", key: "secondGloves" },
+    ];
 
-const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState }> = [
-  {
-    label: "Armour Skill",
-    key: "armourSkill",
-  },
-  {
-    label: "Shield Skill",
-    key: "shieldSkill",
-  },
-  {
-    label: "Dodging Skill",
-    key: "dodgingSkill",
-  },
-];
+  const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
+    [
+      {
+        label: "Armour Skill",
+        key: "armourSkill",
+      },
+      {
+        label: "Shield Skill",
+        key: "shieldSkill",
+      },
+      {
+        label: "Dodging Skill",
+        key: "dodgingSkill",
+      },
+    ];
 
-const Calculator = ({ state, setState }: CalculatorProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2">

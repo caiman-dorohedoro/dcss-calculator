@@ -1,12 +1,20 @@
-import Calculator from "./components/Calculator";
+import Calculator from "@/components/Calculator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { useCalculatorState } from "./hooks/useCalculatorState";
+import { useCalculatorState } from "@/hooks/useCalculatorState";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "./components/ui/label";
+import { Label } from "@/components/ui/label";
 import { useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { GameVersion, gameVersions } from "@/types/game";
 
 function App() {
-  const { state, setState, resetState } = useCalculatorState();
+  const { state, setState, resetState, changeVersion } = useCalculatorState();
 
   useEffect(() => {
     if (state.spellMode) {
@@ -39,6 +47,21 @@ function App() {
             >
               Spell<span className="hidden md:inline"> Mode</span>
             </Label>
+            <Select
+              value={state.version}
+              onValueChange={(value) => changeVersion(value as GameVersion)}
+            >
+              <SelectTrigger className="h-5 w-20">
+                <SelectValue placeholder="Version" />
+              </SelectTrigger>
+              <SelectContent>
+                {gameVersions.map((version) => (
+                  <SelectItem key={version} value={version}>
+                    {version}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
           <button

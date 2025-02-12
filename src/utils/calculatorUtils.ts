@@ -2,9 +2,13 @@ import { calculateEV } from "@/utils/evCalculation";
 import { calculateMixedAC } from "@/utils/acCalculation";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateSH } from "./shCalculation";
-import { calculateSpellFailureRate, getSpellSchools } from "./spellCalculation";
-import { spells } from "@/data/spells";
-import { SpellName, SpellSchool } from "@/types/spell.ts";
+import {
+  calculateSpellFailureRate,
+  getSpellData,
+  getSpellSchools,
+} from "./spellCalculation";
+import { GameVersion } from "@/types/game";
+import { VersionedSchoolSkillLevels } from "@/types/spells";
 
 type DataPoint = {
   dodgingSkill: number;
@@ -22,7 +26,9 @@ type ACDataPoint = {
   ac: number;
 };
 
-export const calculateAcData = (state: CalculatorState): ACDataPoint[] => {
+export const calculateAcData = <V extends GameVersion>(
+  state: CalculatorState<V>
+): ACDataPoint[] => {
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const armour = index / 10;
@@ -47,7 +53,9 @@ export const calculateAcData = (state: CalculatorState): ACDataPoint[] => {
   return result;
 };
 
-export const calculateEvData = (state: CalculatorState): DataPoint[] => {
+export const calculateEvData = <V extends GameVersion>(
+  state: CalculatorState<V>
+): DataPoint[] => {
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const dodgingSkill = index / 10;
@@ -73,7 +81,9 @@ export const calculateEvData = (state: CalculatorState): DataPoint[] => {
   return result;
 };
 
-export const calculateAcTicks = (state: CalculatorState): number[] => {
+export const calculateAcTicks = <V extends GameVersion>(
+  state: CalculatorState<V>
+): number[] => {
   const acData = calculateAcData(state);
   const acChangePoints = new Set<number>();
 
@@ -88,7 +98,9 @@ export const calculateAcTicks = (state: CalculatorState): number[] => {
   return Array.from(acChangePoints);
 };
 
-export const calculateEvTicks = (state: CalculatorState): number[] => {
+export const calculateEvTicks = <V extends GameVersion>(
+  state: CalculatorState<V>
+): number[] => {
   const evData = calculateEvData(state);
   const evChangePoints = new Set<number>();
 
@@ -108,7 +120,9 @@ export type SHDataPoint = {
   sh: number;
 };
 
-export const calculateSHData = (state: CalculatorState): SHDataPoint[] => {
+export const calculateSHData = <V extends GameVersion>(
+  state: CalculatorState<V>
+): SHDataPoint[] => {
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const shield = index / 10;
@@ -126,7 +140,9 @@ export const calculateSHData = (state: CalculatorState): SHDataPoint[] => {
   return result;
 };
 
-export const calculateShTicks = (state: CalculatorState): number[] => {
+export const calculateShTicks = <V extends GameVersion>(
+  state: CalculatorState<V>
+): number[] => {
   const shData = calculateSHData(state);
   const shChangePoints = new Set<number>();
 
@@ -146,11 +162,17 @@ export type FristSchoolSFDataPoint = {
   spellFailureRate: number;
 };
 
-export const calculateAvgSFData = (
-  state: CalculatorState
+export const calculateAvgSFData = <V extends GameVersion>(
+  state: CalculatorState<V>
 ): FristSchoolSFDataPoint[] => {
-  const spellDifficulty = spells.find(
-    (spell) => spell.name === state.targetSpell
+  const targetSpell = state.targetSpell;
+
+  if (targetSpell === undefined) {
+    throw new Error("Target spell not found");
+  }
+
+  const spellDifficulty = getSpellData<V>(state.version).find(
+    (spell) => spell.name === targetSpell
   )?.level;
 
   if (spellDifficulty === undefined) {
@@ -160,25 +182,22 @@ export const calculateAvgSFData = (
   if (state.targetSpell === undefined) {
     throw new Error("Target spell not found");
   }
-  const spellSchools = getSpellSchools(state.targetSpell);
+  const spellSchools = getSpellSchools<V>(state.version, targetSpell);
 
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
-      if (state.schoolSkills === undefined) {
-        throw new Error("School skills not found");
-      }
-
       const schoolSkills = spellSchools.reduce((acc, school) => {
         acc[school] = index / 10;
 
         return acc;
-      }, {} as Record<SpellSchool, number>);
+      }, {} as VersionedSchoolSkillLevels<V>);
 
       const spellFailureRate = calculateSpellFailureRate({
+        version: state.version,
         strength: state.strength,
         intelligence: state.intelligence,
         spellcasting: state.spellcasting ?? 0,
-        targetSpell: state.targetSpell as SpellName,
+        targetSpell: targetSpell,
         schoolSkills: schoolSkills,
         spellDifficulty,
         armour: state.armour,
@@ -200,8 +219,10 @@ export const calculateAvgSFData = (
   return result;
 };
 
-export const calculateSFTicks = (state: CalculatorState): number[] => {
-  const sfData = calculateAvgSFData(state);
+export const calculateSFTicks = <V extends GameVersion>(
+  state: CalculatorState<V>
+): number[] => {
+  const sfData = calculateAvgSFData<V>(state);
   const sfChangePoints = new Set<number>();
 
   const fibo = [1, 2, 3, 5, 8, 13, 21];

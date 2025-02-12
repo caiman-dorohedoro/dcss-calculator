@@ -13,12 +13,13 @@ import CustomTick from "@/components/chart/CustomTick";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateEvData, calculateEvTicks } from "@/utils/calculatorUtils";
+import { GameVersion } from "@/types/game";
 
-type EVChartProps = {
-  state: CalculatorState;
+type EVChartProps<V extends GameVersion> = {
+  state: CalculatorState<V>;
 };
 
-const EVChart = ({ state }: EVChartProps) => {
+const EVChart = <V extends GameVersion>({ state }: EVChartProps<V>) => {
   const [data, setData] = useState<ReturnType<typeof calculateEvData>>([]);
   const [evTicks, setEvTicks] = useState<number[]>([]);
 

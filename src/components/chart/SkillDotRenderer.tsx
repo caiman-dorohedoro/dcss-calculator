@@ -1,4 +1,5 @@
 import { CalculatorState } from "@/hooks/useCalculatorState";
+import { GameVersion } from "@/types/game";
 import { LineDot } from "recharts/types/cartesian/Line";
 
 type ChartPayload = {
@@ -32,8 +33,8 @@ const minBottomOffset = 15;
 const widthPerDigit = 8.3;
 const heightDigit = 14;
 
-const renderDot = (
-  skillKey: keyof CalculatorState | "spellSkill",
+const renderDot = <V extends GameVersion>(
+  skillKey: keyof CalculatorState<V> | "spellSkill",
   currentSkill: number
 ) => {
   const dotRenderer: LineDot = (params: RenderDotParams) => {

@@ -13,12 +13,13 @@ import CustomTick from "@/components/chart/CustomTick";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateSHData, calculateShTicks } from "@/utils/calculatorUtils";
+import { GameVersion } from "@/types/game";
 
-type SHChartProps = {
-  state: CalculatorState;
+type SHChartProps<V extends GameVersion> = {
+  state: CalculatorState<V>;
 };
 
-const SHChart = ({ state }: SHChartProps) => {
+const SHChart = <V extends GameVersion>({ state }: SHChartProps<V>) => {
   const [shData, setShData] = useState<ReturnType<typeof calculateSHData>>([]);
   const [shTicks, setShTicks] = useState<number[]>([]);
 

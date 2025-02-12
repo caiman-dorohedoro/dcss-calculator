@@ -33,7 +33,7 @@ export type VersionedSpellDatum<V extends GameVersion> = {
   name: VersionedSpellName<V>;
   schools: VersionedSpellSchool<V>[];
   flags: VersionedSpellFlag<V>[];
-  level: number;
+  level: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   power: number;
   range: {
     min: number;

@@ -13,12 +13,13 @@ import CustomTick from "@/components/chart/CustomTick";
 import renderDot from "@/components/chart/SkillDotRenderer";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateAcData, calculateAcTicks } from "@/utils/calculatorUtils";
+import { GameVersion } from "@/types/game";
 
-type ACChartProps = {
-  state: CalculatorState;
+type ACChartProps<V extends GameVersion> = {
+  state: CalculatorState<V>;
 };
 
-const ACChart = ({ state }: ACChartProps) => {
+const ACChart = <V extends GameVersion>({ state }: ACChartProps<V>) => {
   const [acData, setAcData] = useState<ReturnType<typeof calculateAcData>>([]);
   const [acTicks, setAcTicks] = useState<number[]>([]);
 

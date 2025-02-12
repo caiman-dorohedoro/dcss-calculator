@@ -14,22 +14,19 @@ import CustomSpellTick from "@/components/chart/CustomSpellTick";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateAvgSFData, calculateSFTicks } from "@/utils/calculatorUtils";
 import { getSpellSchools } from "@/utils/spellCalculation";
-import { spells } from "@/data/spells";
-import { SpellName } from "@/types/spell.ts";
+import { GameVersion } from "@/types/game";
 
-type SFChartProps = {
-  state: CalculatorState;
+type SFChartProps<V extends GameVersion> = {
+  state: CalculatorState<V>;
 };
 
-const SFChart = ({ state }: SFChartProps) => {
+const SFChart = <V extends GameVersion>({ state }: SFChartProps<V>) => {
   const [sfData, setSFData] = useState<ReturnType<typeof calculateAvgSFData>>(
     []
   );
   const [sfTicks, setSfTicks] = useState<number[]>([]);
-
-  const firstSchool = spells.find((spell) => spell.name === state.targetSpell)
-    ?.schools[0];
-  const spellSchools = getSpellSchools(state.targetSpell as SpellName);
+  const spellSchools = getSpellSchools<V>(state.version, state.targetSpell);
+  const [firstSchool] = spellSchools;
 
   useEffect(() => {
     const firstSFData = calculateAvgSFData(state);

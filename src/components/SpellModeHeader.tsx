@@ -7,16 +7,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import AttrInput from "@/components/AttrInput";
-import { CalculatorState, isSchoolSkillKey } from "@/hooks/useCalculatorState";
-import { spells } from "@/data/spells";
-import { SpellName, SpellSchool } from "@/types/spell.ts";
+import { CalculatorState } from "@/hooks/useCalculatorState";
+import { GameVersion } from "@/types/game";
+import { VersionedSpellName } from "@/types/spells";
+import { getSpellData } from "@/utils/spellCalculation";
 
-type SpellModeHeaderProps = {
-  state: CalculatorState;
-  setState: React.Dispatch<React.SetStateAction<CalculatorState>>;
+type SpellModeHeaderProps<V extends GameVersion> = {
+  state: CalculatorState<V>;
+  setState: React.Dispatch<React.SetStateAction<CalculatorState<V>>>;
 };
 
-const SpellModeHeader = ({ state, setState }: SpellModeHeaderProps) => {
+const SpellModeHeader = <V extends GameVersion>({
+  state,
+  setState,
+}: SpellModeHeaderProps<V>) => {
+  const spells = getSpellData<V>(state.version);
+
   return (
     <>
       <div className="h-px w-full bg-gray-200"></div>
@@ -28,7 +34,7 @@ const SpellModeHeader = ({ state, setState }: SpellModeHeaderProps) => {
             onValueChange={(value) =>
               setState((prev) => ({
                 ...prev,
-                targetSpell: value as SpellName,
+                targetSpell: value as VersionedSpellName<V>,
               }))
             }
           >
@@ -59,16 +65,6 @@ const SpellModeHeader = ({ state, setState }: SpellModeHeaderProps) => {
         {spells
           .find((spell) => spell.name === state.targetSpell)
           ?.schools.map((schoolName) => {
-            // const lowerCaseSchoolName = schoolName.toLowerCase();
-
-            if (!isSchoolSkillKey(schoolName)) {
-              return null;
-            }
-
-            if (typeof state.schoolSkills?.[schoolName] !== "number") {
-              return null;
-            }
-
             return (
               <AttrInput
                 key={schoolName}
@@ -81,7 +77,7 @@ const SpellModeHeader = ({ state, setState }: SpellModeHeaderProps) => {
                     schoolSkills: {
                       ...prev.schoolSkills,
                       [schoolName]: value === undefined ? 0 : value,
-                    } as Record<SpellSchool, number>,
+                    },
                   }))
                 }
               />
