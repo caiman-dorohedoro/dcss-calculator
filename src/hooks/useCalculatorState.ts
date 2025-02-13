@@ -193,6 +193,7 @@ export const useCalculatorState = <V extends GameVersion>() => {
 
     return getDefaultState<"trunk">(initialVersion) as CalculatorState<V>;
   });
+  const [flash, setFlash] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(getStorageKey(state.version), JSON.stringify(state));
@@ -204,6 +205,8 @@ export const useCalculatorState = <V extends GameVersion>() => {
   };
 
   const changeVersion = (version: GameVersion) => {
+    setFlash(false);
+    setTimeout(() => setFlash(true), 0);
     const saved = localStorage.getItem(getStorageKey(version));
 
     if (!saved) {
@@ -227,5 +230,6 @@ export const useCalculatorState = <V extends GameVersion>() => {
     setState,
     resetState,
     changeVersion,
+    flash,
   };
 };
