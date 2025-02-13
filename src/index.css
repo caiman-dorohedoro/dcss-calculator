@@ -96,28 +96,3 @@ body {
   color: hsl(var(--popover-foreground));
   padding: 0.5rem;
 }
-
-.flash-container {
-  transition: all 0.15s ease-in-out;
-  position: relative;
-  border-radius: calc(var(--radius) - 2px);
-  overflow: hidden;
-}
-
-.flash-container.flash {
-  opacity: 0.95;
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-}
-
-.flash-container.flash::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.2);
-  z-index: 10;
-  pointer-events: none;
-}
