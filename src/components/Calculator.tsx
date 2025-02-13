@@ -45,19 +45,28 @@ type CalculatorProps<V extends GameVersion> = {
   setState: React.Dispatch<React.SetStateAction<CalculatorState<V>>>;
 };
 
+const checkboxKeys032: Array<{
+  label: string;
+  key: keyof CalculatorState<"0.32">;
+}> = [
+  { label: "Helmet", key: "helmet" },
+  { label: "Cloak", key: "cloak" },
+  { label: "Gloves", key: "gloves" },
+  { label: "Boots", key: "boots" },
+  { label: "Barding", key: "barding" },
+];
+
+const checkboxKeysTrunk: Array<{
+  label: string;
+  key: keyof CalculatorState<"trunk">;
+}> = [...checkboxKeys032, { label: "2nd Gloves", key: "secondGloves" }];
+
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
   const checkboxKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
-    [
-      { label: "Helmet", key: "helmet" },
-      { label: "Cloak", key: "cloak" },
-      { label: "Gloves", key: "gloves" },
-      { label: "Boots", key: "boots" },
-      { label: "Barding", key: "barding" },
-      { label: "2nd Gloves", key: "secondGloves" },
-    ];
+    state.version === "trunk" ? checkboxKeysTrunk : checkboxKeys032;
 
   const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
     [
