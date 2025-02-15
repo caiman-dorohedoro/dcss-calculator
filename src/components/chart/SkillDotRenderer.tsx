@@ -24,12 +24,12 @@ type RenderDotParams = {
 };
 
 const baseLeftPadding = 40;
-const baseTopOffset = 310;
-const baseLeftOffset = 612;
+const baseTopOffset = 287; // y 좌표는 숫자가 클수록 아래에 위치. 현재 크기에서 기본 bottom 위치는 310
+const baseLeftOffset = 632;
 
 const minLeftOffset = 7;
 const minRightOffset = 7;
-const minBottomOffset = 15;
+const minBottomOffset = 0; // 최소로 15px 이상 떨어져있어야함
 const widthPerDigit = 8.3;
 const heightDigit = 14;
 
@@ -56,7 +56,7 @@ const renderDot = <V extends GameVersion>(
       }
 
       if (cy >= baseTopOffset - minBottomOffset - heightDigit) {
-        textCy += -heightDigit - minBottomOffset - (cy - baseTopOffset);
+        textCy += -heightDigit - minBottomOffset - (baseTopOffset - cy);
       } else {
         textCy += heightDigit;
       }
