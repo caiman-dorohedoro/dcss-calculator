@@ -194,6 +194,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
 
       const spellFailureRate = calculateSpellFailureRate({
         version: state.version,
+        species: state.species,
         strength: state.strength,
         intelligence: state.intelligence,
         spellcasting: state.spellcasting ?? 0,

@@ -137,4 +137,20 @@ describe("EV Calculations", () => {
 
     expect(result.finalEV).toBe(7);
   });
+
+  // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
+  test("9 - mountain dwarf, tower shield, scale mail, str 30, dex 12, armour skill 19.4, dodge skill 14.8, shields skill 23.3, bonus ev 4", () => {
+    const result = calculateEV({
+      species: "mountainDwarf",
+      armour: "scale_mail",
+      armourSkill: 19.4,
+      dodgingSkill: 14.8,
+      dexterity: 12,
+      strength: 30,
+      shield: "tower_shield",
+      shieldSkill: 23.3,
+    });
+
+    expect(result.finalEV).toBe(15);
+  });
 });

@@ -102,4 +102,19 @@ describe("AC Calculations", () => {
       })
     ).toBe(21);
   });
+
+  test("mountain dwarf, scale mail, helmet, cloack, gloves, boots, str 30, 19.4 armour skill, total 13 ac bounus", () => {
+    // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
+    expect(
+      calculateMixedAC({
+        species: "mountainDwarf",
+        armour: "scale_mail",
+        armourSkill: 19.4,
+        gloves: true,
+        cloak: true,
+        boots: true,
+        helmet: true,
+      })
+    ).toBe(18);
+  });
 });

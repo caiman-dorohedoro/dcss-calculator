@@ -13,9 +13,11 @@ import {
 } from "@/types/spells";
 import spells032 from "@/data/generated-spells.0.32.json" assert { type: "json" };
 import spellsTrunk from "@/data/generated-spells.trunk.json" assert { type: "json" };
+import { SpeciesKey } from "@/types/species";
 
 export type SpellCalculationParams<V extends GameVersion> = {
   version: GameVersion;
+  species: SpeciesKey;
   strength: number;
   spellcasting: number;
   intelligence: number;
@@ -88,6 +90,7 @@ const getSkillPower = <V extends GameVersion>(
 };
 
 type CalculateArmourPenaltyParams = {
+  species: SpeciesKey;
   armour: ArmourKey;
   armourSkill: number;
   strength: number;
@@ -96,6 +99,7 @@ type CalculateArmourPenaltyParams = {
 
 // 갑옷 패널티 계산
 function calculateArmourPenalty({
+  species,
   armour,
   armourSkill,
   strength,
@@ -109,6 +113,10 @@ function calculateArmourPenalty({
         (5 * (strength + 3))
     ) / 450
   );
+
+  if (species === "mountainDwarf") {
+    return Math.floor(Math.max(penalty * 19, 0) / 4);
+  }
 
   return Math.max(penalty * 19, 0);
 }
@@ -144,6 +152,7 @@ function calculateShieldPenalty({
 }
 
 type armourShieldSpellPenaltyParams = {
+  species: SpeciesKey;
   strength: number;
   armourSkill: number;
   armour: ArmourKey;
@@ -152,6 +161,7 @@ type armourShieldSpellPenaltyParams = {
 };
 
 function calculateArmourShieldSpellPenalty({
+  species,
   strength,
   armourSkill,
   armour,
@@ -162,6 +172,7 @@ function calculateArmourShieldSpellPenalty({
 
   const totalPenalty =
     calculateArmourPenalty({
+      species,
       armour,
       armourSkill,
       strength,
@@ -219,6 +230,7 @@ const applyWizardryBoost = (chance: number, wizardry: number) => {
 
 function rawSpellFail<V extends GameVersion>({
   version,
+  species,
   strength,
   intelligence,
   spellDifficulty,
@@ -250,6 +262,7 @@ function rawSpellFail<V extends GameVersion>({
 
   // 방어구/방패 페널티 계산
   chance += calculateArmourShieldSpellPenalty({
+    species,
     strength: strength,
     armourSkill,
     armour,

@@ -5,6 +5,7 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 4.5,
       intelligence: 25,
@@ -26,6 +27,7 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 2", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 4.8,
       intelligence: 25,
@@ -47,6 +49,7 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 3", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 6.2,
       intelligence: 31,
@@ -68,6 +71,7 @@ describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism) - 4", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 9.2,
       intelligence: 32,
@@ -89,6 +93,7 @@ describe("Spell Calculations", () => {
   test("leather armour, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 9.2,
       intelligence: 32,
@@ -110,6 +115,7 @@ describe("Spell Calculations", () => {
   test("chain mail, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 9.2,
       intelligence: 32,
@@ -131,6 +137,7 @@ describe("Spell Calculations", () => {
   test("ring mail, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 9.2,
       intelligence: 32,
@@ -152,6 +159,7 @@ describe("Spell Calculations", () => {
   test("robe, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 4,
       spellcasting: 10.3,
       intelligence: 34,
@@ -174,6 +182,7 @@ describe("Spell Calculations", () => {
   test("leather armour, 3 level hex/fire spell (Dazzling Flash)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 13,
       spellcasting: 7,
       intelligence: 13,
@@ -196,6 +205,7 @@ describe("Spell Calculations", () => {
   test("storm dragon scales, kite shield, 4 level tloc/air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 41,
       spellcasting: 15,
       intelligence: 9,
@@ -219,6 +229,7 @@ describe("Spell Calculations", () => {
   test("tower shield, 5 level hex/air spell (silence)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 12,
       spellcasting: 14,
       intelligence: 25,
@@ -261,6 +272,7 @@ describe("Spell Calculations", () => {
   test("tower shield, 2 level conj/air spell (static discharge) - same case as above", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 12,
       spellcasting: 14,
       intelligence: 25,
@@ -283,6 +295,7 @@ describe("Spell Calculations", () => {
   test("tower shield, 8 level conj/alchemy spell (Fulsome Fusillade)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
+      species: "human",
       strength: 29,
       spellcasting: 16,
       intelligence: 43,
@@ -305,6 +318,7 @@ describe("Spell Calculations", () => {
   test("buckler, 8 level conj/earth spell (Lehudib's Crystal Spear)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
+      species: "human",
       strength: 8,
       spellcasting: 23.3,
       intelligence: 34,
@@ -327,6 +341,7 @@ describe("Spell Calculations", () => {
   test("tower shield, 9 level conj/air spell (Chain Lightning)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
+      species: "human",
       strength: 18,
       spellcasting: 27,
       intelligence: 10,
@@ -349,6 +364,7 @@ describe("Spell Calculations", () => {
   test("kite shield, leather armour, 4 level tloc/air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "human",
       strength: 14,
       spellcasting: 10,
       intelligence: 14,
@@ -371,6 +387,7 @@ describe("Spell Calculations", () => {
   test("naga, tower shield, pearl dragon scales, barding, 7 level ice/necr spell (Rimeblight)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "naga",
       strength: 34,
       spellcasting: 20.3,
       intelligence: 49,
@@ -393,6 +410,7 @@ describe("Spell Calculations", () => {
   test("naga, tower shield, robe, barding, 9 level Conj/Air spell (Chain Lightning)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
+      species: "naga",
       strength: 17,
       spellcasting: 15,
       intelligence: 23,
@@ -415,6 +433,7 @@ describe("Spell Calculations", () => {
   test("naga, kite shield, plate armour, barding, 4 level Tloc/Air spell (Vhi's Electric Charge)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "naga",
       strength: 21,
       spellcasting: 18,
       intelligence: 51,
@@ -437,6 +456,7 @@ describe("Spell Calculations", () => {
   test("naga, tower shield, ring mail, barding, 6 level Alch spell (Eringya's Noxious Bog)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "naga",
       strength: 12,
       spellcasting: 16,
       intelligence: 52,
@@ -458,6 +478,7 @@ describe("Spell Calculations", () => {
   test("deep elf, steam dragon scales, buckler, 4 level Summoning/Air spell (Summon Lightning Spire)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "deepElf",
       strength: 4,
       spellcasting: 18,
       intelligence: 29,
@@ -481,6 +502,7 @@ describe("Spell Calculations", () => {
   test("white draconian, tower shield, 8 level Conj/Earth spell (Lehudib's Crystal Spear)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "draconian",
       strength: 12,
       spellcasting: 14,
       intelligence: 25,
@@ -504,6 +526,7 @@ describe("Spell Calculations", () => {
   test("deep elf, robe, wucad mu, 7 level Fire/Earth spell (Hellfire Mortar)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "deepElf",
       strength: 6,
       spellcasting: 23.7,
       intelligence: 33,
@@ -528,6 +551,7 @@ describe("Spell Calculations", () => {
   test("formicid, leather armour, kite shield, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "formicid",
       strength: 26,
       spellcasting: 5,
       intelligence: 28,
@@ -550,6 +574,7 @@ describe("Spell Calculations", () => {
   test("formicid, leather armour, kite shield, wild magic 1, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "formicid",
       strength: 27,
       spellcasting: 5,
       intelligence: 29,
@@ -573,6 +598,7 @@ describe("Spell Calculations", () => {
   test("formicid, leather armour, tower shield, 9 level Ice spell (Polar Vortex)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
+      species: "formicid",
       strength: 29,
       spellcasting: 13,
       intelligence: 34,
@@ -588,5 +614,74 @@ describe("Spell Calculations", () => {
     });
 
     expect(failureRate).toBe(21); // 게임 화면상으로는 21
+  });
+
+  // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
+  test("9 - mountain dwarf, tower shield, scale mail, str 30, dex 12, int 18, armour skill 19.4, shields skill 23.3, spellcasting 0, air 8.0, 3 level Air spell (Swiftness)", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "trunk",
+      species: "mountainDwarf",
+      armour: "scale_mail",
+      armourSkill: 19.4,
+      intelligence: 18,
+      strength: 30,
+      shield: "tower_shield",
+      shieldSkill: 23.3,
+      spellcasting: 0,
+      schoolSkills: {
+        air: 8.0,
+      },
+      spellDifficulty: 3,
+      targetSpell: "Swiftness",
+    });
+
+    expect(failureRate).toBe(3);
+  });
+
+  // https://crawl.akrasiac.org/rawdata/KarmaDistortion/morgue-KarmaDistortion-20250214-104740.txt
+  test("9 - mountain dwarf, kite shield, pearl dragon scales, str 31, dex 16, int 27, armour skill 22, shields skill 18, spellcasting 14, conj 16, fire 24.5, 9 level Conj/Fire spell (Fire Storm), wild magic 1, 77%", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "trunk",
+      species: "mountainDwarf",
+      armour: "pearl_dragon",
+      armourSkill: 22,
+      intelligence: 27,
+      strength: 31,
+      shield: "kite_shield",
+      shieldSkill: 18,
+      spellcasting: 14,
+      schoolSkills: {
+        conjuration: 16,
+        fire: 24.5,
+      },
+      spellDifficulty: 9,
+      targetSpell: "Fire Storm",
+      wildMagic: 1,
+    });
+
+    expect(failureRate).toBe(77);
+  });
+
+  // 위의 테스트 케이스와 동일한 테스트
+  test("9 - mountain dwarf, kite shield, pearl dragon scales, str 31, dex 16, int 27, armour skill 22, shields skill 18, spellcasting 14, conj 16, fire 24.5, 8 level Fire spell (Ignition), wild magic 1, 2%", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "trunk",
+      species: "mountainDwarf",
+      armour: "pearl_dragon",
+      armourSkill: 22,
+      intelligence: 27,
+      strength: 31,
+      shield: "kite_shield",
+      shieldSkill: 18,
+      spellcasting: 14,
+      schoolSkills: {
+        fire: 24.5,
+      },
+      spellDifficulty: 8,
+      targetSpell: "Ignition",
+      wildMagic: 1,
+    });
+
+    expect(failureRate).toBe(2);
   });
 });
