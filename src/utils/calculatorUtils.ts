@@ -60,6 +60,7 @@ export const calculateEvData = <V extends GameVersion>(
     (_, index) => {
       const dodgingSkill = index / 10;
       const calcResult = calculateEV({
+        version: state.version,
         dodgingSkill,
         dexterity: state.dexterity,
         strength: state.strength,

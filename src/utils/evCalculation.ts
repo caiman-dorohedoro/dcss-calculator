@@ -1,5 +1,11 @@
-import {ArmourKey, armourOptions, ShieldKey, shieldOptions} from "@/types/equipment.ts";
-import {Size, SpeciesKey, speciesOptions} from "@/types/species.ts";
+import {
+  ArmourKey,
+  armourOptions,
+  ShieldKey,
+  shieldOptions,
+} from "@/types/equipment.ts";
+import { GameVersion } from "@/types/game";
+import { Size, SpeciesKey, speciesOptions } from "@/types/species.ts";
 
 const sizeToNumber: Record<Size, number> = {
   tiny: 2,
@@ -10,17 +16,19 @@ const sizeToNumber: Record<Size, number> = {
   giant: 12,
 };
 
-export function calculateEV(params: {
+export function calculateEV<V extends GameVersion>(params: {
+  version: GameVersion;
   dodgingSkill: number;
   dexterity: number;
   strength: number;
-  species: SpeciesKey;
+  species: SpeciesKey<V>;
   shield: ShieldKey;
   armour: ArmourKey;
   shieldSkill: number;
   armourSkill: number;
 }) {
   const {
+    version,
     dodgingSkill,
     dexterity,
     strength,
@@ -31,7 +39,12 @@ export function calculateEV(params: {
     armour,
   } = params;
 
-  const sizeFactor = sizeToNumber[speciesOptions[species].size];
+  const speciesOpts = speciesOptions(version);
+  if (!speciesOpts || !speciesOpts[species]) {
+    throw new Error(`Invalid species: ${species}, version: ${version}`);
+  }
+
+  const sizeFactor = sizeToNumber[speciesOpts[species].size];
   const baseEV = 10 + sizeFactor;
   const shieldEncumbrance = shieldOptions[shield].encumbrance;
 

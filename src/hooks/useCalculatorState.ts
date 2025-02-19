@@ -18,7 +18,7 @@ export interface CalculatorState<V extends GameVersion> {
   dexterity: number;
   strength: number;
   intelligence: number;
-  species: SpeciesKey;
+  species: SpeciesKey<V>;
   shield: ShieldKey;
   armour: ArmourKey;
   shieldSkill: number;

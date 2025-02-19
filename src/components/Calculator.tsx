@@ -157,18 +157,23 @@ const Calculator = <V extends GameVersion>({
             <Select
               value={state.species}
               onValueChange={(value) =>
-                setState((prev) => ({ ...prev, species: value as SpeciesKey }))
+                setState((prev) => ({
+                  ...prev,
+                  species: value as SpeciesKey<V>,
+                }))
               }
             >
               <SelectTrigger className="w-[180px] h-6">
                 <SelectValue placeholder="Species" />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(speciesOptions).map(([key, value]) => (
-                  <SelectItem key={key} value={key}>
-                    {value.name} ({value.size})
-                  </SelectItem>
-                ))}
+                {Object.entries(speciesOptions(state.version)).map(
+                  ([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value.name} ({value.size})
+                    </SelectItem>
+                  )
+                )}
               </SelectContent>
             </Select>
           </label>

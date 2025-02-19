@@ -17,7 +17,7 @@ import { SpeciesKey } from "@/types/species";
 
 export type SpellCalculationParams<V extends GameVersion> = {
   version: GameVersion;
-  species: SpeciesKey;
+  species: SpeciesKey<V>;
   strength: number;
   spellcasting: number;
   intelligence: number;
@@ -89,8 +89,8 @@ const getSkillPower = <V extends GameVersion>(
   return power + spellCasting * 50;
 };
 
-type CalculateArmourPenaltyParams = {
-  species: SpeciesKey;
+type CalculateArmourPenaltyParams<V extends GameVersion> = {
+  species: SpeciesKey<V>;
   armour: ArmourKey;
   armourSkill: number;
   strength: number;
@@ -98,13 +98,13 @@ type CalculateArmourPenaltyParams = {
 };
 
 // 갑옷 패널티 계산
-function calculateArmourPenalty({
+function calculateArmourPenalty<V extends GameVersion>({
   species,
   armour,
   armourSkill,
   strength,
   SCALE,
-}: CalculateArmourPenaltyParams) {
+}: CalculateArmourPenaltyParams<V>) {
   const baseEvPenalty = armourOptions[armour].encumbrance;
 
   const penalty = Math.floor(
@@ -151,8 +151,8 @@ function calculateShieldPenalty({
   return Math.max(penalty * 19, 0);
 }
 
-type armourShieldSpellPenaltyParams = {
-  species: SpeciesKey;
+type armourShieldSpellPenaltyParams<V extends GameVersion> = {
+  species: SpeciesKey<V>;
   strength: number;
   armourSkill: number;
   armour: ArmourKey;
@@ -160,14 +160,14 @@ type armourShieldSpellPenaltyParams = {
   shield: ShieldKey;
 };
 
-function calculateArmourShieldSpellPenalty({
+function calculateArmourShieldSpellPenalty<V extends GameVersion>({
   species,
   strength,
   armourSkill,
   armour,
   shieldSkill,
   shield,
-}: armourShieldSpellPenaltyParams) {
+}: armourShieldSpellPenaltyParams<V>) {
   const SCALE = 100;
 
   const totalPenalty =
