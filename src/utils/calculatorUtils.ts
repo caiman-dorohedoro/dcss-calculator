@@ -161,6 +161,7 @@ export const calculateShTicks = <V extends GameVersion>(
 export type FristSchoolSFDataPoint = {
   spellSkill: number;
   spellFailureRate: number;
+  enKindledSpellFailureRate?: number;
 };
 
 export const calculateAvgSFData = <V extends GameVersion>(
@@ -210,6 +211,33 @@ export const calculateAvgSFData = <V extends GameVersion>(
         channel: state.channel,
         wildMagic: state.wildMagic,
       });
+
+      if (state.species === "revenant") {
+        const enKindledSpellFailureRate = calculateSpellFailureRate({
+          version: state.version,
+          species: state.species,
+          strength: state.strength,
+          intelligence: state.intelligence,
+          spellcasting: state.spellcasting ?? 0,
+          targetSpell: targetSpell,
+          schoolSkills: schoolSkills,
+          spellDifficulty,
+          armour: state.armour,
+          shield: state.shield,
+          armourSkill: state.armourSkill,
+          shieldSkill: state.shieldSkill,
+          wizardry: state.wizardry,
+          channel: state.channel,
+          wildMagic: state.wildMagic,
+          enkindle: true,
+        });
+
+        return {
+          spellSkill: index / 10,
+          spellFailureRate,
+          enKindledSpellFailureRate,
+        };
+      }
 
       return {
         spellSkill: index / 10,
