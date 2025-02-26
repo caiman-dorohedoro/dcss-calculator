@@ -684,4 +684,52 @@ describe("Spell Calculations", () => {
 
     expect(failureRate).toBe(2);
   });
+
+  // Revenant Enkindle 테스트 (로컬 실행) - 1
+  test("Revenant, scale mail, buckler, str 19, int 7, armour 2.6, shield 2.6, splcasting 0, ice 0, 1 level Ice spell (Freeze)", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "trunk",
+      species: "revenant",
+      armour: "scale_mail",
+      armourSkill: 2.6,
+      intelligence: 7,
+      strength: 19,
+      shield: "buckler",
+      shieldSkill: 2.6,
+      spellcasting: 0,
+      schoolSkills: {
+        ice: 0,
+      },
+      spellDifficulty: 1,
+      targetSpell: "Freeze",
+      enkindle: true,
+    });
+
+    expect(failureRate).toBe(12);
+  });
+
+  // Revenant Enkindle 테스트 (로컬 실행) - 1
+  test("Revenant, quicksilver dragon scale, str 19, int 14, armour 2.6, shield 2.6, splcasting 8, fire 7, earth 8, forgecraft 9, 7 level Fire/Earth/Forge spell (Hellfire Mortar), 73%", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "trunk",
+      species: "revenant",
+      armour: "quicksilver_dragon",
+      armourSkill: 2.6,
+      intelligence: 14,
+      strength: 19,
+      shield: "none",
+      shieldSkill: 0,
+      spellcasting: 8,
+      schoolSkills: {
+        fire: 7,
+        earth: 8,
+        forgecraft: 9,
+      },
+      spellDifficulty: 7,
+      targetSpell: "Hellfire Mortar",
+      enkindle: true,
+    });
+
+    expect(failureRate).toBe(73);
+  });
 });

@@ -31,6 +31,7 @@ export type SpellCalculationParams<V extends GameVersion> = {
   wizardry?: number;
   channel?: boolean;
   wildMagic?: number;
+  enkindle?: boolean;
 };
 
 const spellDifficulties = {
@@ -244,6 +245,7 @@ function rawSpellFail<V extends GameVersion>({
   wizardry = 0,
   channel = false,
   wildMagic = 0,
+  enkindle = false,
 }: SpellCalculationParams<V>) {
   // 기본 실패율 60%에서 시작
   let chance = 60;
@@ -261,7 +263,7 @@ function rawSpellFail<V extends GameVersion>({
   chance -= intelligence * 2;
 
   // 방어구/방패 페널티 계산
-  chance += calculateArmourShieldSpellPenalty({
+  const armourShieldSpellPenalty = calculateArmourShieldSpellPenalty({
     species,
     strength: strength,
     armourSkill,
@@ -269,6 +271,10 @@ function rawSpellFail<V extends GameVersion>({
     shieldSkill,
     shield,
   });
+
+  if (!enkindle) {
+    chance += armourShieldSpellPenalty;
+  }
 
   // 주문 난이도별 기본 실패율
   chance += spellDifficulties[spellDifficulty];
@@ -292,6 +298,10 @@ function rawSpellFail<V extends GameVersion>({
 
   if (wizardry > 0) {
     chance2 = applyWizardryBoost(chance2, wizardry);
+  }
+
+  if (enkindle) {
+    chance2 = Math.floor((chance2 * 3) / 4) - 5;
   }
 
   // 최종 실패율은 0-100% 사이
