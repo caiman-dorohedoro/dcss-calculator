@@ -43,7 +43,7 @@ const renderDot = <V extends GameVersion>(
     const r = 2;
     const fillColor = "#fff";
 
-    if (payload[skillKey] === currentSkill) {
+    if (payload[skillKey] === currentSkill && value !== undefined) {
       const textWidth = value.toString().length * widthPerDigit;
 
       let textCx = cx;
