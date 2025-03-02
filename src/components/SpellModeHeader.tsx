@@ -11,6 +11,7 @@ import { CalculatorState } from "@/hooks/useCalculatorState";
 import { GameVersion } from "@/types/game";
 import { VersionedSpellName } from "@/types/spells";
 import { getSpellData } from "@/utils/spellCalculation";
+import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
 
 type SpellModeHeaderProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -45,7 +46,15 @@ const SpellModeHeader = <V extends GameVersion>({
                 .toSorted((a, b) => a.name.localeCompare(b.name))
                 .map((spell) => (
                   <SelectItem key={spell.name} value={spell.name}>
-                    {spell.name}
+                    <span className="inline-flex items-center gap-2">
+                      <span>{spell.name}</span>
+                      {state.species === "revenant" &&
+                        spellCanBeEnkindled(spell.name) && (
+                          <span className="text-[#60FDFF] transform translate-y-0.5">
+                            *
+                          </span>
+                        )}
+                    </span>
                   </SelectItem>
                 ))}
             </SelectContent>

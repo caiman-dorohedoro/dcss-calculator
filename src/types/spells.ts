@@ -22,7 +22,7 @@ export type VersionedSpellSchool<V extends GameVersion> = V extends "0.32"
   ? SpellSchoolTrunk
   : never;
 
-type VersionedSpellFlag<V extends GameVersion> = V extends "0.32"
+export type VersionedSpellFlag<V extends GameVersion> = V extends "0.32"
   ? SpellFlag032
   : V extends "trunk"
   ? SpellFlagTrunk

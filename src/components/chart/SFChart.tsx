@@ -18,6 +18,7 @@ import { getSpellSchools } from "@/utils/spellCalculation";
 import { GameVersion } from "@/types/game";
 import SpellModeHeader from "../SpellModeHeader";
 import { CartesianViewBox } from "recharts/types/util/types";
+import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
 
 type SFChartProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -139,6 +140,7 @@ const SFChart = <V extends GameVersion>({
             )}
           />
           {state.species === "revenant" &&
+            spellCanBeEnkindled(state.targetSpell) &&
             sfData.some((data) => data.enKindledSpellFailureRate !== 0) && (
               <Line
                 type="stepAfter"

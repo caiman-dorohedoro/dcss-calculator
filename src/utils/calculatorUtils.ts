@@ -9,6 +9,7 @@ import {
 } from "./spellCalculation";
 import { GameVersion } from "@/types/game";
 import { VersionedSchoolSkillLevels } from "@/types/spells";
+import { spellCanBeEnkindled } from "./spellCanbeEnkindled";
 
 type DataPoint = {
   dodgingSkill: number;
@@ -212,7 +213,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
         wildMagic: state.wildMagic,
       });
 
-      if (state.species === "revenant") {
+      if (state.species === "revenant" && spellCanBeEnkindled(targetSpell)) {
         const enKindledSpellFailureRate = calculateSpellFailureRate({
           version: state.version,
           species: state.species,

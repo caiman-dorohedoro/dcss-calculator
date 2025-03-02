@@ -8,6 +8,7 @@ import { GameVersion } from "@/types/game";
 import {
   VersionedSchoolSkillLevels,
   VersionedSpellDatum,
+  VersionedSpellFlag,
   VersionedSpellName,
   VersionedSpellSchool,
 } from "@/types/spells";
@@ -217,6 +218,24 @@ export const getSpellSchools = <V extends GameVersion>(
   }
 
   return spell.schools;
+};
+
+export const getSpellFlags = <V extends GameVersion>(
+  version: GameVersion,
+  targetSpell?: VersionedSpellName<V>
+): VersionedSpellFlag<V>[] => {
+  const spellData = getSpellData<V>(version);
+
+  if (!spellData) {
+    throw new Error("spellData is undefined");
+  }
+
+  const spell = spellData.find((spell) => spell.name === targetSpell);
+  if (!spell) {
+    throw new Error("Spell not found");
+  }
+
+  return spell.flags;
 };
 
 const applyWizardryBoost = (chance: number, wizardry: number) => {
