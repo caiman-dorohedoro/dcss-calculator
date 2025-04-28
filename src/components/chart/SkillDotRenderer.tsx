@@ -24,12 +24,12 @@ type RenderDotParams = {
 };
 
 const baseLeftPadding = 40;
-const baseTopOffset = 287; // y 좌표는 숫자가 클수록 아래에 위치. 현재 크기에서 기본 bottom 위치는 310
+const baseTopOffset = 287; // y coordinate increases as it goes down. current size base bottom position is 310
 const baseLeftOffset = 632;
 
 const minLeftOffset = 7;
 const minRightOffset = 7;
-const minBottomOffset = 0; // 최소로 15px 이상 떨어져있어야함
+const minBottomOffset = 0; // must be at least 15px apart
 const widthPerDigit = 8.3;
 const heightDigit = 14;
 

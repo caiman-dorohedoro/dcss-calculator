@@ -18,7 +18,7 @@ export const calculateSH = (params: SHCalculationParams) => {
     return 0;
   }
 
-  // DCSS 공식 반영
+  // reflects DCSS formula
   const base = baseSH * 2;
 
   let sh = base * 50;

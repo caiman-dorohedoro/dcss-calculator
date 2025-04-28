@@ -67,7 +67,7 @@ const playerNonbookSpells = [
 
 const parseSpellDataHeader = (fileContent: string) => {
   try {
-    // 시작 부분을 찾을 때 더 유연하게 검색
+    // search for the start part more flexibly
     const startMarker = "spelldata[] =";
     const endMarker = "#if TAG_MAJOR_VERSION == 34";
 
@@ -83,7 +83,7 @@ const parseSpellDataHeader = (fileContent: string) => {
       );
     }
 
-    // 중괄호 매칭을 통해 전체 배열 내용을 추출
+    // extract the entire array content through brace matching
     let braceCount = 0;
     const startIndex = fileContent.indexOf("{", dataStart);
     let currentIndex = startIndex;
@@ -100,37 +100,36 @@ const parseSpellDataHeader = (fileContent: string) => {
       currentIndex < (dataEnd === -1 ? fileContent.length : dataEnd)
     );
 
-    // 전체 spell 데이터 섹션을 추출
+    // extract the entire spell data section
     const spellDataSection = fileContent.substring(startIndex, currentIndex);
 
     return spellDataSection;
   } catch (error) {
     console.error("Error extracting spell data:", error);
-    throw error; // 에러를 다시 던져서 호출하는 쪽에서 처리할 수 있게 함
+    throw error; // throw the error again so the caller can handle it
   }
 };
 
 export const parseSpellBlock = (
   spellBlock: string
 ): SpellData_PROTO | undefined => {
-  // AXED_SPELL 체크
   if (spellBlock.includes("AXED_SPELL")) {
     return; // skip this iteration
   }
 
   try {
-    // 중괄호와 앞뒤 공백 제거
+    // remove braces and whitespace at the beginning and end
     const cleanBlock = spellBlock.replace(/^{\s*|\s*}$/g, "");
-    // 각 줄을 배열로 분리
+    // split each line into an array
     const lines = cleanBlock
       .split("\n")
-      .map((line) => line.split("//")[0].trim()) // 주석 제거
+      .map((line) => line.split("//")[0].trim()) // remove comments
       .join("")
       .split(",")
       .map((line) => line.trim())
-      .filter((line) => line !== ""); // 빈 문자열 제거
+      .filter((line) => line !== ""); // remove empty strings
 
-    if (lines.length < 9) return; // 유효하지 않은 데이터는 건너뛰기
+    if (lines.length < 9) return; // skip invalid data
 
     const spell = {
       id: lines[0].trim(),
@@ -155,7 +154,7 @@ export const parseSpellBlock = (
 
 const parseSpellData = (spellDataSection: string) => {
   const spells: [] = [];
-  // 각각의 spell 블록을 매칭하는 정규식
+  // regex to match each spell block
   const spellRegex = /{\s*SPELL_[^}]+}/g;
 
   const matches = spellDataSection.match(spellRegex);
@@ -256,7 +255,7 @@ const getOnlyPlayerSpells = (parsedSpells: SpellData_PROTO[]) => {
     .filter(
       (spell) =>
         !spell.flags.includes("monster") && !spell.flags.includes(" monster")
-    ) // Glaciate flag 오타 반영
+    ) // Glaciate flag typo reflection
     .filter((spell) => !spell.flags.includes("testing"))
     .filter((spell) => !Object.values(wandSpells).includes(spell.id))
     .filter((spell) => !playerNonbookSpells.includes(spell.id));

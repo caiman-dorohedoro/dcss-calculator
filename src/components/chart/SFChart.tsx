@@ -63,12 +63,12 @@ const SFChart = <V extends GameVersion>({
               }
 
               const { x, y, width, height } = props.viewBox as CartesianViewBox;
-              // x 좌표를 오른쪽으로, y 좌표는 원하는 위치로 조정
+              // adjust x coordinate to the right, and y coordinate to the desired position
               return (
                 <text
-                  x={(x ?? 0) + (width ?? 0) - 20} // 오른쪽 끝으로 이동
-                  y={(y ?? 0) + (height ?? 0) + 24} // 원하는 높이로 조정
-                  textAnchor="end" // 텍스트 정렬 (end는 오른쪽 정렬)
+                  x={(x ?? 0) + (width ?? 0) - 20} // move to the right end
+                  y={(y ?? 0) + (height ?? 0) + 24} // adjust to desired height
+                  textAnchor="end" // text alignment (end means right-aligned)
                   fill="#eee"
                 >
                   {spellSchools.length > 1

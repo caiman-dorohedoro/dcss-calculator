@@ -69,7 +69,7 @@ describe("AC Calculations", () => {
       })
     ).toBe(34);
 
-    // 개인 플레이중
+    // while in personal gameplay
     expect(
       calculateMixedAC({
         species: "armataur",
@@ -78,7 +78,7 @@ describe("AC Calculations", () => {
       })
     ).toBe(3);
 
-    // 이거 틀리게 나오는데, serpent talisman을 어떻게 손으로 들고 있는거지?
+    // This shows incorrect results, how is the serpent talisman being held in hand?
     // // https://underhound.eu/crawl/morgue/Ge0ff/morgue-Ge0ff-20240125-133758.txt
     // expect(
     //   mixedCalculations({

@@ -87,7 +87,7 @@ body {
   }
 }
 
-/* Recharts 툴팁 스타일 */
+/* Recharts tooltip styles */
 .recharts-tooltip-wrapper {
   background-color: hsl(var(--popover));
   border: 1px solid hsl(var(--border));

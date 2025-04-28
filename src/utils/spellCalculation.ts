@@ -52,7 +52,7 @@ function tetrahedralNumber(n: number) {
 }
 
 function getTrueFailRate(rawFail: number) {
-  const outcomes = 101 * 101 * 100; // 총 가능한 결과의 수
+  const outcomes = 101 * 101 * 100; // total number of possible outcomes
   const target = rawFail * 3;
 
   if (target <= 100) {
@@ -99,7 +99,6 @@ type CalculateArmourPenaltyParams<V extends GameVersion> = {
   SCALE: number;
 };
 
-// 갑옷 패널티 계산
 function calculateArmourPenalty<V extends GameVersion>({
   species,
   armour,
@@ -130,7 +129,7 @@ type CalculateShieldPenaltyParams = {
   SCALE: number;
 };
 
-// 방패 패널티 계산
+// shield penalty calculation
 function calculateShieldPenalty({
   shield,
   shieldSkill,
@@ -266,22 +265,22 @@ function rawSpellFail<V extends GameVersion>({
   wildMagic = 0,
   enkindle = false,
 }: SpellCalculationParams<V>) {
-  // 기본 실패율 60%에서 시작
+  // start with base failure rate of 60%
   let chance = 60;
 
-  // 주문 기술력 계산
+  // calculate spell skill power
   const spellPower = Math.floor(
     (getSkillPower<V>(version, targetSpell, schoolSkills, spellcasting) * 6) /
       100
   );
 
-  // 주문력으로 실패율 감소
+  // reduce failure rate with spell power
   chance -= spellPower;
 
-  // 지능으로 실패율 감소
+  // reduce failure rate with intelligence
   chance -= intelligence * 2;
 
-  // 방어구/방패 페널티 계산
+  // calculate armor/shield penalty
   const armourShieldSpellPenalty = calculateArmourShieldSpellPenalty({
     species,
     strength: strength,
@@ -295,13 +294,13 @@ function rawSpellFail<V extends GameVersion>({
     chance += armourShieldSpellPenalty;
   }
 
-  // 주문 난이도별 기본 실패율
+  // base failure rate by spell difficulty
   chance += spellDifficulties[spellDifficulty];
 
-  // 최대값 제한
+  // limit maximum value
   chance = Math.min(chance, 210);
 
-  // 3차 다항식을 통한 실패율 계산
+  // calculate failure rate through cubic polynomial
   let chance2 = Math.max(
     Math.floor((((chance + 426) * chance + 82670) * chance + 7245398) / 262144),
     0
@@ -323,7 +322,7 @@ function rawSpellFail<V extends GameVersion>({
     chance2 = Math.floor((chance2 * 3) / 4) - 5;
   }
 
-  // 최종 실패율은 0-100% 사이
+  // final failure rate is between 0-100%
   const failRate = Math.min(Math.max(chance2, 0), 100);
 
   return failRate;

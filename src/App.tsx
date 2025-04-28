@@ -20,7 +20,7 @@ function App() {
   useEffect(() => {
     if (flash) {
       setIsFlashing(true);
-      const timer = setTimeout(() => setIsFlashing(false), 150); // 애니메이션 시간
+      const timer = setTimeout(() => setIsFlashing(false), 150); // animation duration
       return () => clearTimeout(timer);
     }
   }, [flash]);

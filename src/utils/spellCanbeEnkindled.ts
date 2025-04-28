@@ -6,11 +6,11 @@ import {
 } from "@/types/spells";
 import { getSpellFlags, getSpellSchools } from "./spellCalculation";
 
-// 버전별 스펠 학교가 conjuration인지 확인하는 함수
+// check if the spell school is conjuration by version
 const isConjuration = <V extends GameVersion>(
   school: VersionedSpellSchool<V>
 ): boolean => {
-  // 버전별로 "conjuration"을 나타내는 값과 비교
+  // compare with "conjuration" based on version
   return school === ("conjuration" as VersionedSpellSchool<V>);
 };
 
@@ -42,7 +42,7 @@ export const spellCanBeEnkindled = <V extends GameVersion>(
     return false;
   }
 
-  // 현재는 trunk에만 enkindle이 존재함
+  // Currently, enkindle only exists in trunk
   const version = "trunk" as GameVersion;
 
   switch (spellName) {

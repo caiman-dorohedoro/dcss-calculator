@@ -2,7 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import { calculateEV } from "../evCalculation";
 
 describe("EV Calculations", () => {
-  test("기본 EV 계산 (중간 크기 종족)", () => {
+  test("basic EV calculation (medium size species)", () => {
     const result = calculateEV({
       version: "0.32",
       dodgingSkill: 0,
@@ -19,7 +19,7 @@ describe("EV Calculations", () => {
     expect(result.finalEV).toBe(10);
   });
 
-  test("1 - 코글린, str 13, dex 25, no shield, armour er 0, dodge skill 20.5", () => {
+  test("1 - coglin, str 13, dex 25, no shield, armour er 0, dodge skill 20.5", () => {
     const result = calculateEV({
       version: "0.32",
       dodgingSkill: 20.5,
@@ -35,7 +35,7 @@ describe("EV Calculations", () => {
     expect(result.finalEV).toBe(30);
   });
 
-  test("2 - 코글린, str 10, dex 22, no shield, armour er 0, dodge skill 16.7", () => {
+  test("2 - coglin, str 10, dex 22, no shield, armour er 0, dodge skill 16.7", () => {
     const result = calculateEV({
       version: "0.32",
       dodgingSkill: 16.7,

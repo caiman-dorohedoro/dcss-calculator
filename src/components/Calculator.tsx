@@ -91,7 +91,7 @@ const Calculator = <V extends GameVersion>({
     })
   );
 
-  // 기본 아이템 순서 정의
+  // define default item order
   const defaultAccordionItems = [
     {
       id: "sf",
@@ -115,12 +115,12 @@ const Calculator = <V extends GameVersion>({
     },
   ];
 
-  // 상태의 accordionOrder에 따라 아이템 순서 정렬
+  // sort items according to the state's accordionOrder
   const accordionItems = [...defaultAccordionItems].sort((a, b) => {
     const aIndex = state.accordionOrder.indexOf(a.id);
     const bIndex = state.accordionOrder.indexOf(b.id);
 
-    // 새로운 아이템(상태에 없는 아이템)은 마지막에 배치
+    // place new items (not in state) at the end
     if (aIndex === -1) return 1;
     if (bIndex === -1) return -1;
 

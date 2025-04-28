@@ -224,8 +224,8 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(4);
   });
 
-  // https://crawl.akrasiac.org/rawdata/hammy3456/morgue-hammy3456-20250206-022444.txt ==> 0.27 버전이었음
-  // WIZARD 모드로 실행하니 다른 수치가 나와서 고침..
+  // https://crawl.akrasiac.org/rawdata/hammy3456/morgue-hammy3456-20250206-022444.txt ==> was version 0.27
+  // tested in WIZARD mode and fixed due to different values..
   test("tower shield, 5 level hex/air spell (silence)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -474,7 +474,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(9);
   });
 
-  // 개인 플레이 도중
+  // during personal gameplay
   test("deep elf, steam dragon scales, buckler, 4 level Summoning/Air spell (Summon Lightning Spire)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -498,7 +498,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(2);
   });
 
-  // WIZ 모드 테스트
+  // WIZ mode test
   test("white draconian, tower shield, 8 level Conj/Earth spell (Lehudib's Crystal Spear)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -522,7 +522,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(28);
   });
 
-  // 개인 플레이 도중
+  // during personal gameplay
   test("deep elf, robe, wucad mu, 7 level Fire/Earth spell (Hellfire Mortar)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -547,7 +547,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(26);
   });
 
-  // 개인 플레이 도중, 그래프에 10이라고 나와서 테스트
+  // during personal gameplay, showed 10 on the graph so testing
   test("formicid, leather armour, kite shield, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -570,7 +570,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(9);
   });
 
-  // 개인 플레이 도중
+  // during personal gameplay
   test("formicid, leather armour, kite shield, wild magic 1, 4 level Hex/Tloc spell (Dimensional Bullseye)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -594,7 +594,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(12);
   });
 
-  // 개인 플레이 도중
+  // during personal gameplay
   test("formicid, leather armour, tower shield, 9 level Ice spell (Polar Vortex)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",
@@ -613,7 +613,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 25.6,
     });
 
-    expect(failureRate).toBe(21); // 게임 화면상으로는 21
+    expect(failureRate).toBe(21); // shows 21 on game screen
   });
 
   // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
@@ -662,7 +662,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(77);
   });
 
-  // 위의 테스트 케이스와 동일한 테스트
+  // same test case as above
   test("9 - mountain dwarf, kite shield, pearl dragon scales, str 31, dex 16, int 27, armour skill 22, shields skill 18, spellcasting 14, conj 16, fire 24.5, 8 level Fire spell (Ignition), wild magic 1, 2%", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
@@ -685,7 +685,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(2);
   });
 
-  // Revenant Enkindle 테스트 (로컬 실행) - 1
+  // Revenant Enkindle test (local execution) - 1
   test("Revenant, scale mail, buckler, str 19, int 7, armour 2.6, shield 2.6, splcasting 0, ice 0, 1 level Ice spell (Freeze)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
@@ -708,7 +708,7 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(12);
   });
 
-  // Revenant Enkindle 테스트 (로컬 실행) - 1
+  // Revenant Enkindle test (local execution) - 1
   test("Revenant, quicksilver dragon scale, str 19, int 14, armour 2.6, shield 2.6, splcasting 8, fire 7, earth 8, forgecraft 9, 7 level Fire/Earth/Forge spell (Hellfire Mortar), 73%", () => {
     const failureRate = calculateSpellFailureRate({
       version: "trunk",
