@@ -1273,24 +1273,6 @@
     "tile": "TILEG_CHAIN_LIGHTNING"
   },
   {
-    "id": "SPELL_MONSTROUS_MENAGERIE",
-    "name": "Monstrous Menagerie",
-    "schools": [
-      "summoning"
-    ],
-    "flags": [
-      "mons_abjure"
-    ],
-    "level": 7,
-    "power": 200,
-    "range": {
-      "min": -1,
-      "max": -1
-    },
-    "noise": 0,
-    "tile": "TILEG_MONSTROUS_MENAGERIE"
-  },
-  {
     "id": "SPELL_GOLUBRIAS_PASSAGE",
     "name": "Passage of Golubria",
     "schools": [
@@ -2521,5 +2503,43 @@
     },
     "noise": 0,
     "tile": "TILEG_RENDING_BLADE"
+  },
+  {
+    "id": "SPELL_DETONATION_CATALYST",
+    "name": "Detonation Catalyst",
+    "schools": [
+      "fire",
+      "alchemy"
+    ],
+    "flags": [
+      "selfench"
+    ],
+    "level": 5,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 15,
+    "tile": "TILEG_DETONATION_CATALYST"
+  },
+  {
+    "id": "SPELL_SPHINX_SISTERS",
+    "name": "Sphinx Sisters",
+    "schools": [
+      "summoning",
+      "hexes"
+    ],
+    "flags": [
+      "mons_abjure"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SPHINX_SISTERS"
   }
 ]

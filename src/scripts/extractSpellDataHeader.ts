@@ -8,7 +8,7 @@ const EXTRACTED_SPELL_DATA_PATH = `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`;
 const EXTRACTED_SPELL_TYPES_PATH = `src/types/${EXTRACTED_SPELL_TYPES_FILE_NAME}`;
 
 // trunk
-const TRUNK_SPELL_DATA_FILE_NAME = `spl-data.trunk.20240209.h`;
+const TRUNK_SPELL_DATA_FILE_NAME = `spl-data.trunk.20240416.h`;
 const TRUNK_SPELL_DATA_PATH = `src/data/${TRUNK_SPELL_DATA_FILE_NAME}`;
 const TRUNK_EXTRACTED_SPELL_DATA_FILE_NAME = "generated-spells.trunk.json";
 const TRUNK_EXTRACTED_SPELL_TYPES_FILE_NAME = "generated-spells.trunk.d.ts";
@@ -63,6 +63,8 @@ const playerNonbookSpells = [
   "SPELL_CAUSTIC_BREATH",
   "SPELL_GALVANIC_BREATH",
   "SPELL_MUD_BREATH",
+  "SPELL_RUST_BREATH",
+  "SPELL_GOLDEN_BREATH",
 ];
 
 const parseSpellDataHeader = (fileContent: string) => {
