@@ -9,24 +9,34 @@ import {
   SpellSchool as SpellSchool032,
   SpellFlag as SpellFlag032,
 } from "@/types/generated-spells.0.32.d";
+import {
+  SpellName as SpellName033,
+  SpellSchool as SpellSchool033,
+  SpellFlag as SpellFlag033,
+} from "@/types/generated-spells.0.33.d";
 
-export type VersionedSpellName<V extends GameVersion> = V extends "0.32"
-  ? SpellName032
-  : V extends "trunk"
-  ? SpellNameTrunk
-  : never;
+// 버전별 타입 맵핑
+type SpellNameMap = {
+  "0.32": SpellName032;
+  "0.33": SpellName033;
+  "trunk": SpellNameTrunk;
+};
 
-export type VersionedSpellSchool<V extends GameVersion> = V extends "0.32"
-  ? SpellSchool032
-  : V extends "trunk"
-  ? SpellSchoolTrunk
-  : never;
+type SpellSchoolMap = {
+  "0.32": SpellSchool032;
+  "0.33": SpellSchool033;
+  "trunk": SpellSchoolTrunk;
+};
 
-export type VersionedSpellFlag<V extends GameVersion> = V extends "0.32"
-  ? SpellFlag032
-  : V extends "trunk"
-  ? SpellFlagTrunk
-  : never;
+type SpellFlagMap = {
+  "0.32": SpellFlag032;
+  "0.33": SpellFlag033;
+  "trunk": SpellFlagTrunk;
+};
+
+export type VersionedSpellName<V extends GameVersion> = SpellNameMap[V];
+export type VersionedSpellSchool<V extends GameVersion> = SpellSchoolMap[V];
+export type VersionedSpellFlag<V extends GameVersion> = SpellFlagMap[V];
 
 export type VersionedSpellDatum<V extends GameVersion> = {
   id: string;

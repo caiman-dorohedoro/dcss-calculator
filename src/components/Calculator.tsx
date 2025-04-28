@@ -56,17 +56,28 @@ const checkboxKeys032: Array<{
   { label: "Barding", key: "barding" },
 ];
 
+const checkboxKeys033: Array<{
+  label: string;
+  key: keyof CalculatorState<"0.33">;
+}> = [...checkboxKeys032, { label: "2nd Gloves", key: "secondGloves" }];
+
 const checkboxKeysTrunk: Array<{
   label: string;
   key: keyof CalculatorState<"trunk">;
 }> = [...checkboxKeys032, { label: "2nd Gloves", key: "secondGloves" }];
+
+const versionToCheckboxKyes = {
+  "trunk": checkboxKeysTrunk,
+  "0.33": checkboxKeys033,
+  "0.32": checkboxKeys032,
+}
 
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
   const checkboxKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
-    state.version === "trunk" ? checkboxKeysTrunk : checkboxKeys032;
+    versionToCheckboxKyes[state.version];
 
   const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
     [

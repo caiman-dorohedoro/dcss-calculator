@@ -39,14 +39,12 @@ export interface CalculatorState<V extends GameVersion> {
   wildMagic?: number;
 }
 
-const defaultStateTrunk: CalculatorState<"trunk"> = {
-  version: "trunk",
+const baseDefaultState: Omit<CalculatorState<"0.32">, "version" | "species" | "targetSpell"> = {
   accordionValue: ["sf"],
   accordionOrder: ["sf", "ev", "ac", "sh"],
   dexterity: 10,
   strength: 10,
   intelligence: 10,
-  species: "armataur",
   shield: "none",
   armour: "robe",
   shieldSkill: 0,
@@ -57,64 +55,55 @@ const defaultStateTrunk: CalculatorState<"trunk"> = {
   boots: false,
   cloak: false,
   barding: false,
+  spellcasting: 0,
+  wizardry: 0,
+  channel: false,
+  wildMagic: 0,
+}
+
+const baseSchoolSkills: VersionedSchoolSkillLevels<"0.32"> = {
+  translocation: 0,
+  fire: 0,
+  ice: 0,
+  conjuration: 0,
+  necromancy: 0,
+  earth: 0,
+  air: 0,
+  hexes: 0,
+  alchemy: 0,
+  summoning: 0,
+}
+
+const defaultStateTrunk: CalculatorState<"trunk"> = {
+  ...baseDefaultState,
+  version: "trunk",
+  species: "armataur",
   secondGloves: false,
-  //
   schoolSkills: {
-    translocation: 0,
-    fire: 0,
-    ice: 0,
-    conjuration: 0,
-    necromancy: 0,
-    earth: 0,
-    air: 0,
-    hexes: 0,
-    alchemy: 0,
-    summoning: 0,
+    ...baseSchoolSkills,
     forgecraft: 0,
   },
   targetSpell: "Airstrike",
-  spellcasting: 0,
-  wizardry: 0,
-  channel: false,
-  wildMagic: 0,
+};
+
+const defaultState033: CalculatorState<"0.33"> = {
+  ...baseDefaultState,
+  version: "0.33",
+  species: "armataur",
+  schoolSkills: {
+    ...baseSchoolSkills,
+  },
+  targetSpell: "Airstrike",
 };
 
 const defaultState032: CalculatorState<"0.32"> = {
+  ...baseDefaultState,
   version: "0.32",
-  accordionValue: ["sf"],
-  accordionOrder: ["sf", "ev", "ac", "sh"],
-  dexterity: 10,
-  strength: 10,
-  intelligence: 10,
   species: "armataur",
-  shield: "none",
-  armour: "robe",
-  shieldSkill: 0,
-  armourSkill: 0,
-  dodgingSkill: 0,
-  helmet: false,
-  gloves: false,
-  boots: false,
-  cloak: false,
-  barding: false,
-  //
   schoolSkills: {
-    translocation: 0,
-    fire: 0,
-    ice: 0,
-    conjuration: 0,
-    necromancy: 0,
-    earth: 0,
-    air: 0,
-    hexes: 0,
-    alchemy: 0,
-    summoning: 0,
+    ...baseSchoolSkills,
   },
   targetSpell: "Airstrike",
-  spellcasting: 0,
-  wizardry: 0,
-  channel: false,
-  wildMagic: 0,
 };
 
 export const isSchoolSkillKey = <V extends GameVersion>(
@@ -126,7 +115,7 @@ export const isSchoolSkillKey = <V extends GameVersion>(
 };
 
 const isGameVersion = (version: string): version is GameVersion => {
-  return version === "trunk" || version === "0.32";
+  return version === "trunk" || version === "0.32" || version === "0.33";
 };
 
 const isObject = (obj: unknown): obj is Record<string, unknown> => {
@@ -156,18 +145,21 @@ const validateState = <V extends GameVersion>(
   return true;
 };
 
+
+type DefaultStateMap = {
+  [K in GameVersion]: CalculatorState<K>;
+}
+
+const defaultStates: DefaultStateMap = {
+  trunk: defaultStateTrunk,
+  "0.32": defaultState032,
+  "0.33": defaultState033,
+}
+
 const getDefaultState = <V extends GameVersion>(
   version: GameVersion
-): V extends "trunk" ? CalculatorState<"trunk"> : CalculatorState<"0.32"> => {
-  if (version === "trunk") {
-    return defaultStateTrunk as V extends "trunk"
-      ? CalculatorState<"trunk">
-      : CalculatorState<"0.32">;
-  }
-
-  return defaultState032 as V extends "trunk"
-    ? CalculatorState<"trunk">
-    : CalculatorState<"0.32">;
+): CalculatorState<V> => {
+  return defaultStates[version] as CalculatorState<V>;
 };
 
 export const useCalculatorState = <V extends GameVersion>() => {
@@ -175,14 +167,15 @@ export const useCalculatorState = <V extends GameVersion>() => {
     let initialVersion: GameVersion = "trunk";
 
     const savedTrunk = localStorage.getItem(getStorageKey("trunk"));
+    const saved033 = localStorage.getItem(getStorageKey("0.33"));
     const saved032 = localStorage.getItem(getStorageKey("0.32"));
 
-    const saved = savedTrunk || saved032;
+    const saved = savedTrunk || saved032 || saved033;
 
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        if (validateState(parsed)) {
+        if (validateState<V>(parsed)) {
           initialVersion = parsed.version;
           return parsed;
         }
@@ -191,7 +184,7 @@ export const useCalculatorState = <V extends GameVersion>() => {
       }
     }
 
-    return getDefaultState<"trunk">(initialVersion) as CalculatorState<V>;
+    return getDefaultState(initialVersion) as CalculatorState<V>;
   });
   const [flash, setFlash] = useState(false);
 
@@ -215,7 +208,7 @@ export const useCalculatorState = <V extends GameVersion>() => {
     }
 
     try {
-      if (validateState(JSON.parse(saved))) {
+      if (validateState<V>(JSON.parse(saved))) {
         setState(JSON.parse(saved) as CalculatorState<V>);
       } else {
         setState(getDefaultState<V>(version) as CalculatorState<V>);

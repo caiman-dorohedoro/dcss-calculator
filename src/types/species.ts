@@ -28,11 +28,13 @@ type BaseSpeciesKey =
   | "vineStalker";
 
 type SpeciesKey032 = BaseSpeciesKey | "ghoul" | "vampire";
-
+type SpeciesKey033 = BaseSpeciesKey | "poltergeist" | "revenant";
 type SpeciesKeyTrunk = BaseSpeciesKey | "poltergeist" | "revenant";
 
 export type SpeciesKey<V extends GameVersion> = V extends "0.32"
   ? SpeciesKey032
+  : V extends "0.33"
+  ? SpeciesKey033
   : SpeciesKeyTrunk;
 
 // export type Size = "tiny" | "little" | "small" | "medium" | "large" | "giant";
@@ -77,8 +79,8 @@ export const speciesOptions = (version: GameVersion) => {
       vineStalker: { name: "Vine Stalker", size: Size.MEDIUM },
     };
   }
-
-  if (version === "trunk") {
+  
+  if (version === "trunk" || version === "0.33") {
     return {
       armataur: { name: "Armataur", size: Size.LARGE }, // Hybrid, special case
       barachi: { name: "Barachi", size: Size.MEDIUM },

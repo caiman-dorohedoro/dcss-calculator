@@ -1,0 +1,2545 @@
+[
+  {
+    "id": "SPELL_CAUSE_FEAR",
+    "name": "Cause Fear",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "area",
+      "WL_check"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_CAUSE_FEAR"
+  },
+  {
+    "id": "SPELL_MAGIC_DART",
+    "name": "Magic Dart",
+    "schools": [
+      "conjuration"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_MAGIC_DART"
+  },
+  {
+    "id": "SPELL_FIREBALL",
+    "name": "Fireball",
+    "schools": [
+      "conjuration",
+      "fire"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_FIREBALL"
+  },
+  {
+    "id": "SPELL_APPORTATION",
+    "name": "Apportation",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "target",
+      "obj",
+      "not_self"
+    ],
+    "level": 1,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_APPORTATION"
+  },
+  {
+    "id": "SPELL_BLASTMOTE",
+    "name": "Volatile Blastmotes",
+    "schools": [
+      "fire",
+      "translocation"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 3,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_BLASTMOTE"
+  },
+  {
+    "id": "SPELL_ARCJOLT",
+    "name": "Arcjolt",
+    "schools": [
+      "conjuration",
+      "air"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": 2,
+      "max": 2
+    },
+    "noise": 10,
+    "tile": "TILEG_ARCJOLT"
+  },
+  {
+    "id": "SPELL_PLASMA_BEAM",
+    "name": "Plasma Beam",
+    "schools": [
+      "fire",
+      "air"
+    ],
+    "flags": [
+      "noisy",
+      "destructive"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 20,
+    "tile": "TILEG_PLASMA_BEAM"
+  },
+  {
+    "id": "SPELL_PERMAFROST_ERUPTION",
+    "name": "Permafrost Eruption",
+    "schools": [
+      "ice",
+      "earth"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 6,
+      "max": 6
+    },
+    "noise": 0,
+    "tile": "TILEG_PERMAFROST_ERUPTION"
+  },
+  {
+    "id": "SPELL_ELECTRIC_CHARGE",
+    "name": "Vhi's Electric Charge",
+    "schools": [
+      "air",
+      "translocation"
+    ],
+    "flags": [
+      "noisy",
+      "dir_or_target"
+    ],
+    "level": 4,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_ELECTRIC_CHARGE"
+  },
+  {
+    "id": "SPELL_SLOW",
+    "name": "Slow",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "WL_check"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SLOW"
+  },
+  {
+    "id": "SPELL_PETRIFY",
+    "name": "Petrify",
+    "schools": [
+      "alchemy",
+      "earth"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "WL_check"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": 6,
+      "max": 6
+    },
+    "noise": 0,
+    "tile": "TILEG_PETRIFY"
+  },
+  {
+    "id": "SPELL_DISJUNCTION",
+    "name": "Disjunction",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "escape",
+      "utility"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_DISJUNCTION"
+  },
+  {
+    "id": "SPELL_FREEZING_CLOUD",
+    "name": "Freezing Cloud",
+    "schools": [
+      "conjuration",
+      "ice",
+      "air"
+    ],
+    "flags": [
+      "target",
+      "area",
+      "needs_tracer",
+      "cloud"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 2,
+    "tile": "TILEG_FREEZING_CLOUD"
+  },
+  {
+    "id": "SPELL_MEPHITIC_CLOUD",
+    "name": "Mephitic Cloud",
+    "schools": [
+      "conjuration",
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "dir_or_target",
+      "area",
+      "needs_tracer",
+      "cloud"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_MEPHITIC_CLOUD"
+  },
+  {
+    "id": "SPELL_OLGREBS_TOXIC_RADIANCE",
+    "name": "Olgreb's Toxic Radiance",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_OLGREBS_TOXIC_RADIANCE"
+  },
+  {
+    "id": "SPELL_TELEPORT_OTHER",
+    "name": "Teleport Other",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "target",
+      "not_self",
+      "escape",
+      "WL_check"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_TELEPORT_OTHER"
+  },
+  {
+    "id": "SPELL_DEATHS_DOOR",
+    "name": "Death's Door",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "utility",
+      "no_ghost"
+    ],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_DEATHS_DOOR"
+  },
+  {
+    "id": "SPELL_SUMMON_SMALL_MAMMAL",
+    "name": "Summon Small Mammal",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_SMALL_MAMMAL"
+  },
+  {
+    "id": "SPELL_LEHUDIBS_CRYSTAL_SPEAR",
+    "name": "Lehudib's Crystal Spear",
+    "schools": [
+      "conjuration",
+      "earth"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 0,
+    "tile": "TILEG_LEHUDIBS_CRYSTAL_SPEAR"
+  },
+  {
+    "id": "SPELL_POLAR_VORTEX",
+    "name": "Polar Vortex",
+    "schools": [
+      "ice"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_POLAR_VORTEX"
+  },
+  {
+    "id": "SPELL_FIRE_STORM",
+    "name": "Fire Storm",
+    "schools": [
+      "conjuration",
+      "fire"
+    ],
+    "flags": [
+      "target",
+      "area",
+      "needs_tracer"
+    ],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_FIRE_STORM"
+  },
+  {
+    "id": "SPELL_BLINK",
+    "name": "Blink",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "escape",
+      "selfench",
+      "utility"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_BLINK"
+  },
+  {
+    "id": "SPELL_ISKENDERUNS_MYSTIC_BLAST",
+    "name": "Iskenderun's Mystic Blast",
+    "schools": [
+      "conjuration",
+      "translocation"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 2,
+      "max": 2
+    },
+    "noise": 10,
+    "tile": "TILEG_ISKENDERUNS_MYSTIC_BLAST"
+  },
+  {
+    "id": "SPELL_SUMMON_HORRIBLE_THINGS",
+    "name": "Summon Horrible Things",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [
+      "unholy",
+      "chaotic",
+      "mons_abjure"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_HORRIBLE_THINGS"
+  },
+  {
+    "id": "SPELL_MALIGN_GATEWAY",
+    "name": "Malign Gateway",
+    "schools": [
+      "summoning",
+      "translocation"
+    ],
+    "flags": [
+      "unholy",
+      "chaotic"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 15,
+    "tile": "TILEG_MALIGN_GATEWAY"
+  },
+  {
+    "id": "SPELL_ANIMATE_DEAD",
+    "name": "Animate Dead",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "helpful",
+      "utility",
+      "no_ghost"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_ANIMATE_DEAD"
+  },
+  {
+    "id": "SPELL_SOUL_SPLINTER",
+    "name": "Soul Splinter",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "WL_check",
+      "not_self"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_NECROTISE"
+  },
+  {
+    "id": "SPELL_VAMPIRIC_DRAINING",
+    "name": "Vampiric Draining",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_VAMPIRIC_DRAINING"
+  },
+  {
+    "id": "SPELL_HAUNT",
+    "name": "Haunt",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [
+      "target",
+      "not_self",
+      "mons_abjure"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_HAUNT"
+  },
+  {
+    "id": "SPELL_MARTYRS_KNELL",
+    "name": "Martyr's Knell",
+    "schools": [
+      "summoning",
+      "necromancy"
+    ],
+    "flags": [],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_MARTYRS_KNELL"
+  },
+  {
+    "id": "SPELL_BORGNJORS_REVIVIFICATION",
+    "name": "Borgnjor's Revivification",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "utility"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_BORGNJORS_REVIVIFICATION"
+  },
+  {
+    "id": "SPELL_FREEZE",
+    "name": "Freeze",
+    "schools": [
+      "ice"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "destructive"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_FREEZE"
+  },
+  {
+    "id": "SPELL_OZOCUBUS_REFRIGERATION",
+    "name": "Ozocubu's Refrigeration",
+    "schools": [
+      "ice"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_OZOCUBUS_REFRIGERATION"
+  },
+  {
+    "id": "SPELL_STICKY_FLAME",
+    "name": "Sticky Flame",
+    "schools": [
+      "alchemy",
+      "fire"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "destructive"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_STICKY_FLAME"
+  },
+  {
+    "id": "SPELL_SUMMON_ICE_BEAST",
+    "name": "Summon Ice Beast",
+    "schools": [
+      "ice",
+      "summoning"
+    ],
+    "flags": [],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_ICE_BEAST"
+  },
+  {
+    "id": "SPELL_OZOCUBUS_ARMOUR",
+    "name": "Ozocubu's Armour",
+    "schools": [
+      "ice"
+    ],
+    "flags": [
+      "no_ghost"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_OZOCUBUS_ARMOUR"
+  },
+  {
+    "id": "SPELL_CALL_IMP",
+    "name": "Call Imp",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [
+      "unholy"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_CALL_IMP"
+  },
+  {
+    "id": "SPELL_DISPEL_UNDEAD",
+    "name": "Dispel Undead",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_DISPEL_UNDEAD"
+  },
+  {
+    "id": "SPELL_SUBLIMATION_OF_BLOOD",
+    "name": "Sublimation of Blood",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "utility"
+    ],
+    "level": 2,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUBLIMATION_OF_BLOOD"
+  },
+  {
+    "id": "SPELL_TUKIMAS_DANCE",
+    "name": "Tukima's Dance",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "WL_check",
+      "not_self"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_TUKIMAS_DANCE"
+  },
+  {
+    "id": "SPELL_PUTREFACTION",
+    "name": "Cigotuvi's Putrefaction",
+    "schools": [
+      "necromancy",
+      "air"
+    ],
+    "flags": [
+      "target",
+      "unclean"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_CORPSE_ROT"
+  },
+  {
+    "id": "SPELL_BOMBARD",
+    "name": "Bombard",
+    "schools": [
+      "conjuration",
+      "earth"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_IRON_SHOT"
+  },
+  {
+    "id": "SPELL_STONE_ARROW",
+    "name": "Stone Arrow",
+    "schools": [
+      "conjuration",
+      "earth"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 3,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_STONE_ARROW"
+  },
+  {
+    "id": "SPELL_SHOCK",
+    "name": "Shock",
+    "schools": [
+      "conjuration",
+      "air"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SHOCK"
+  },
+  {
+    "id": "SPELL_SWIFTNESS",
+    "name": "Swiftness",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "hasty",
+      "selfench",
+      "utility"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SWIFTNESS"
+  },
+  {
+    "id": "SPELL_CURSE_OF_AGONY",
+    "name": "Curse of Agony",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer",
+      "WL_check"
+    ],
+    "level": 5,
+    "power": 100,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 0,
+    "tile": "TILEG_AGONY"
+  },
+  {
+    "id": "SPELL_DEATH_CHANNEL",
+    "name": "Death Channel",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "helpful",
+      "utility",
+      "selfench"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_DEATH_CHANNEL"
+  },
+  {
+    "id": "SPELL_AIRSTRIKE",
+    "name": "Airstrike",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "target",
+      "not_self",
+      "destructive"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 4,
+    "tile": "TILEG_AIRSTRIKE"
+  },
+  {
+    "id": "SPELL_MOMENTUM_STRIKE",
+    "name": "Momentum Strike",
+    "schools": [
+      "conjuration",
+      "translocation"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_MOMENTUM_STRIKE"
+  },
+  {
+    "id": "SPELL_CONFUSING_TOUCH",
+    "name": "Confusing Touch",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "selfench",
+      "WL_check"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_CONFUSING_TOUCH"
+  },
+  {
+    "id": "SPELL_PASSWALL",
+    "name": "Passwall",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "target",
+      "escape",
+      "not_self",
+      "utility",
+      "silent"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 0,
+    "tile": "TILEG_PASSWALL"
+  },
+  {
+    "id": "SPELL_IGNITE_POISON",
+    "name": "Ignite Poison",
+    "schools": [
+      "fire",
+      "alchemy"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_IGNITE_POISON"
+  },
+  {
+    "id": "SPELL_CALL_CANINE_FAMILIAR",
+    "name": "Call Canine Familiar",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_CALL_CANINE_FAMILIAR"
+  },
+  {
+    "id": "SPELL_HIBERNATION",
+    "name": "Ensorcelled Hibernation",
+    "schools": [
+      "hexes",
+      "ice"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer",
+      "WL_check",
+      "silent"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_ENSORCELLED_HIBERNATION"
+  },
+  {
+    "id": "SPELL_ENGLACIATION",
+    "name": "Metabolic Englaciation",
+    "schools": [
+      "hexes",
+      "ice"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_METABOLIC_ENGLACIATION"
+  },
+  {
+    "id": "SPELL_SILENCE",
+    "name": "Silence",
+    "schools": [
+      "hexes",
+      "air"
+    ],
+    "flags": [
+      "area",
+      "silent"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SILENCE"
+  },
+  {
+    "id": "SPELL_SHATTER",
+    "name": "Shatter",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 30,
+    "tile": "TILEG_SHATTER"
+  },
+  {
+    "id": "SPELL_DISPERSAL",
+    "name": "Dispersal",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "area",
+      "escape"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 1,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_DISPERSAL"
+  },
+  {
+    "id": "SPELL_DISCHARGE",
+    "name": "Static Discharge",
+    "schools": [
+      "conjuration",
+      "air"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_STATIC_DISCHARGE"
+  },
+  {
+    "id": "SPELL_INTOXICATE",
+    "name": "Alistair's Intoxication",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 5,
+    "power": 150,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_ALISTAIRS_INTOXICATION"
+  },
+  {
+    "id": "SPELL_LRD",
+    "name": "Lee's Rapid Deconstruction",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "target",
+      "destructive"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_LEES_RAPID_DECONSTRUCTION"
+  },
+  {
+    "id": "SPELL_SANDBLAST",
+    "name": "Sandblast",
+    "schools": [
+      "earth"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer",
+      "destructive"
+    ],
+    "level": 1,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_SANDBLAST"
+  },
+  {
+    "id": "SPELL_SIMULACRUM",
+    "name": "Sculpt Simulacrum",
+    "schools": [
+      "ice",
+      "alchemy"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer",
+      "unholy"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_SIMULACRUM"
+  },
+  {
+    "id": "SPELL_CONJURE_BALL_LIGHTNING",
+    "name": "Conjure Ball Lightning",
+    "schools": [
+      "air",
+      "conjuration"
+    ],
+    "flags": [],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_CONJURE_BALL_LIGHTNING"
+  },
+  {
+    "id": "SPELL_CHAIN_LIGHTNING",
+    "name": "Chain Lightning",
+    "schools": [
+      "air",
+      "conjuration"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 25,
+    "tile": "TILEG_CHAIN_LIGHTNING"
+  },
+  {
+    "id": "SPELL_GOLUBRIAS_PASSAGE",
+    "name": "Passage of Golubria",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "target",
+      "aim_at_space",
+      "escape",
+      "selfench"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 2,
+      "max": -1
+    },
+    "noise": 8,
+    "tile": "TILEG_PASSAGE_OF_GOLUBRIA"
+  },
+  {
+    "id": "SPELL_FULMINANT_PRISM",
+    "name": "Fulminant Prism",
+    "schools": [
+      "conjuration",
+      "alchemy"
+    ],
+    "flags": [
+      "target",
+      "area",
+      "not_self",
+      "no_ghost"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_FULMINANT_PRISM"
+  },
+  {
+    "id": "SPELL_IOOD",
+    "name": "Orb of Destruction",
+    "schools": [
+      "conjuration"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": 8,
+      "max": 8
+    },
+    "noise": 0,
+    "tile": "TILEG_IOOD"
+  },
+  {
+    "id": "SPELL_LEDAS_LIQUEFACTION",
+    "name": "Leda's Liquefaction",
+    "schools": [
+      "earth",
+      "alchemy"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_LEDAS_LIQUEFACTION"
+  },
+  {
+    "id": "SPELL_SUMMON_HYDRA",
+    "name": "Summon Hydra",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [
+      "mons_abjure"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_HYDRA"
+  },
+  {
+    "id": "SPELL_INNER_FLAME",
+    "name": "Inner Flame",
+    "schools": [
+      "hexes",
+      "fire"
+    ],
+    "flags": [
+      "target",
+      "not_self",
+      "WL_check",
+      "destructive"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_INNER_FLAME"
+  },
+  {
+    "id": "SPELL_BATTLESPHERE",
+    "name": "Iskenderun's Battlesphere",
+    "schools": [
+      "conjuration",
+      "forgecraft"
+    ],
+    "flags": [
+      "utility"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_BATTLESPHERE"
+  },
+  {
+    "id": "SPELL_DAZZLING_FLASH",
+    "name": "Dazzling Flash",
+    "schools": [
+      "hexes",
+      "fire"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 3,
+    "power": 50,
+    "range": {
+      "min": 2,
+      "max": 3
+    },
+    "noise": 0,
+    "tile": "TILEG_DAZZLING_FLASH"
+  },
+  {
+    "id": "SPELL_FUGUE_OF_THE_FALLEN",
+    "name": "Fugue of the Fallen",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "selfench"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 8,
+    "tile": "TILEG_FUGUE_OF_THE_FALLEN"
+  },
+  {
+    "id": "SPELL_SEARING_RAY",
+    "name": "Searing Ray",
+    "schools": [
+      "conjuration"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_SEARING_RAY"
+  },
+  {
+    "id": "SPELL_DISCORD",
+    "name": "Discord",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "area",
+      "hasty",
+      "WL_check"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_DISCORD"
+  },
+  {
+    "id": "SPELL_SUMMON_FOREST",
+    "name": "Summon Forest",
+    "schools": [
+      "summoning",
+      "translocation"
+    ],
+    "flags": [],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 10,
+    "tile": "TILEG_SUMMON_FOREST"
+  },
+  {
+    "id": "SPELL_FORGE_LIGHTNING_SPIRE",
+    "name": "Forge Lightning Spire",
+    "schools": [
+      "forgecraft",
+      "air"
+    ],
+    "flags": [],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_FORGE_LIGHTNING_SPIRE"
+  },
+  {
+    "id": "SPELL_FORGE_BLAZEHEART_GOLEM",
+    "name": "Forge Blazeheart Golem",
+    "schools": [
+      "forgecraft",
+      "fire"
+    ],
+    "flags": [],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_FORGE_BLAZEHEART_GOLEM"
+  },
+  {
+    "id": "SPELL_DRAGON_CALL",
+    "name": "Dragon's Call",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 15,
+    "tile": "TILEG_SUMMON_DRAGON"
+  },
+  {
+    "id": "SPELL_SPELLSPARK_SERVITOR",
+    "name": "Spellspark Servitor",
+    "schools": [
+      "conjuration",
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SPELLSPARK_SERVITOR"
+  },
+  {
+    "id": "SPELL_SUMMON_MANA_VIPER",
+    "name": "Summon Mana Viper",
+    "schools": [
+      "summoning",
+      "hexes"
+    ],
+    "flags": [
+      "mons_abjure"
+    ],
+    "level": 5,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_MANA_VIPER"
+  },
+  {
+    "id": "SPELL_IRRADIATE",
+    "name": "Irradiate",
+    "schools": [
+      "conjuration",
+      "alchemy"
+    ],
+    "flags": [
+      "area",
+      "chaotic"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_IRRADIATE"
+  },
+  {
+    "id": "SPELL_VIOLENT_UNRAVELLING",
+    "name": "Yara's Violent Unravelling",
+    "schools": [
+      "hexes",
+      "alchemy"
+    ],
+    "flags": [
+      "target",
+      "no_ghost",
+      "chaotic",
+      "destructive"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_VIOLENT_UNRAVELLING"
+  },
+  {
+    "id": "SPELL_INFESTATION",
+    "name": "Infestation",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "target",
+      "unclean"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 4,
+    "tile": "TILEG_INFESTATION"
+  },
+  {
+    "id": "SPELL_BECKONING",
+    "name": "Lesser Beckoning",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 3,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_BECKONING"
+  },
+  {
+    "id": "SPELL_MERCURY_ARROW",
+    "name": "Mercury Arrow",
+    "schools": [
+      "alchemy",
+      "conjuration"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_STING"
+  },
+  {
+    "id": "SPELL_POISONOUS_VAPOURS",
+    "name": "Poisonous Vapours",
+    "schools": [
+      "alchemy",
+      "air"
+    ],
+    "flags": [
+      "target",
+      "destructive",
+      "not_self"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 0,
+    "tile": "TILEG_POISONOUS_CLOUD"
+  },
+  {
+    "id": "SPELL_IGNITION",
+    "name": "Ignition",
+    "schools": [
+      "fire"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_IGNITION"
+  },
+  {
+    "id": "SPELL_BORGNJORS_VILE_CLUTCH",
+    "name": "Borgnjor's Vile Clutch",
+    "schools": [
+      "necromancy",
+      "earth"
+    ],
+    "flags": [
+      "dir_or_target",
+      "not_self",
+      "needs_tracer"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": 6,
+      "max": 6
+    },
+    "noise": 5,
+    "tile": "TILEG_BORGNJORS_VILE_CLUTCH"
+  },
+  {
+    "id": "SPELL_STARBURST",
+    "name": "Starburst",
+    "schools": [
+      "conjuration",
+      "fire"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_STARBURST"
+  },
+  {
+    "id": "SPELL_FOXFIRE",
+    "name": "Foxfire",
+    "schools": [
+      "conjuration",
+      "fire"
+    ],
+    "flags": [],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_FOXFIRE"
+  },
+  {
+    "id": "SPELL_HAILSTORM",
+    "name": "Hailstorm",
+    "schools": [
+      "conjuration",
+      "ice"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 0,
+    "tile": "TILEG_HAILSTORM"
+  },
+  {
+    "id": "SPELL_NOXIOUS_BOG",
+    "name": "Eringya's Noxious Bog",
+    "schools": [
+      "alchemy"
+    ],
+    "flags": [
+      "area",
+      "no_ghost",
+      "destructive"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_NOXIOUS_BOG"
+  },
+  {
+    "id": "SPELL_FROZEN_RAMPARTS",
+    "name": "Frozen Ramparts",
+    "schools": [
+      "ice"
+    ],
+    "flags": [
+      "area",
+      "no_ghost",
+      "destructive"
+    ],
+    "level": 3,
+    "power": 50,
+    "range": {
+      "min": 2,
+      "max": 2
+    },
+    "noise": 8,
+    "tile": "TILEG_FROZEN_RAMPARTS"
+  },
+  {
+    "id": "SPELL_MAXWELLS_COUPLING",
+    "name": "Maxwell's Capacitive Coupling",
+    "schools": [
+      "air"
+    ],
+    "flags": [
+      "no_ghost",
+      "destructive"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 25,
+    "tile": "TILEG_MAXWELLS_COUPLING"
+  },
+  {
+    "id": "SPELL_AWAKEN_ARMOUR",
+    "name": "Awaken Armour",
+    "schools": [
+      "forgecraft",
+      "earth"
+    ],
+    "flags": [],
+    "level": 4,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_AWAKEN_ARMOUR"
+  },
+  {
+    "id": "SPELL_MANIFOLD_ASSAULT",
+    "name": "Manifold Assault",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_MANIFOLD_ASSAULT"
+  },
+  {
+    "id": "SPELL_SUMMON_CACTUS",
+    "name": "Summon Cactus Giant",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_CACTUS_GIANT"
+  },
+  {
+    "id": "SPELL_SCORCH",
+    "name": "Scorch",
+    "schools": [
+      "fire"
+    ],
+    "flags": [
+      "destructive"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 8,
+    "tile": "TILEG_SCORCH"
+  },
+  {
+    "id": "SPELL_FLAME_WAVE",
+    "name": "Flame Wave",
+    "schools": [
+      "conjuration",
+      "fire"
+    ],
+    "flags": [
+      "area"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 12,
+    "tile": "TILEG_FLAME_WAVE"
+  },
+  {
+    "id": "SPELL_ENFEEBLE",
+    "name": "Enfeeble",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "WL_check"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_ENFEEBLE"
+  },
+  {
+    "id": "SPELL_ANGUISH",
+    "name": "Anguish",
+    "schools": [
+      "hexes",
+      "necromancy"
+    ],
+    "flags": [
+      "area",
+      "WL_check"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_ANGUISH"
+  },
+  {
+    "id": "SPELL_KISS_OF_DEATH",
+    "name": "Kiss of Death",
+    "schools": [
+      "conjuration",
+      "necromancy"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "not_self"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_KISS_OF_DEATH"
+  },
+  {
+    "id": "SPELL_JINXBITE",
+    "name": "Jinxbite",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [
+      "selfench"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_JINXBITE"
+  },
+  {
+    "id": "SPELL_SIGIL_OF_BINDING",
+    "name": "Sigil of Binding",
+    "schools": [
+      "hexes"
+    ],
+    "flags": [],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SIGIL_OF_BINDING"
+  },
+  {
+    "id": "SPELL_DIMENSIONAL_BULLSEYE",
+    "name": "Dimensional Bullseye",
+    "schools": [
+      "translocation",
+      "hexes"
+    ],
+    "flags": [
+      "target",
+      "not_self",
+      "prefer_farthest"
+    ],
+    "level": 4,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_PORTAL_PROJECTILE"
+  },
+  {
+    "id": "SPELL_BOULDER",
+    "name": "Brom's Barrelling Boulder",
+    "schools": [
+      "earth",
+      "conjuration"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_BOULDER"
+  },
+  {
+    "id": "SPELL_PILEDRIVER",
+    "name": "Maxwell's Portable Piledriver",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "target"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_PILEDRIVER"
+  },
+  {
+    "id": "SPELL_GELLS_GAVOTTE",
+    "name": "Gell's Gavotte",
+    "schools": [
+      "translocation"
+    ],
+    "flags": [
+      "target",
+      "aim_at_space"
+    ],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_GAVOTTE"
+  },
+  {
+    "id": "SPELL_MAGNAVOLT",
+    "name": "Magnavolt",
+    "schools": [
+      "air",
+      "earth"
+    ],
+    "flags": [
+      "target",
+      "needs_tracer",
+      "destructive",
+      "prefer_farthest"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_MAGNAVOLT"
+  },
+  {
+    "id": "SPELL_FULSOME_FUSILLADE",
+    "name": "Fulsome Fusillade",
+    "schools": [
+      "alchemy",
+      "conjuration"
+    ],
+    "flags": [
+      "area",
+      "destructive",
+      "chaotic"
+    ],
+    "level": 8,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_FULSOME_FUSILLADE"
+  },
+  {
+    "id": "SPELL_RIMEBLIGHT",
+    "name": "Rimeblight",
+    "schools": [
+      "necromancy",
+      "ice"
+    ],
+    "flags": [
+      "dir_or_target",
+      "unclean",
+      "destructive",
+      "not_self"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": 5,
+      "max": 5
+    },
+    "noise": 0,
+    "tile": "TILEG_RIMEBLIGHT"
+  },
+  {
+    "id": "SPELL_HOARFROST_CANNONADE",
+    "name": "Hoarfrost Cannonade",
+    "schools": [
+      "forgecraft",
+      "ice"
+    ],
+    "flags": [],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_HOARFROST_CANNONADE"
+  },
+  {
+    "id": "SPELL_HELLFIRE_MORTAR",
+    "name": "Hellfire Mortar",
+    "schools": [
+      "earth",
+      "fire",
+      "forgecraft"
+    ],
+    "flags": [
+      "dir_or_target",
+      "destructive"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 20,
+    "tile": "TILEG_HELLFIRE_MORTAR"
+  },
+  {
+    "id": "SPELL_GRAVE_CLAW",
+    "name": "Grave Claw",
+    "schools": [
+      "necromancy"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_GRAVE_CLAW"
+  },
+  {
+    "id": "SPELL_CLOCKWORK_BEE",
+    "name": "Launch Clockwork Bee",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 3,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_CLOCKWORK_BEE"
+  },
+  {
+    "id": "SPELL_SPIKE_LAUNCHER",
+    "name": "Construct Spike Launcher",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 2,
+    "power": 50,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SPIKE_LAUNCHER"
+  },
+  {
+    "id": "SPELL_KINETIC_GRAPNEL",
+    "name": "Kinetic Grapnel",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "dir_or_target",
+      "needs_tracer",
+      "destructive"
+    ],
+    "level": 1,
+    "power": 25,
+    "range": {
+      "min": 4,
+      "max": 4
+    },
+    "noise": 0,
+    "tile": "TILEG_KINETIC_GRAPNEL"
+  },
+  {
+    "id": "SPELL_DIAMOND_SAWBLADES",
+    "name": "Diamond Sawblades",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_DIAMOND_SAWBLADES"
+  },
+  {
+    "id": "SPELL_SURPRISING_CROCODILE",
+    "name": "Eringya's Surprising Crocodile",
+    "schools": [
+      "summoning"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_SURPRISING_CROCODILE"
+  },
+  {
+    "id": "SPELL_PLATINUM_PARAGON",
+    "name": "Platinum Paragon",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 9,
+    "power": 200,
+    "range": {
+      "min": 3,
+      "max": 3
+    },
+    "noise": 10,
+    "tile": "TILEG_PLATINUM_PARAGON"
+  },
+  {
+    "id": "SPELL_WALKING_ALEMBIC",
+    "name": "Alistair's Walking Alembic",
+    "schools": [
+      "forgecraft",
+      "alchemy"
+    ],
+    "flags": [],
+    "level": 5,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_WALKING_ALEMBIC"
+  },
+  {
+    "id": "SPELL_MONARCH_BOMB",
+    "name": "Forge Monarch Bomb",
+    "schools": [
+      "forgecraft",
+      "fire"
+    ],
+    "flags": [],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_MONARCH_BOMB"
+  },
+  {
+    "id": "SPELL_SPLINTERFROST_SHELL",
+    "name": "Splinterfrost Shell",
+    "schools": [
+      "forgecraft",
+      "ice"
+    ],
+    "flags": [
+      "target",
+      "not_self"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": 1,
+      "max": 1
+    },
+    "noise": 0,
+    "tile": "TILEG_SPLINTERFROST_SHELL"
+  },
+  {
+    "id": "SPELL_PERCUSSIVE_TEMPERING",
+    "name": "Nazja's Percussive Tempering",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "target",
+      "helpful",
+      "not_self",
+      "destructive"
+    ],
+    "level": 5,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_PERCUSSIVE_TEMPERING"
+  },
+  {
+    "id": "SPELL_FORTRESS_BLAST",
+    "name": "Fortress Blast",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [
+      "area",
+      "destructive"
+    ],
+    "level": 6,
+    "power": 75,
+    "range": {
+      "min": 2,
+      "max": 2
+    },
+    "noise": 20,
+    "tile": "TILEG_FORTRESS_BLAST"
+  },
+  {
+    "id": "SPELL_SUMMON_SEISMOSAURUS_EGG",
+    "name": "Summon Seismosaurus Egg",
+    "schools": [
+      "summoning",
+      "earth"
+    ],
+    "flags": [],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SUMMON_SEISMOSAURUS_EGG"
+  },
+  {
+    "id": "SPELL_PHALANX_BEETLE",
+    "name": "Forge Phalanx Beetle",
+    "schools": [
+      "forgecraft"
+    ],
+    "flags": [],
+    "level": 6,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_PHALANX_BEETLE"
+  },
+  {
+    "id": "SPELL_RENDING_BLADE",
+    "name": "Rending Blade",
+    "schools": [
+      "conjuration",
+      "forgecraft"
+    ],
+    "flags": [
+      "utility"
+    ],
+    "level": 4,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_RENDING_BLADE"
+  },
+  {
+    "id": "SPELL_DETONATION_CATALYST",
+    "name": "Detonation Catalyst",
+    "schools": [
+      "fire",
+      "alchemy"
+    ],
+    "flags": [
+      "selfench"
+    ],
+    "level": 5,
+    "power": 100,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 15,
+    "tile": "TILEG_DETONATION_CATALYST"
+  },
+  {
+    "id": "SPELL_SPHINX_SISTERS",
+    "name": "Sphinx Sisters",
+    "schools": [
+      "summoning",
+      "hexes"
+    ],
+    "flags": [
+      "mons_abjure"
+    ],
+    "level": 7,
+    "power": 200,
+    "range": {
+      "min": -1,
+      "max": -1
+    },
+    "noise": 0,
+    "tile": "TILEG_SPHINX_SISTERS"
+  }
+]
