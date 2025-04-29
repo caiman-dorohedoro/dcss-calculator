@@ -4,13 +4,13 @@
   <img src="./screenshot.png" alt="screenshot">
 </p>
 
-A tool that calculates and visually displays 'Spell Failure Rate', 'EV', 'AC', and 'SH' for Dungeon Crawl Stone Soup.
+A tool that calculates and visually displays **Spell Failure Rate**, **EV**, **AC**, and **SH** for Dungeon Crawl Stone Soup.
 
 And since most DCSS players are basically ancient dungeon-crawling fossils, I made the UI as outdated as they are.
 
 ## How to Use
 
-[Go to app ↗︎ (opens in new tab)](https://dcss-calculator.pages.dev/)
+This tool is run on web browser. [Go to app ↗︎ (opens in new tab)](https://dcss-calculator.pages.dev/)
 
 ## Under Construction 🏗️
 
