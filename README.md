@@ -1,6 +1,8 @@
 # DCSS Calculator ✖️➕➖➗ 🟰 ☠️
 
-![screenshot](./screenshot.png)
+<p align="center">
+  <img src="./screenshot.png" alt="screenshot">
+</p>
 
 A tool that calculates and visually displays 'Spell Failure Rate', 'EV', 'AC', and 'SH' for Dungeon Crawl Stone Soup.
 
