@@ -30,7 +30,7 @@ function App() {
       <Tabs defaultValue="ev" className="w-full max-w-2xl">
         <div
           className={cn(
-            "relative rounded-[calc(theme(borderRadius.lg)-2px)] overflow-hidden transition-all duration-150",
+            "relative overflow-hidden transition-all duration-150",
             isFlashing &&
               "bg-white/20 shadow-[0_0_20px_rgba(255,255,255,0.3)] after:absolute after:inset-0 after:bg-white/20 after:pointer-events-none after:z-10"
           )}
