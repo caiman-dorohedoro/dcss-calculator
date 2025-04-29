@@ -318,7 +318,7 @@ const Calculator = <V extends GameVersion>({
         </Accordion>
         <div className="text-right text-xs mb-1 mr-1 hover:cursor-pointer hover:underline">
           <a
-            href="https://github.com/caiman-dorohedoro/dcss-tools"
+            href="https://github.com/caiman-dorohedoro/dcss-calculator"
             className="inline-flex items-center gap-1"
             target="_blank"
           >
