@@ -39,7 +39,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
-import githubIcon from "@/assets/github-pixel-white-16x16.png";
+import githubIcon from "@/assets/pixelated-github-white.png";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
