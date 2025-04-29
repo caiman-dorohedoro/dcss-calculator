@@ -39,6 +39,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
+import githubIcon from "@/assets/github-pixel-white-16x16.png";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -67,10 +68,10 @@ const checkboxKeysTrunk: Array<{
 }> = [...checkboxKeys032, { label: "2nd Gloves", key: "secondGloves" }];
 
 const versionToCheckboxKyes = {
-  "trunk": checkboxKeysTrunk,
+  trunk: checkboxKeysTrunk,
   "0.33": checkboxKeys033,
   "0.32": checkboxKeys032,
-}
+};
 
 const Calculator = <V extends GameVersion>({
   state,
@@ -286,7 +287,7 @@ const Calculator = <V extends GameVersion>({
           ))}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-1 pb-0">
         <Accordion
           type="multiple"
           value={state.accordionValue}
@@ -303,17 +304,28 @@ const Calculator = <V extends GameVersion>({
               items={accordionItems}
               strategy={verticalListSortingStrategy}
             >
-              {accordionItems.map((item) => (
+              {accordionItems.map((item, index) => (
                 <SortableAccordionItem
                   key={item.id}
                   id={item.id}
                   title={item.title}
                   content={item.content}
+                  isLast={index === accordionItems.length - 1}
                 />
               ))}
             </SortableContext>
           </DndContext>
         </Accordion>
+        <div className="text-right text-xs mb-1 mr-1 hover:cursor-pointer hover:underline">
+          <a
+            href="https://github.com/caiman-dorohedoro/dcss-tools"
+            className="inline-flex items-center gap-1"
+            target="_blank"
+          >
+            <img src={githubIcon} alt="GitHub" width={12} height={12} />
+            github
+          </a>
+        </div>
       </CardContent>
     </Card>
   );
