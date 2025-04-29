@@ -11,12 +11,14 @@ interface SortableAccordionItemProps {
   id: string;
   title: string;
   content: React.ReactNode;
+  isLast: boolean;
 }
 
 export function SortableAccordionItem({
   id,
   title,
   content,
+  isLast,
 }: SortableAccordionItemProps) {
   const {
     attributes,
@@ -38,7 +40,10 @@ export function SortableAccordionItem({
       ref={setNodeRef}
       value={id}
       style={style}
-      className={`relative ${isDragging ? "opacity-50" : ""}`}
+      className={`relative ${isDragging ? "opacity-50" : ""}
+      ${isLast ? "border-b-0" : ""}
+      pr-1
+      `}
     >
       <div className="flex items-center">
         <div
