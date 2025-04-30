@@ -298,7 +298,12 @@ function rawSpellFail<V extends GameVersion>({
   chance += spellDifficulties[spellDifficulty];
 
   // limit maximum value
-  chance = Math.min(chance, 210);
+  // For version 0.32 and below it's 210, for 0.33 and above it's 400, changed on 2025-04-09 (c42be)
+  if (version !== "0.33" && version !== "trunk") {
+    chance = Math.min(chance, 210);
+  } else {
+    chance = Math.min(chance, 400);
+  }
 
   // calculate failure rate through cubic polynomial
   let chance2 = Math.max(
