@@ -10,7 +10,7 @@ And since most DCSS players are basically ancient dungeon-crawling fossils, I ma
 
 ## How to Use
 
-This tool is run on web browser. [Go to app ↗︎ (opens in new tab)](https://dcss-calculator.pages.dev/)
+This tool is run on web browser. <a href="https://dcss-calculator.pages.dev/" target="_blank">Go to app ↗︎ (opens in new tab)</a>
 
 ## Under Construction 🏗️
 
