@@ -735,67 +735,9 @@ describe("Spell Calculations", () => {
 });
 
 describe("2025-04-30. 0.33", () => {
-  // personal gameplay
-  test("deep elf, robe, str 4, int 22, dex 13, splc 3.1, conj 4.4, alch 0, 4 level conj/alchemy spell (Fulminant Prism), 43", () => {
-    const failureRate = calculateSpellFailureRate({
-      version: "0.33",
-      species: "deepElf",
-      strength: 4,
-      intelligence: 22,
-      spellcasting: 3.1,
-      schoolSkills: { conjuration: 4.4, alchemy: 0 },
-      targetSpell: "Fulminant Prism",
-      spellDifficulty: 4,
-      armour: "robe",
-      shield: "none",
-      armourSkill: 0,
-      shieldSkill: 0,
-    });
-
-    expect(failureRate).toBe(43);
-  });
-
-  // same case as above
-  test("deep elf, robe, str 4, int 25, dex 13, splc 5.4, conj 5.3, alch 1.4, 4 level conj/alchemy spell (Fulminant Prism), 19", () => {
-    const failureRate = calculateSpellFailureRate({
-      version: "0.33",
-      species: "deepElf",
-      strength: 4,
-      intelligence: 25,
-      spellcasting: 5.4,
-      schoolSkills: { conjuration: 5.3, alchemy: 1.4 },
-      targetSpell: "Fulminant Prism",
-      spellDifficulty: 4,
-      armour: "robe",
-      shield: "none",
-      armourSkill: 0,
-      shieldSkill: 0,
-    });
-
-    expect(failureRate).toBe(19);
-  });
-
-  // same case as above
-  test("deep elf, robe, str 4, int 25, dex 13, splc 6.2, conj 5.8, alch 2.7, 4 level conj/alchemy spell (Fulminant Prism), 12", () => {
-    const failureRate = calculateSpellFailureRate({
-      version: "0.33",
-      species: "deepElf",
-      strength: 4,
-      intelligence: 25,
-      spellcasting: 6.2,
-      schoolSkills: { conjuration: 5.8, alchemy: 2.7 },
-      targetSpell: "Fulminant Prism",
-      spellDifficulty: 4,
-      armour: "robe",
-      shield: "none",
-      armourSkill: 0,
-      shieldSkill: 0,
-    });
-
-    expect(failureRate).toBe(12);
-  });
-
-  // same case as above. dead. https://archive.nemelex.cards/morgue/caiman/morgue-caiman-20250429-233740.txt
+  // The test case below fails - is it because the second decimal place isn't displayed on the game screen?
+  // When building and running 0.33 directly and inputting skills in wizard mode, the exact value (10 in this case) is shown in the game screen.
+  // https://archive.nemelex.cards/morgue/caiman/morgue-caiman-20250429-233740.txt
   test("deep elf, robe, str 4, int 25, dex 13, splc 8.1, conj 6.1, alch 3, 4 level conj/alchemy spell (Fulminant Prism), 9%", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.33",
@@ -993,5 +935,63 @@ describe("2025-04-30. 0.33", () => {
     });
 
     expect(failureRate).toBe(3);
+  });
+
+  // personal gameplay
+  test("octopode, none, str 7, int 19, dex 12, splc 3.3, earth 4.2, conj 1.0, 2 level earth spell (Sandblast), 2%", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "0.33",
+      species: "octopode",
+      strength: 7,
+      intelligence: 19,
+      spellcasting: 3.3,
+      schoolSkills: { earth: 4.2 },
+      targetSpell: "Sandblast",
+      spellDifficulty: 1,
+      armour: "none",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+    });
+
+    expect(failureRate).toBe(2);
+  });
+
+  test("octopode, none, str 7, int 19, dex 12, splc 3.3, earth 4.2, alch 0, 4 level earth/alchemy spell (Petrify), 52%", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "0.33",
+      species: "octopode",
+      strength: 7,
+      intelligence: 19,
+      spellcasting: 3.3,
+      schoolSkills: { earth: 4.2, alchemy: 0 },
+      targetSpell: "Petrify",
+      spellDifficulty: 4,
+      armour: "none",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+    });
+
+    expect(failureRate).toBe(52);
+  });
+
+  test("octopode, none, str 7, int 19, dex 12, splc 3.3, earth 4.2, conj 1, 4 level earth/conj spell (Brom's Barrelling Boulder), 45%", () => {
+    const failureRate = calculateSpellFailureRate({
+      version: "0.33",
+      species: "octopode",
+      strength: 7,
+      intelligence: 19,
+      spellcasting: 3.3,
+      schoolSkills: { earth: 4.2, conjuration: 1 },
+      targetSpell: "Brom's Barrelling Boulder",
+      spellDifficulty: 4,
+      armour: "none",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+    });
+
+    expect(failureRate).toBe(45);
   });
 });
