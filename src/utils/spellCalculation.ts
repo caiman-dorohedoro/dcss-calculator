@@ -12,9 +12,9 @@ import {
   VersionedSpellName,
   VersionedSpellSchool,
 } from "@/types/spells";
-import spells032 from "@/data/generated-spells.0.32.json" assert { type: "json" };
-import spellsTrunk from "@/data/generated-spells.trunk.json" assert { type: "json" };
 import { SpeciesKey } from "@/types/species";
+import { getFormulaProfile } from "@/versioning/formulaProfiles";
+import { getVersionConfig } from "@/versioning/versionRegistry";
 
 export type SpellCalculationParams<V extends GameVersion> = {
   version: GameVersion;
@@ -195,10 +195,8 @@ function failureRateToInt(fail: number) {
   else return Math.max(1, Math.floor(100 * getTrueFailRate(fail)));
 }
 
-export const getSpellData = <V extends GameVersion>(version: GameVersion) => {
-  return version === "0.32"
-    ? (spells032 as VersionedSpellDatum<"0.32">[] as VersionedSpellDatum<V>[])
-    : (spellsTrunk as VersionedSpellDatum<"trunk">[] as VersionedSpellDatum<V>[]);
+export const getSpellData = <V extends GameVersion>(version: V) => {
+  return getVersionConfig(version).spells as VersionedSpellDatum<V>[];
 };
 
 export const getSpellSchools = <V extends GameVersion>(
@@ -265,6 +263,9 @@ function rawSpellFail<V extends GameVersion>({
   wildMagic = 0,
   enkindle = false,
 }: SpellCalculationParams<V>) {
+  const config = getVersionConfig(version);
+  const formula = getFormulaProfile(config.formulaProfile);
+
   // start with base failure rate of 60%
   let chance = 60;
 
@@ -296,14 +297,7 @@ function rawSpellFail<V extends GameVersion>({
 
   // base failure rate by spell difficulty
   chance += spellDifficulties[spellDifficulty];
-
-  // limit maximum value
-  // For version 0.32 and below it's 210, for 0.33 and above it's 400, changed on 2025-04-09 (c42be)
-  if (version !== "0.33" && version !== "trunk") {
-    chance = Math.min(chance, 210);
-  } else {
-    chance = Math.min(chance, 400);
-  }
+  chance = formula.applySpellCap(chance);
 
   // calculate failure rate through cubic polynomial
   let chance2 = Math.max(
