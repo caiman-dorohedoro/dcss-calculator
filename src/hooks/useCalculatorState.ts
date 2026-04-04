@@ -99,7 +99,7 @@ export const useCalculatorState = <V extends GameVersion>() => {
       }
     }
 
-    return getDefaultState(initialVersion) as CalculatorState<V>;
+    return getDefaultState(initialVersion) as unknown as CalculatorState<V>;
   });
   const [flash, setFlash] = useState(false);
 
@@ -108,7 +108,7 @@ export const useCalculatorState = <V extends GameVersion>() => {
   }, [state]);
 
   const resetState = () => {
-    setState(getDefaultState(state.version) as CalculatorState<V>);
+    setState(getDefaultState(state.version) as unknown as CalculatorState<V>);
     localStorage.removeItem(getStorageKey(state.version));
   };
 
@@ -118,7 +118,7 @@ export const useCalculatorState = <V extends GameVersion>() => {
     const saved = localStorage.getItem(getStorageKey(version));
 
     if (!saved) {
-      setState(getDefaultState(version) as CalculatorState<V>);
+      setState(getDefaultState(version) as unknown as CalculatorState<V>);
       return;
     }
 
@@ -126,10 +126,10 @@ export const useCalculatorState = <V extends GameVersion>() => {
       if (validateState<V>(JSON.parse(saved))) {
         setState(JSON.parse(saved) as CalculatorState<V>);
       } else {
-        setState(getDefaultState(version) as CalculatorState<V>);
+        setState(getDefaultState(version) as unknown as CalculatorState<V>);
       }
     } catch {
-      setState(getDefaultState(version) as CalculatorState<V>);
+      setState(getDefaultState(version) as unknown as CalculatorState<V>);
     }
   };
 

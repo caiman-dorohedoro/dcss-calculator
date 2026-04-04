@@ -1,11 +1,8 @@
-import { Size } from "@/types/species.ts";
+import { Size } from "@/versioning/speciesModel";
+import type { SpeciesOption } from "@/versioning/speciesModel";
 
 export { Size };
-
-export type SpeciesOption = {
-  name: string;
-  size: Size;
-};
+export type { SpeciesOption };
 
 export const baseSpecies = {
   armataur: { name: "Armataur", size: Size.LARGE },

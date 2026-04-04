@@ -3,7 +3,8 @@ import spells033 from "@/data/generated-spells.0.33.json";
 import spellsTrunk from "@/data/generated-spells.trunk.json";
 import { GameVersion, gameVersions } from "@/types/game";
 import { FormulaProfileName } from "./formulaProfiles";
-import { SpeciesOption, species032, species033, speciesTrunk } from "./speciesData";
+import type { SpeciesOption } from "./speciesModel";
+import { species032, species033, speciesTrunk } from "./speciesData";
 
 type VersionFeatures = {
   secondGloves: boolean;
