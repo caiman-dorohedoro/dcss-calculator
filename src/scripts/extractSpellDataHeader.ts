@@ -1,28 +1,28 @@
 import * as fs from "fs";
 
-// 0.32
-const SPELL_DATA_FILE_NAME = `spl-data.0.32.h`;
-const SPELL_DATA_PATH = `src/data/${SPELL_DATA_FILE_NAME}`;
-const EXTRACTED_SPELL_DATA_FILE_NAME = "generated-spells.0.32.json";
-const EXTRACTED_SPELL_TYPES_FILE_NAME = "generated-spells.0.32.d.ts";
-const EXTRACTED_SPELL_DATA_PATH = `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME}`;
-const EXTRACTED_SPELL_TYPES_PATH = `src/types/${EXTRACTED_SPELL_TYPES_FILE_NAME}`;
+type ExtractionTarget = {
+  spellDataPath: string;
+  extractedSpellDataPath: string;
+  extractedSpellTypesPath: string;
+};
 
-// 0.33
-const SPELL_DATA_FILE_NAME_0_33 = `spl-data.0.33.h`;
-const SPELL_DATA_PATH_0_33 = `src/data/${SPELL_DATA_FILE_NAME_0_33}`;
-const EXTRACTED_SPELL_DATA_FILE_NAME_0_33 = "generated-spells.0.33.json";
-const EXTRACTED_SPELL_TYPES_FILE_NAME_0_33 = "generated-spells.0.33.d.ts";
-const EXTRACTED_SPELL_DATA_PATH_0_33 = `src/data/${EXTRACTED_SPELL_DATA_FILE_NAME_0_33}`;
-const EXTRACTED_SPELL_TYPES_PATH_0_33 = `src/types/${EXTRACTED_SPELL_TYPES_FILE_NAME_0_33}`;
-
-// trunk
-const TRUNK_SPELL_DATA_FILE_NAME = 'spl-data.trunk.20240428.h';
-const TRUNK_SPELL_DATA_PATH = `src/data/${TRUNK_SPELL_DATA_FILE_NAME}`;
-const TRUNK_EXTRACTED_SPELL_DATA_FILE_NAME = "generated-spells.trunk.json";
-const TRUNK_EXTRACTED_SPELL_TYPES_FILE_NAME = "generated-spells.trunk.d.ts";
-const TRUNK_EXTRACTED_SPELL_DATA_PATH = `src/data/${TRUNK_EXTRACTED_SPELL_DATA_FILE_NAME}`;
-const TRUNK_EXTRACTED_SPELL_TYPES_PATH = `src/types/${TRUNK_EXTRACTED_SPELL_TYPES_FILE_NAME}`;
+const extractionTargets: ExtractionTarget[] = [
+  {
+    spellDataPath: "src/data/spl-data.0.32.h",
+    extractedSpellDataPath: "src/data/generated-spells.0.32.json",
+    extractedSpellTypesPath: "src/types/generated-spells.0.32.d.ts",
+  },
+  {
+    spellDataPath: "src/data/spl-data.0.33.h",
+    extractedSpellDataPath: "src/data/generated-spells.0.33.json",
+    extractedSpellTypesPath: "src/types/generated-spells.0.33.d.ts",
+  },
+  {
+    spellDataPath: "src/data/spl-data.trunk.20240428.h",
+    extractedSpellDataPath: "src/data/generated-spells.trunk.json",
+    extractedSpellTypesPath: "src/types/generated-spells.trunk.d.ts",
+  },
+];
 
 type SpellData_PROTO = {
   id: string;
@@ -318,15 +318,10 @@ const extract = (
   }
 };
 
-// extract trunk
-extract(
-  TRUNK_SPELL_DATA_PATH,
-  TRUNK_EXTRACTED_SPELL_DATA_PATH,
-  TRUNK_EXTRACTED_SPELL_TYPES_PATH
-);
-
-// extract 0.32
-extract(SPELL_DATA_PATH, EXTRACTED_SPELL_DATA_PATH, EXTRACTED_SPELL_TYPES_PATH);
-
-// extract 0.33
-extract(SPELL_DATA_PATH_0_33, EXTRACTED_SPELL_DATA_PATH_0_33, EXTRACTED_SPELL_TYPES_PATH_0_33);
+for (const target of extractionTargets) {
+  extract(
+    target.spellDataPath,
+    target.extractedSpellDataPath,
+    target.extractedSpellTypesPath
+  );
+}

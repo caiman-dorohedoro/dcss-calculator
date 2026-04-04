@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
-    "extract-spell-data": "tsx src/scripts/extractSpellDataHeader.ts"
+    "extract-spell-data": "tsx src/scripts/extractSpellDataHeader.ts",
+    "report-version-diff": "tsx src/scripts/reportVersionDiff.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
