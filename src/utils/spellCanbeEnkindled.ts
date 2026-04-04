@@ -6,7 +6,6 @@ import {
 } from "@/types/spells";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 import { getSpellFlags, getSpellSchools } from "./spellCalculation";
-import { isGameVersion } from "@/types/game";
 
 // check if the spell school is conjuration by version
 const isConjuration = <V extends GameVersion>(
@@ -57,24 +56,8 @@ const vehumetSupportsSpell = <V extends GameVersion>(
 export function spellCanBeEnkindled<V extends GameVersion>(
   version: V,
   spellName?: VersionedSpellName<V>
-): boolean;
-
-export function spellCanBeEnkindled<V extends GameVersion>(
-  spellName?: VersionedSpellName<V>
-): boolean;
-
-export function spellCanBeEnkindled<V extends GameVersion>(
-  versionOrSpellName?: GameVersion | VersionedSpellName<V>,
-  spellName?: VersionedSpellName<V>
 ) {
-  const version = isGameVersion(versionOrSpellName ?? "")
-    ? versionOrSpellName
-    : "trunk";
-  const resolvedSpellName = isGameVersion(versionOrSpellName ?? "")
-    ? spellName
-    : versionOrSpellName;
-
-  if (!resolvedSpellName) {
+  if (!spellName) {
     return false;
   }
 
@@ -82,16 +65,16 @@ export function spellCanBeEnkindled<V extends GameVersion>(
     return false;
   }
 
-  if (explicitFalseSpells.has(resolvedSpellName as VersionedSpellName<GameVersion>)) {
+  if (explicitFalseSpells.has(spellName as VersionedSpellName<GameVersion>)) {
     return false;
   }
 
-  if (explicitTrueSpells.has(resolvedSpellName as VersionedSpellName<GameVersion>)) {
+  if (explicitTrueSpells.has(spellName as VersionedSpellName<GameVersion>)) {
     return true;
   }
 
   return vehumetSupportsSpell(
     version,
-    resolvedSpellName as VersionedSpellName<typeof version>
+    spellName as VersionedSpellName<typeof version>
   );
 }
