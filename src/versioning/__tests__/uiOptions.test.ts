@@ -22,4 +22,15 @@ describe("getEquipmentToggleKeys", () => {
       "secondGloves",
     ]);
   });
+
+  test("trunk includes secondGloves", () => {
+    expect(getEquipmentToggleKeys("trunk")).toEqual([
+      "helmet",
+      "cloak",
+      "gloves",
+      "boots",
+      "barding",
+      "secondGloves",
+    ]);
+  });
 });

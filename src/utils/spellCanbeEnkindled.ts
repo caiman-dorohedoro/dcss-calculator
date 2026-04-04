@@ -38,16 +38,12 @@ const vehumetSupportsSpell = <V extends GameVersion>(
   version: V,
   spellName: VersionedSpellName<V>
 ) => {
-  try {
-    if (getSpellSchools(version, spellName).some(isConjuration)) {
-      return true;
-    }
+  if (getSpellSchools(version, spellName).some(isConjuration)) {
+    return true;
+  }
 
-    if (getSpellFlags(version, spellName).some(isDestructive)) {
-      return true;
-    }
-  } catch {
-    return false;
+  if (getSpellFlags(version, spellName).some(isDestructive)) {
+    return true;
   }
 
   return false;
