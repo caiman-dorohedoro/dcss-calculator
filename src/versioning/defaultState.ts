@@ -1,11 +1,6 @@
 import type { CalculatorState } from "@/hooks/useCalculatorState";
 import type { GameVersion } from "@/types/game";
-import type {
-  VersionedSchoolSkillLevels,
-  VersionedSpellDatum,
-  VersionedSpellName,
-} from "@/types/spells";
-import type { SpeciesKey } from "@/types/species";
+import type { VersionedSchoolSkillLevels } from "@/types/spells";
 import { getVersionConfig } from "./versionRegistry";
 
 const baseDefaultState = {
@@ -33,7 +28,7 @@ const baseDefaultState = {
 const buildSchoolDefaults = <V extends GameVersion>(version: V) => {
   const schools = new Set<string>();
 
-  for (const spell of getVersionConfig(version).spells as VersionedSpellDatum<V>[]) {
+  for (const spell of getVersionConfig(version).spells) {
     for (const school of spell.schools) {
       schools.add(school);
     }
@@ -54,8 +49,8 @@ export const buildDefaultCalculatorState = <V extends GameVersion>(
   const state: CalculatorState<V> = {
     ...baseDefaultState,
     version,
-    species: config.defaults.species as SpeciesKey<V>,
-    targetSpell: config.defaults.targetSpell as VersionedSpellName<V>,
+    species: config.defaults.species,
+    targetSpell: config.defaults.targetSpell,
     schoolSkills: buildSchoolDefaults(version),
   };
 
