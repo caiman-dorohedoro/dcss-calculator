@@ -17,7 +17,7 @@ const sizeToNumber: Record<Size, number> = {
 };
 
 export function calculateEV<V extends GameVersion>(params: {
-  version: GameVersion;
+  version: V;
   dodgingSkill: number;
   dexterity: number;
   strength: number;

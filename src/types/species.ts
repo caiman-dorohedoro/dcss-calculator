@@ -1,5 +1,6 @@
 import type { GameVersion } from "./game";
 import { Size } from "@/versioning/speciesModel";
+import type { SpeciesOption } from "@/versioning/speciesModel";
 import { species032, species033, speciesTrunk } from "@/versioning/speciesData";
 
 const speciesByVersion = {
@@ -10,12 +11,15 @@ const speciesByVersion = {
 
 type SpeciesMap = typeof speciesByVersion;
 
-export type SpeciesKey<V extends GameVersion> = keyof SpeciesMap[V];
+export type SpeciesKey<V extends GameVersion> = Extract<
+  keyof SpeciesMap[V],
+  string
+>;
 
 export { Size };
 
 export const speciesOptions = <V extends GameVersion>(
   version: V
-): SpeciesMap[V] => {
-  return speciesByVersion[version];
+): Record<SpeciesKey<V>, SpeciesOption> => {
+  return speciesByVersion[version] as Record<SpeciesKey<V>, SpeciesOption>;
 };

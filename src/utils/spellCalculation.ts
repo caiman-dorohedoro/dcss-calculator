@@ -17,7 +17,7 @@ import { getFormulaProfile } from "@/versioning/formulaProfiles";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
 export type SpellCalculationParams<V extends GameVersion> = {
-  version: GameVersion;
+  version: V;
   species: SpeciesKey<V>;
   strength: number;
   spellcasting: number;
@@ -70,7 +70,7 @@ function getTrueFailRate(rawFail: number) {
 }
 
 const getSkillPower = <V extends GameVersion>(
-  version: GameVersion,
+  version: V,
   targetSpell: VersionedSpellName<V>,
   schoolSkills: VersionedSchoolSkillLevels<V>,
   spellCasting: number
@@ -200,7 +200,7 @@ export const getSpellData = <V extends GameVersion>(version: V) => {
 };
 
 export const getSpellSchools = <V extends GameVersion>(
-  version: GameVersion,
+  version: V,
   targetSpell?: VersionedSpellName<V>
 ): VersionedSpellSchool<V>[] => {
   const spellData = getSpellData<V>(version);
@@ -218,7 +218,7 @@ export const getSpellSchools = <V extends GameVersion>(
 };
 
 export const getSpellFlags = <V extends GameVersion>(
-  version: GameVersion,
+  version: V,
   targetSpell?: VersionedSpellName<V>
 ): VersionedSpellFlag<V>[] => {
   const spellData = getSpellData<V>(version);

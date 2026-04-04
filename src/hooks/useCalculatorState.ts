@@ -14,7 +14,7 @@ const getStorageKey = (version: GameVersion) => {
 };
 
 export interface CalculatorState<V extends GameVersion> {
-  version: GameVersion;
+  version: V;
   accordionValue: string[];
   accordionOrder: string[];
   //
@@ -54,7 +54,7 @@ export const getStartupSavedState = () => {
 };
 
 export const isSchoolSkillKey = <V extends GameVersion>(
-  version: GameVersion,
+  version: V,
   key: string
 ): key is keyof CalculatorState<V>["schoolSkills"] => {
   const defaultState = getDefaultState(version);
@@ -87,7 +87,7 @@ const validateState = <V extends GameVersion>(
   return true;
 };
 
-const getDefaultState = (version: GameVersion) => {
+const getDefaultState = <V extends GameVersion>(version: V) => {
   return buildDefaultCalculatorState(version);
 };
 
