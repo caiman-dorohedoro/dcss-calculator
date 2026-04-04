@@ -26,13 +26,29 @@ const extractionTargets: ExtractionTarget[] = [
 
 const assertUniqueExtractionTargets = (targets: ExtractionTarget[]) => {
   const seenSpellDataPaths = new Set<string>();
+  const seenExtractedSpellDataPaths = new Set<string>();
+  const seenExtractedSpellTypesPaths = new Set<string>();
 
   for (const target of targets) {
     if (seenSpellDataPaths.has(target.spellDataPath)) {
       throw new Error(`Duplicate extraction target: ${target.spellDataPath}`);
     }
 
+    if (seenExtractedSpellDataPaths.has(target.extractedSpellDataPath)) {
+      throw new Error(
+        `Duplicate extracted spell data target: ${target.extractedSpellDataPath}`
+      );
+    }
+
+    if (seenExtractedSpellTypesPaths.has(target.extractedSpellTypesPath)) {
+      throw new Error(
+        `Duplicate extracted spell types target: ${target.extractedSpellTypesPath}`
+      );
+    }
+
     seenSpellDataPaths.add(target.spellDataPath);
+    seenExtractedSpellDataPaths.add(target.extractedSpellDataPath);
+    seenExtractedSpellTypesPaths.add(target.extractedSpellTypesPath);
   }
 };
 
