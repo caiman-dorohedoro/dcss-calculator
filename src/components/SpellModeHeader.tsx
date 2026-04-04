@@ -49,7 +49,7 @@ const SpellModeHeader = <V extends GameVersion>({
                     <span className="inline-flex items-center gap-2">
                       <span>{spell.name}</span>
                       {state.species === "revenant" &&
-                        spellCanBeEnkindled(spell.name) && (
+                        spellCanBeEnkindled(state.version, spell.name) && (
                           <span className="text-[#60FDFF] transform translate-y-0.5">
                             *
                           </span>

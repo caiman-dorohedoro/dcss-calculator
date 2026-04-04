@@ -213,7 +213,10 @@ export const calculateAvgSFData = <V extends GameVersion>(
         wildMagic: state.wildMagic,
       });
 
-      if (state.species === "revenant" && spellCanBeEnkindled(targetSpell)) {
+      if (
+        state.species === "revenant" &&
+        spellCanBeEnkindled(state.version, targetSpell)
+      ) {
         const enKindledSpellFailureRate = calculateSpellFailureRate({
           version: state.version,
           species: state.species,

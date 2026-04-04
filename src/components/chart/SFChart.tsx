@@ -140,7 +140,7 @@ const SFChart = <V extends GameVersion>({
             )}
           />
           {state.species === "revenant" &&
-            spellCanBeEnkindled(state.targetSpell) &&
+            spellCanBeEnkindled(state.version, state.targetSpell) &&
             sfData.some((data) => data.enKindledSpellFailureRate !== 0) && (
               <Line
                 type="stepAfter"

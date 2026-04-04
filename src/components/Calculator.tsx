@@ -23,6 +23,7 @@ import {
 } from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { GameVersion } from "@/types/game";
+import { EquipmentToggleKey, getEquipmentToggleKeys } from "@/versioning/uiOptions";
 import {
   DndContext,
   closestCenter,
@@ -46,39 +47,20 @@ type CalculatorProps<V extends GameVersion> = {
   setState: React.Dispatch<React.SetStateAction<CalculatorState<V>>>;
 };
 
-const checkboxKeys032: Array<{
-  label: string;
-  key: keyof CalculatorState<"0.32">;
-}> = [
-  { label: "Helmet", key: "helmet" },
-  { label: "Cloak", key: "cloak" },
-  { label: "Gloves", key: "gloves" },
-  { label: "Boots", key: "boots" },
-  { label: "Barding", key: "barding" },
-];
-
-const checkboxKeys033: Array<{
-  label: string;
-  key: keyof CalculatorState<"0.33">;
-}> = [...checkboxKeys032, { label: "2nd Gloves", key: "secondGloves" }];
-
-const checkboxKeysTrunk: Array<{
-  label: string;
-  key: keyof CalculatorState<"trunk">;
-}> = [...checkboxKeys032, { label: "2nd Gloves", key: "secondGloves" }];
-
-const versionToCheckboxKyes = {
-  trunk: checkboxKeysTrunk,
-  "0.33": checkboxKeys033,
-  "0.32": checkboxKeys032,
+const equipmentToggleLabels: Record<EquipmentToggleKey, string> = {
+  helmet: "Helmet",
+  cloak: "Cloak",
+  gloves: "Gloves",
+  boots: "Boots",
+  barding: "Barding",
+  secondGloves: "2nd Gloves",
 };
 
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
-  const checkboxKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
-    versionToCheckboxKyes[state.version];
+  const checkboxKeys = getEquipmentToggleKeys(state.version);
 
   const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
     [
@@ -270,7 +252,7 @@ const Calculator = <V extends GameVersion>({
           </label>
         </div>
         <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
-          {checkboxKeys.map(({ label, key }) => (
+          {checkboxKeys.map((key) => (
             <Fragment key={key}>
               <label htmlFor={key} className="flex flex-row items-center gap-2">
                 <Checkbox
@@ -280,7 +262,7 @@ const Calculator = <V extends GameVersion>({
                   }
                   id={key}
                 />
-                {label}
+                {equipmentToggleLabels[key]}
               </label>
               {key === "boots" && <div className="h-3 w-px bg-gray-200"></div>}
             </Fragment>

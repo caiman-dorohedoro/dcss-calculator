@@ -4,7 +4,9 @@ import {
   VersionedSpellName,
   VersionedSpellSchool,
 } from "@/types/spells";
+import { getVersionConfig } from "@/versioning/versionRegistry";
 import { getSpellFlags, getSpellSchools } from "./spellCalculation";
+import { isGameVersion } from "@/types/game";
 
 // check if the spell school is conjuration by version
 const isConjuration = <V extends GameVersion>(
@@ -20,44 +22,76 @@ const isDestructive = <V extends GameVersion>(
   return flag === ("destructive" as VersionedSpellFlag<V>);
 };
 
-const vehumetSupportsSpell = <V extends GameVersion>(
-  spellName: VersionedSpellName<V>,
-  version: GameVersion
-) => {
-  if (getSpellSchools(version, spellName).some(isConjuration)) {
-    return true;
-  }
+const explicitFalseSpells = new Set<VersionedSpellName<GameVersion>>([
+  "Iskenderun's Battlesphere",
+  "Spellforged Servitor",
+  "Mephitic Cloud",
+]);
 
-  if (getSpellFlags(version, spellName).some(isDestructive)) {
-    return true;
+const explicitTrueSpells = new Set<VersionedSpellName<GameVersion>>([
+  "Grave Claw",
+  "Vampiric Draining",
+  "Borgnjor's Vile Clutch",
+  "Cigotuvi's Putrefaction",
+]);
+
+const vehumetSupportsSpell = <V extends GameVersion>(
+  version: V,
+  spellName: VersionedSpellName<V>
+) => {
+  try {
+    if (getSpellSchools(version, spellName).some(isConjuration)) {
+      return true;
+    }
+
+    if (getSpellFlags(version, spellName).some(isDestructive)) {
+      return true;
+    }
+  } catch {
+    return false;
   }
 
   return false;
 };
 
-export const spellCanBeEnkindled = <V extends GameVersion>(
+export function spellCanBeEnkindled<V extends GameVersion>(
+  version: V,
   spellName?: VersionedSpellName<V>
-) => {
-  if (!spellName) {
+): boolean;
+
+export function spellCanBeEnkindled<V extends GameVersion>(
+  spellName?: VersionedSpellName<V>
+): boolean;
+
+export function spellCanBeEnkindled<V extends GameVersion>(
+  versionOrSpellName?: GameVersion | VersionedSpellName<V>,
+  spellName?: VersionedSpellName<V>
+) {
+  const version = isGameVersion(versionOrSpellName ?? "")
+    ? versionOrSpellName
+    : "trunk";
+  const resolvedSpellName = isGameVersion(versionOrSpellName ?? "")
+    ? spellName
+    : versionOrSpellName;
+
+  if (!resolvedSpellName) {
     return false;
   }
 
-  // Currently, enkindle only exists in trunk
-  const version = "trunk" as GameVersion;
-
-  switch (spellName) {
-    case "Iskenderun's Battlesphere":
-    case "Spellforged Servitor":
-    case "Mephitic Cloud":
-      return false;
-
-    case "Grave Claw":
-    case "Vampiric Draining":
-    case "Borgnjor's Vile Clutch":
-    case "Cigotuvi's Putrefaction":
-      return true;
-
-    default:
-      return vehumetSupportsSpell(spellName, version);
+  if (!getVersionConfig(version).features.enkindle) {
+    return false;
   }
-};
+
+  if (explicitFalseSpells.has(resolvedSpellName as VersionedSpellName<GameVersion>)) {
+    return false;
+  }
+
+  if (explicitTrueSpells.has(resolvedSpellName as VersionedSpellName<GameVersion>)) {
+    return true;
+  }
+
+  return vehumetSupportsSpell(
+    version,
+    resolvedSpellName as VersionedSpellName<typeof version>
+  );
+}
