@@ -22,12 +22,19 @@ const extractionTargets: ExtractionTarget[] = [
     extractedSpellDataPath: "src/data/generated-spells.0.33.json",
     extractedSpellTypesPath: "src/types/generated-spells.0.33.d.ts",
   },
-  {
-    spellDataPath: "src/data/spl-data.0.33.h",
-    extractedSpellDataPath: "src/data/generated-spells.0.33.json",
-    extractedSpellTypesPath: "src/types/generated-spells.0.33.d.ts",
-  },
 ];
+
+const assertUniqueExtractionTargets = (targets: ExtractionTarget[]) => {
+  const seenSpellDataPaths = new Set<string>();
+
+  for (const target of targets) {
+    if (seenSpellDataPaths.has(target.spellDataPath)) {
+      throw new Error(`Duplicate extraction target: ${target.spellDataPath}`);
+    }
+
+    seenSpellDataPaths.add(target.spellDataPath);
+  }
+};
 
 type SpellData_PROTO = {
   id: string;
@@ -322,6 +329,8 @@ const extract = (
     process.exit(1);
   }
 };
+
+assertUniqueExtractionTargets(extractionTargets);
 
 for (const target of extractionTargets) {
   extract(
