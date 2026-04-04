@@ -8,6 +8,11 @@ type ExtractionTarget = {
 
 const extractionTargets: ExtractionTarget[] = [
   {
+    spellDataPath: "src/data/spl-data.trunk.20240428.h",
+    extractedSpellDataPath: "src/data/generated-spells.trunk.json",
+    extractedSpellTypesPath: "src/types/generated-spells.trunk.d.ts",
+  },
+  {
     spellDataPath: "src/data/spl-data.0.32.h",
     extractedSpellDataPath: "src/data/generated-spells.0.32.json",
     extractedSpellTypesPath: "src/types/generated-spells.0.32.d.ts",
@@ -18,9 +23,9 @@ const extractionTargets: ExtractionTarget[] = [
     extractedSpellTypesPath: "src/types/generated-spells.0.33.d.ts",
   },
   {
-    spellDataPath: "src/data/spl-data.trunk.20240428.h",
-    extractedSpellDataPath: "src/data/generated-spells.trunk.json",
-    extractedSpellTypesPath: "src/types/generated-spells.trunk.d.ts",
+    spellDataPath: "src/data/spl-data.0.33.h",
+    extractedSpellDataPath: "src/data/generated-spells.0.33.json",
+    extractedSpellTypesPath: "src/types/generated-spells.0.33.d.ts",
   },
 ];
 
