@@ -62,7 +62,7 @@ describe("buildDefaultCalculatorState", () => {
 
     const restored = getStartupSavedState();
 
-    expect(JSON.parse(restored ?? "{}").version).toBe("trunk");
+    expect(restored?.version).toBe("trunk");
   });
 
   test("falls back to 0.32 before 0.33 when trunk state is absent", () => {
@@ -93,6 +93,68 @@ describe("buildDefaultCalculatorState", () => {
 
     const restored = getStartupSavedState();
 
-    expect(JSON.parse(restored ?? "{}").version).toBe("0.32");
+    expect(restored?.version).toBe("0.32");
+  });
+
+  test("skips an invalid trunk species save and falls back to 0.32", () => {
+    const store = new Map<string, string>();
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    };
+
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: localStorageMock,
+    });
+
+    localStorageMock.setItem(
+      "calculator_trunk",
+      JSON.stringify({
+        ...buildDefaultCalculatorState("trunk"),
+        species: "ghoul",
+      })
+    );
+    localStorageMock.setItem(
+      "calculator_0.32",
+      JSON.stringify(buildDefaultCalculatorState("0.32"))
+    );
+
+    const restored = getStartupSavedState();
+
+    expect(restored?.version).toBe("0.32");
+  });
+
+  test("rejects a save whose target spell is not valid for that version", () => {
+    const store = new Map<string, string>();
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    };
+
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: localStorageMock,
+    });
+
+    localStorageMock.setItem(
+      "calculator_trunk",
+      JSON.stringify({
+        ...buildDefaultCalculatorState("trunk"),
+        targetSpell: "Sting",
+      })
+    );
+
+    expect(getStartupSavedState()).toBeNull();
   });
 });

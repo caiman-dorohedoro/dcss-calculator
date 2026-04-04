@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { ArmourKey, ShieldKey } from "@/types/equipment.ts";
 import type { SpeciesKey } from "@/types/species.ts";
-import { isGameVersion } from "@/types/game";
+import { isGameVersion, startupRestoreOrder } from "@/types/game";
 import type { GameVersion } from "@/types/game";
 import type { VersionedSchoolSkillLevels, VersionedSpellName } from "@/types/spells";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+import { getVersionConfig } from "@/versioning/versionRegistry";
 
 const STORAGE_KEY = "calculator";
-const startupRestoreOrder: GameVersion[] = ["trunk", "0.32", "0.33"];
 
 const getStorageKey = (version: GameVersion) => {
   return `${STORAGE_KEY}_${version}`;
@@ -42,17 +42,6 @@ export interface CalculatorState<V extends GameVersion> {
   wildMagic?: number;
 }
 
-export const getStartupSavedState = () => {
-  for (const version of startupRestoreOrder) {
-    const saved = localStorage.getItem(getStorageKey(version));
-    if (saved) {
-      return saved;
-    }
-  }
-
-  return null;
-};
-
 export const isSchoolSkillKey = <V extends GameVersion>(
   version: V,
   key: string
@@ -65,9 +54,7 @@ const isObject = (obj: unknown): obj is Record<string, unknown> => {
   return typeof obj === "object" && obj !== null;
 };
 
-const validateState = <V extends GameVersion>(
-  state: unknown
-): state is CalculatorState<V> => {
+const validateState = (state: unknown): state is CalculatorState<GameVersion> => {
   if (!isObject(state)) return false;
 
   if (
@@ -77,14 +64,67 @@ const validateState = <V extends GameVersion>(
   )
     return false;
 
-  const defaultState = getDefaultState(state.version);
+  const version = state.version;
+  const defaultState = getDefaultState(version);
+  const config = getVersionConfig(version);
+
   for (const key of Object.keys(defaultState)) {
     if (!(key in state)) {
       return false;
     }
   }
 
+  if (typeof state.species !== "string" || !(state.species in config.species)) {
+    return false;
+  }
+
+  if (
+    state.targetSpell !== undefined &&
+    (typeof state.targetSpell !== "string" ||
+      !config.spells.some((spell) => spell.name === state.targetSpell))
+  ) {
+    return false;
+  }
+
+  if (!isObject(state.schoolSkills)) {
+    return false;
+  }
+
+  const validSchoolSkills = new Set(
+    Object.keys(defaultState.schoolSkills ?? {})
+  );
+  for (const [key, value] of Object.entries(state.schoolSkills)) {
+    if (!validSchoolSkills.has(key) || typeof value !== "number") {
+      return false;
+    }
+  }
+
   return true;
+};
+
+const parseSavedState = (saved: string): CalculatorState<GameVersion> | null => {
+  try {
+    const parsed = JSON.parse(saved);
+    return validateState(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+export const getStartupSavedState = () => {
+  for (const version of startupRestoreOrder) {
+    const saved = localStorage.getItem(getStorageKey(version));
+    if (!saved) {
+      continue;
+    }
+
+    const parsed = parseSavedState(saved);
+    if (parsed) {
+      return parsed;
+    }
+  }
+
+  return null;
 };
 
 const getDefaultState = <V extends GameVersion>(version: V) => {
@@ -98,15 +138,8 @@ export const useCalculatorState = <V extends GameVersion>() => {
     const saved = getStartupSavedState();
 
     if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (validateState<V>(parsed)) {
-          initialVersion = parsed.version;
-          return parsed;
-        }
-      } catch (e) {
-        console.error("Invalid saved state", e);
-      }
+      initialVersion = saved.version;
+      return saved as unknown as CalculatorState<V>;
     }
 
     return getDefaultState(initialVersion) as unknown as CalculatorState<V>;
@@ -132,13 +165,10 @@ export const useCalculatorState = <V extends GameVersion>() => {
       return;
     }
 
-    try {
-      if (validateState<V>(JSON.parse(saved))) {
-        setState(JSON.parse(saved) as CalculatorState<V>);
-      } else {
-        setState(getDefaultState(version) as unknown as CalculatorState<V>);
-      }
-    } catch {
+    const parsed = parseSavedState(saved);
+    if (parsed && parsed.version === version) {
+      setState(parsed as unknown as CalculatorState<V>);
+    } else {
       setState(getDefaultState(version) as unknown as CalculatorState<V>);
     }
   };

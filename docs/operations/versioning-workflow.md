@@ -13,6 +13,8 @@ When adding or updating a version, check these files first:
 - `src/types/generated-spells.<version>.d.ts`
 - `src/scripts/extractSpellDataHeader.ts`
 - `src/types/game.ts`
+- `src/types/species.ts`
+- `src/types/spells.ts`
 - `src/versioning/speciesData.ts`
 - `src/versioning/versionRegistry.ts`
 - `src/versioning/defaultState.ts`
@@ -25,12 +27,13 @@ When adding or updating a version, check these files first:
 2. Register the new header in `src/scripts/extractSpellDataHeader.ts`.
 3. Run `npm run extract-spell-data` to regenerate the versioned spell JSON and types.
 4. Add the new `GameVersion` literal to `src/types/game.ts`.
-5. Add the version-specific species dataset in `src/versioning/speciesData.ts`.
-6. Add the version entry in `src/versioning/versionRegistry.ts`.
-7. Pick the correct formula profile in `src/versioning/versionRegistry.ts`.
-8. Update `src/versioning/defaultState.ts` if the version needs different default species, spells, or feature flags.
-9. Update `src/versioning/uiOptions.ts` if the version changes which equipment toggles appear in the UI.
-10. If the formula rules changed, update or add a profile in `src/versioning/formulaProfiles.ts`.
+5. Extend `src/types/species.ts` and `src/types/spells.ts` with the new version maps.
+6. Add the version-specific species dataset in `src/versioning/speciesData.ts`.
+7. Add the version entry in `src/versioning/versionRegistry.ts`.
+8. Pick the correct formula profile in `src/versioning/versionRegistry.ts`.
+9. Update `src/versioning/defaultState.ts` if the version needs different default species, spells, or feature flags.
+10. Update `src/versioning/uiOptions.ts` if the version changes which equipment toggles appear in the UI.
+11. If the formula rules changed, update or add a profile in `src/versioning/formulaProfiles.ts`.
 
 ## Check Version Diffs
 
