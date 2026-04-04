@@ -12,7 +12,7 @@ export type SpeciesOption = {
   size: Size;
 };
 
-const baseSpecies = {
+export const baseSpecies = {
   armataur: { name: "Armataur", size: Size.LARGE },
   barachi: { name: "Barachi", size: Size.MEDIUM },
   coglin: { name: "Coglin", size: Size.MEDIUM },
