@@ -12,6 +12,10 @@ And since most DCSS players are basically ancient dungeon-crawling fossils, I ma
 
 This tool is run on web browser. [open app](https://dcss-calculator.pages.dev/)
 
+## Maintenance
+
+- [Versioning workflow](./docs/operations/versioning-workflow.md)
+
 ## Under Construction 🏗️
 
 This tool is still under construction. Some features are not yet implemented, such as poltergeist auxiliary armours, etc. I'll be adding more features in the future... after I clear the dungeon with a Spriggan Fighter of Cheibriados under 30k turns.
