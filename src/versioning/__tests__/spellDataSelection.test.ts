@@ -1,13 +1,15 @@
 import { describe, expect, test } from "@jest/globals";
+import spells033 from "@/data/generated-spells.0.33.json";
+import spellsTrunk from "@/data/generated-spells.trunk.json";
 import { getSpellData } from "@/utils/spellCalculation";
-import { getVersionConfig } from "../versionRegistry";
 
 describe("spell data selection", () => {
   test("0.33 reads from the 0.33 generated dataset instead of falling through", () => {
-    expect(getSpellData("0.33")).toBe(getVersionConfig("0.33").spells);
+    expect(getSpellData("0.33")).toBe(spells033);
+    expect(getSpellData("0.33")).not.toBe(spellsTrunk);
   });
 
   test("trunk keeps reading from the trunk generated dataset", () => {
-    expect(getSpellData("trunk")).toBe(getVersionConfig("trunk").spells);
+    expect(getSpellData("trunk")).toBe(spellsTrunk);
   });
 });
