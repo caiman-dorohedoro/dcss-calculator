@@ -25,3 +25,6 @@ dist-ssr
 
 # tsbuildinfo
 tsconfig.tsbuildinfo
+
+# original source files
+crawl
