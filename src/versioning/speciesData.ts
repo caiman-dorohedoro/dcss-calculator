@@ -1,11 +1,6 @@
-export enum Size {
-  TINY = "tiny",
-  LITTLE = "little",
-  SMALL = "small",
-  MEDIUM = "medium",
-  LARGE = "large",
-  GIANT = "giant",
-}
+import { Size } from "@/types/species.ts";
+
+export { Size };
 
 export type SpeciesOption = {
   name: string;
