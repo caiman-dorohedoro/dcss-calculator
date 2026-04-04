@@ -11,7 +11,7 @@ describe("versionRegistry", () => {
     expect(getVersionConfig("trunk").spells).toBe(spellsTrunk);
   });
 
-  test("keeps 0.32-only and trunk-only species separate", () => {
+  test("keeps version-specific species separate", () => {
     expect("ghoul" in versionRegistry["0.32"].species).toBe(true);
     expect("ghoul" in versionRegistry["0.33"].species).toBe(false);
     expect("revenant" in versionRegistry.trunk.species).toBe(true);
@@ -22,5 +22,28 @@ describe("versionRegistry", () => {
     expect(versionRegistry["0.32"].formulaProfile).toBe("legacy210");
     expect(versionRegistry["0.33"].formulaProfile).toBe("modern400");
     expect(versionRegistry.trunk.formulaProfile).toBe("modern400");
+  });
+
+  test("exposes the expected feature flags and defaults per version", () => {
+    expect(versionRegistry["0.32"].features.secondGloves).toBe(false);
+    expect(versionRegistry["0.32"].features.enkindle).toBe(false);
+    expect(versionRegistry["0.32"].defaults).toEqual({
+      species: "armataur",
+      targetSpell: "Airstrike",
+    });
+
+    expect(versionRegistry["0.33"].features.secondGloves).toBe(true);
+    expect(versionRegistry["0.33"].features.enkindle).toBe(false);
+    expect(versionRegistry["0.33"].defaults).toEqual({
+      species: "armataur",
+      targetSpell: "Airstrike",
+    });
+
+    expect(versionRegistry.trunk.features.secondGloves).toBe(true);
+    expect(versionRegistry.trunk.features.enkindle).toBe(true);
+    expect(versionRegistry.trunk.defaults).toEqual({
+      species: "armataur",
+      targetSpell: "Airstrike",
+    });
   });
 });
