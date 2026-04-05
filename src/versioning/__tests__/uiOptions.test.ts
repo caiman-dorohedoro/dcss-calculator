@@ -23,6 +23,17 @@ describe("getEquipmentToggleKeys", () => {
     ]);
   });
 
+  test("0.34 includes secondGloves", () => {
+    expect(getEquipmentToggleKeys("0.34")).toEqual([
+      "helmet",
+      "cloak",
+      "gloves",
+      "boots",
+      "barding",
+      "secondGloves",
+    ]);
+  });
+
   test("trunk includes secondGloves", () => {
     expect(getEquipmentToggleKeys("trunk")).toEqual([
       "helmet",

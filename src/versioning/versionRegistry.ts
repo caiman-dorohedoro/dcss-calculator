@@ -1,5 +1,6 @@
 import spells032 from "@/data/generated-spells.0.32.json";
 import spells033 from "@/data/generated-spells.0.33.json";
+import spells034 from "@/data/generated-spells.0.34.json";
 import spellsTrunk from "@/data/generated-spells.trunk.json";
 import { GameVersion, gameVersions } from "@/types/game";
 import type { SpeciesKey } from "@/types/species";
@@ -9,7 +10,7 @@ import type {
   VersionedSpellDatum,
   VersionedSpellName,
 } from "@/types/spells";
-import { species032, species033, speciesTrunk } from "./speciesData";
+import { species032, species033, species034, speciesTrunk } from "./speciesData";
 
 type VersionFeatures = {
   secondGloves: boolean;
@@ -47,6 +48,19 @@ export const versionRegistry = {
   "0.33": defineVersionConfig<"0.33">({
     spells: spells033 as readonly VersionedSpellDatum<"0.33">[],
     species: species033,
+    formulaProfile: "modern400",
+    features: {
+      secondGloves: true,
+      enkindle: false,
+    },
+    defaults: {
+      species: "armataur",
+      targetSpell: "Airstrike",
+    },
+  }),
+  "0.34": defineVersionConfig<"0.34">({
+    spells: spells034 as readonly VersionedSpellDatum<"0.34">[],
+    species: species034,
     formulaProfile: "modern400",
     features: {
       secondGloves: true,

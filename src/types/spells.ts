@@ -14,23 +14,31 @@ import {
   SpellSchool as SpellSchool033,
   SpellFlag as SpellFlag033,
 } from "@/types/generated-spells.0.33.d";
+import {
+  SpellName as SpellName034,
+  SpellSchool as SpellSchool034,
+  SpellFlag as SpellFlag034,
+} from "@/types/generated-spells.0.34.d";
 
 // 버전별 타입 맵핑
 type SpellNameMap = {
   "0.32": SpellName032;
   "0.33": SpellName033;
+  "0.34": SpellName034;
   "trunk": SpellNameTrunk;
 };
 
 type SpellSchoolMap = {
   "0.32": SpellSchool032;
   "0.33": SpellSchool033;
+  "0.34": SpellSchool034;
   "trunk": SpellSchoolTrunk;
 };
 
 type SpellFlagMap = {
   "0.32": SpellFlag032;
   "0.33": SpellFlag033;
+  "0.34": SpellFlag034;
   "trunk": SpellFlagTrunk;
 };
 

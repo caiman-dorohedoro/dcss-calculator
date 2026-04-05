@@ -44,6 +44,10 @@ export const species033 = {
   revenant: { name: "Revenant", size: Size.MEDIUM },
 } as const satisfies Record<string, SpeciesOption>;
 
-export const speciesTrunk = {
+export const species034 = {
   ...species033,
+} as const satisfies Record<string, SpeciesOption>;
+
+export const speciesTrunk = {
+  ...species034,
 } as const satisfies Record<string, SpeciesOption>;

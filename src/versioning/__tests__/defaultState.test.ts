@@ -9,6 +9,12 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.schoolSkills?.forgecraft).toBe(0);
   });
 
+  test("adds forgecraft to 0.34 school defaults because the spell dataset includes it", () => {
+    const state = buildDefaultCalculatorState("0.34");
+
+    expect(state.schoolSkills?.forgecraft).toBe(0);
+  });
+
   test("uses registry defaults for species and target spell", () => {
     const state = buildDefaultCalculatorState("0.33");
 
@@ -30,7 +36,13 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.secondGloves).toBe(false);
   });
 
-  test("restores saved state in trunk, then 0.32, then 0.33 order", () => {
+  test("enables secondGloves on 0.34 defaults", () => {
+    const state = buildDefaultCalculatorState("0.34");
+
+    expect(state.secondGloves).toBe(false);
+  });
+
+  test("restores saved state in trunk, then 0.34, then 0.32, then 0.33 order", () => {
     const store = new Map<string, string>();
     const localStorageMock = {
       getItem: (key: string) => store.get(key) ?? null,
@@ -50,6 +62,10 @@ describe("buildDefaultCalculatorState", () => {
     localStorageMock.setItem(
       "calculator_0.33",
       JSON.stringify(buildDefaultCalculatorState("0.33"))
+    );
+    localStorageMock.setItem(
+      "calculator_0.34",
+      JSON.stringify(buildDefaultCalculatorState("0.34"))
     );
     localStorageMock.setItem(
       "calculator_0.32",
@@ -65,7 +81,7 @@ describe("buildDefaultCalculatorState", () => {
     expect(restored?.version).toBe("trunk");
   });
 
-  test("falls back to 0.32 before 0.33 when trunk state is absent", () => {
+  test("falls back to 0.34 before older stable saves when trunk state is absent", () => {
     const store = new Map<string, string>();
     const localStorageMock = {
       getItem: (key: string) => store.get(key) ?? null,
@@ -87,16 +103,20 @@ describe("buildDefaultCalculatorState", () => {
       JSON.stringify(buildDefaultCalculatorState("0.33"))
     );
     localStorageMock.setItem(
+      "calculator_0.34",
+      JSON.stringify(buildDefaultCalculatorState("0.34"))
+    );
+    localStorageMock.setItem(
       "calculator_0.32",
       JSON.stringify(buildDefaultCalculatorState("0.32"))
     );
 
     const restored = getStartupSavedState();
 
-    expect(restored?.version).toBe("0.32");
+    expect(restored?.version).toBe("0.34");
   });
 
-  test("skips an invalid trunk species save and falls back to 0.32", () => {
+  test("skips an invalid trunk species save and falls back to 0.34", () => {
     const store = new Map<string, string>();
     const localStorageMock = {
       getItem: (key: string) => store.get(key) ?? null,
@@ -121,13 +141,17 @@ describe("buildDefaultCalculatorState", () => {
       })
     );
     localStorageMock.setItem(
+      "calculator_0.34",
+      JSON.stringify(buildDefaultCalculatorState("0.34"))
+    );
+    localStorageMock.setItem(
       "calculator_0.32",
       JSON.stringify(buildDefaultCalculatorState("0.32"))
     );
 
     const restored = getStartupSavedState();
 
-    expect(restored?.version).toBe("0.32");
+    expect(restored?.version).toBe("0.34");
   });
 
   test("rejects a save whose target spell is not valid for that version", () => {
