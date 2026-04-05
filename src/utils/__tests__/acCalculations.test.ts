@@ -1,4 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
+import { armourOptions } from "@/types/equipment";
 import { calculateAC, calculateMixedAC } from "../acCalculation";
 
 describe("AC Calculations", () => {
@@ -134,6 +135,28 @@ describe("AC Calculations", () => {
         barding: true,
       })
     ).toBe(21);
+  });
+
+  test("0.34 naga still keeps the deformed-body armour penalty", () => {
+    const minotaurAc = calculateMixedAC({
+      version: "0.34",
+      species: "minotaur",
+      armour: "acid_dragon",
+      armourSkill: 26.5,
+    });
+
+    const nagaAc = calculateMixedAC({
+      version: "0.34",
+      species: "naga",
+      armour: "acid_dragon",
+      armourSkill: 26.5,
+    });
+
+    const expectedPenalty = Math.floor(armourOptions.acid_dragon.baseAC * 0.5);
+
+    expect(minotaurAc).toBe(13);
+    expect(nagaAc).toBe(10);
+    expect(nagaAc).toBe(minotaurAc - expectedPenalty);
   });
 
   test("mountain dwarf, scale mail, helmet, cloack, gloves, boots, str 30, 19.4 armour skill, total 13 ac bounus", () => {
