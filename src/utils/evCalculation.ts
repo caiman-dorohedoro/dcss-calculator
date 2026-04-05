@@ -1,6 +1,7 @@
 import {
   ArmourKey,
   armourOptions,
+  miscellaneousOptions,
   ShieldKey,
   shieldOptions,
 } from "@/types/equipment.ts";
@@ -24,6 +25,7 @@ export function calculateEV<V extends GameVersion>(params: {
   species: SpeciesKey<V>;
   shield: ShieldKey;
   armour: ArmourKey;
+  barding?: boolean;
   shieldSkill: number;
   armourSkill: number;
 }) {
@@ -37,6 +39,7 @@ export function calculateEV<V extends GameVersion>(params: {
     shieldSkill,
     armourSkill,
     armour,
+    barding = false,
   } = params;
 
   const speciesOpts = speciesOptions(version);
@@ -82,8 +85,17 @@ export function calculateEV<V extends GameVersion>(params: {
       (strength + 3)
   );
 
+  const auxiliaryArmourPenalty = barding
+    ? Math.max(0, Math.floor(-miscellaneousOptions.barding.encumbrance / 3))
+    : 0;
+
   // Apply penalties
-  currentEV = baseEV + actualDodgeBonus - shieldPenalty - armourPenalty;
+  currentEV =
+    baseEV +
+    actualDodgeBonus -
+    shieldPenalty -
+    armourPenalty -
+    auxiliaryArmourPenalty;
   currentEV = Math.max(1, Math.floor(currentEV));
 
   return {

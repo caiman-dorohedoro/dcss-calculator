@@ -9,6 +9,7 @@ import {
 import AttrInput from "@/components/AttrInput";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { GameVersion } from "@/types/game";
+import { bodyArmourEgoOptions } from "@/types/equipment.ts";
 import { VersionedSpellName } from "@/types/spells";
 import { getSpellData } from "@/utils/spellCalculation";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
@@ -121,6 +122,30 @@ const SpellModeHeader = <V extends GameVersion>({
             setState((prev) => ({ ...prev, wildMagic: value }))
           }
         />
+        <div className="flex flex-row items-center gap-2">
+          <span>body armour ego</span>
+          <Select
+            disabled={state.armour === "none"}
+            value={state.bodyArmourEgo ?? "none"}
+            onValueChange={(value) =>
+              setState((prev) => ({
+                ...prev,
+                bodyArmourEgo: value as keyof typeof bodyArmourEgoOptions,
+              }))
+            }
+          >
+            <SelectTrigger className="min-w-[120px] h-6 w-auto gap-2">
+              <SelectValue placeholder="None" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.entries(bodyArmourEgoOptions).map(([key, value]) => (
+                <SelectItem key={key} value={key}>
+                  {value.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );

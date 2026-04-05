@@ -29,23 +29,39 @@ The compare payload was useful for the baseline and current head, but not comple
   - trunk ships `crawl-ref/source/dat/species/gale-centaur.yaml`
   - trunk also keeps `crawl-ref/source/dat/species/deprecated-armataur.yaml` for compatibility
 - The trunk species lineage and mutation naming moved from Armataur and `MUT_ROLLPAGE` toward Gale Centaur and `MUT_STAMPEDE`, so version-aware species traits remain the right boundary for calculator support instead of hardcoded string checks.
+- The calculator follow-up now also reflects two mechanic fixes discovered during this audit:
+  - trunk barding EV parity now includes Crawl's auxiliary-armour EV penalty
+  - spell failure now models `death` body-armour ego for `Necromancy` spells
 
-## Audit-Only Findings / Follow-Up Candidates
+## Previously Supported Repo Trunk Snapshot Drift
 
-### Known Calculator Gap Confirmed During Morgue Validation
+- The repo's previously committed trunk snapshot, before this 2026 refresh, still exposed older trunk-era app data:
+  - `src/versioning/speciesData.ts` still modeled trunk as `armataur`
+  - `src/types/generated-spells.trunk.d.ts` still modeled trunk with `Dazzling Flash` instead of `Gloom`
+- The refreshed trunk snapshot now needs `galeCentaur` and `Gloom`.
+- This matters operationally because a stable `0.34.1 -> trunk` diff does not reveal every repo-trunk drift:
+  - `0.34` already includes `Gloom`, so the spell rename would not stand out from the stable baseline alone
+  - the repo's older committed trunk support could therefore lag behind local Crawl even when the stable baseline looked close
+- Future version refreshes should audit both:
+  - stable release tag -> current local `crawl/master`
+  - previously supported repo trunk snapshot -> current local `crawl/master`
 
-- A `0.35-a0` Gale Centaur morgue validation showed the calculator matching the sampled spell-failure values, `AC 19`, and `SH 0`, but over-reporting EV as `18` instead of the morgue's `16`.
-- The current app already exposes a `barding` toggle in UI state and uses it for AC, but EV still ignores it because `calculateEV` only models body armour and shield penalties.
+## Audit Findings And Follow-Up Outcomes
+
+### Barding EV Gap Confirmed And Fixed
+
+- A `0.35-a0` Gale Centaur morgue validation initially showed the calculator matching the sampled spell-failure values, `AC 19`, and `SH 0`, but over-reporting EV as `18` instead of the morgue's `16`.
+- The app already exposed a `barding` toggle in UI state and used it for AC, but EV originally ignored it because `calculateEV` only modeled body armour and shield penalties.
 - Crawl trunk applies an additional auxiliary-armour EV penalty outside body armour and shield, and barding contributes a fixed `EV -2` in that path:
   - `crawl-ref/source/player.cc` `_player_aux_evasion_penalty`
   - `crawl-ref/source/item-prop.cc` `ARM_BARDING ... -60`
   - `crawl-ref/source/describe.cc` notes that barding affects evasion directly instead of using normal encumbrance behavior
 - Crawl's spell-failure penalty still only uses body armour and shield, so this gap is specific to EV and should not be "fixed" by adding barding to spell-failure calculations.
-- This was intentionally left out of the `0.34 -> trunk` version-data update because it is a calculator behavior change rather than a version-registry/data refresh. Treat it as a follow-up bugfix if EV parity for barding-wearing species is in scope.
+- Follow-up result: the calculator now subtracts the equivalent barding auxiliary-armour EV penalty and the sampled Gale Centaur EV regressions match.
 
-### Known Calculator Gap Confirmed During Endgame Spell Validation
+### Death-Ego Necromancy Gap Confirmed And Fixed
 
-- A second `0.35-a0` Gale Centaur morgue validation showed a split result for spell failure:
+- A second `0.35-a0` Gale Centaur morgue validation initially showed a split result for spell failure:
   - non-Necromancy sample spells matched the calculator
   - several Necromancy-tagged sample spells from the spell library did not
 - The sampled mismatches were:
@@ -66,8 +82,7 @@ The compare payload was useful for the baseline and current head, but not comple
 - Death Form itself does not explain these mismatches:
   - `crawl-ref/source/dat/forms/death.yaml` grants resistances, undead holiness, and utility traits, but no spell-success or Necromancy-enhancer effect
   - `crawl-ref/source/transform.cc` only gives Death Form a `Will+` form bonus
-- Result: the current calculator is missing body-armour ego support in spell-failure calculations, at least for `SPARM_DEATH`.
-- These regressions are intentionally left as normal failing tests rather than `test.failing`, so the mismatch stays visible until body-armour ego support is added.
+- Follow-up result: the calculator now models `SPARM_DEATH` as a body-armour spell-success adjustment for `Necromancy` spells, and the sampled regressions match without changing the non-Necromancy parity cases.
 
 ### Spell Metadata Changes Observed
 
@@ -139,4 +154,4 @@ What changed in those files:
 - `skills.cc` adds Four Winds skill tracking and mutation updates for Gale Centaur progression.
 - `player-stats.cc` did not change.
 
-Result: nothing in this pass required an immediate rewrite of the calculator's spell-failure, AC, EV, or SH formulas. Future version bumps should still re-check these files instead of assuming formula safety.
+Result: the initial version-data pass did not need a broad formula rewrite, but the audit did uncover two targeted calculator follow-ups that are now implemented: barding auxiliary-armour EV penalty and `death` ego Necromancy spell-success support. Future version bumps should still re-check these files instead of assuming formula safety.

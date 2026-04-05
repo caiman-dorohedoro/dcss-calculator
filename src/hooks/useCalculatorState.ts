@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { ArmourKey, ShieldKey } from "@/types/equipment.ts";
+import {
+  ArmourKey,
+  BodyArmourEgoKey,
+  ShieldKey,
+  bodyArmourEgoOptions,
+} from "@/types/equipment.ts";
 import type { SpeciesKey } from "@/types/species.ts";
 import { isGameVersion, startupRestoreOrder } from "@/types/game";
 import type { GameVersion } from "@/types/game";
@@ -24,6 +29,7 @@ export interface CalculatorState<V extends GameVersion> {
   species: SpeciesKey<V>;
   shield: ShieldKey;
   armour: ArmourKey;
+  bodyArmourEgo?: BodyArmourEgoKey;
   shieldSkill: number;
   armourSkill: number;
   dodgingSkill: number;
@@ -82,6 +88,14 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     state.targetSpell !== undefined &&
     (typeof state.targetSpell !== "string" ||
       !config.spells.some((spell) => spell.name === state.targetSpell))
+  ) {
+    return false;
+  }
+
+  if (
+    state.bodyArmourEgo !== undefined &&
+    (typeof state.bodyArmourEgo !== "string" ||
+      !(state.bodyArmourEgo in bodyArmourEgoOptions))
   ) {
     return false;
   }

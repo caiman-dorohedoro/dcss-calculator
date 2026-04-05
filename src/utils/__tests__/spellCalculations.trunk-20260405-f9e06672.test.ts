@@ -20,6 +20,7 @@ const mnemeGaleCentaurBase = {
   intelligence: 11,
   spellcasting: 0,
   armour: "plate" as const,
+  bodyArmourEgo: "death" as const,
   shield: "tower_shield" as const,
   armourSkill: 24.5,
   shieldSkill: 27,

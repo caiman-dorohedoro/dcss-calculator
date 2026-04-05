@@ -69,6 +69,7 @@ export const calculateEvData = <V extends GameVersion>(
         species: state.species,
         shield: state.shield,
         armour: state.armour,
+        barding: state.barding,
         shieldSkill: state.shieldSkill,
         armourSkill: state.armourSkill,
       });
@@ -206,6 +207,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
         schoolSkills: schoolSkills,
         spellDifficulty,
         armour: state.armour,
+        bodyArmourEgo: state.bodyArmourEgo,
         shield: state.shield,
         armourSkill: state.armourSkill,
         shieldSkill: state.shieldSkill,
@@ -228,6 +230,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
           schoolSkills: schoolSkills,
           spellDifficulty,
           armour: state.armour,
+          bodyArmourEgo: state.bodyArmourEgo,
           shield: state.shield,
           armourSkill: state.armourSkill,
           shieldSkill: state.shieldSkill,

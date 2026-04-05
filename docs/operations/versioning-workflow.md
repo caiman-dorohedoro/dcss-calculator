@@ -59,6 +59,33 @@ Review the output for:
 - added species
 - removed species
 
+## Compare The Previously Supported Trunk Snapshot
+
+Do not rely only on the stable-release baseline. Before and after refreshing trunk, compare the repo's previously committed trunk snapshot against the newly generated trunk snapshot as well.
+
+This catches repo-trunk drift that a stable baseline can hide. In the `0.34.1 -> trunk` pass, the repo's older committed trunk support still modeled `Armataur` and `Dazzling Flash`, while the refreshed trunk support needed `Gale Centaur` and `Gloom`. The stable `0.34` baseline already had `Gloom`, so a stable-only diff would not have highlighted that older repo trunk spell drift.
+
+Useful commands:
+
+```bash
+git log --oneline -- \
+  src/data/generated-spells.trunk.json \
+  src/types/generated-spells.trunk.d.ts \
+  src/versioning/speciesData.ts \
+  src/types/species.ts
+
+git diff --word-diff -- \
+  src/types/generated-spells.trunk.d.ts \
+  src/versioning/speciesData.ts \
+  src/types/species.ts
+```
+
+Review the repo-trunk diff for:
+
+- spell renames or removals that might be invisible from the stable baseline
+- species renames, additions, removals, or trait changes
+- versioned defaults or saved-state assumptions that still mention old trunk-only names
+
 ## Snapshot Stable And Trunk Spell Headers
 
 Use exact source snapshots instead of reusing older generated artifacts:
@@ -145,9 +172,11 @@ Audit checklist:
 
 - record the dereferenced stable release commit from `git -C crawl rev-parse "${STABLE_TAG}^{commit}"`
 - record the local `crawl/master` head SHA and date
+- compare the repo's previously committed trunk snapshot against the refreshed trunk snapshot before concluding the update is complete
 - inspect spell metadata changes from `spl-data.h`
 - inspect species source files and related history from `crawl-ref/source/dat/species`, `species.txt`, `files.cc`, and `tags.cc`
-- inspect mutation and item or unrand changes that may affect future calculator scope
+- inspect mutation or ability changes and item or unrand changes that may affect future calculator scope
+- inspect repo-trunk drift for spell names, species names, and versioned traits or defaults that may need app updates even when the stable baseline looks similar
 - if the supported species can wear barding, validate at least one barding-wearing morgue against AC and EV separately rather than assuming the armour and spell-failure paths cover it
 - when validating spell-failure parity from a morgue, check whether the equipped body armour has an ego that changes spell success, especially `death` for Necromancy, before classifying the mismatch as a formula bug
 - inspect formula-adjacent files before deciding no formula rewrite is needed

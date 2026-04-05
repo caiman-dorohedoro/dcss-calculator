@@ -20,6 +20,8 @@ export type ArmourKey =
   | "shadow_dragon"
   | "golden_dragon";
 
+export type BodyArmourEgoKey = "none" | "death";
+
 export const armourOptions = {
   none: { name: "none", baseAC: 0, encumbrance: 0 },
   robe: { name: "robe", baseAC: 2, encumbrance: 0 },
@@ -68,3 +70,8 @@ export const miscellaneousOptions = {
   gloves: {name: "gloves", baseAC: 1, encumbrance: 0},
   barding: {name: "barding", baseAC: 4, encumbrance: -6},
 } as const;
+
+export const bodyArmourEgoOptions = {
+  none: { name: "None" },
+  death: { name: "Death" },
+} as const satisfies Record<BodyArmourEgoKey, { name: string }>;

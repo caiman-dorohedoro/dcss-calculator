@@ -1,6 +1,7 @@
 import {
   ArmourKey,
   armourOptions,
+  BodyArmourEgoKey,
   ShieldKey,
   shieldOptions,
 } from "@/types/equipment.ts";
@@ -26,6 +27,7 @@ export type SpellCalculationParams<V extends GameVersion> = {
   schoolSkills: VersionedSchoolSkillLevels<V>;
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   armour: ArmourKey;
+  bodyArmourEgo?: BodyArmourEgoKey;
   shield: ShieldKey;
   armourSkill: number;
   shieldSkill: number;
@@ -235,8 +237,32 @@ export const getSpellFlags = <V extends GameVersion>(
   return spell.flags;
 };
 
-const applyWizardryBoost = (chance: number, wizardry: number) => {
+type ApplySpellSuccessBoostsParams<V extends GameVersion> = {
+  version: V;
+  targetSpell: VersionedSpellName<V>;
+  armour: ArmourKey;
+  bodyArmourEgo: BodyArmourEgoKey;
+  chance: number;
+  wizardry: number;
+};
+
+const applySpellSuccessBoosts = <V extends GameVersion>({
+  version,
+  targetSpell,
+  armour,
+  bodyArmourEgo,
+  chance,
+  wizardry,
+}: ApplySpellSuccessBoostsParams<V>) => {
   let failReduce = 100;
+
+  if (
+    armour !== "none" &&
+    bodyArmourEgo === "death" &&
+    getSpellSchools(version, targetSpell).some((school) => school === "necromancy")
+  ) {
+    failReduce = Math.floor(failReduce / 2);
+  }
 
   if (wizardry > 0) {
     failReduce = Math.floor((failReduce * 6) / (7 + wizardry));
@@ -252,6 +278,7 @@ function rawSpellFail<V extends GameVersion>({
   intelligence,
   spellDifficulty,
   armour,
+  bodyArmourEgo = "none",
   shield,
   targetSpell,
   schoolSkills,
@@ -313,9 +340,14 @@ function rawSpellFail<V extends GameVersion>({
     chance2 += 10;
   }
 
-  if (wizardry > 0) {
-    chance2 = applyWizardryBoost(chance2, wizardry);
-  }
+  chance2 = applySpellSuccessBoosts({
+    version,
+    targetSpell,
+    armour,
+    bodyArmourEgo,
+    chance: chance2,
+    wizardry,
+  });
 
   if (enkindle) {
     chance2 = Math.floor((chance2 * 3) / 4) - 5;

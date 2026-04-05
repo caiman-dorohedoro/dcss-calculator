@@ -8,6 +8,8 @@
 
 **Tech Stack:** TypeScript, React 18, Vite, Jest with ts-jest, Node/tsx scripts, Markdown docs, local `crawl` checkout, GitHub raw and compare HTTP endpoints
 
+> Follow-up note (`2026-04-05`): This plan captured the main `0.34/trunk` refresh. The two calculator gaps discovered during the audit (`barding` EV parity and `death` ego Necromancy spell-success parity) were handled afterward in `docs/superpowers/plans/2026-04-05-version-followups-and-crawl-audit.md`, so this older plan should not be read as the branch's final calculator state.
+
 ---
 
 ## File Map
