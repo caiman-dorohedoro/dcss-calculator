@@ -15,6 +15,7 @@ This guide explains how to add or update a DCSS version now that version-specifi
 
 When adding or updating a version, check these files first:
 
+- `README.md`
 - `src/data/spl-data.<version>.h`
 - `src/data/generated-spells.<version>.json`
 - `src/types/generated-spells.<version>.d.ts`
@@ -41,6 +42,7 @@ When adding or updating a version, check these files first:
 9. Update `src/versioning/defaultState.ts` if the version needs different default species, spells, or feature flags.
 10. Update `src/versioning/uiOptions.ts` if the version changes which equipment toggles appear in the UI.
 11. If the formula rules changed, update or add a profile in `src/versioning/formulaProfiles.ts`.
+12. Update `README.md` if the supported versions or maintenance links changed.
 
 ## Check Version Diffs
 
@@ -62,12 +64,27 @@ Review the output for:
 Use exact source snapshots instead of reusing older generated artifacts:
 
 ```bash
-curl -L https://raw.githubusercontent.com/crawl/crawl/0.34.1/crawl-ref/source/spl-data.h -o src/data/spl-data.0.34.h
-cp crawl/crawl-ref/source/spl-data.h src/data/spl-data.trunk.20260405.h
+export STABLE_TAG=<stable_tag>
+export STABLE_VERSION=<stable_version>
+export TRUNK_SNAPSHOT_DATE=<yyyymmdd>
+
+git -C crawl rev-parse "${STABLE_TAG}^{commit}"
+curl -L "https://raw.githubusercontent.com/crawl/crawl/${STABLE_TAG}/crawl-ref/source/spl-data.h" \
+  -o "src/data/spl-data.${STABLE_VERSION}.h"
+cp crawl/crawl-ref/source/spl-data.h "src/data/spl-data.trunk.${TRUNK_SNAPSHOT_DATE}.h"
 npm run extract-spell-data
 ```
 
-When refreshing trunk again, replace the dated trunk header filename with the new snapshot date and keep the stable header pinned to the exact release tag you are targeting.
+Record the output of `git -C crawl rev-parse "${STABLE_TAG}^{commit}"` in the audit doc as the dereferenced release commit for the stable baseline. Do not record the annotated tag object SHA.
+
+Example for the current `0.34.1 -> trunk` pass:
+
+```bash
+git -C crawl rev-parse "0.34.1^{commit}"
+curl -L "https://raw.githubusercontent.com/crawl/crawl/0.34.1/crawl-ref/source/spl-data.h" \
+  -o "src/data/spl-data.0.34.h"
+cp crawl/crawl-ref/source/spl-data.h "src/data/spl-data.trunk.20260405.h"
+```
 
 ## Audit Release-To-Trunk Changes
 
@@ -76,15 +93,21 @@ Before landing a stable-to-trunk refresh, capture a release audit from both the 
 Collect the compare payload:
 
 ```bash
+export STABLE_TAG=<stable_tag>
+export AUDIT_BASENAME=<stable_tag>-to-master
+
 python3 - <<'PY'
 import json
 import urllib.request
+import os
 
-url = "https://api.github.com/repos/crawl/crawl/compare/0.34.1...master"
+stable_tag = os.environ["STABLE_TAG"]
+audit_basename = os.environ["AUDIT_BASENAME"]
+url = f"https://api.github.com/repos/crawl/crawl/compare/{stable_tag}...master"
 with urllib.request.urlopen(url) as response:
     compare = json.load(response)
 
-with open("/tmp/crawl-0.34.1-to-master-compare.json", "w") as handle:
+with open(f"/tmp/crawl-{audit_basename}-compare.json", "w") as handle:
     json.dump(compare, handle, indent=2)
 
 print(compare["status"])
@@ -96,14 +119,19 @@ print(len(compare["files"]))
 PY
 ```
 
-Then verify the current local Crawl head and inspect the files that most often affect calculator scope:
+Then verify the current local Crawl head, the dereferenced stable baseline, and the files that most often affect calculator scope:
 
 ```bash
+git -C crawl rev-parse "${STABLE_TAG}^{commit}"
 git -C crawl rev-parse master
 git -C crawl show -s --format=%cs master
-git -C crawl log --oneline 0.34.1..master -- \
+git -C crawl log --oneline "${STABLE_TAG}"..master -- \
   crawl-ref/source/spl-data.h \
   crawl-ref/source/mutation-data.h \
+  crawl-ref/source/dat/species \
+  crawl-ref/source/dat/descript/species.txt \
+  crawl-ref/source/files.cc \
+  crawl-ref/source/tags.cc \
   crawl-ref/source/art-data.txt \
   crawl-ref/source/dat/descript/unrand.txt \
   crawl-ref/source/spl-cast.cc \
@@ -113,7 +141,17 @@ git -C crawl log --oneline 0.34.1..master -- \
   crawl-ref/source/player-stats.cc
 ```
 
-Write the results into a dated audit doc under `docs/operations/`. For the `0.34.1 -> trunk` pass, see `docs/operations/crawl-0.34.1-to-trunk-audit.md`.
+Audit checklist:
+
+- record the dereferenced stable release commit from `git -C crawl rev-parse "${STABLE_TAG}^{commit}"`
+- record the local `crawl/master` head SHA and date
+- inspect spell metadata changes from `spl-data.h`
+- inspect species source files and related history from `crawl-ref/source/dat/species`, `species.txt`, `files.cc`, and `tags.cc`
+- inspect mutation and item or unrand changes that may affect future calculator scope
+- inspect formula-adjacent files before deciding no formula rewrite is needed
+- update `README.md` if the supported versions or maintenance links changed
+
+Write the results into a dated audit doc under `docs/operations/`. The current example is `docs/operations/crawl-0.34.1-to-trunk-audit.md`.
 
 ## Required Verification
 

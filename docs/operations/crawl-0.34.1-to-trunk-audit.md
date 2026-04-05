@@ -4,7 +4,7 @@
 
 - Audit date: `2026-04-05`
 - Stable source: `crawl` tag `0.34.1` dereferenced to release commit `1eebc1a2892e1c89776a0d7a10691f8dac8d9796`
-- Trunk source: local `/Users/hyeon/playground/dcss-tools-caiman/crawl` checkout, treating `crawl/master` as `origin/master`
+- Trunk source: local `crawl/` checkout, treating `crawl/master` as `origin/master`
 - Local trunk head used for diffs: `f9e06672e492112214d3eb06629e27c47ed457ff` (`2026-04-05`)
 - GitHub compare API: `https://api.github.com/repos/crawl/crawl/compare/0.34.1...master`
 
