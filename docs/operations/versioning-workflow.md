@@ -149,6 +149,7 @@ Audit checklist:
 - inspect species source files and related history from `crawl-ref/source/dat/species`, `species.txt`, `files.cc`, and `tags.cc`
 - inspect mutation and item or unrand changes that may affect future calculator scope
 - if the supported species can wear barding, validate at least one barding-wearing morgue against AC and EV separately rather than assuming the armour and spell-failure paths cover it
+- when validating spell-failure parity from a morgue, check whether the equipped body armour has an ego that changes spell success, especially `death` for Necromancy, before classifying the mismatch as a formula bug
 - inspect formula-adjacent files before deciding no formula rewrite is needed
 - update `README.md` if the supported versions or maintenance links changed
 

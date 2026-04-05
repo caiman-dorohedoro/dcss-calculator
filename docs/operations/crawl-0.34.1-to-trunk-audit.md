@@ -43,6 +43,32 @@ The compare payload was useful for the baseline and current head, but not comple
 - Crawl's spell-failure penalty still only uses body armour and shield, so this gap is specific to EV and should not be "fixed" by adding barding to spell-failure calculations.
 - This was intentionally left out of the `0.34 -> trunk` version-data update because it is a calculator behavior change rather than a version-registry/data refresh. Treat it as a follow-up bugfix if EV parity for barding-wearing species is in scope.
 
+### Known Calculator Gap Confirmed During Endgame Spell Validation
+
+- A second `0.35-a0` Gale Centaur morgue validation showed a split result for spell failure:
+  - non-Necromancy sample spells matched the calculator
+  - several Necromancy-tagged sample spells from the spell library did not
+- The sampled mismatches were:
+  - `Kiss of Death` `9%` in the morgue vs `61%` in the calculator
+  - `Soul Splinter` `9%` vs `61%`
+  - `Grave Claw` `13%` vs `75%`
+  - `Gloom` `24%` vs `93%`
+  - `Vampiric Draining` `24%` vs `93%`
+  - `Anguish` `54%` vs `100%`
+  - `Animate Dead` `54%` vs `100%`
+  - `Dispel Undead` `54%` vs `100%`
+  - `Martyr's Knell` `54%` vs `100%`
+  - `Curse of Agony` `85%` vs `100%`
+- The dump character wore `+11 plate armour "Hukaluag" {Death, ...}` while in Death Form.
+- Crawl trunk applies an additional spell-success reduction when the player is wearing `death ego` body armour and the spell has the `Necromancy` school:
+  - `crawl-ref/source/spl-cast.cc` checks `SPARM_DEATH` and halves `fail_reduce` for Necromancy spells
+- The sampled mismatches are all Necromancy spells or mixed-school spells that still include `Necromancy` in `crawl-ref/source/spl-data.h`.
+- Death Form itself does not explain these mismatches:
+  - `crawl-ref/source/dat/forms/death.yaml` grants resistances, undead holiness, and utility traits, but no spell-success or Necromancy-enhancer effect
+  - `crawl-ref/source/transform.cc` only gives Death Form a `Will+` form bonus
+- Result: the current calculator is missing body-armour ego support in spell-failure calculations, at least for `SPARM_DEATH`.
+- These regressions are intentionally left as normal failing tests rather than `test.failing`, so the mismatch stays visible until body-armour ego support is added.
+
 ### Spell Metadata Changes Observed
 
 - Crawl trunk renamed two monster-only spell entries in `crawl-ref/source/spl-data.h`:

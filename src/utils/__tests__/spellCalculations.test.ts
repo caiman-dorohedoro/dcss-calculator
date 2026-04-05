@@ -1068,7 +1068,7 @@ describe("2025-04-30. 0.33", () => {
     expect(failureRate).toBe(50);
   });
 
-  test.failing.each([
+  test.each([
     {
       label: "Kiss of Death",
       targetSpell: "Kiss of Death" as const,
@@ -1140,7 +1140,7 @@ describe("2025-04-30. 0.33", () => {
       expected: 85,
     },
   ])(
-    "trunk gale centaur shapeshifter dump known gap: $label should be $expected%",
+    "trunk gale centaur shapeshifter dump regression: $label should be $expected%",
     ({ targetSpell, spellDifficulty, schoolSkills, expected }) => {
       const failureRate = calculateSpellFailureRate({
         ...mnemeGaleCentaurBase,
