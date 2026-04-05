@@ -28,3 +28,4 @@ tsconfig.tsbuildinfo
 
 # original source files
 crawl
+.worktrees/
