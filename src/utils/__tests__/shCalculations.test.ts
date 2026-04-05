@@ -29,5 +29,13 @@ describe("SH Calculations", () => {
         dexterity: 14,
       })
     ).toBe(24);
+
+    expect(
+      calculateSH({
+        shield: "none",
+        shieldSkill: 5,
+        dexterity: 27,
+      })
+    ).toBe(0);
   });
 });

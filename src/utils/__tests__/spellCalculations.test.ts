@@ -1,6 +1,18 @@
 import { describe, expect, test } from "@jest/globals";
 import { calculateSpellFailureRate } from "../spellCalculation";
 
+const boodzGaleCentaurBase = {
+  version: "trunk" as const,
+  species: "galeCentaur" as const,
+  strength: 13,
+  intelligence: 15,
+  spellcasting: 0,
+  armour: "pearl_dragon" as const,
+  shield: "none" as const,
+  armourSkill: 13.8,
+  shieldSkill: 0,
+};
+
 describe("Spell Calculations", () => {
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
@@ -993,5 +1005,49 @@ describe("2025-04-30. 0.33", () => {
     });
 
     expect(failureRate).toBe(45);
+  });
+
+  test("trunk gale centaur, pearl dragon scales, 3 level air spell (Swiftness), 30%", () => {
+    const failureRate = calculateSpellFailureRate({
+      ...boodzGaleCentaurBase,
+      targetSpell: "Swiftness",
+      schoolSkills: { air: 5.6 },
+      spellDifficulty: 3,
+    });
+
+    expect(failureRate).toBe(30);
+  });
+
+  test("trunk gale centaur, pearl dragon scales, 2 level translocation spell (Blink), 7%", () => {
+    const failureRate = calculateSpellFailureRate({
+      ...boodzGaleCentaurBase,
+      targetSpell: "Blink",
+      schoolSkills: { translocation: 7.5 },
+      spellDifficulty: 2,
+    });
+
+    expect(failureRate).toBe(7);
+  });
+
+  test("trunk gale centaur, pearl dragon scales, 1 level translocation spell (Apportation), 4%", () => {
+    const failureRate = calculateSpellFailureRate({
+      ...boodzGaleCentaurBase,
+      targetSpell: "Apportation",
+      schoolSkills: { translocation: 7.5 },
+      spellDifficulty: 1,
+    });
+
+    expect(failureRate).toBe(4);
+  });
+
+  test("trunk gale centaur, pearl dragon scales, 4 level hexes/translocation spell (Dimensional Bullseye), 50%", () => {
+    const failureRate = calculateSpellFailureRate({
+      ...boodzGaleCentaurBase,
+      targetSpell: "Dimensional Bullseye",
+      schoolSkills: { hexes: 6.5, translocation: 7.5 },
+      spellDifficulty: 4,
+    });
+
+    expect(failureRate).toBe(50);
   });
 });

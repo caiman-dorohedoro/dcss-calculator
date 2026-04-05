@@ -163,4 +163,20 @@ describe("EV Calculations", () => {
 
     expect(result.finalEV).toBe(15);
   });
+
+  test("10 - trunk gale centaur, pearl dragon scales, str 13, dex 27, dodging 18.8, armour skill 13.8, EV 16", () => {
+    const result = calculateEV({
+      version: "trunk",
+      dodgingSkill: 18.8,
+      dexterity: 27,
+      strength: 13,
+      species: "galeCentaur",
+      shield: "none",
+      armour: "pearl_dragon",
+      shieldSkill: 5,
+      armourSkill: 13.8,
+    });
+
+    expect(result.finalEV).toBe(16);
+  });
 });

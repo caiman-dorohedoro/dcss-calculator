@@ -159,6 +159,19 @@ describe("AC Calculations", () => {
     expect(nagaAc).toBe(minotaurAc - expectedPenalty);
   });
 
+  test("trunk gale centaur, pearl dragon scales, gloves, barding, armour skill 13.8, AC 19", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "galeCentaur",
+        armour: "pearl_dragon",
+        armourSkill: 13.8,
+        gloves: true,
+        barding: true,
+      })
+    ).toBe(19);
+  });
+
   test("mountain dwarf, scale mail, helmet, cloack, gloves, boots, str 30, 19.4 armour skill, total 13 ac bounus", () => {
     // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
     expect(
