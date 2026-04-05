@@ -36,6 +36,13 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.secondGloves).toBe(false);
   });
 
+  test("uses gale centaur for trunk defaults", () => {
+    const state = buildDefaultCalculatorState("trunk");
+
+    expect(state.species).toBe("galeCentaur");
+    expect(state.targetSpell).toBe("Airstrike");
+  });
+
   test("enables secondGloves on 0.34 defaults", () => {
     const state = buildDefaultCalculatorState("0.34");
 
@@ -116,7 +123,7 @@ describe("buildDefaultCalculatorState", () => {
     expect(restored?.version).toBe("0.34");
   });
 
-  test("skips an invalid trunk species save and falls back to 0.34", () => {
+  test("skips an old trunk armataur save and falls back to 0.34", () => {
     const store = new Map<string, string>();
     const localStorageMock = {
       getItem: (key: string) => store.get(key) ?? null,
@@ -137,7 +144,7 @@ describe("buildDefaultCalculatorState", () => {
       "calculator_trunk",
       JSON.stringify({
         ...buildDefaultCalculatorState("trunk"),
-        species: "ghoul",
+        species: "armataur",
       })
     );
     localStorageMock.setItem(

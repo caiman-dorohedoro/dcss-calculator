@@ -10,4 +10,5 @@ export enum Size {
 export type SpeciesOption = {
   name: string;
   size: Size;
+  deformedBody?: boolean;
 };

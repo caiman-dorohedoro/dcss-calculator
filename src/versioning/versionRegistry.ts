@@ -80,7 +80,7 @@ export const versionRegistry = {
       enkindle: true,
     },
     defaults: {
-      species: "armataur",
+      species: "galeCentaur",
       targetSpell: "Airstrike",
     },
   }),

@@ -17,7 +17,10 @@ describe("versionRegistry", () => {
     expect("ghoul" in versionRegistry["0.32"].species).toBe(true);
     expect("ghoul" in versionRegistry["0.33"].species).toBe(false);
     expect("ghoul" in versionRegistry["0.34"].species).toBe(false);
+    expect("armataur" in versionRegistry["0.34"].species).toBe(true);
     expect("revenant" in versionRegistry["0.34"].species).toBe(true);
+    expect("galeCentaur" in versionRegistry.trunk.species).toBe(true);
+    expect("armataur" in versionRegistry.trunk.species).toBe(false);
     expect("revenant" in versionRegistry.trunk.species).toBe(true);
     expect("revenant" in versionRegistry["0.32"].species).toBe(false);
   });
@@ -54,7 +57,7 @@ describe("versionRegistry", () => {
     expect(versionRegistry.trunk.features.secondGloves).toBe(true);
     expect(versionRegistry.trunk.features.enkindle).toBe(true);
     expect(versionRegistry.trunk.defaults).toEqual({
-      species: "armataur",
+      species: "galeCentaur",
       targetSpell: "Airstrike",
     });
   });

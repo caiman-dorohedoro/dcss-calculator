@@ -13,6 +13,7 @@ describe("AC Calculations", () => {
     // https://crawl.akrasiac.org/rawdata/fnjp/morgue-fnjp-20250205-042438.txt
     expect(
       calculateMixedAC({
+        version: "trunk",
         species: "minotaur",
         armour: "plate",
         armourSkill: 27,
@@ -25,6 +26,7 @@ describe("AC Calculations", () => {
     // https://crawl.akrasiac.org/rawdata/fnjp/morgue-fnjp-20250205-042438.txt
     expect(
       calculateMixedAC({
+        version: "trunk",
         species: "minotaur",
         armour: "crystal_plate",
         cloak: true,
@@ -37,6 +39,7 @@ describe("AC Calculations", () => {
     // https://cbro.berotato.org/morgue/Shard1697/morgue-Shard1697-20250204-221626.txt
     expect(
       calculateMixedAC({
+        version: "trunk",
         species: "demonspawn",
         armour: "pearl_dragon",
         boots: true,
@@ -47,6 +50,7 @@ describe("AC Calculations", () => {
     // https://cbro.berotato.org/morgue/ojifijod/morgue-ojifijod-20250201-121909.txt
     expect(
       calculateMixedAC({
+        version: "trunk",
         species: "formicid",
         armour: "golden_dragon",
         armourSkill: 27,
@@ -60,6 +64,7 @@ describe("AC Calculations", () => {
     // https://archive.nemelex.cards/morgue/AxeManiac/morgue-AxeManiac-20250202-074753.txt
     expect(
       calculateMixedAC({
+        version: "0.34",
         species: "armataur",
         armour: "golden_dragon",
         armourSkill: 27,
@@ -72,6 +77,7 @@ describe("AC Calculations", () => {
     // while in personal gameplay
     expect(
       calculateMixedAC({
+        version: "0.34",
         species: "armataur",
         armour: "troll_leather",
         armourSkill: 11.9,
@@ -94,6 +100,33 @@ describe("AC Calculations", () => {
     // https://crawl.akrasiac.org/rawdata/kerplink/morgue-kerplink-20250209-042353.txt
     expect(
       calculateMixedAC({
+        version: "0.34",
+        species: "armataur",
+        armour: "acid_dragon",
+        armourSkill: 26.5,
+        gloves: true,
+        barding: true,
+      })
+    ).toBe(21);
+  });
+
+  test("trunk gale centaur keeps the deformed-body armour penalty", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "galeCentaur",
+        armour: "acid_dragon",
+        armourSkill: 26.5,
+        gloves: true,
+        barding: true,
+      })
+    ).toBe(21);
+  });
+
+  test("0.34 armataur keeps the deformed-body armour penalty", () => {
+    expect(
+      calculateMixedAC({
+        version: "0.34",
         species: "armataur",
         armour: "acid_dragon",
         armourSkill: 26.5,
@@ -107,6 +140,7 @@ describe("AC Calculations", () => {
     // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
     expect(
       calculateMixedAC({
+        version: "trunk",
         species: "mountainDwarf",
         armour: "scale_mail",
         armourSkill: 19.4,

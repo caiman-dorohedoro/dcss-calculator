@@ -4,14 +4,16 @@ import {
   headgearOptions,
   miscellaneousOptions,
 } from "@/types/equipment.ts";
-import { GameVersion } from "@/types/game";
-import { SpeciesKey } from "@/types/species.ts";
+import type { GameVersion } from "@/types/game";
+import type { SpeciesKey } from "@/types/species.ts";
+import { getVersionSpecies } from "@/versioning/versionRegistry";
 
 export const calculateAC = (baseAC: number, skill: number): number => {
   return Math.floor(baseAC * (1 + skill / 22));
 };
 
 type MixedCalculationsParams<V extends GameVersion> = {
+  version: V;
   species: SpeciesKey<V>;
   armour?: ArmourKey;
   helmet?: boolean;
@@ -24,6 +26,7 @@ type MixedCalculationsParams<V extends GameVersion> = {
 };
 
 export const calculateMixedAC = <V extends GameVersion>({
+  version,
   species,
   armour,
   helmet,
@@ -34,7 +37,7 @@ export const calculateMixedAC = <V extends GameVersion>({
   secondGloves,
   armourSkill,
 }: MixedCalculationsParams<V>): number => {
-  const isDeformed = species === "armataur" || species === "naga";
+  const isDeformed = getVersionSpecies(version)[species].deformedBody === true;
   let baseAC = 0;
 
   if (armour) {

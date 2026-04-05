@@ -5,7 +5,7 @@ export { Size };
 export type { SpeciesOption };
 
 export const baseSpecies = {
-  armataur: { name: "Armataur", size: Size.LARGE },
+  armataur: { name: "Armataur", size: Size.LARGE, deformedBody: true },
   barachi: { name: "Barachi", size: Size.MEDIUM },
   coglin: { name: "Coglin", size: Size.MEDIUM },
   deepElf: { name: "Deep Elf", size: Size.MEDIUM },
@@ -23,7 +23,7 @@ export const baseSpecies = {
   merfolk: { name: "Merfolk", size: Size.MEDIUM },
   minotaur: { name: "Minotaur", size: Size.MEDIUM },
   mummy: { name: "Mummy", size: Size.MEDIUM },
-  naga: { name: "Naga", size: Size.LARGE },
+  naga: { name: "Naga", size: Size.LARGE, deformedBody: true },
   octopode: { name: "Octopode", size: Size.MEDIUM },
   oni: { name: "Oni", size: Size.LARGE },
   spriggan: { name: "Spriggan", size: Size.LITTLE },
@@ -48,6 +48,13 @@ export const species034 = {
   ...species033,
 } as const satisfies Record<string, SpeciesOption>;
 
+const { armataur: _armataur, ...species034WithoutArmataur } = species034;
+
 export const speciesTrunk = {
-  ...species034,
+  ...species034WithoutArmataur,
+  galeCentaur: {
+    name: "Gale Centaur",
+    size: Size.LARGE,
+    deformedBody: true,
+  },
 } as const satisfies Record<string, SpeciesOption>;

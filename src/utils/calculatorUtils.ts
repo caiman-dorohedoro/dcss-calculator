@@ -37,6 +37,7 @@ export const calculateAcData = <V extends GameVersion>(
       return {
         armour,
         ac: calculateMixedAC({
+          version: state.version,
           species: state.species,
           armour: state.armour,
           helmet: state.helmet,
