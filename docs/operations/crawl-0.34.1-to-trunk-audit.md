@@ -32,6 +32,17 @@ The compare payload was useful for the baseline and current head, but not comple
 
 ## Audit-Only Findings / Follow-Up Candidates
 
+### Known Calculator Gap Confirmed During Morgue Validation
+
+- A `0.35-a0` Gale Centaur morgue validation showed the calculator matching the sampled spell-failure values, `AC 19`, and `SH 0`, but over-reporting EV as `18` instead of the morgue's `16`.
+- The current app already exposes a `barding` toggle in UI state and uses it for AC, but EV still ignores it because `calculateEV` only models body armour and shield penalties.
+- Crawl trunk applies an additional auxiliary-armour EV penalty outside body armour and shield, and barding contributes a fixed `EV -2` in that path:
+  - `crawl-ref/source/player.cc` `_player_aux_evasion_penalty`
+  - `crawl-ref/source/item-prop.cc` `ARM_BARDING ... -60`
+  - `crawl-ref/source/describe.cc` notes that barding affects evasion directly instead of using normal encumbrance behavior
+- Crawl's spell-failure penalty still only uses body armour and shield, so this gap is specific to EV and should not be "fixed" by adding barding to spell-failure calculations.
+- This was intentionally left out of the `0.34 -> trunk` version-data update because it is a calculator behavior change rather than a version-registry/data refresh. Treat it as a follow-up bugfix if EV parity for barding-wearing species is in scope.
+
 ### Spell Metadata Changes Observed
 
 - Crawl trunk renamed two monster-only spell entries in `crawl-ref/source/spl-data.h`:
