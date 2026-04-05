@@ -15,6 +15,14 @@ This tool is run on web browser. [open app](https://dcss-calculator.pages.dev/)
 ## Maintenance
 
 - [Versioning workflow](./docs/operations/versioning-workflow.md)
+- [Crawl 0.34.1 to trunk audit](./docs/operations/crawl-0.34.1-to-trunk-audit.md)
+
+## Supported Versions
+
+- `0.32`
+- `0.33`
+- `0.34`
+- `trunk`
 
 ## Under Construction 🏗️
 

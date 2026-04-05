@@ -4,6 +4,13 @@
 
 This guide explains how to add or update a DCSS version now that version-specific data, defaults, and UI behavior live behind the `src/versioning` registry layer. The goal is to keep version updates bounded to a small set of files instead of scattering conditionals across calculators and components.
 
+## Current Supported Versions
+
+- `0.32`
+- `0.33`
+- `0.34`
+- `trunk`
+
 ## Files To Update
 
 When adding or updating a version, check these files first:
@@ -49,6 +56,64 @@ Review the output for:
 - removed spells
 - added species
 - removed species
+
+## Snapshot Stable And Trunk Spell Headers
+
+Use exact source snapshots instead of reusing older generated artifacts:
+
+```bash
+curl -L https://raw.githubusercontent.com/crawl/crawl/0.34.1/crawl-ref/source/spl-data.h -o src/data/spl-data.0.34.h
+cp crawl/crawl-ref/source/spl-data.h src/data/spl-data.trunk.20260405.h
+npm run extract-spell-data
+```
+
+When refreshing trunk again, replace the dated trunk header filename with the new snapshot date and keep the stable header pinned to the exact release tag you are targeting.
+
+## Audit Release-To-Trunk Changes
+
+Before landing a stable-to-trunk refresh, capture a release audit from both the GitHub compare API and the local `crawl/master` checkout.
+
+Collect the compare payload:
+
+```bash
+python3 - <<'PY'
+import json
+import urllib.request
+
+url = "https://api.github.com/repos/crawl/crawl/compare/0.34.1...master"
+with urllib.request.urlopen(url) as response:
+    compare = json.load(response)
+
+with open("/tmp/crawl-0.34.1-to-master-compare.json", "w") as handle:
+    json.dump(compare, handle, indent=2)
+
+print(compare["status"])
+print(compare["ahead_by"])
+print(compare["behind_by"])
+print(compare["total_commits"])
+print(len(compare["commits"]))
+print(len(compare["files"]))
+PY
+```
+
+Then verify the current local Crawl head and inspect the files that most often affect calculator scope:
+
+```bash
+git -C crawl rev-parse master
+git -C crawl show -s --format=%cs master
+git -C crawl log --oneline 0.34.1..master -- \
+  crawl-ref/source/spl-data.h \
+  crawl-ref/source/mutation-data.h \
+  crawl-ref/source/art-data.txt \
+  crawl-ref/source/dat/descript/unrand.txt \
+  crawl-ref/source/spl-cast.cc \
+  crawl-ref/source/spl-util.cc \
+  crawl-ref/source/player-equip.cc \
+  crawl-ref/source/skills.cc \
+  crawl-ref/source/player-stats.cc
+```
+
+Write the results into a dated audit doc under `docs/operations/`. For the `0.34.1 -> trunk` pass, see `docs/operations/crawl-0.34.1-to-trunk-audit.md`.
 
 ## Required Verification
 
