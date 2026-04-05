@@ -24,10 +24,6 @@ The compare payload was useful for the baseline and current head, but not comple
 ## Directly Reflected In This Calculator Update
 
 - The app now treats `0.34` as the stable release baseline and trunk as the current development snapshot, using `0.34.1` for the stable spell header and the local `crawl/master` spell header for trunk.
-- Trunk spell metadata includes two visible name and identifier changes in `crawl-ref/source/spl-data.h`:
-  - `SPELL_SUMMON_UFETUBUS` / `Summon Ufetubus` -> `SPELL_UFETUBI_SWARM` / `Ufetubi Swarm`
-  - `SPELL_WALL_OF_BRAMBLES` / `Wall of Brambles` -> `SPELL_CAGE_OF_BRAMBLES` / `Cage of Brambles`
-- `Cage of Brambles` also changed spell metadata, dropping `spschool::conjuration` and becoming `spschool::earth` only. That change is carried automatically by the refreshed spell snapshot.
 - Species handling needs to stay version-aware:
   - `0.34.1` still ships `crawl-ref/source/dat/species/armataur.yaml`
   - trunk ships `crawl-ref/source/dat/species/gale-centaur.yaml`
@@ -35,6 +31,14 @@ The compare payload was useful for the baseline and current head, but not comple
 - The trunk species lineage and mutation naming moved from Armataur and `MUT_ROLLPAGE` toward Gale Centaur and `MUT_STAMPEDE`, so version-aware species traits remain the right boundary for calculator support instead of hardcoded string checks.
 
 ## Audit-Only Findings / Follow-Up Candidates
+
+### Spell Metadata Changes Observed
+
+- Crawl trunk renamed two monster-only spell entries in `crawl-ref/source/spl-data.h`:
+  - `SPELL_SUMMON_UFETUBUS` / `Summon Ufetubus` -> `SPELL_UFETUBI_SWARM` / `Ufetubi Swarm`
+  - `SPELL_WALL_OF_BRAMBLES` / `Wall of Brambles` -> `SPELL_CAGE_OF_BRAMBLES` / `Cage of Brambles`
+- `Cage of Brambles` also changed spell metadata, dropping `spschool::conjuration` and becoming `spschool::earth` only.
+- These spell changes are relevant for Crawl auditing, but they are not reflected in the app's generated player-spell artifacts because `extractSpellDataHeader.ts` filters out monster-only spells.
 
 ### Species And Mutation Changes Observed
 

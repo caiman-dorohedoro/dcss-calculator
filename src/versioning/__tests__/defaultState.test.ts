@@ -49,7 +49,7 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.secondGloves).toBe(false);
   });
 
-  test("restores saved state in trunk, then 0.34, then 0.32, then 0.33 order", () => {
+  test("restores saved state in trunk, then 0.34, then 0.33, then 0.32 order", () => {
     const store = new Map<string, string>();
     const localStorageMock = {
       getItem: (key: string) => store.get(key) ?? null,
@@ -121,6 +121,37 @@ describe("buildDefaultCalculatorState", () => {
     const restored = getStartupSavedState();
 
     expect(restored?.version).toBe("0.34");
+  });
+
+  test("falls back to 0.33 before 0.32 when newer saves are absent", () => {
+    const store = new Map<string, string>();
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    };
+
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: localStorageMock,
+    });
+
+    localStorageMock.setItem(
+      "calculator_0.33",
+      JSON.stringify(buildDefaultCalculatorState("0.33"))
+    );
+    localStorageMock.setItem(
+      "calculator_0.32",
+      JSON.stringify(buildDefaultCalculatorState("0.32"))
+    );
+
+    const restored = getStartupSavedState();
+
+    expect(restored?.version).toBe("0.33");
   });
 
   test("skips an old trunk armataur save and falls back to 0.34", () => {
