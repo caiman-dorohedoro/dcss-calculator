@@ -37,5 +37,14 @@ describe("SH Calculations", () => {
         dexterity: 27,
       })
     ).toBe(0);
+
+    // Dump SH 36 minus the tower shield's +7 enhancement bonus.
+    expect(
+      calculateSH({
+        shield: "tower_shield",
+        shieldSkill: 27,
+        dexterity: 31,
+      })
+    ).toBe(29);
   });
 });

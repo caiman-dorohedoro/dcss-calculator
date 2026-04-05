@@ -179,4 +179,24 @@ describe("EV Calculations", () => {
 
     expect(result.finalEV).toBe(16);
   });
+
+  test.failing(
+    "11 - trunk gale centaur shapeshifter dump: plate, tower shield, EV ring removed, EV should be 29",
+    () => {
+      // Dump EV 34 minus ring of Woatro's EV+5 should leave 29.
+      const result = calculateEV({
+        version: "trunk",
+        dodgingSkill: 26.4,
+        dexterity: 31,
+        strength: 44,
+        species: "galeCentaur",
+        shield: "tower_shield",
+        armour: "plate",
+        shieldSkill: 27,
+        armourSkill: 24.5,
+      });
+
+      expect(result.finalEV).toBe(29);
+    }
+  );
 });

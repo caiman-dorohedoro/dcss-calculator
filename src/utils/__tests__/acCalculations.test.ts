@@ -172,6 +172,26 @@ describe("AC Calculations", () => {
     ).toBe(19);
   });
 
+  test.failing(
+    "trunk gale centaur shapeshifter dump: plate plus aux pieces should be 27 AC after removing enchantment bonuses",
+    () => {
+      // Dump AC 50 minus enchantment bonuses (+11 plate, +4 helmet,
+      // +1 cloak, +2 gloves, +5 barding) should leave 27.
+      expect(
+        calculateMixedAC({
+          version: "trunk",
+          species: "galeCentaur",
+          armour: "plate",
+          armourSkill: 24.5,
+          helmet: true,
+          cloak: true,
+          gloves: true,
+          barding: true,
+        })
+      ).toBe(27);
+    }
+  );
+
   test("mountain dwarf, scale mail, helmet, cloack, gloves, boots, str 30, 19.4 armour skill, total 13 ac bounus", () => {
     // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt
     expect(
