@@ -394,4 +394,86 @@ describe("trunk snapshot 20260405 (crawl f9e06672)", () => {
       expect(failureRate).toBe(expected);
     });
   });
+
+  describe("spell-failure gear bonuses", () => {
+    test("orb of energy adds the Crawl raw fail penalty", () => {
+      const failureRate = calculateSpellFailureRate({
+        version: "trunk",
+        species: "human",
+        strength: 10,
+        intelligence: 15,
+        spellcasting: 0,
+        armour: "robe",
+        shield: "none",
+        orb: "energy",
+        armourSkill: 0,
+        shieldSkill: 0,
+        targetSpell: "Magic Dart",
+        schoolSkills: zeroSkillLevels("conjuration"),
+        spellDifficulty: 1,
+      });
+
+      expect(failureRate).toBe(47);
+    });
+
+    test("crystal ball of Wucad Mu shares the same spell-failure penalty", () => {
+      const failureRate = calculateSpellFailureRate({
+        version: "trunk",
+        species: "human",
+        strength: 10,
+        intelligence: 15,
+        spellcasting: 0,
+        armour: "robe",
+        shield: "none",
+        orb: "wucad_mu",
+        armourSkill: 0,
+        shieldSkill: 0,
+        targetSpell: "Magic Dart",
+        schoolSkills: zeroSkillLevels("conjuration"),
+        spellDifficulty: 1,
+      });
+
+      expect(failureRate).toBe(47);
+    });
+
+    test("command ego lowers Summoning spell failure on body armour", () => {
+      const failureRate = calculateSpellFailureRate({
+        version: "trunk",
+        species: "galeCentaur",
+        strength: 20,
+        intelligence: 12,
+        spellcasting: 0,
+        armour: "plate",
+        bodyArmourEgo: "command",
+        shield: "none",
+        armourSkill: 27,
+        shieldSkill: 0,
+        targetSpell: "Summon Small Mammal",
+        schoolSkills: zeroSkillLevels("summoning"),
+        spellDifficulty: 1,
+      });
+
+      expect(failureRate).toBe(8);
+    });
+
+    test("resonance ego lowers Forgecraft spell failure on body armour", () => {
+      const failureRate = calculateSpellFailureRate({
+        version: "trunk",
+        species: "revenant",
+        strength: 19,
+        intelligence: 14,
+        spellcasting: 8,
+        armour: "plate",
+        bodyArmourEgo: "resonance",
+        shield: "none",
+        armourSkill: 20,
+        shieldSkill: 0,
+        targetSpell: "Kinetic Grapnel",
+        schoolSkills: zeroSkillLevels("forgecraft"),
+        spellDifficulty: 1,
+      });
+
+      expect(failureRate).toBe(26);
+    });
+  });
 });

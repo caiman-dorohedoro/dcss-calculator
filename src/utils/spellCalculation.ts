@@ -1,7 +1,7 @@
 import {
   ArmourKey,
-  armourOptions,
   BodyArmourEgoKey,
+  OrbKey,
   ShieldKey,
   shieldOptions,
 } from "@/types/equipment.ts";
@@ -14,6 +14,10 @@ import {
   VersionedSpellSchool,
 } from "@/types/spells";
 import { SpeciesKey } from "@/types/species";
+import {
+  getArmourEncumbrance,
+  getBodyArmourEgoOptions,
+} from "@/versioning/equipmentData";
 import { getFormulaProfile } from "@/versioning/formulaProfiles";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
@@ -28,11 +32,11 @@ export type SpellCalculationParams<V extends GameVersion> = {
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   armour: ArmourKey;
   bodyArmourEgo?: BodyArmourEgoKey;
+  orb?: OrbKey;
   shield: ShieldKey;
   armourSkill: number;
   shieldSkill: number;
   wizardry?: number;
-  channel?: boolean;
   wildMagic?: number;
   enkindle?: boolean;
 };
@@ -94,6 +98,7 @@ const getSkillPower = <V extends GameVersion>(
 };
 
 type CalculateArmourPenaltyParams<V extends GameVersion> = {
+  version: V;
   species: SpeciesKey<V>;
   armour: ArmourKey;
   armourSkill: number;
@@ -102,13 +107,14 @@ type CalculateArmourPenaltyParams<V extends GameVersion> = {
 };
 
 function calculateArmourPenalty<V extends GameVersion>({
+  version,
   species,
   armour,
   armourSkill,
   strength,
   SCALE,
 }: CalculateArmourPenaltyParams<V>) {
-  const baseEvPenalty = armourOptions[armour].encumbrance;
+  const baseEvPenalty = getArmourEncumbrance(version, armour);
 
   const penalty = Math.floor(
     Math.floor(
@@ -155,6 +161,7 @@ function calculateShieldPenalty({
 }
 
 type armourShieldSpellPenaltyParams<V extends GameVersion> = {
+  version: V;
   species: SpeciesKey<V>;
   strength: number;
   armourSkill: number;
@@ -164,6 +171,7 @@ type armourShieldSpellPenaltyParams<V extends GameVersion> = {
 };
 
 function calculateArmourShieldSpellPenalty<V extends GameVersion>({
+  version,
   species,
   strength,
   armourSkill,
@@ -175,6 +183,7 @@ function calculateArmourShieldSpellPenalty<V extends GameVersion>({
 
   const totalPenalty =
     calculateArmourPenalty({
+      version,
       species,
       armour,
       armourSkill,
@@ -242,6 +251,8 @@ type ApplySpellSuccessBoostsParams<V extends GameVersion> = {
   targetSpell: VersionedSpellName<V>;
   armour: ArmourKey;
   bodyArmourEgo: BodyArmourEgoKey;
+  orb: OrbKey;
+  armourSkill: number;
   chance: number;
   wizardry: number;
 };
@@ -251,24 +262,52 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
   targetSpell,
   armour,
   bodyArmourEgo,
+  orb,
+  armourSkill,
   chance,
   wizardry,
 }: ApplySpellSuccessBoostsParams<V>) => {
+  const spellSchools = getSpellSchools(version, targetSpell);
+  const supportedBodyArmourEgos = getBodyArmourEgoOptions(version);
+  let boostedChance = chance;
   let failReduce = 100;
+
+  if (orb === "energy" || orb === "wucad_mu") {
+    boostedChance += 10;
+  }
 
   if (
     armour !== "none" &&
+    bodyArmourEgo in supportedBodyArmourEgos &&
     bodyArmourEgo === "death" &&
-    getSpellSchools(version, targetSpell).some((school) => school === "necromancy")
+    spellSchools.some((school) => school === "necromancy")
   ) {
     failReduce = Math.floor(failReduce / 2);
+  }
+
+  if (
+    armour !== "none" &&
+    bodyArmourEgo in supportedBodyArmourEgos &&
+    bodyArmourEgo === "command" &&
+    spellSchools.some((school) => school === "summoning")
+  ) {
+    failReduce = Math.floor((failReduce * 180) / (180 + armourSkill * 10));
+  }
+
+  if (
+    armour !== "none" &&
+    bodyArmourEgo in supportedBodyArmourEgos &&
+    bodyArmourEgo === "resonance" &&
+    spellSchools.some((school) => school === "forgecraft")
+  ) {
+    failReduce = Math.floor((failReduce * 2) / 3);
   }
 
   if (wizardry > 0) {
     failReduce = Math.floor((failReduce * 6) / (7 + wizardry));
   }
 
-  return Math.floor((chance * failReduce) / 100);
+  return Math.floor((boostedChance * failReduce) / 100);
 };
 
 function rawSpellFail<V extends GameVersion>({
@@ -279,6 +318,7 @@ function rawSpellFail<V extends GameVersion>({
   spellDifficulty,
   armour,
   bodyArmourEgo = "none",
+  orb = "none",
   shield,
   targetSpell,
   schoolSkills,
@@ -286,7 +326,6 @@ function rawSpellFail<V extends GameVersion>({
   armourSkill,
   shieldSkill,
   wizardry = 0,
-  channel = false,
   wildMagic = 0,
   enkindle = false,
 }: SpellCalculationParams<V>) {
@@ -310,6 +349,7 @@ function rawSpellFail<V extends GameVersion>({
 
   // calculate armor/shield penalty
   const armourShieldSpellPenalty = calculateArmourShieldSpellPenalty({
+    version,
     species,
     strength: strength,
     armourSkill,
@@ -336,15 +376,13 @@ function rawSpellFail<V extends GameVersion>({
     chance2 += wildMagic * 4;
   }
 
-  if (channel) {
-    chance2 += 10;
-  }
-
   chance2 = applySpellSuccessBoosts({
     version,
     targetSpell,
     armour,
     bodyArmourEgo,
+    orb,
+    armourSkill,
     chance: chance2,
     wizardry,
   });

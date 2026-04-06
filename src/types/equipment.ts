@@ -20,7 +20,11 @@ export type ArmourKey =
   | "shadow_dragon"
   | "golden_dragon";
 
-export type BodyArmourEgoKey = "none" | "death";
+export type BodyArmourEgoKey =
+  | "none"
+  | "command"
+  | "death"
+  | "resonance";
 
 export const armourOptions = {
   none: { name: "none", baseAC: 0, encumbrance: 0 },
@@ -58,6 +62,14 @@ export const shieldOptions = {
   tower_shield: {name: "tower shield", encumbrance: 15, baseSH: 13},
 } as const;
 
+export type OrbKey = "none" | "energy" | "wucad_mu";
+
+export const orbOptions = {
+  none: { name: "none" },
+  energy: { name: "orb of energy" },
+  wucad_mu: { name: "crystal ball of Wucad Mu" },
+} as const;
+
 export const headgearOptions = {
   helmet: {name: "helmet", baseAC: 1, encumbrance: 0},
   hat: {name: "hat", baseAC: 0, encumbrance: 0},
@@ -73,5 +85,7 @@ export const miscellaneousOptions = {
 
 export const bodyArmourEgoOptions = {
   none: { name: "None" },
+  command: { name: "Command" },
   death: { name: "Death" },
+  resonance: { name: "Resonance" },
 } as const satisfies Record<BodyArmourEgoKey, { name: string }>;

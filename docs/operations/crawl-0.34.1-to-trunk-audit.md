@@ -32,6 +32,9 @@ The compare payload was useful for the baseline and current head, but not comple
 - The calculator follow-up now also reflects two mechanic fixes discovered during this audit:
   - trunk barding EV parity now includes Crawl's auxiliary-armour EV penalty
   - spell failure now models `death` body-armour ego for `Necromancy` spells
+- A later pass on the same audit scope also confirmed two more spell-failure mechanics that matter for current app scope:
+  - `fire dragon scales` changed encumbrance from `11` in `0.32` and `0.33` to `9` in `0.34` and trunk, so body-armour encumbrance must stay version-aware instead of assuming one shared table
+  - spell failure can also be shifted by `command` body-armour ego for `Summoning`, `resonance` body-armour ego for `Forgecraft`, and `orb of energy`
 
 ## Previously Supported Repo Trunk Snapshot Drift
 
@@ -155,3 +158,16 @@ What changed in those files:
 - `player-stats.cc` did not change.
 
 Result: the initial version-data pass did not need a broad formula rewrite, but the audit did uncover two targeted calculator follow-ups that are now implemented: barding auxiliary-armour EV penalty and `death` ego Necromancy spell-success support. Future version bumps should still re-check these files instead of assuming formula safety.
+
+## Deferred Follow-Up: Talismans And Forms
+
+- Crawl currently applies direct spell-success adjustments for some forms:
+  - `rime_yak` reduces `Ice` spell failure
+  - `sphinx` reduces `Hexes` spell failure
+  - `sun_scarab` reduces `Fire` spell failure
+- These checks live in `crawl-ref/source/spl-cast.cc` and are separate from the body-armour and shield penalties.
+- The calculator does not model form state or talisman state yet, and a correct implementation would need more than a single checkbox:
+  - current form or talisman selection
+  - how the form changes equipment availability or meld state
+  - version-aware form metadata and school-specific spell-success bonuses
+- Result: talisman and form spell-failure support should be tracked as a dedicated future batch instead of being mixed into this version-refresh patch.

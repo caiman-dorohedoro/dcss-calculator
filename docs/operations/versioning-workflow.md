@@ -178,7 +178,10 @@ Audit checklist:
 - inspect mutation or ability changes and item or unrand changes that may affect future calculator scope
 - inspect repo-trunk drift for spell names, species names, and versioned traits or defaults that may need app updates even when the stable baseline looks similar
 - if the supported species can wear barding, validate at least one barding-wearing morgue against AC and EV separately rather than assuming the armour and spell-failure paths cover it
-- when validating spell-failure parity from a morgue, check whether the equipped body armour has an ego that changes spell success, especially `death` for Necromancy, before classifying the mismatch as a formula bug
+- when validating spell-failure parity from a morgue, check whether the equipped body armour or orb has an ego that changes spell success before classifying the mismatch as a formula bug
+- for current known gear-side spell-failure modifiers, explicitly check `death` for `Necromancy`, `command` for `Summoning`, `resonance` for `Forgecraft`, and `orb of energy`
+- when auditing item-property churn, verify whether any body-armour encumbrance values changed by version instead of assuming the shared app table is still correct
+- when auditing `spl-cast.cc`, also note any talisman or transformation-based spell-failure bonuses and either model them directly or record them as deferred scope
 - inspect formula-adjacent files before deciding no formula rewrite is needed
 - update `README.md` if the supported versions or maintenance links changed
 

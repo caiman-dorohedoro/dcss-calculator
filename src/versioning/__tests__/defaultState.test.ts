@@ -36,6 +36,12 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.secondGloves).toBe(false);
   });
 
+  test("defaults the orb slot to none", () => {
+    const state = buildDefaultCalculatorState("trunk") as { orb?: string };
+
+    expect(state.orb).toBe("none");
+  });
+
   test("uses gale centaur for trunk defaults", () => {
     const state = buildDefaultCalculatorState("trunk");
 
@@ -190,6 +196,74 @@ describe("buildDefaultCalculatorState", () => {
     const restored = getStartupSavedState();
 
     expect(restored?.version).toBe("0.34");
+  });
+
+  test("restores a pre-orb save by defaulting the orb slot to none", () => {
+    const store = new Map<string, string>();
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    };
+
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: localStorageMock,
+    });
+
+    const legacySave = buildDefaultCalculatorState("trunk") as unknown as Record<
+      string,
+      unknown
+    >;
+    delete legacySave.orb;
+
+    localStorageMock.setItem("calculator_trunk", JSON.stringify(legacySave));
+
+    const restored = getStartupSavedState() as {
+      version?: string;
+      orb?: string;
+    } | null;
+
+    expect(restored?.version).toBe("trunk");
+    expect(restored?.orb).toBe("none");
+  });
+
+  test("migrates a legacy channel toggle into an orb selection", () => {
+    const store = new Map<string, string>();
+    const localStorageMock = {
+      getItem: (key: string) => store.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        store.set(key, value);
+      },
+      removeItem: (key: string) => {
+        store.delete(key);
+      },
+    };
+
+    Object.defineProperty(globalThis, "localStorage", {
+      configurable: true,
+      value: localStorageMock,
+    });
+
+    const legacySave = {
+      ...buildDefaultCalculatorState("0.32"),
+      channel: true,
+    } as unknown as Record<string, unknown>;
+    delete legacySave.orb;
+
+    localStorageMock.setItem("calculator_0.32", JSON.stringify(legacySave));
+
+    const restored = getStartupSavedState() as {
+      version?: string;
+      orb?: string;
+    } | null;
+
+    expect(restored?.version).toBe("0.32");
+    expect(restored?.orb).toBe("energy");
   });
 
   test("rejects a save whose target spell is not valid for that version", () => {

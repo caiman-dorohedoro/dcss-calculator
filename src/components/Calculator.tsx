@@ -18,6 +18,8 @@ import { CalculatorState } from "@/hooks/useCalculatorState";
 import {
   ArmourKey,
   armourOptions,
+  OrbKey,
+  orbOptions,
   ShieldKey,
   shieldOptions,
 } from "@/types/equipment.ts";
@@ -233,9 +235,14 @@ const Calculator = <V extends GameVersion>({
           <label className="flex flex-row items-center gap-2 text-sm">
             Shield:
             <Select
+              disabled={state.orb !== "none"}
               value={state.shield}
               onValueChange={(value) =>
-                setState((prev) => ({ ...prev, shield: value as ShieldKey }))
+                setState((prev) => ({
+                  ...prev,
+                  shield: value as ShieldKey,
+                  orb: value === "none" ? prev.orb : "none",
+                }))
               }
             >
               <SelectTrigger className="w-[160px] h-6">
@@ -243,6 +250,31 @@ const Calculator = <V extends GameVersion>({
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(shieldOptions).map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </label>
+          <label className="flex flex-row items-center gap-2 text-sm">
+            Orb:
+            <Select
+              disabled={state.shield !== "none"}
+              value={state.orb}
+              onValueChange={(value) =>
+                setState((prev) => ({
+                  ...prev,
+                  orb: value as OrbKey,
+                  shield: value === "none" ? prev.shield : "none",
+                }))
+              }
+            >
+              <SelectTrigger className="w-[160px] h-6">
+                <SelectValue placeholder="Orb" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(orbOptions).map(([key, value]) => (
                   <SelectItem key={key} value={key}>
                     {value.name}
                   </SelectItem>

@@ -208,11 +208,11 @@ export const calculateAvgSFData = <V extends GameVersion>(
         spellDifficulty,
         armour: state.armour,
         bodyArmourEgo: state.bodyArmourEgo,
+        orb: state.orb,
         shield: state.shield,
         armourSkill: state.armourSkill,
         shieldSkill: state.shieldSkill,
         wizardry: state.wizardry,
-        channel: state.channel,
         wildMagic: state.wildMagic,
       });
 
@@ -231,11 +231,11 @@ export const calculateAvgSFData = <V extends GameVersion>(
           spellDifficulty,
           armour: state.armour,
           bodyArmourEgo: state.bodyArmourEgo,
+          orb: state.orb,
           shield: state.shield,
           armourSkill: state.armourSkill,
           shieldSkill: state.shieldSkill,
           wizardry: state.wizardry,
-          channel: state.channel,
           wildMagic: state.wildMagic,
           enkindle: true,
         });

@@ -10,6 +10,7 @@ const baseDefaultState = {
   strength: 10,
   intelligence: 10,
   shield: "none" as const,
+  orb: "none" as const,
   armour: "robe" as const,
   shieldSkill: 0,
   armourSkill: 0,
@@ -21,7 +22,6 @@ const baseDefaultState = {
   barding: false,
   spellcasting: 0,
   wizardry: 0,
-  channel: false,
   wildMagic: 0,
 };
 

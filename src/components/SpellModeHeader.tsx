@@ -1,4 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -9,8 +8,9 @@ import {
 import AttrInput from "@/components/AttrInput";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { GameVersion } from "@/types/game";
-import { bodyArmourEgoOptions } from "@/types/equipment.ts";
+import { BodyArmourEgoKey } from "@/types/equipment.ts";
 import { VersionedSpellName } from "@/types/spells";
+import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getSpellData } from "@/utils/spellCalculation";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
 
@@ -24,6 +24,11 @@ const SpellModeHeader = <V extends GameVersion>({
   setState,
 }: SpellModeHeaderProps<V>) => {
   const spells = getSpellData<V>(state.version);
+  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
+  const selectedBodyArmourEgo =
+    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
+      ? state.bodyArmourEgo
+      : "none";
 
   return (
     <div className="flex flex-col gap-2 pl-2 pr-4 pb-4">
@@ -103,16 +108,6 @@ const SpellModeHeader = <V extends GameVersion>({
             setState((prev) => ({ ...prev, wizardry: value }))
           }
         />
-        <div className="flex flex-row items-center gap-2">
-          <Checkbox
-            id="channel"
-            checked={state.channel}
-            onCheckedChange={(checked) =>
-              setState((prev) => ({ ...prev, channel: !!checked }))
-            }
-          />
-          <label htmlFor="channel">channel</label>
-        </div>
         <AttrInput
           label="wild magic (mutation)"
           value={state.wildMagic ?? 0}
@@ -126,11 +121,11 @@ const SpellModeHeader = <V extends GameVersion>({
           <span>body armour ego</span>
           <Select
             disabled={state.armour === "none"}
-            value={state.bodyArmourEgo ?? "none"}
+            value={selectedBodyArmourEgo}
             onValueChange={(value) =>
               setState((prev) => ({
                 ...prev,
-                bodyArmourEgo: value as keyof typeof bodyArmourEgoOptions,
+                bodyArmourEgo: value as BodyArmourEgoKey,
               }))
             }
           >
@@ -138,9 +133,9 @@ const SpellModeHeader = <V extends GameVersion>({
               <SelectValue placeholder="None" />
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(bodyArmourEgoOptions).map(([key, value]) => (
+              {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map((key) => (
                 <SelectItem key={key} value={key}>
-                  {value.name}
+                  {bodyArmourEgos[key]?.name ?? key}
                 </SelectItem>
               ))}
             </SelectContent>

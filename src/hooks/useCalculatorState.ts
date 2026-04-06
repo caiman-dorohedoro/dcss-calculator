@@ -2,14 +2,16 @@ import { useState, useEffect } from "react";
 import {
   ArmourKey,
   BodyArmourEgoKey,
+  OrbKey,
   ShieldKey,
-  bodyArmourEgoOptions,
+  orbOptions,
 } from "@/types/equipment.ts";
 import type { SpeciesKey } from "@/types/species.ts";
 import { isGameVersion, startupRestoreOrder } from "@/types/game";
 import type { GameVersion } from "@/types/game";
 import type { VersionedSchoolSkillLevels, VersionedSpellName } from "@/types/spells";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
 const STORAGE_KEY = "calculator";
@@ -28,6 +30,7 @@ export interface CalculatorState<V extends GameVersion> {
   intelligence: number;
   species: SpeciesKey<V>;
   shield: ShieldKey;
+  orb: OrbKey;
   armour: ArmourKey;
   bodyArmourEgo?: BodyArmourEgoKey;
   shieldSkill: number;
@@ -44,7 +47,6 @@ export interface CalculatorState<V extends GameVersion> {
   targetSpell?: VersionedSpellName<V>;
   spellcasting?: number;
   wizardry?: number;
-  channel?: boolean;
   wildMagic?: number;
 }
 
@@ -95,8 +97,12 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
   if (
     state.bodyArmourEgo !== undefined &&
     (typeof state.bodyArmourEgo !== "string" ||
-      !(state.bodyArmourEgo in bodyArmourEgoOptions))
+      !(state.bodyArmourEgo in getBodyArmourEgoOptions(version)))
   ) {
+    return false;
+  }
+
+  if (typeof state.orb !== "string" || !(state.orb in orbOptions)) {
     return false;
   }
 
@@ -119,7 +125,19 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
 const parseSavedState = (saved: string): CalculatorState<GameVersion> | null => {
   try {
     const parsed = JSON.parse(saved);
-    return validateState(parsed) ? parsed : null;
+
+    if (!isObject(parsed)) {
+      return null;
+    }
+
+    const migrated = {
+      ...parsed,
+      orb:
+        parsed.orb ??
+        (parsed.channel === true ? "energy" : "none"),
+    };
+
+    return validateState(migrated) ? migrated : null;
   } catch {
     return null;
   }

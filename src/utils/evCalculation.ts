@@ -1,12 +1,12 @@
 import {
   ArmourKey,
-  armourOptions,
   miscellaneousOptions,
   ShieldKey,
   shieldOptions,
 } from "@/types/equipment.ts";
 import { GameVersion } from "@/types/game";
 import { Size, SpeciesKey, speciesOptions } from "@/types/species.ts";
+import { getArmourEncumbrance } from "@/versioning/equipmentData";
 
 const sizeToNumber: Record<Size, number> = {
   tiny: 2,
@@ -50,9 +50,10 @@ export function calculateEV<V extends GameVersion>(params: {
   const sizeFactor = sizeToNumber[speciesOpts[species].size];
   const baseEV = 10 + sizeFactor;
   const shieldEncumbrance = shieldOptions[shield].encumbrance;
+  const armourEncumbrance = getArmourEncumbrance(version, armour);
 
   // Calculate dodge bonus with armor penalty modifier
-  const armorPenaltyForDodge = armourOptions[armour].encumbrance - 3;
+  const armorPenaltyForDodge = armourEncumbrance - 3;
   let dodgeModifier = 1;
 
   if (armorPenaltyForDodge > 0) {
@@ -80,7 +81,7 @@ export function calculateEV<V extends GameVersion>(params: {
   // Armour penalty
   const armourPenalty = Math.floor(
     ((1 / 225) *
-      Math.pow(armourOptions[armour].encumbrance, 2) *
+      Math.pow(armourEncumbrance, 2) *
       (90 - 2 * armourSkill)) /
       (strength + 3)
   );

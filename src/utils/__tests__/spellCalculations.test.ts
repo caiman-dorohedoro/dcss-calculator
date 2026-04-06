@@ -538,10 +538,10 @@ describe("Spell Calculations", () => {
       spellDifficulty: 7,
       armour: "robe",
       shield: "none",
+      orb: "wucad_mu",
       armourSkill: 0,
       shieldSkill: 5,
       wizardry: 1,
-      channel: true,
     });
 
     expect(failureRate).toBe(26);
