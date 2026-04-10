@@ -1,4 +1,5 @@
 import Calculator from "@/components/Calculator";
+import MorgueImportControls from "@/components/MorgueImportControls";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { useCalculatorState } from "@/hooks/useCalculatorState";
 import {
@@ -55,6 +56,10 @@ function App() {
                   ))}
                 </SelectContent>
               </Select>
+              <MorgueImportControls
+                currentVersion={state.version}
+                onApplyImport={(importedState) => setState(importedState)}
+              />
             </div>
             <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
             <button
