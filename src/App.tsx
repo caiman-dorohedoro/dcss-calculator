@@ -17,8 +17,6 @@ function App() {
   const { state, setState, resetState, changeVersion, flash } =
     useCalculatorState();
   const [isFlashing, setIsFlashing] = useState(false);
-  const [morgueSummaryHost, setMorgueSummaryHost] =
-    useState<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (flash) {
@@ -58,13 +56,14 @@ function App() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="mx-auto flex items-center gap-x-2">
+              <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
               <MorgueImportControls
                 currentVersion={state.version}
                 onApplyImport={(importedState) => setState(importedState)}
-                summaryHost={morgueSummaryHost}
               />
             </div>
-            <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
             <button
               onClick={resetState}
               className="text-sm text-muted-foreground hover:text-foreground absolute right-8"
@@ -73,7 +72,6 @@ function App() {
               <span className="block md:hidden">Reset</span>
             </button>
           </TabsList>
-          <div ref={setMorgueSummaryHost} className="px-1 pt-2 md:px-4" />
           <TabsContent value="ev">
             <Calculator state={state} setState={setState} />
           </TabsContent>

@@ -18,7 +18,6 @@ import { deepElfConjurer033Morgue } from "@/morgueImport/__fixtures__/deepElfCon
 
 describe("MorgueImportControls", () => {
   let container: HTMLDivElement;
-  let summaryHost: HTMLDivElement;
   let root: Root;
   const setTextareaValue = (textarea: HTMLTextAreaElement, value: string) => {
     const valueSetter = Object.getOwnPropertyDescriptor(
@@ -38,10 +37,7 @@ describe("MorgueImportControls", () => {
     localStorage.clear();
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
     container = document.createElement("div");
-    summaryHost = document.createElement("div");
-    summaryHost.setAttribute("data-testid", "summary-host");
     document.body.appendChild(container);
-    document.body.appendChild(summaryHost);
     root = createRoot(container);
   });
 
@@ -50,79 +46,123 @@ describe("MorgueImportControls", () => {
       root.unmount();
     });
     container.remove();
-    summaryHost.remove();
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", false);
   });
 
-  test("renders modals in a portal, then applies into a dismissible summary host", async () => {
+  test("renders modals in a portal, then shows a temporary imported status after success", async () => {
+    const onApplyImport = jest.fn<(state: CalculatorState<GameVersion>) => void>();
+    jest.useFakeTimers();
+
+    try {
+      await act(async () => {
+        root.render(
+          <MorgueImportControls
+            currentVersion="trunk"
+            onApplyImport={onApplyImport}
+          />
+        );
+      });
+
+      await act(async () => {
+        (
+          container.querySelector('[data-testid="open-morgue-import"]') as HTMLButtonElement
+        ).click();
+      });
+
+      expect(container.querySelector('[data-testid="morgue-import-modal"]')).toBeNull();
+      expect(
+        document.body.querySelector('[data-testid="morgue-import-modal"]')
+      ).not.toBeNull();
+      const modalPanel = document.body.querySelector(
+        '[data-testid="morgue-import-modal"] > div'
+      ) as HTMLDivElement;
+      expect(modalPanel.className).toContain("bg-card");
+      expect(modalPanel.className).toContain("text-card-foreground");
+      expect(modalPanel.className).toContain("border-white");
+      expect(modalPanel.style.outline).toBe("1px solid white");
+      expect(modalPanel.style.outlineOffset).toBe("-4px");
+
+      const textarea = document.body.querySelector(
+        '[data-testid="morgue-import-textarea"]'
+      ) as HTMLTextAreaElement;
+
+      await act(async () => {
+        setTextareaValue(textarea, deepElfConjurer033Morgue);
+      });
+
+      await act(async () => {
+        (
+          document.body.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
+        ).click();
+      });
+
+      expect(
+        document.body.querySelector('[data-testid="morgue-import-confirm-modal"]')
+      ).not.toBeNull();
+      expect(document.body.textContent).toContain("0.33");
+      expect(onApplyImport).not.toHaveBeenCalled();
+
+      await act(async () => {
+        (
+          document.body.querySelector('[data-testid="confirm-version-import"]') as HTMLButtonElement
+        ).click();
+      });
+
+      expect(onApplyImport).toHaveBeenCalledTimes(1);
+      expect(onApplyImport.mock.calls[0][0]).toMatchObject({
+        version: "0.33",
+        species: "deepElf",
+        targetSpell: "Magic Dart",
+      });
+      expect(
+        container.querySelector('[data-testid="morgue-import-success"]')
+          ?.textContent
+      ).toContain("Imported!");
+      expect(
+        container.querySelector('[data-testid="morgue-import-success"]')
+          ?.className
+      ).toContain("absolute");
+      expect(
+        container.querySelector('[data-testid="morgue-import-success"]')
+          ?.className
+      ).toContain("left-full");
+      expect(
+        container.querySelector('[data-testid="morgue-import-success-anchor"]')
+          ?.className
+      ).toContain("relative");
+      expect(document.body.textContent).not.toContain("Applied");
+      expect(document.body.textContent).not.toContain("Skipped");
+
+      await act(async () => {
+        jest.advanceTimersByTime(2000);
+      });
+
+      expect(
+        container.querySelector('[data-testid="morgue-import-success"]')
+      ).toBeNull();
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("renders an icon-only import trigger with an accessible label", async () => {
     const onApplyImport = jest.fn<(state: CalculatorState<GameVersion>) => void>();
 
     await act(async () => {
       root.render(
         <MorgueImportControls
-          currentVersion="trunk"
+          currentVersion="0.34"
           onApplyImport={onApplyImport}
-          summaryHost={summaryHost}
         />
       );
     });
 
-    await act(async () => {
-      (
-        container.querySelector('[data-testid="open-morgue-import"]') as HTMLButtonElement
-      ).click();
-    });
+    const trigger = container.querySelector(
+      '[data-testid="open-morgue-import"]'
+    ) as HTMLButtonElement;
 
-    expect(container.querySelector('[data-testid="morgue-import-modal"]')).toBeNull();
-    expect(
-      document.body.querySelector('[data-testid="morgue-import-modal"]')
-    ).not.toBeNull();
-
-    const textarea = document.body.querySelector(
-      '[data-testid="morgue-import-textarea"]'
-    ) as HTMLTextAreaElement;
-
-    await act(async () => {
-      setTextareaValue(textarea, deepElfConjurer033Morgue);
-    });
-
-    await act(async () => {
-      (
-        document.body.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
-      ).click();
-    });
-
-    expect(
-      document.body.querySelector('[data-testid="morgue-import-confirm-modal"]')
-    ).not.toBeNull();
-    expect(document.body.textContent).toContain("0.33");
-    expect(onApplyImport).not.toHaveBeenCalled();
-
-    await act(async () => {
-      (
-        document.body.querySelector('[data-testid="confirm-version-import"]') as HTMLButtonElement
-      ).click();
-    });
-
-    expect(onApplyImport).toHaveBeenCalledTimes(1);
-    expect(onApplyImport.mock.calls[0][0]).toMatchObject({
-      version: "0.33",
-      species: "deepElf",
-      targetSpell: "Magic Dart",
-    });
-    expect(summaryHost.textContent).toContain("Applied");
-    expect(summaryHost.textContent).toContain("Skipped");
-    expect(summaryHost.textContent).toContain("Rings");
-
-    await act(async () => {
-      (
-        summaryHost.querySelector(
-          '[data-testid="dismiss-morgue-import-summary"]'
-        ) as HTMLButtonElement
-      ).click();
-    });
-
-    expect(summaryHost.textContent).not.toContain("Applied");
+    expect(trigger.getAttribute("aria-label")).toBe("Import Morgue");
+    expect(trigger.textContent?.trim()).toBe("");
   });
 
   test("shows an inline parser failure without calling onApplyImport", async () => {
@@ -133,7 +173,6 @@ describe("MorgueImportControls", () => {
         <MorgueImportControls
           currentVersion="0.34"
           onApplyImport={onApplyImport}
-          summaryHost={summaryHost}
         />
       );
     });
