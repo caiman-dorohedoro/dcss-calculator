@@ -1,7 +1,7 @@
 # 메타 카탈로그
 
 작성일: 2026-04-05  
-최종 업데이트: 2026-04-05
+최종 업데이트: 2026-04-10
 
 ## 목적
 
@@ -39,6 +39,7 @@
 | `2026-04-04-version-registry-design.md` | version registry 레이어 도입 범위와 경계를 정리한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-04-version-registry-refactor.md` | version registry 리팩터링 구현 계획 | `/docs/superpowers/plans` |
 | `2026-04-05-034-trunk-version-update-design.md` | `0.34` stable + trunk snapshot 갱신 범위를 정리한 설계 문서 | `/docs/superpowers/specs` |
+| `2026-04-10-morgue-import-design.md` | morgue 붙여넣기 기반 calculator 자동 할당과 import summary 흐름을 정의한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-05-034-trunk-version-update.md` | `0.34.1 -> trunk` 갱신 구현 계획과 검증 순서 | `/docs/superpowers/plans` |
 
 ## 핵심 유지보수 엔트리포인트
