@@ -18,6 +18,7 @@ import { deepElfConjurer033Morgue } from "@/morgueImport/__fixtures__/deepElfCon
 
 describe("MorgueImportControls", () => {
   let container: HTMLDivElement;
+  let summaryHost: HTMLDivElement;
   let root: Root;
   const setTextareaValue = (textarea: HTMLTextAreaElement, value: string) => {
     const valueSetter = Object.getOwnPropertyDescriptor(
@@ -37,7 +38,10 @@ describe("MorgueImportControls", () => {
     localStorage.clear();
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", true);
     container = document.createElement("div");
+    summaryHost = document.createElement("div");
+    summaryHost.setAttribute("data-testid", "summary-host");
     document.body.appendChild(container);
+    document.body.appendChild(summaryHost);
     root = createRoot(container);
   });
 
@@ -46,10 +50,11 @@ describe("MorgueImportControls", () => {
       root.unmount();
     });
     container.remove();
+    summaryHost.remove();
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", false);
   });
 
-  test("asks for confirmation when the morgue targets a different version, then applies and shows the summary", async () => {
+  test("renders modals in a portal, then applies into a dismissible summary host", async () => {
     const onApplyImport = jest.fn<(state: CalculatorState<GameVersion>) => void>();
 
     await act(async () => {
@@ -57,6 +62,7 @@ describe("MorgueImportControls", () => {
         <MorgueImportControls
           currentVersion="trunk"
           onApplyImport={onApplyImport}
+          summaryHost={summaryHost}
         />
       );
     });
@@ -67,7 +73,12 @@ describe("MorgueImportControls", () => {
       ).click();
     });
 
-    const textarea = container.querySelector(
+    expect(container.querySelector('[data-testid="morgue-import-modal"]')).toBeNull();
+    expect(
+      document.body.querySelector('[data-testid="morgue-import-modal"]')
+    ).not.toBeNull();
+
+    const textarea = document.body.querySelector(
       '[data-testid="morgue-import-textarea"]'
     ) as HTMLTextAreaElement;
 
@@ -77,16 +88,19 @@ describe("MorgueImportControls", () => {
 
     await act(async () => {
       (
-        container.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
+        document.body.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
       ).click();
     });
 
-    expect(container.textContent).toContain("0.33");
+    expect(
+      document.body.querySelector('[data-testid="morgue-import-confirm-modal"]')
+    ).not.toBeNull();
+    expect(document.body.textContent).toContain("0.33");
     expect(onApplyImport).not.toHaveBeenCalled();
 
     await act(async () => {
       (
-        container.querySelector('[data-testid="confirm-version-import"]') as HTMLButtonElement
+        document.body.querySelector('[data-testid="confirm-version-import"]') as HTMLButtonElement
       ).click();
     });
 
@@ -96,9 +110,19 @@ describe("MorgueImportControls", () => {
       species: "deepElf",
       targetSpell: "Magic Dart",
     });
-    expect(container.textContent).toContain("Applied");
-    expect(container.textContent).toContain("Skipped");
-    expect(container.textContent).toContain("Rings");
+    expect(summaryHost.textContent).toContain("Applied");
+    expect(summaryHost.textContent).toContain("Skipped");
+    expect(summaryHost.textContent).toContain("Rings");
+
+    await act(async () => {
+      (
+        summaryHost.querySelector(
+          '[data-testid="dismiss-morgue-import-summary"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(summaryHost.textContent).not.toContain("Applied");
   });
 
   test("shows an inline parser failure without calling onApplyImport", async () => {
@@ -109,6 +133,7 @@ describe("MorgueImportControls", () => {
         <MorgueImportControls
           currentVersion="0.34"
           onApplyImport={onApplyImport}
+          summaryHost={summaryHost}
         />
       );
     });
@@ -119,7 +144,7 @@ describe("MorgueImportControls", () => {
       ).click();
     });
 
-    const textarea = container.querySelector(
+    const textarea = document.body.querySelector(
       '[data-testid="morgue-import-textarea"]'
     ) as HTMLTextAreaElement;
 
@@ -129,11 +154,11 @@ describe("MorgueImportControls", () => {
 
     await act(async () => {
       (
-        container.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
+        document.body.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
       ).click();
     });
 
     expect(onApplyImport).not.toHaveBeenCalled();
-    expect(container.textContent).toContain("could not be parsed");
+    expect(document.body.textContent).toContain("could not be parsed");
   });
 });
