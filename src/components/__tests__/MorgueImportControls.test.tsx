@@ -163,6 +163,7 @@ describe("MorgueImportControls", () => {
 
     expect(trigger.getAttribute("aria-label")).toBe("Import Morgue");
     expect(trigger.textContent?.trim()).toBe("");
+    expect(trigger.className).toContain("hover:!bg-transparent");
   });
 
   test("shows an inline parser failure without calling onApplyImport", async () => {

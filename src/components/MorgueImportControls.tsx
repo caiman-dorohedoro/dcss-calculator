@@ -158,7 +158,7 @@ export default function MorgueImportControls({
           data-testid="open-morgue-import"
           aria-label="Import Morgue"
           title="Import Morgue"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
+          className="h-8 w-8 text-muted-foreground hover:!bg-transparent hover:text-foreground"
           onClick={() => setIsPasteOpen(true)}
         >
           <ImportIcon />
