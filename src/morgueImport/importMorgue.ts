@@ -68,7 +68,10 @@ const schoolSkillKeyMap = {
 
 const makeNameMap = <T extends string>(options: Record<T, { name: string }>) => {
   return Object.fromEntries(
-    Object.entries(options).map(([key, value]) => [value.name, key])
+    (Object.entries(options) as [T, { name: string }][]).map(([key, value]) => [
+      value.name,
+      key,
+    ])
   ) as Record<string, T>;
 };
 
@@ -174,7 +177,7 @@ const chooseTargetSpell = (
   version: GameVersion,
   record: ParsedMorgueTextRecord
 ) => {
-  const supportedSpellNames = new Set(
+  const supportedSpellNames = new Set<string>(
     getVersionConfig(version).spells.map((spell) => spell.name)
   );
 
