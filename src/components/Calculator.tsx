@@ -17,7 +17,6 @@ import SFChart from "@/components/chart/SFChart";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import {
   ArmourKey,
-  BodyArmourEgoKey,
   armourOptions,
   OrbKey,
   orbOptions,
@@ -27,8 +26,6 @@ import {
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { GameVersion } from "@/types/game";
 import { EquipmentToggleKey, getEquipmentToggleKeys } from "@/versioning/uiOptions";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
-import { getSpellSchools } from "@/utils/spellCalculation";
 import {
   DndContext,
   closestCenter,
@@ -46,6 +43,7 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
+import SpellControls from "@/components/SpellControls";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -66,14 +64,6 @@ const Calculator = <V extends GameVersion>({
   setState,
 }: CalculatorProps<V>) => {
   const checkboxKeys = getEquipmentToggleKeys(state.version);
-  const spellSchools = state.targetSpell
-    ? getSpellSchools(state.version, state.targetSpell)
-    : [];
-  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
-  const selectedBodyArmourEgo =
-    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
-      ? state.bodyArmourEgo
-      : "none";
 
   const skillAttrKeys: Array<{ label: string; key: "armourSkill" | "shieldSkill" | "dodgingSkill" }> =
     [
@@ -236,37 +226,14 @@ const Calculator = <V extends GameVersion>({
               }
             />
           ))}
-          <AttrInput
-            label="Spellcasting"
-            value={state.spellcasting ?? 0}
-            type="skill"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, spellcasting: value }))
-            }
-          />
         </div>
-        {spellSchools.length > 0 && (
-          <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
-            {spellSchools.map((schoolName) => (
-              <AttrInput
-                key={schoolName}
-                label={schoolName}
-                value={state.schoolSkills?.[schoolName] ?? 0}
-                type="skill"
-                onChange={(value) =>
-                  setState((prev) => ({
-                    ...prev,
-                    schoolSkills: {
-                      ...prev.schoolSkills,
-                      [schoolName]: value === undefined ? 0 : value,
-                    },
-                  }))
-                }
-              />
-            ))}
-          </div>
-        )}
       </section>
+      <SpellControls
+        state={state}
+        setState={setState}
+        className="hidden lg:flex"
+        testId="desktop-spell-controls"
+      />
       <section
         data-testid="sidebar-section-equipment"
         className="flex flex-col gap-2"
@@ -360,52 +327,6 @@ const Calculator = <V extends GameVersion>({
               {key === "boots" && <div className="h-3 w-px bg-gray-200"></div>}
             </Fragment>
           ))}
-        </div>
-        <div className="flex flex-row gap-4 text-sm items-center flex-wrap border-t border-gray-700 pt-2">
-          <AttrInput
-            label="ring of wizardry"
-            value={state.wizardry ?? 0}
-            type="number"
-            max={10}
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, wizardry: value }))
-            }
-          />
-          <AttrInput
-            label="wild magic (mutation)"
-            value={state.wildMagic ?? 0}
-            type="number"
-            max={3}
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, wildMagic: value }))
-            }
-          />
-          <div className="flex flex-row items-center gap-2">
-            <span>body armour ego</span>
-            <Select
-              disabled={state.armour === "none"}
-              value={selectedBodyArmourEgo}
-              onValueChange={(value) =>
-                setState((prev) => ({
-                  ...prev,
-                  bodyArmourEgo: value as BodyArmourEgoKey,
-                }))
-              }
-            >
-              <SelectTrigger className="min-w-[120px] h-6 w-auto gap-2">
-                <SelectValue placeholder="None" />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map(
-                  (key) => (
-                    <SelectItem key={key} value={key}>
-                      {bodyArmourEgos[key]?.name ?? key}
-                    </SelectItem>
-                  )
-                )}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       </section>
     </CardHeader>

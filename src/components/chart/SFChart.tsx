@@ -17,6 +17,7 @@ import { calculateAvgSFData, calculateSFTicks } from "@/utils/calculatorUtils";
 import { getSpellSchools } from "@/utils/spellCalculation";
 import { GameVersion } from "@/types/game";
 import SpellModeHeader from "../SpellModeHeader";
+import SpellControls from "../SpellControls";
 import { CartesianViewBox } from "recharts/types/util/types";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
 
@@ -45,6 +46,12 @@ const SFChart = <V extends GameVersion>({
   return (
     <>
       <SpellModeHeader state={state} setState={setState} />
+      <SpellControls
+        state={state}
+        setState={setState}
+        className="lg:hidden"
+        testId="mobile-spell-controls"
+      />
       <ResponsiveContainer width="100%" height={350}>
         <LineChart
           data={sfData}

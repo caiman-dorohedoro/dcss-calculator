@@ -128,6 +128,12 @@ describe("Calculator desktop layout", () => {
     ).find((label) => label.textContent?.includes("Species"));
     expect(speciesLabel).toBeDefined();
     expect(speciesLabel?.className).toContain("lg:basis-full");
+    const desktopSpellControls = container.querySelector(
+      '[data-testid="desktop-spell-controls"]'
+    ) as HTMLDivElement;
+    expect(desktopSpellControls).not.toBeNull();
+    expect(desktopSpellControls.className).toContain("hidden");
+    expect(desktopSpellControls.className).toContain("lg:flex");
     expect(baseStatsRow).not.toBeNull();
     expect(baseStatsRow.className).toContain("lg:flex-nowrap");
     expect(baseStatsRow.textContent).toContain("Str");
@@ -165,10 +171,14 @@ describe("Calculator desktop layout", () => {
     const equipmentSection = container.querySelector(
       '[data-testid="sidebar-section-equipment"]'
     ) as HTMLDivElement;
+    const desktopSpellControls = container.querySelector(
+      '[data-testid="desktop-spell-controls"]'
+    ) as HTMLDivElement;
 
     expect(baseStatsSection).not.toBeNull();
     expect(skillSection).not.toBeNull();
     expect(equipmentSection).not.toBeNull();
+    expect(desktopSpellControls).not.toBeNull();
 
     expect(baseStatsSection.textContent).toContain("Species");
     expect(baseStatsSection.textContent).toContain("Str");
@@ -178,21 +188,27 @@ describe("Calculator desktop layout", () => {
     expect(skillSection.textContent).toContain("Armour");
     expect(skillSection.textContent).toContain("Shield");
     expect(skillSection.textContent).toContain("Dodging");
-    expect(skillSection.textContent).toContain("Spellcasting");
-    expect(skillSection.textContent).toContain("conjuration");
-    expect(skillSection.textContent).toContain("fire");
+    expect(skillSection.textContent).not.toContain("Spellcasting");
+    expect(skillSection.textContent).not.toContain("conjuration");
+    expect(skillSection.textContent).not.toContain("fire");
     expect(skillSection.textContent).not.toContain("translocation");
     expect(skillSection.textContent).not.toContain("Armour Skill");
     expect(skillSection.textContent).not.toContain("Shield Skill");
     expect(skillSection.textContent).not.toContain("Dodging Skill");
     expect(skillSection.textContent).not.toContain("Spellcasting Skill");
 
+    expect(desktopSpellControls.className).toContain("hidden");
+    expect(desktopSpellControls.className).toContain("lg:flex");
+    expect(desktopSpellControls.textContent).toContain("Spellcasting");
+    expect(desktopSpellControls.textContent).toContain("conjuration");
+    expect(desktopSpellControls.textContent).toContain("fire");
+    expect(desktopSpellControls.textContent).toContain("ring of wizardry");
+    expect(desktopSpellControls.textContent).toContain("wild magic (mutation)");
+    expect(desktopSpellControls.textContent).toContain("body armour ego");
+
     expect(equipmentSection.textContent).toContain("Armour:");
     expect(equipmentSection.textContent).toContain("Shield:");
     expect(equipmentSection.textContent).toContain("Orb:");
-    expect(equipmentSection.textContent).toContain("ring of wizardry");
-    expect(equipmentSection.textContent).toContain("wild magic (mutation)");
-    expect(equipmentSection.textContent).toContain("body armour ego");
     expect(equipmentSection.textContent).toContain("Helmet");
   });
 });
