@@ -36,16 +36,17 @@ describe("SpellModeHeader", () => {
   });
 
   test("renders only spell selection controls", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.targetSpell = "Fireball";
+
     await act(async () => {
       root.render(
-        <SpellModeHeader
-          state={buildDefaultCalculatorState("trunk")}
-          setState={setState}
-        />
+        <SpellModeHeader state={state} setState={setState} />
       );
     });
 
     expect(container.textContent).toContain("Spell:");
+    expect(container.textContent).not.toContain("conjuration");
     expect(container.textContent).not.toContain("Spellcasting");
     expect(container.textContent).not.toContain("ring of wizardry");
     expect(container.textContent).not.toContain("wild magic (mutation)");
