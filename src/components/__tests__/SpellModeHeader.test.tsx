@@ -45,7 +45,11 @@ describe("SpellModeHeader", () => {
       );
     });
 
+    const combobox = container.querySelector('[role="combobox"]');
+
     expect(container.textContent).toContain("Spell:");
+    expect(combobox).not.toBeNull();
+    expect(combobox?.textContent).toContain("Fireball");
     expect(container.textContent).not.toContain("conjuration");
     expect(container.textContent).not.toContain("Spellcasting");
     expect(container.textContent).not.toContain("ring of wizardry");
