@@ -5,12 +5,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import AttrInput from "@/components/AttrInput";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { GameVersion } from "@/types/game";
-import { BodyArmourEgoKey } from "@/types/equipment.ts";
 import { VersionedSpellName } from "@/types/spells";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getSpellData } from "@/utils/spellCalculation";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
 
@@ -24,11 +21,6 @@ const SpellModeHeader = <V extends GameVersion>({
   setState,
 }: SpellModeHeaderProps<V>) => {
   const spells = getSpellData<V>(state.version);
-  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
-  const selectedBodyArmourEgo =
-    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
-      ? state.bodyArmourEgo
-      : "none";
 
   return (
     <div className="flex flex-col gap-2 pl-2 pr-4 pb-4">
@@ -63,82 +55,7 @@ const SpellModeHeader = <V extends GameVersion>({
                     </span>
                   </SelectItem>
                 ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <AttrInput
-          label="Spellcasting Skill"
-          value={state.spellcasting ?? 0}
-          type="skill"
-          onChange={(value) =>
-            setState((prev) => ({ ...prev, spellcasting: value }))
-          }
-        />
-      </div>
-      <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start">
-        {spells
-          .find((spell) => spell.name === state.targetSpell)
-          ?.schools.map((schoolName) => {
-            return (
-              <AttrInput
-                key={schoolName}
-                label={`${schoolName}`}
-                value={state.schoolSkills?.[schoolName] ?? 0}
-                type="skill"
-                onChange={(value) =>
-                  setState((prev) => ({
-                    ...prev,
-                    schoolSkills: {
-                      ...prev.schoolSkills,
-                      [schoolName]: value === undefined ? 0 : value,
-                    },
-                  }))
-                }
-              />
-            );
-          })}
-      </div>
-      <div className="flex flex-row gap-4 text-sm items-center flex-wrap flex-start border-t border-gray-700 pt-2">
-        <AttrInput
-          label="ring of wizardry"
-          value={state.wizardry ?? 0}
-          type="number"
-          max={10}
-          onChange={(value) =>
-            setState((prev) => ({ ...prev, wizardry: value }))
-          }
-        />
-        <AttrInput
-          label="wild magic (mutation)"
-          value={state.wildMagic ?? 0}
-          type="number"
-          max={3}
-          onChange={(value) =>
-            setState((prev) => ({ ...prev, wildMagic: value }))
-          }
-        />
-        <div className="flex flex-row items-center gap-2">
-          <span>body armour ego</span>
-          <Select
-            disabled={state.armour === "none"}
-            value={selectedBodyArmourEgo}
-            onValueChange={(value) =>
-              setState((prev) => ({
-                ...prev,
-                bodyArmourEgo: value as BodyArmourEgoKey,
-              }))
-            }
-          >
-            <SelectTrigger className="min-w-[120px] h-6 w-auto gap-2">
-              <SelectValue placeholder="None" />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {bodyArmourEgos[key]?.name ?? key}
-                </SelectItem>
-              ))}
-            </SelectContent>
+              </SelectContent>
           </Select>
         </div>
       </div>
