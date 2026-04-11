@@ -75,7 +75,8 @@ describe("App desktop shell", () => {
     ) as HTMLDivElement[];
 
     expect(shell.className).toContain("min-h-screen");
-    expect(tabs.className).toContain("max-w-6xl");
+    expect(tabs.className).toContain("max-w-7xl");
+    expect(tabs.className).not.toContain("max-w-6xl");
     expect(tabs.className).not.toContain("max-w-2xl");
     expect(tabList.className).toContain("w-full");
     expect(tabList.className).toContain("gap-x-2");

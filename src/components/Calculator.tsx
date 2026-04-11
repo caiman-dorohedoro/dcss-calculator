@@ -162,7 +162,10 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-2"
       >
         <h2 className="text-sm font-medium">Base Stats</h2>
-        <div className="flex flex-row gap-4 items-center flex-wrap">
+        <div
+          data-testid="base-stats-row"
+          className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
+        >
           <label className="flex flex-row items-center gap-2 text-sm">
             Species:
             <Select
@@ -452,7 +455,7 @@ const Calculator = <V extends GameVersion>({
   return (
     <div
       data-testid="calculator-layout"
-      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-2"
+      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-2"
     >
       <Card className="lg:contents">
         <div

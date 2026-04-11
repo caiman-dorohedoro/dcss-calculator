@@ -31,7 +31,7 @@ function App() {
       data-testid="app-shell"
       className="flex min-h-screen w-screen justify-center p-1 md:p-4"
     >
-      <Tabs defaultValue="ev" data-testid="app-tabs" className="w-full max-w-6xl">
+      <Tabs defaultValue="ev" data-testid="app-tabs" className="w-full max-w-7xl">
         <div
           className={cn(
             "relative overflow-hidden transition-all duration-150",
