@@ -10,8 +10,15 @@ import {
   test,
 } from "@jest/globals";
 import { act } from "react";
+import type { ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+
+type SortableAccordionItemMockProps = {
+  id: string;
+  title: string;
+  content: ReactNode;
+};
 
 await jest.unstable_mockModule("@/components/chart/SFChart", () => ({
   __esModule: true,
@@ -34,7 +41,11 @@ await jest.unstable_mockModule("@/components/chart/SHChart", () => ({
 }));
 
 await jest.unstable_mockModule("@/components/SortableAccordionItem", () => ({
-  SortableAccordionItem: ({ id, title, content }: any) => (
+  SortableAccordionItem: ({
+    id,
+    title,
+    content,
+  }: SortableAccordionItemMockProps) => (
     <section data-testid={`accordion-item-${id}`}>
       <h2>{title}</h2>
       <div>{content}</div>
@@ -89,14 +100,22 @@ describe("Calculator desktop layout", () => {
     const graphs = container.querySelector(
       '[data-testid="calculator-graphs-card"]'
     ) as HTMLDivElement;
+    const mobileCard = container.querySelector(
+      '[data-testid="calculator-mobile-card"]'
+    ) as HTMLDivElement;
 
     expect(layout.className).toContain("lg:grid");
     expect(layout.className).toContain("lg:grid-cols-[minmax(0,1fr)_22rem]");
+    expect(mobileCard.className).toContain("lg:hidden");
     expect(controls.className).toContain("lg:order-2");
     expect(controls.className).toContain("lg:sticky");
     expect(controls.className).toContain("lg:top-4");
+    expect(controls.className).toContain("hidden");
+    expect(controls.className).toContain("lg:block");
     expect(graphs.className).toContain("min-w-0");
     expect(graphs.className).toContain("lg:order-1");
+    expect(graphs.className).toContain("hidden");
+    expect(graphs.className).toContain("lg:block");
     expect(container.textContent).toContain("Species");
     expect(
       container.querySelector('[data-testid="accordion-item-sf"]')
