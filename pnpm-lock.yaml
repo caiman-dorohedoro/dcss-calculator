@@ -45,8 +45,8 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       dcss-morgue-parser:
-        specifier: ^0.5.0
-        version: 0.5.0
+        specifier: ^0.5.2
+        version: 0.5.2
       lucide-react:
         specifier: ^0.474.0
         version: 0.474.0(react@18.3.1)
@@ -1798,8 +1798,8 @@ packages:
     resolution: {integrity: sha512-Jy/tj3ldjZJo63sVAvg6LHt2mHvl4V6AgRAmNDtLdm7faqtsx+aJG42rsyCo9JCoRVKwPFzKlIPx3DIibwSIaQ==}
     engines: {node: '>=12'}
 
-  dcss-morgue-parser@0.5.0:
-    resolution: {integrity: sha512-Qd3920awIJwyAASyfRyQifRbmYUwUVW3NVmCiGqR7vC0ugaCTjAa1wuFIQRtQ02iaBLY+5YPjaXb8dxCELsUvQ==}
+  dcss-morgue-parser@0.5.2:
+    resolution: {integrity: sha512-p9+bBzVhTijyLR1BrieqlppoIdAEZpUJKxaLYw5f3tGFgxZ3tdWo50arDhfD29s4aXIGt+Rx5wSmoKpP+EfEUQ==}
     engines: {node: '>=18'}
 
   debug@4.4.3:
@@ -4892,7 +4892,7 @@ snapshots:
       whatwg-mimetype: 3.0.0
       whatwg-url: 11.0.0
 
-  dcss-morgue-parser@0.5.0: {}
+  dcss-morgue-parser@0.5.2: {}
 
   debug@4.4.3:
     dependencies:

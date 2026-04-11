@@ -2,6 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import type { EquipmentItemSnapshot, ParsedMorgueTextRecord } from "dcss-morgue-parser";
 import { parseMorgueText } from "dcss-morgue-parser";
 import { deepElfConjurer033Morgue } from "../__fixtures__/deepElfConjurer033";
+import { oniMonkTrunkStatueFormMorgue } from "../__fixtures__/oniMonkTrunkStatueForm";
 import {
   buildImportedCalculatorState,
   normalizeMorgueVersion,
@@ -236,5 +237,22 @@ describe("morgue import mapper", () => {
       ok: false,
       kind: "parse_failed",
     });
+  });
+
+  test("parses a trunk oni morgue even when form text adds a direct self-description", () => {
+    const parsed = parseMorgueText(oniMonkTrunkStatueFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const imported = parseImportedMorgue(oniMonkTrunkStatueFormMorgue);
+    expect(imported.ok).toBe(true);
+    if (!imported.ok) {
+      throw new Error(`import should succeed: ${imported.kind}`);
+    }
+
+    expect(imported.importedState.version).toBe("trunk");
+    expect(imported.importedState.species).toBe("oni");
   });
 });
