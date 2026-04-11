@@ -73,15 +73,29 @@ describe("SFChart mobile spell controls", () => {
     const mobileSpellControls = container.querySelector(
       '[data-testid="mobile-spell-controls"]'
     ) as HTMLDivElement;
+    const mobileSpellSkillControls = mobileSpellControls.querySelector(
+      '[data-testid="mobile-spell-skill-controls"]'
+    ) as HTMLDivElement;
+    const mobileSpellEquipmentControls = mobileSpellControls.querySelector(
+      '[data-testid="mobile-spell-equipment-controls"]'
+    ) as HTMLDivElement;
 
     expect(mobileSpellControls).not.toBeNull();
     expect(mobileSpellControls.className).toContain("lg:hidden");
+    expect(mobileSpellSkillControls).not.toBeNull();
+    expect(mobileSpellEquipmentControls).not.toBeNull();
     expect(container.textContent).toContain("Spell:");
-    expect(container.textContent).toContain("Spellcasting");
-    expect(container.textContent).toContain("conjuration");
-    expect(container.textContent).toContain("fire");
-    expect(container.textContent).toContain("ring of wizardry");
-    expect(container.textContent).toContain("wild magic (mutation)");
-    expect(container.textContent).toContain("body armour ego");
+    expect(mobileSpellSkillControls.textContent).toContain("Spellcasting");
+    expect(mobileSpellSkillControls.textContent).toContain("conjuration");
+    expect(mobileSpellSkillControls.textContent).toContain("fire");
+    expect(mobileSpellEquipmentControls.textContent).toContain(
+      "ring of wizardry"
+    );
+    expect(mobileSpellEquipmentControls.textContent).toContain(
+      "wild magic (mutation)"
+    );
+    expect(mobileSpellEquipmentControls.textContent).toContain(
+      "body armour ego"
+    );
   });
 });

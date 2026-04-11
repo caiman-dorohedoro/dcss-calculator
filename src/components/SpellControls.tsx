@@ -1,10 +1,4 @@
-import { cn } from "@/lib/utils";
-import { CalculatorState } from "@/hooks/useCalculatorState";
-import { GameVersion } from "@/types/game";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
-import { getSpellSchools } from "@/utils/spellCalculation";
 import AttrInput from "@/components/AttrInput";
-import { BodyArmourEgoKey } from "@/types/equipment.ts";
 import {
   Select,
   SelectContent,
@@ -12,6 +6,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { CalculatorState } from "@/hooks/useCalculatorState";
+import { BodyArmourEgoKey } from "@/types/equipment.ts";
+import { GameVersion } from "@/types/game";
+import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
+import { getSpellSchools } from "@/utils/spellCalculation";
 
 type SpellControlsProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -20,7 +20,7 @@ type SpellControlsProps<V extends GameVersion> = {
   testId?: string;
 };
 
-const SpellControls = <V extends GameVersion>({
+export const SpellSkillControls = <V extends GameVersion>({
   state,
   setState,
   className,
@@ -29,11 +29,6 @@ const SpellControls = <V extends GameVersion>({
   const spellSchools = state.targetSpell
     ? getSpellSchools(state.version, state.targetSpell)
     : [];
-  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
-  const selectedBodyArmourEgo =
-    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
-      ? state.bodyArmourEgo
-      : "none";
 
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
@@ -46,24 +41,46 @@ const SpellControls = <V extends GameVersion>({
             setState((prev) => ({ ...prev, spellcasting: value }))
           }
         />
-        {spellSchools.map((schoolName) => (
-          <AttrInput
-            key={schoolName}
-            label={schoolName}
-            value={state.schoolSkills?.[schoolName] ?? 0}
-            type="skill"
-            onChange={(value) =>
-              setState((prev) => ({
-                ...prev,
-                schoolSkills: {
-                  ...prev.schoolSkills,
-                  [schoolName]: value === undefined ? 0 : value,
-                },
-              }))
-            }
-          />
-        ))}
       </div>
+      {spellSchools.length > 0 && (
+        <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
+          {spellSchools.map((schoolName) => (
+            <AttrInput
+              key={schoolName}
+              label={schoolName}
+              value={state.schoolSkills?.[schoolName] ?? 0}
+              type="skill"
+              onChange={(value) =>
+                setState((prev) => ({
+                  ...prev,
+                  schoolSkills: {
+                    ...prev.schoolSkills,
+                    [schoolName]: value === undefined ? 0 : value,
+                  },
+                }))
+              }
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export const SpellEquipmentControls = <V extends GameVersion>({
+  state,
+  setState,
+  className,
+  testId,
+}: SpellControlsProps<V>) => {
+  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
+  const selectedBodyArmourEgo =
+    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
+      ? state.bodyArmourEgo
+      : "none";
+
+  return (
+    <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
       <div className="flex flex-row gap-4 text-sm items-center flex-wrap border-t border-gray-700 pt-2">
         <AttrInput
           label="ring of wizardry"
@@ -113,5 +130,3 @@ const SpellControls = <V extends GameVersion>({
     </div>
   );
 };
-
-export default SpellControls;

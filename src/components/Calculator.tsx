@@ -43,7 +43,10 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
-import SpellControls from "@/components/SpellControls";
+import {
+  SpellEquipmentControls,
+  SpellSkillControls,
+} from "@/components/SpellControls";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -58,6 +61,15 @@ const equipmentToggleLabels: Record<EquipmentToggleKey, string> = {
   barding: "Barding",
   secondGloves: "2nd Gloves",
 };
+
+const SectionHeading = ({ children }: { children: string }) => (
+  <div className="flex items-center gap-3">
+    <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      {children}
+    </h2>
+    <div className="h-px flex-1 bg-border/60" />
+  </div>
+);
 
 const Calculator = <V extends GameVersion>({
   state,
@@ -149,9 +161,9 @@ const Calculator = <V extends GameVersion>({
     <CardHeader className="flex flex-col gap-4">
       <section
         data-testid="sidebar-section-base-stats"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-3"
       >
-        <h2 className="text-sm font-medium">Base Stats</h2>
+        <SectionHeading>Base Stats</SectionHeading>
         <div className="flex flex-row flex-wrap items-center gap-4 text-sm">
           <label className="flex flex-row items-center gap-2 text-sm lg:basis-full">
             Species:
@@ -211,9 +223,9 @@ const Calculator = <V extends GameVersion>({
       </section>
       <section
         data-testid="sidebar-section-skill"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-3"
       >
-        <h2 className="text-sm font-medium">Skill</h2>
+        <SectionHeading>Skill</SectionHeading>
         <div className="flex flex-row items-center gap-2 flex-wrap">
           {skillAttrKeys.map(({ label, key }) => (
             <AttrInput
@@ -227,18 +239,18 @@ const Calculator = <V extends GameVersion>({
             />
           ))}
         </div>
+        <SpellSkillControls
+          state={state}
+          setState={setState}
+          className="hidden lg:flex"
+          testId="desktop-spell-skill-controls"
+        />
       </section>
-      <SpellControls
-        state={state}
-        setState={setState}
-        className="hidden lg:flex"
-        testId="desktop-spell-controls"
-      />
       <section
         data-testid="sidebar-section-equipment"
-        className="flex flex-col gap-2"
+        className="flex flex-col gap-3"
       >
-        <h2 className="text-sm font-medium">Equipment</h2>
+        <SectionHeading>Equipment</SectionHeading>
         <div className="flex items-center flex-row gap-4 flex-wrap">
           <label className="flex flex-row items-center gap-2 text-sm">
             Armour:
@@ -328,6 +340,12 @@ const Calculator = <V extends GameVersion>({
             </Fragment>
           ))}
         </div>
+        <SpellEquipmentControls
+          state={state}
+          setState={setState}
+          className="hidden lg:flex"
+          testId="desktop-spell-equipment-controls"
+        />
       </section>
     </CardHeader>
   );
