@@ -27,8 +27,11 @@ function App() {
   }, [flash]);
 
   return (
-    <div className="p-1 md:p-4 flex items-center justify-center w-screen">
-      <Tabs defaultValue="ev" className="w-full max-w-2xl">
+    <div
+      data-testid="app-shell"
+      className="flex min-h-screen w-screen justify-center p-1 md:p-4"
+    >
+      <Tabs defaultValue="ev" data-testid="app-tabs" className="w-full max-w-7xl">
         <div
           className={cn(
             "relative overflow-hidden transition-all duration-150",

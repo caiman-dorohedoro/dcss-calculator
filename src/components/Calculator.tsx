@@ -43,6 +43,10 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
+import {
+  SpellEquipmentControls,
+  SpellSkillControls,
+} from "@/components/SpellControls";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -58,24 +62,33 @@ const equipmentToggleLabels: Record<EquipmentToggleKey, string> = {
   secondGloves: "2nd Gloves",
 };
 
+const SectionHeading = ({ children }: { children: string }) => (
+  <div className="flex items-center gap-3">
+    <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+      {children}
+    </h2>
+    <div className="h-px flex-1 bg-border/60" />
+  </div>
+);
+
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
   const checkboxKeys = getEquipmentToggleKeys(state.version);
 
-  const skillAttrKeys: Array<{ label: string; key: keyof CalculatorState<V> }> =
+  const skillAttrKeys: Array<{ label: string; key: "armourSkill" | "shieldSkill" | "dodgingSkill" }> =
     [
       {
-        label: "Armour Skill",
+        label: "Armour",
         key: "armourSkill",
       },
       {
-        label: "Shield Skill",
+        label: "Shield",
         key: "shieldSkill",
       },
       {
-        label: "Dodging Skill",
+        label: "Dodging",
         key: "dodgingSkill",
       },
     ];
@@ -144,11 +157,15 @@ const Calculator = <V extends GameVersion>({
     }));
   };
 
-  return (
-    <Card>
-      <CardHeader className="flex flex-col gap-2">
-        <div className="flex flex-row gap-4 items-center flex-wrap">
-          <label className="flex flex-row items-center gap-2 text-sm">
+  const controlsContent = (
+    <CardHeader className="flex flex-col gap-4">
+      <section
+        data-testid="sidebar-section-base-stats"
+        className="flex flex-col gap-3"
+      >
+        <SectionHeading>Base Stats</SectionHeading>
+        <div className="flex flex-row flex-wrap items-center gap-4 text-sm">
+          <label className="flex flex-row items-center gap-2 text-sm lg:basis-full">
             Species:
             <Select
               value={state.species}
@@ -173,31 +190,42 @@ const Calculator = <V extends GameVersion>({
               </SelectContent>
             </Select>
           </label>
-          <AttrInput
-            label="Str"
-            value={state.strength}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, strength: value }))
-            }
-          />
-          <AttrInput
-            label="Dex"
-            value={state.dexterity}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, dexterity: value }))
-            }
-          />
-          <AttrInput
-            label="Int"
-            value={state.intelligence}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, intelligence: value }))
-            }
-          />
+          <div
+            data-testid="base-stats-row"
+            className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
+          >
+            <AttrInput
+              label="Str"
+              value={state.strength}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, strength: value }))
+              }
+            />
+            <AttrInput
+              label="Dex"
+              value={state.dexterity}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, dexterity: value }))
+              }
+            />
+            <AttrInput
+              label="Int"
+              value={state.intelligence}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, intelligence: value }))
+              }
+            />
+          </div>
         </div>
+      </section>
+      <section
+        data-testid="sidebar-section-skill"
+        className="flex flex-col gap-3"
+      >
+        <SectionHeading>Skill</SectionHeading>
         <div className="flex flex-row items-center gap-2 flex-wrap">
           {skillAttrKeys.map(({ label, key }) => (
             <AttrInput
@@ -211,6 +239,18 @@ const Calculator = <V extends GameVersion>({
             />
           ))}
         </div>
+        <SpellSkillControls
+          state={state}
+          setState={setState}
+          className="hidden lg:flex"
+          testId="desktop-spell-skill-controls"
+        />
+      </section>
+      <section
+        data-testid="sidebar-section-equipment"
+        className="flex flex-col gap-3"
+      >
+        <SectionHeading>Equipment</SectionHeading>
         <div className="flex items-center flex-row gap-4 flex-wrap">
           <label className="flex flex-row items-center gap-2 text-sm">
             Armour:
@@ -300,48 +340,79 @@ const Calculator = <V extends GameVersion>({
             </Fragment>
           ))}
         </div>
-      </CardHeader>
-      <CardContent className="p-1 pb-0">
-        <Accordion
-          type="multiple"
-          value={state.accordionValue}
-          onValueChange={(value) =>
-            setState((prev) => ({ ...prev, accordionValue: value }))
-          }
+        <SpellEquipmentControls
+          state={state}
+          setState={setState}
+          className="hidden lg:flex"
+          testId="desktop-spell-equipment-controls"
+        />
+      </section>
+    </CardHeader>
+  );
+
+  const graphsContent = (
+    <CardContent className="p-1 pb-0">
+      <Accordion
+        type="multiple"
+        value={state.accordionValue}
+        onValueChange={(value) =>
+          setState((prev) => ({ ...prev, accordionValue: value }))
+        }
+      >
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+          <SortableContext
+            items={accordionItems}
+            strategy={verticalListSortingStrategy}
           >
-            <SortableContext
-              items={accordionItems}
-              strategy={verticalListSortingStrategy}
-            >
-              {accordionItems.map((item, index) => (
-                <SortableAccordionItem
-                  key={item.id}
-                  id={item.id}
-                  title={item.title}
-                  content={item.content}
-                  isLast={index === accordionItems.length - 1}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
-        </Accordion>
-        <div className="text-right text-xs mb-1 mr-1 hover:cursor-pointer hover:underline">
-          <a
-            href="https://github.com/caiman-dorohedoro/dcss-calculator"
-            className="inline-flex items-center gap-1"
-            target="_blank"
-          >
-            <img src={githubIcon} alt="GitHub" width={12} height={12} />
-            github
-          </a>
+            {accordionItems.map((item, index) => (
+              <SortableAccordionItem
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                content={item.content}
+                isLast={index === accordionItems.length - 1}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
+      </Accordion>
+      <div className="text-right text-xs mb-1 mr-1 hover:cursor-pointer hover:underline">
+        <a
+          href="https://github.com/caiman-dorohedoro/dcss-calculator"
+          className="inline-flex items-center gap-1"
+          target="_blank"
+        >
+          <img src={githubIcon} alt="GitHub" width={12} height={12} />
+          github
+        </a>
+      </div>
+    </CardContent>
+  );
+
+  return (
+    <div
+      data-testid="calculator-layout"
+      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start lg:gap-2"
+    >
+      <Card className="lg:contents">
+        <div
+          data-testid="calculator-controls-card"
+          className="lg:order-2 lg:sticky lg:top-4 lg:border lg:border-white lg:bg-card lg:text-card-foreground lg:[outline:1px_solid_white] lg:[outline-offset:-4px]"
+        >
+          {controlsContent}
         </div>
-      </CardContent>
-    </Card>
+        <div
+          data-testid="calculator-graphs-card"
+          className="min-w-0 lg:order-1 lg:border lg:border-white lg:bg-card lg:text-card-foreground lg:[outline:1px_solid_white] lg:[outline-offset:-4px]"
+        >
+          {graphsContent}
+        </div>
+      </Card>
+    </div>
   );
 };
 
