@@ -350,21 +350,19 @@ const Calculator = <V extends GameVersion>({
       data-testid="calculator-layout"
       className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-2"
     >
-      <Card data-testid="calculator-mobile-card" className="lg:hidden">
-        {controlsContent}
-        {graphsContent}
-      </Card>
-      <Card
-        data-testid="calculator-controls-card"
-        className="hidden lg:order-2 lg:block lg:sticky lg:top-4"
-      >
-        {controlsContent}
-      </Card>
-      <Card
-        data-testid="calculator-graphs-card"
-        className="hidden min-w-0 lg:order-1 lg:block"
-      >
-        {graphsContent}
+      <Card className="lg:contents">
+        <div
+          data-testid="calculator-controls-card"
+          className="lg:order-2 lg:sticky lg:top-4 lg:border lg:border-white lg:bg-card lg:text-card-foreground lg:[outline:1px_solid_white] lg:[outline-offset:-4px]"
+        >
+          {controlsContent}
+        </div>
+        <div
+          data-testid="calculator-graphs-card"
+          className="min-w-0 lg:order-1 lg:border lg:border-white lg:bg-card lg:text-card-foreground lg:[outline:1px_solid_white] lg:[outline-offset:-4px]"
+        >
+          {graphsContent}
+        </div>
       </Card>
     </div>
   );

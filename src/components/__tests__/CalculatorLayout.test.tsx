@@ -100,34 +100,35 @@ describe("Calculator desktop layout", () => {
     const graphs = container.querySelector(
       '[data-testid="calculator-graphs-card"]'
     ) as HTMLDivElement;
-    const mobileCard = container.querySelector(
-      '[data-testid="calculator-mobile-card"]'
-    ) as HTMLDivElement;
 
     expect(layout.className).toContain("lg:grid");
     expect(layout.className).toContain("lg:grid-cols-[minmax(0,1fr)_22rem]");
-    expect(mobileCard.className).toContain("lg:hidden");
+    expect(
+      container.querySelector('[data-testid="calculator-mobile-card"]')
+    ).toBeNull();
+    expect(
+      container.querySelectorAll('[data-testid="calculator-controls-card"]')
+    ).toHaveLength(1);
+    expect(
+      container.querySelectorAll('[data-testid="calculator-graphs-card"]')
+    ).toHaveLength(1);
     expect(controls.className).toContain("lg:order-2");
     expect(controls.className).toContain("lg:sticky");
     expect(controls.className).toContain("lg:top-4");
-    expect(controls.className).toContain("hidden");
-    expect(controls.className).toContain("lg:block");
     expect(graphs.className).toContain("min-w-0");
     expect(graphs.className).toContain("lg:order-1");
-    expect(graphs.className).toContain("hidden");
-    expect(graphs.className).toContain("lg:block");
     expect(container.textContent).toContain("Species");
     expect(
-      container.querySelector('[data-testid="accordion-item-sf"]')
-    ).not.toBeNull();
+      container.querySelectorAll('[data-testid="accordion-item-sf"]')
+    ).toHaveLength(1);
     expect(
-      container.querySelector('[data-testid="accordion-item-ev"]')
-    ).not.toBeNull();
+      container.querySelectorAll('[data-testid="accordion-item-ev"]')
+    ).toHaveLength(1);
     expect(
-      container.querySelector('[data-testid="accordion-item-ac"]')
-    ).not.toBeNull();
+      container.querySelectorAll('[data-testid="accordion-item-ac"]')
+    ).toHaveLength(1);
     expect(
-      container.querySelector('[data-testid="accordion-item-sh"]')
-    ).not.toBeNull();
+      container.querySelectorAll('[data-testid="accordion-item-sh"]')
+    ).toHaveLength(1);
   });
 });
