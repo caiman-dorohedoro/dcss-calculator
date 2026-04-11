@@ -70,6 +70,9 @@ describe("App desktop shell", () => {
       '[data-testid="app-tabs"]'
     ) as HTMLDivElement;
     const tabList = container.querySelector('[role="tablist"]') as HTMLDivElement;
+    const [versionCluster, centerCluster, resetButton] = Array.from(
+      tabList.children
+    ) as HTMLDivElement[];
 
     expect(shell.className).toContain("min-h-screen");
     expect(tabs.className).toContain("max-w-6xl");
@@ -77,6 +80,18 @@ describe("App desktop shell", () => {
     expect(tabList.className).toContain("w-full");
     expect(tabList.className).toContain("gap-x-2");
     expect(tabList.className).toContain("relative");
+    expect(versionCluster.className).toContain("absolute");
+    expect(versionCluster.className).toContain("left-4");
+    expect(versionCluster.className).toContain("top-1/2");
+    expect(versionCluster.className).toContain("-translate-y-1/2");
+    expect(versionCluster.className).toContain("flex items-center gap-x-2");
+    expect(versionCluster.textContent).toContain("trunk");
+    expect(centerCluster.className).toContain("mx-auto");
+    expect(centerCluster.className).toContain("flex items-center gap-x-2");
+    expect(centerCluster.textContent).toContain("DCSS Calculator");
+    expect(centerCluster.textContent).toContain("import");
+    expect(resetButton.className).toContain("absolute");
+    expect(resetButton.className).toContain("right-8");
     expect(container.textContent).toContain("DCSS Calculator");
     expect(container.textContent).toContain("trunk");
     expect(container.textContent).toContain("Reset to Default");
