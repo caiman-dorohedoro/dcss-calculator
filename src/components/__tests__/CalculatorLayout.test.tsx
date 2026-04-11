@@ -131,4 +131,52 @@ describe("Calculator desktop layout", () => {
       container.querySelectorAll('[data-testid="accordion-item-sh"]')
     ).toHaveLength(1);
   });
+
+  test("groups the right sidebar into base stats, skill, and equipment sections", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.targetSpell = "Fireball";
+
+    await act(async () => {
+      root.render(<Calculator state={state} setState={mockSetState} />);
+    });
+
+    const baseStatsSection = container.querySelector(
+      '[data-testid="sidebar-section-base-stats"]'
+    ) as HTMLDivElement;
+    const skillSection = container.querySelector(
+      '[data-testid="sidebar-section-skill"]'
+    ) as HTMLDivElement;
+    const equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+
+    expect(baseStatsSection).not.toBeNull();
+    expect(skillSection).not.toBeNull();
+    expect(equipmentSection).not.toBeNull();
+
+    expect(baseStatsSection.textContent).toContain("Species");
+    expect(baseStatsSection.textContent).toContain("Str");
+    expect(baseStatsSection.textContent).toContain("Dex");
+    expect(baseStatsSection.textContent).toContain("Int");
+
+    expect(skillSection.textContent).toContain("Armour");
+    expect(skillSection.textContent).toContain("Shield");
+    expect(skillSection.textContent).toContain("Dodging");
+    expect(skillSection.textContent).toContain("Spellcasting");
+    expect(skillSection.textContent).toContain("conjuration");
+    expect(skillSection.textContent).toContain("fire");
+    expect(skillSection.textContent).not.toContain("translocation");
+    expect(skillSection.textContent).not.toContain("Armour Skill");
+    expect(skillSection.textContent).not.toContain("Shield Skill");
+    expect(skillSection.textContent).not.toContain("Dodging Skill");
+    expect(skillSection.textContent).not.toContain("Spellcasting Skill");
+
+    expect(equipmentSection.textContent).toContain("Armour:");
+    expect(equipmentSection.textContent).toContain("Shield:");
+    expect(equipmentSection.textContent).toContain("Orb:");
+    expect(equipmentSection.textContent).toContain("ring of wizardry");
+    expect(equipmentSection.textContent).toContain("wild magic (mutation)");
+    expect(equipmentSection.textContent).toContain("body armour ego");
+    expect(equipmentSection.textContent).toContain("Helmet");
+  });
 });
