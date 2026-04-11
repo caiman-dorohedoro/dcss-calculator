@@ -123,6 +123,11 @@ describe("Calculator desktop layout", () => {
     expect(controls.className).toContain("lg:top-4");
     expect(graphs.className).toContain("min-w-0");
     expect(graphs.className).toContain("lg:order-1");
+    const speciesLabel = Array.from(
+      baseStatsSection.querySelectorAll("label")
+    ).find((label) => label.textContent?.includes("Species"));
+    expect(speciesLabel).toBeDefined();
+    expect(speciesLabel?.className).toContain("lg:basis-full");
     expect(baseStatsRow).not.toBeNull();
     expect(baseStatsRow.className).toContain("lg:flex-nowrap");
     expect(baseStatsRow.textContent).toContain("Str");
