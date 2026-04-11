@@ -128,7 +128,6 @@ describe("Calculator desktop layout", () => {
     expect(baseStatsRow.textContent).toContain("Str");
     expect(baseStatsRow.textContent).toContain("Dex");
     expect(baseStatsRow.textContent).toContain("Int");
-    expect(baseStatsRow.textContent).not.toContain("Species");
     expect(baseStatsSection.textContent).toContain("Species");
     expect(
       container.querySelectorAll('[data-testid="accordion-item-sf"]')

@@ -162,8 +162,8 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-2"
       >
         <h2 className="text-sm font-medium">Base Stats</h2>
-        <div className="flex flex-row items-center gap-2 text-sm">
-          <label className="flex flex-row items-center gap-2 text-sm">
+        <div className="flex flex-row flex-wrap items-center gap-4 text-sm">
+          <label className="flex flex-row items-center gap-2 text-sm lg:basis-full">
             Species:
             <Select
               value={state.species}
@@ -188,35 +188,35 @@ const Calculator = <V extends GameVersion>({
               </SelectContent>
             </Select>
           </label>
-        </div>
-        <div
-          data-testid="base-stats-row"
-          className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
-        >
-          <AttrInput
-            label="Str"
-            value={state.strength}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, strength: value }))
-            }
-          />
-          <AttrInput
-            label="Dex"
-            value={state.dexterity}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, dexterity: value }))
-            }
-          />
-          <AttrInput
-            label="Int"
-            value={state.intelligence}
-            type="stat"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, intelligence: value }))
-            }
-          />
+          <div
+            data-testid="base-stats-row"
+            className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
+          >
+            <AttrInput
+              label="Str"
+              value={state.strength}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, strength: value }))
+              }
+            />
+            <AttrInput
+              label="Dex"
+              value={state.dexterity}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, dexterity: value }))
+              }
+            />
+            <AttrInput
+              label="Int"
+              value={state.intelligence}
+              type="stat"
+              onChange={(value) =>
+                setState((prev) => ({ ...prev, intelligence: value }))
+              }
+            />
+          </div>
         </div>
       </section>
       <section
