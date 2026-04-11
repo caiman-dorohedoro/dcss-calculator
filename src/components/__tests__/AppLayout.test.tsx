@@ -69,11 +69,17 @@ describe("App desktop shell", () => {
     const tabs = container.querySelector(
       '[data-testid="app-tabs"]'
     ) as HTMLDivElement;
+    const tabList = container.querySelector('[role="tablist"]') as HTMLDivElement;
 
     expect(shell.className).toContain("min-h-screen");
     expect(tabs.className).toContain("max-w-6xl");
     expect(tabs.className).not.toContain("max-w-2xl");
+    expect(tabList.className).toContain("w-full");
+    expect(tabList.className).toContain("gap-x-2");
+    expect(tabList.className).toContain("relative");
     expect(container.textContent).toContain("DCSS Calculator");
+    expect(container.textContent).toContain("trunk");
+    expect(container.textContent).toContain("Reset to Default");
     expect(
       container.querySelector('[data-testid="morgue-import-stub"]')
     ).not.toBeNull();
