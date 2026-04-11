@@ -109,6 +109,9 @@ describe("Calculator desktop layout", () => {
     const baseStatsRow = container.querySelector(
       '[data-testid="base-stats-row"]'
     ) as HTMLDivElement;
+    const baseStatsSection = container.querySelector(
+      '[data-testid="sidebar-section-base-stats"]'
+    ) as HTMLDivElement;
     expect(
       container.querySelectorAll('[data-testid="calculator-controls-card"]')
     ).toHaveLength(1);
@@ -122,7 +125,11 @@ describe("Calculator desktop layout", () => {
     expect(graphs.className).toContain("lg:order-1");
     expect(baseStatsRow).not.toBeNull();
     expect(baseStatsRow.className).toContain("lg:flex-nowrap");
-    expect(container.textContent).toContain("Species");
+    expect(baseStatsRow.textContent).toContain("Str");
+    expect(baseStatsRow.textContent).toContain("Dex");
+    expect(baseStatsRow.textContent).toContain("Int");
+    expect(baseStatsRow.textContent).not.toContain("Species");
+    expect(baseStatsSection.textContent).toContain("Species");
     expect(
       container.querySelectorAll('[data-testid="accordion-item-sf"]')
     ).toHaveLength(1);

@@ -162,10 +162,7 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-2"
       >
         <h2 className="text-sm font-medium">Base Stats</h2>
-        <div
-          data-testid="base-stats-row"
-          className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
-        >
+        <div className="flex flex-row items-center gap-2 text-sm">
           <label className="flex flex-row items-center gap-2 text-sm">
             Species:
             <Select
@@ -191,6 +188,11 @@ const Calculator = <V extends GameVersion>({
               </SelectContent>
             </Select>
           </label>
+        </div>
+        <div
+          data-testid="base-stats-row"
+          className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
+        >
           <AttrInput
             label="Str"
             value={state.strength}
