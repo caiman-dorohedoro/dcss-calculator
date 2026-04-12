@@ -16,6 +16,7 @@ import {
   clearAmuletSlotMetadata,
   clearAuxArmourSlotMetadata,
   clearRingSlotMetadata,
+  applyRingSlotUpdate,
 } from "@/types/equipmentSlots";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import AttrInput from "../AttrInput";
@@ -212,5 +213,21 @@ describe("DynamicEquipmentControls", () => {
     const nextState = updater(state);
 
     expect(nextState.headgearSlots[0].enchant).toBe(-2);
+  });
+
+  test("ring slot updates do not overwrite legacy wizardry", () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.wizardry = 1;
+
+    const nextState = applyRingSlotUpdate(state, 0, () => ({
+      kind: "wizardry",
+      plus: 0,
+    }));
+
+    expect(nextState.wizardry).toBe(1);
+    expect(nextState.ringSlots[0]).toEqual({
+      kind: "wizardry",
+      plus: 0,
+    });
   });
 });

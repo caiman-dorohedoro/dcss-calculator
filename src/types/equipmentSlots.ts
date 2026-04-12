@@ -67,3 +67,17 @@ export const clearAuxArmourSlotMetadata = (
   present,
   enchant: present ? slot.enchant : 0,
 });
+
+export const applyRingSlotUpdate = <T extends { ringSlots: RingSlotState[] }>(
+  state: T,
+  index: number,
+  update: (slot: RingSlotState) => RingSlotState
+): T => {
+  const nextRingSlots = [...state.ringSlots];
+  nextRingSlots[index] = update(nextRingSlots[index] ?? createDefaultRingSlot());
+
+  return {
+    ...state,
+    ringSlots: nextRingSlots,
+  };
+};

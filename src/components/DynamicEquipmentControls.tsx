@@ -13,6 +13,7 @@ import {
   createDefaultAmuletSlot,
   createDefaultAuxArmourSlot,
   createDefaultRingSlot,
+  applyRingSlotUpdate,
   clearAmuletSlotMetadata,
   clearAuxArmourSlotMetadata,
   clearRingSlotMetadata,
@@ -86,22 +87,18 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     update: (slot: RingSlotState) => RingSlotState
   ) => {
     setState((prev) => {
-      const nextRingSlots = coerceSlotArrayLength(
-        prev.ringSlots,
-        slotCounts.ringSlots,
-        createDefaultRingSlot
+      return applyRingSlotUpdate(
+        {
+          ...prev,
+          ringSlots: coerceSlotArrayLength(
+            prev.ringSlots,
+            slotCounts.ringSlots,
+            createDefaultRingSlot
+          ),
+        },
+        index,
+        update
       );
-      nextRingSlots[index] = update(nextRingSlots[index] ?? createDefaultRingSlot());
-      const wizardry = nextRingSlots.reduce(
-        (count, slot) => count + (slot.kind === "wizardry" ? 1 : 0),
-        0
-      );
-
-      return {
-        ...prev,
-        ringSlots: nextRingSlots,
-        wizardry,
-      };
     });
   };
 
