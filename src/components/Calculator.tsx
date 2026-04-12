@@ -1,6 +1,4 @@
-import { Fragment } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -25,7 +23,6 @@ import {
 } from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { GameVersion } from "@/types/game";
-import { EquipmentToggleKey, getEquipmentToggleKeys } from "@/versioning/uiOptions";
 import {
   DndContext,
   closestCenter,
@@ -43,23 +40,12 @@ import {
 } from "@dnd-kit/sortable";
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
-import {
-  SpellEquipmentControls,
-  SpellSkillControls,
-} from "@/components/SpellControls";
+import { SpellSkillControls } from "@/components/SpellControls";
+import DynamicEquipmentControls from "@/components/DynamicEquipmentControls";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
   setState: React.Dispatch<React.SetStateAction<CalculatorState<V>>>;
-};
-
-const equipmentToggleLabels: Record<EquipmentToggleKey, string> = {
-  helmet: "Helmet",
-  cloak: "Cloak",
-  gloves: "Gloves",
-  boots: "Boots",
-  barding: "Barding",
-  secondGloves: "2nd Gloves",
 };
 
 const SectionHeading = ({ children }: { children: string }) => (
@@ -75,8 +61,6 @@ const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
-  const checkboxKeys = getEquipmentToggleKeys(state.version);
-
   const skillAttrKeys: Array<{ label: string; key: "armourSkill" | "shieldSkill" | "dodgingSkill" }> =
     [
       {
@@ -100,7 +84,6 @@ const Calculator = <V extends GameVersion>({
     })
   );
 
-  // define default item order
   const defaultAccordionItems = [
     {
       id: "sf",
@@ -323,28 +306,11 @@ const Calculator = <V extends GameVersion>({
             </Select>
           </label>
         </div>
-        <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
-          {checkboxKeys.map((key) => (
-            <Fragment key={key}>
-              <label htmlFor={key} className="flex flex-row items-center gap-2">
-                <Checkbox
-                  checked={!!state[key]}
-                  onCheckedChange={(checked) =>
-                    setState((prev) => ({ ...prev, [key]: !!checked }))
-                  }
-                  id={key}
-                />
-                {equipmentToggleLabels[key]}
-              </label>
-              {key === "boots" && <div className="h-3 w-px bg-gray-200"></div>}
-            </Fragment>
-          ))}
-        </div>
-        <SpellEquipmentControls
+        <DynamicEquipmentControls
           state={state}
           setState={setState}
           className="hidden lg:flex"
-          testId="desktop-spell-equipment-controls"
+          testId="desktop-dynamic-equipment-controls"
         />
       </section>
     </CardHeader>

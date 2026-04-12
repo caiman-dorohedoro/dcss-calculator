@@ -16,6 +16,7 @@ type AttrInputProps = {
   label: string;
   value: number;
   type: "stat" | "skill" | "number";
+  min?: number;
   max?: number;
   onChange: (value: number) => void;
 };
@@ -24,9 +25,12 @@ const AttrInput = ({
   label,
   value,
   type = "stat",
+  min,
   max,
   onChange,
 }: AttrInputProps) => {
+  const minValue =
+    min !== undefined ? min : type === "number" ? undefined : 0;
   const maxValue = max !== undefined ? max : type === "skill" ? 27 : undefined;
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue =
@@ -43,7 +47,7 @@ const AttrInput = ({
       <Input
         type="number"
         className={cn(defaultWidth, type === "skill" ? skillWidth : "", "h-6")}
-        min="0"
+        min={minValue}
         max={maxValue}
         step={type === "skill" ? "0.1" : undefined}
         value={value}

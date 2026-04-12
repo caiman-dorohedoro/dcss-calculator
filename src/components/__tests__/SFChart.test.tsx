@@ -76,25 +76,23 @@ describe("SFChart mobile spell controls", () => {
     const mobileSpellSkillControls = mobileSpellControls.querySelector(
       '[data-testid="mobile-spell-skill-controls"]'
     ) as HTMLDivElement;
-    const mobileSpellEquipmentControls = mobileSpellControls.querySelector(
-      '[data-testid="mobile-spell-equipment-controls"]'
+    const mobileDynamicEquipmentControls = mobileSpellControls.querySelector(
+      '[data-testid="mobile-dynamic-equipment-controls"]'
     ) as HTMLDivElement;
 
     expect(mobileSpellControls).not.toBeNull();
     expect(mobileSpellControls.className).toContain("lg:hidden");
     expect(mobileSpellSkillControls).not.toBeNull();
-    expect(mobileSpellEquipmentControls).not.toBeNull();
+    expect(mobileDynamicEquipmentControls).not.toBeNull();
     expect(container.textContent).toContain("Spell:");
     expect(mobileSpellSkillControls.textContent).toContain("Spellcasting");
     expect(mobileSpellSkillControls.textContent).toContain("conjuration");
     expect(mobileSpellSkillControls.textContent).toContain("fire");
-    expect(mobileSpellEquipmentControls.textContent).toContain(
-      "ring of wizardry"
-    );
-    expect(mobileSpellEquipmentControls.textContent).toContain(
-      "wild magic (mutation)"
-    );
-    expect(mobileSpellEquipmentControls.textContent).toContain(
+    expect(mobileDynamicEquipmentControls.textContent).toContain("Ring 1");
+    expect(mobileDynamicEquipmentControls.textContent).toContain("Amulet 1");
+    expect(mobileDynamicEquipmentControls.textContent).toContain("Headgear 1");
+    expect(mobileDynamicEquipmentControls.textContent).toContain("Glove 1");
+    expect(mobileDynamicEquipmentControls.textContent).toContain(
       "body armour ego"
     );
   });

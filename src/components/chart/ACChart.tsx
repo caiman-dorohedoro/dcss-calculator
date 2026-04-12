@@ -31,6 +31,8 @@ const ACChart = <V extends GameVersion>({ state }: ACChartProps<V>) => {
 
   const zeroBaseAC =
     state.armour === "none" &&
+    !state.headgearSlots.some((slot) => slot.present) &&
+    !state.gloveSlots.some((slot) => slot.present) &&
     !state.helmet &&
     !state.gloves &&
     !state.boots &&

@@ -1,16 +1,7 @@
 import AttrInput from "@/components/AttrInput";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { CalculatorState } from "@/hooks/useCalculatorState";
-import { BodyArmourEgoKey } from "@/types/equipment.ts";
 import { GameVersion } from "@/types/game";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getSpellSchools } from "@/utils/spellCalculation";
 
 type SpellControlsProps<V extends GameVersion> = {
@@ -63,70 +54,6 @@ export const SpellSkillControls = <V extends GameVersion>({
           ))}
         </div>
       )}
-    </div>
-  );
-};
-
-export const SpellEquipmentControls = <V extends GameVersion>({
-  state,
-  setState,
-  className,
-  testId,
-}: SpellControlsProps<V>) => {
-  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
-  const selectedBodyArmourEgo =
-    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
-      ? state.bodyArmourEgo
-      : "none";
-
-  return (
-    <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
-      <div className="flex flex-row gap-4 text-sm items-center flex-wrap border-t border-gray-700 pt-2">
-        <AttrInput
-          label="ring of wizardry"
-          value={state.wizardry ?? 0}
-          type="number"
-          max={10}
-          onChange={(value) =>
-            setState((prev) => ({ ...prev, wizardry: value }))
-          }
-        />
-        <AttrInput
-          label="wild magic (mutation)"
-          value={state.wildMagic ?? 0}
-          type="number"
-          max={3}
-          onChange={(value) =>
-            setState((prev) => ({ ...prev, wildMagic: value }))
-          }
-        />
-        <div className="flex flex-row items-center gap-2">
-          <span>body armour ego</span>
-          <Select
-            disabled={state.armour === "none"}
-            value={selectedBodyArmourEgo}
-            onValueChange={(value) =>
-              setState((prev) => ({
-                ...prev,
-                bodyArmourEgo: value as BodyArmourEgoKey,
-              }))
-            }
-          >
-            <SelectTrigger className="min-w-[120px] h-6 w-auto gap-2">
-              <SelectValue placeholder="None" />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map(
-                (key) => (
-                  <SelectItem key={key} value={key}>
-                    {bodyArmourEgos[key]?.name ?? key}
-                  </SelectItem>
-                )
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
     </div>
   );
 };

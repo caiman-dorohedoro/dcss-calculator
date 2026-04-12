@@ -171,15 +171,15 @@ describe("Calculator desktop layout", () => {
     const desktopSpellSkillControls = skillSection.querySelector(
       '[data-testid="desktop-spell-skill-controls"]'
     ) as HTMLDivElement;
-    const desktopSpellEquipmentControls = equipmentSection.querySelector(
-      '[data-testid="desktop-spell-equipment-controls"]'
+    const desktopDynamicEquipmentControls = equipmentSection.querySelector(
+      '[data-testid="desktop-dynamic-equipment-controls"]'
     ) as HTMLDivElement;
 
     expect(baseStatsSection).not.toBeNull();
     expect(skillSection).not.toBeNull();
     expect(equipmentSection).not.toBeNull();
     expect(desktopSpellSkillControls).not.toBeNull();
-    expect(desktopSpellEquipmentControls).not.toBeNull();
+    expect(desktopDynamicEquipmentControls).not.toBeNull();
 
     expect(baseStatsSection.textContent).toContain("Species");
     expect(baseStatsSection.textContent).toContain("Str");
@@ -206,21 +206,20 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).toContain("Armour:");
     expect(equipmentSection.textContent).toContain("Shield:");
     expect(equipmentSection.textContent).toContain("Orb:");
-    expect(equipmentSection.textContent).toContain("Helmet");
-    expect(desktopSpellEquipmentControls.className).toContain("hidden");
-    expect(desktopSpellEquipmentControls.className).toContain("lg:flex");
-    expect(desktopSpellEquipmentControls.textContent).toContain(
-      "ring of wizardry"
-    );
-    expect(desktopSpellEquipmentControls.textContent).toContain(
-      "wild magic (mutation)"
-    );
-    expect(desktopSpellEquipmentControls.textContent).toContain(
+    expect(desktopDynamicEquipmentControls.className).toContain("hidden");
+    expect(desktopDynamicEquipmentControls.className).toContain("lg:flex");
+    expect(desktopDynamicEquipmentControls.textContent).toContain("Ring 1");
+    expect(desktopDynamicEquipmentControls.textContent).toContain("Amulet 1");
+    expect(desktopDynamicEquipmentControls.textContent).toContain("Headgear 1");
+    expect(desktopDynamicEquipmentControls.textContent).toContain("Glove 1");
+    expect(desktopDynamicEquipmentControls.textContent).toContain(
       "body armour ego"
     );
 
-    expect(equipmentSection.textContent).toContain("ring of wizardry");
-    expect(equipmentSection.textContent).toContain("wild magic (mutation)");
+    expect(equipmentSection.textContent).toContain("Ring 1");
+    expect(equipmentSection.textContent).toContain("Amulet 1");
+    expect(equipmentSection.textContent).toContain("Headgear 1");
+    expect(equipmentSection.textContent).toContain("Glove 1");
     expect(equipmentSection.textContent).toContain("body armour ego");
   });
 });
