@@ -220,6 +220,9 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).toContain("Amulet 1");
     expect(equipmentSection.textContent).toContain("Headgear 1");
     expect(equipmentSection.textContent).toContain("Glove 1");
+    expect(equipmentSection.textContent).toContain("Cloak");
+    expect(equipmentSection.textContent).toContain("Boots");
+    expect(equipmentSection.textContent).toContain("Barding");
     expect(equipmentSection.textContent).toContain("body armour ego");
   });
 });

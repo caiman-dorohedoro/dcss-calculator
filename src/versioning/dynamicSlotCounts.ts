@@ -1,5 +1,13 @@
 import type { GameVersion } from "@/types/game";
 import type { SpeciesKey } from "@/types/species";
+import {
+  createDefaultAmuletSlot,
+  createDefaultAuxArmourSlot,
+  createDefaultRingSlot,
+  type AmuletSlotState,
+  type AuxArmourSlotState,
+  type RingSlotState,
+} from "@/types/equipmentSlots";
 import { getVersionSpecies } from "./versionRegistry";
 
 export type DynamicSlotCounts = {
@@ -40,4 +48,42 @@ export const coerceSlotArrayLength = <T>(
   }
 
   return coerced;
+};
+
+export type DynamicEquipmentSlotCollections = {
+  ringSlots: RingSlotState[];
+  amuletSlots: AmuletSlotState[];
+  headgearSlots: AuxArmourSlotState[];
+  gloveSlots: AuxArmourSlotState[];
+};
+
+export const coerceEquipmentSlotCollections = <V extends GameVersion>(
+  version: V,
+  species: SpeciesKey<V>,
+  slots: DynamicEquipmentSlotCollections
+): DynamicEquipmentSlotCollections => {
+  const slotCounts = getDynamicSlotCounts(version, species);
+
+  return {
+    ringSlots: coerceSlotArrayLength(
+      slots.ringSlots,
+      slotCounts.ringSlots,
+      createDefaultRingSlot
+    ),
+    amuletSlots: coerceSlotArrayLength(
+      slots.amuletSlots,
+      slotCounts.amuletSlots,
+      createDefaultAmuletSlot
+    ),
+    headgearSlots: coerceSlotArrayLength(
+      slots.headgearSlots,
+      slotCounts.headgearSlots,
+      createDefaultAuxArmourSlot
+    ),
+    gloveSlots: coerceSlotArrayLength(
+      slots.gloveSlots,
+      slotCounts.gloveSlots,
+      createDefaultAuxArmourSlot
+    ),
+  };
 };

@@ -229,6 +229,22 @@ describe("AC Calculations", () => {
     ).toBe(15);
   });
 
+  test("ignores legacy helmet and glove booleans when slot arrays are present", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "human",
+        armour: "none",
+        armourSkill: 0,
+        headgearSlots: [{ present: false, enchant: 0 }],
+        gloveSlots: [{ present: false, enchant: 0 }],
+        helmet: true,
+        gloves: true,
+        secondGloves: true,
+      })
+    ).toBe(0);
+  });
+
   test("ignores stale body-armour enchant when no body armour is equipped", () => {
     expect(
       calculateMixedAC({

@@ -42,6 +42,7 @@ import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
 import { SpellSkillControls } from "@/components/SpellControls";
 import DynamicEquipmentControls from "@/components/DynamicEquipmentControls";
+import { coerceEquipmentSlotCollections } from "@/versioning/dynamicSlotCounts";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -153,10 +154,20 @@ const Calculator = <V extends GameVersion>({
             <Select
               value={state.species}
               onValueChange={(value) =>
-                setState((prev) => ({
-                  ...prev,
-                  species: value as SpeciesKey<V>,
-                }))
+                setState((prev) => {
+                  const species = value as SpeciesKey<V>;
+
+                  return {
+                    ...prev,
+                    species,
+                    ...coerceEquipmentSlotCollections(prev.version, species, {
+                      ringSlots: prev.ringSlots,
+                      amuletSlots: prev.amuletSlots,
+                      headgearSlots: prev.headgearSlots,
+                      gloveSlots: prev.gloveSlots,
+                    }),
+                  };
+                })
               }
             >
               <SelectTrigger className="w-[180px] h-6">

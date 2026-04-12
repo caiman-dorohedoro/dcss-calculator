@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import {
   coerceSlotArrayLength,
+  coerceEquipmentSlotCollections,
   getDynamicSlotCounts,
 } from "../dynamicSlotCounts";
 
@@ -43,5 +44,36 @@ describe("dynamic slot counts", () => {
       { kind: "none", plus: 0 },
       { kind: "none", plus: 0 },
     ]);
+  });
+
+  test("coerces all equipment slot arrays when species changes", () => {
+    expect(
+      coerceEquipmentSlotCollections("trunk", "human", {
+        ringSlots: [
+          { kind: "wizardry", plus: 0 },
+          { kind: "protection", plus: 3 },
+          { kind: "evasion", plus: 1 },
+          { kind: "none", plus: 0 },
+          { kind: "none", plus: 0 },
+          { kind: "none", plus: 0 },
+          { kind: "none", plus: 0 },
+          { kind: "none", plus: 0 },
+        ],
+        amuletSlots: [],
+        headgearSlots: [],
+        gloveSlots: [
+          { present: true, enchant: 2 },
+          { present: true, enchant: -1 },
+        ],
+      })
+    ).toEqual({
+      ringSlots: [
+        { kind: "wizardry", plus: 0 },
+        { kind: "protection", plus: 3 },
+      ],
+      amuletSlots: [{ kind: "none" }],
+      headgearSlots: [{ present: false, enchant: 0 }],
+      gloveSlots: [{ present: true, enchant: 2 }],
+    });
   });
 });

@@ -356,6 +356,43 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         </div>
       </section>
 
+      <section data-testid="fixed-equipment-controls" className="flex flex-col gap-3">
+        <SectionHeading>Fixed Equipment</SectionHeading>
+        <div className="flex flex-wrap gap-4">
+          {[
+            {
+              key: "cloak" as const,
+              label: "Cloak",
+              value: state.cloak ?? false,
+            },
+            {
+              key: "boots" as const,
+              label: "Boots",
+              value: state.boots ?? false,
+            },
+            {
+              key: "barding" as const,
+              label: "Barding",
+              value: state.barding ?? false,
+            },
+          ].map(({ key, label, value }) => (
+            <label key={key} className="flex items-center gap-2 text-sm">
+              <Checkbox
+                checked={value}
+                onCheckedChange={(checked) =>
+                  setState((prev) => ({
+                    ...prev,
+                    [key]: !!checked,
+                  }))
+                }
+                id={key}
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+      </section>
+
       <section data-testid="dynamic-equipment-modifiers" className="flex flex-col gap-3">
         <SectionHeading>Modifiers</SectionHeading>
         <div className="flex flex-wrap gap-4">

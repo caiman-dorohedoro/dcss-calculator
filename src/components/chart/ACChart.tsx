@@ -33,12 +33,9 @@ const ACChart = <V extends GameVersion>({ state }: ACChartProps<V>) => {
     state.armour === "none" &&
     !state.headgearSlots.some((slot) => slot.present) &&
     !state.gloveSlots.some((slot) => slot.present) &&
-    !state.helmet &&
-    !state.gloves &&
     !state.boots &&
     !state.cloak &&
-    !state.barding &&
-    !state.secondGloves;
+    !state.barding;
 
   return (
     <ResponsiveContainer className="mt-4" width="100%" height={350}>

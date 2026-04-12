@@ -61,8 +61,8 @@ export const calculateMixedAC = <V extends GameVersion>({
   const isDeformed = getVersionSpecies(version)[species].deformedBody === true;
   const hasBodyArmour = armour !== undefined && armour !== "none";
   let baseAC = 0;
-  const hasHeadgearSlots = headgearSlots?.some((slot) => slot.present) ?? false;
-  const hasGloveSlots = gloveSlots?.some((slot) => slot.present) ?? false;
+  const hasHeadgearSlots = headgearSlots !== undefined;
+  const hasGloveSlots = gloveSlots !== undefined;
 
   if (hasBodyArmour) {
     baseAC += armourOptions[armour].baseAC;

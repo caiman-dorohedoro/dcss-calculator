@@ -114,6 +114,25 @@ describe("DynamicEquipmentControls", () => {
     expect(gloveSection.querySelectorAll('[data-testid^="glove-slot-"]')).toHaveLength(2);
   });
 
+  test("renders fixed cloak boots and barding controls", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const fixedSection = container.querySelector(
+      '[data-testid="fixed-equipment-controls"]'
+    ) as HTMLDivElement;
+
+    expect(fixedSection).not.toBeNull();
+    expect(fixedSection.textContent).toContain("Cloak");
+    expect(fixedSection.textContent).toContain("Boots");
+    expect(fixedSection.textContent).toContain("Barding");
+    expect(container.textContent).toContain("cloak enchant");
+    expect(container.textContent).toContain("boots enchant");
+  });
+
   test("allows a signed headgear enchant edit when the slot is present", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.headgearSlots = [{ present: true, enchant: 0 }];
