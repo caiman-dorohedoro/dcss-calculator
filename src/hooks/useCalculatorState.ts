@@ -78,6 +78,14 @@ const isObject = (obj: unknown): obj is Record<string, unknown> => {
   return typeof obj === "object" && obj !== null;
 };
 
+const isArtifactKind = (
+  value: unknown
+): value is "normal" | "randart" | "unrand" =>
+  value === "normal" || value === "randart" || value === "unrand";
+
+const isSlotSource = (value: unknown): value is "manual" | "imported" =>
+  value === "manual" || value === "imported";
+
 const isRingSlot = (value: unknown): value is RingSlotState => {
   if (!isObject(value)) return false;
 
@@ -86,7 +94,10 @@ const isRingSlot = (value: unknown): value is RingSlotState => {
       value.kind === "wizardry" ||
       value.kind === "protection" ||
       value.kind === "evasion") &&
-    typeof value.plus === "number"
+    typeof value.plus === "number" &&
+    (value.displayName === undefined || typeof value.displayName === "string") &&
+    (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
+    (value.source === undefined || isSlotSource(value.source))
   );
 };
 
@@ -95,14 +106,22 @@ const isAmuletSlot = (value: unknown): value is AmuletSlotState => {
 
   return (
     (value.kind === "none" || value.kind === "reflection") &&
-    (value.displayName === undefined || typeof value.displayName === "string")
+    (value.displayName === undefined || typeof value.displayName === "string") &&
+    (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
+    (value.source === undefined || isSlotSource(value.source))
   );
 };
 
 const isAuxArmourSlot = (value: unknown): value is AuxArmourSlotState => {
   if (!isObject(value)) return false;
 
-  return typeof value.present === "boolean" && typeof value.enchant === "number";
+  return (
+    typeof value.present === "boolean" &&
+    typeof value.enchant === "number" &&
+    (value.displayName === undefined || typeof value.displayName === "string") &&
+    (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
+    (value.source === undefined || isSlotSource(value.source))
+  );
 };
 
 const isValidSlotArray = <T>(

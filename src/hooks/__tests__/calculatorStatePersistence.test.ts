@@ -189,4 +189,24 @@ describe("calculator saved-state migration", () => {
 
     expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
   });
+
+  test("rejects malformed slot metadata when slot arrays are the source", () => {
+    const malformed = omitKeys(buildDefaultCalculatorState("0.34"), [
+      "wizardry",
+      "gloves",
+      "secondGloves",
+      "helmet",
+    ]);
+
+    malformed.ringSlots = [
+      {
+        kind: "wizardry",
+        plus: 0,
+        source: 123,
+      },
+      { kind: "none", plus: 0 },
+    ];
+
+    expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
+  });
 });
