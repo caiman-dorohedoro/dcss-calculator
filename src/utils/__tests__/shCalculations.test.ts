@@ -73,4 +73,19 @@ describe("SH Calculations", () => {
 
     expect(modified - base).toBe(19);
   });
+
+  test("shieldless SH still includes reflection, residual SH, and bone plates", () => {
+    expect(
+      calculateSH({
+        shield: "none",
+        shieldSkill: 0,
+        dexterity: 0,
+        equipmentDex: 0,
+        shieldEnchant: 7,
+        equipmentSH: 4,
+        amuletReflection: 1,
+        largeBonePlates: 2,
+      })
+    ).toBe(15);
+  });
 });

@@ -24,28 +24,22 @@ export const calculateSH = (params: SHCalculationParams) => {
   } = params;
   const baseSH = shieldOptions[shield].baseSH;
   const effectiveDexterity = dexterity + equipmentDex;
+  const hasShield = shield !== "none";
 
-  if (shield === "none") {
-    return 0;
+  let sh = 0;
+
+  if (hasShield && effectiveDexterity > 0) {
+    // reflects DCSS formula
+    const base = baseSH * 2;
+
+    sh = base * 50;
+    sh += (base * shieldSkill * 5) / 2;
+    sh += shieldSkill * 38;
+    sh += 3 * 38;
+    sh += (effectiveDexterity * 38 * (base + 13)) / 26;
   }
 
-  if (effectiveDexterity === 0) {
-    return 0;
-  }
-
-  // reflects DCSS formula
-  const base = baseSH * 2;
-
-  let sh = base * 50;
-
-  sh += (base * shieldSkill * 5) / 2;
-
-  sh += shieldSkill * 38;
-
-  sh += 3 * 38;
-
-  sh += (effectiveDexterity * 38 * (base + 13)) / 26;
-  sh += shieldEnchant * 200;
+  sh += hasShield ? shieldEnchant * 200 : 0;
   sh += equipmentSH * 200;
   sh += amuletReflection * 1000;
   sh += largeBonePlates > 0 ? largeBonePlates * 400 + 400 : 0;
