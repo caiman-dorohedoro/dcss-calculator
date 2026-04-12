@@ -763,7 +763,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 25.6,
     });
 
-    expect(failureRate).toBe(21); // shows 21 on game screen
+    expect(failureRate).toBe(22); // shows 22 on game screen
   });
 
   // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt

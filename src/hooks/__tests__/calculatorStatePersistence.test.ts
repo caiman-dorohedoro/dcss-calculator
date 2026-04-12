@@ -123,6 +123,70 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.wizardry).toBe(1);
   });
 
+  test("clears stale mirrored wizardry when restored ring slots are manual and metadata-free", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.wizardry = 2;
+    legacy.ringSlots = [
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+    ];
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.ringSlots).toEqual([
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+    ]);
+    expect(parsed?.wizardry).toBe(0);
+  });
+
+  test("preserves residual wizardry when restored wizardry rings carry imported metadata", () => {
+    const modern = buildDefaultCalculatorState("0.34");
+
+    modern.species = "formicid";
+    modern.wizardry = 2;
+    modern.ringSlots = [
+      {
+        kind: "wizardry",
+        plus: 0,
+        displayName: "ring of wizardry",
+        artifactKind: "normal",
+        source: "imported",
+      },
+      {
+        kind: "wizardry",
+        plus: 0,
+        displayName: "ring of wizardry",
+        artifactKind: "normal",
+        source: "imported",
+      },
+    ];
+
+    const parsed = parseSavedState(JSON.stringify(modern));
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.ringSlots).toEqual([
+      {
+        kind: "wizardry",
+        plus: 0,
+        displayName: "ring of wizardry",
+        artifactKind: "normal",
+        source: "imported",
+      },
+      {
+        kind: "wizardry",
+        plus: 0,
+        displayName: "ring of wizardry",
+        artifactKind: "normal",
+        source: "imported",
+      },
+    ]);
+    expect(parsed?.wizardry).toBe(2);
+  });
+
   test("preserves modern slot data even when legacy keys are present", () => {
     const modern = buildDefaultCalculatorState("0.34");
 
