@@ -201,4 +201,46 @@ describe("EV Calculations", () => {
       expect(result.finalEV).toBe(29);
     }
   );
+
+  test("equipment stats, evasion rings, and EV mutations stack into EV", () => {
+    const base = calculateEV({
+      version: "trunk",
+      dodgingSkill: 10,
+      dexterity: 12,
+      equipmentDex: 0,
+      strength: 10,
+      equipmentStr: 0,
+      species: "tengu",
+      shield: "none",
+      armour: "robe",
+      barding: false,
+      shieldSkill: 0,
+      armourSkill: 0,
+      ringEvasion: 0,
+      equipmentEV: 0,
+      distortionField: 0,
+      tenguFlight: 0,
+    });
+
+    const modified = calculateEV({
+      version: "trunk",
+      dodgingSkill: 10,
+      dexterity: 12,
+      equipmentDex: 6,
+      strength: 10,
+      equipmentStr: 0,
+      species: "tengu",
+      shield: "none",
+      armour: "robe",
+      barding: false,
+      shieldSkill: 0,
+      armourSkill: 0,
+      ringEvasion: 5,
+      equipmentEV: 2,
+      distortionField: 3,
+      tenguFlight: 1,
+    });
+
+    expect(modified.finalEV - base.finalEV).toBe(17);
+  });
 });

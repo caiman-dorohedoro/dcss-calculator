@@ -58,6 +58,24 @@ export interface CalculatorState<V extends GameVersion> {
   amuletSlots: AmuletSlotState[];
   headgearSlots: AuxArmourSlotState[];
   gloveSlots: AuxArmourSlotState[];
+  bodyArmourEnchant?: number;
+  shieldEnchant?: number;
+  bootsEnchant?: number;
+  cloakEnchant?: number;
+  equipmentStr?: number;
+  equipmentDex?: number;
+  equipmentInt?: number;
+  equipmentAC?: number;
+  equipmentEV?: number;
+  equipmentSH?: number;
+  subduedMagic?: number;
+  antiWizardry?: number;
+  runicMagic?: number;
+  bigBrainWizardry?: number;
+  scalesAC?: number;
+  distortionField?: number;
+  tenguFlight?: number;
+  largeBonePlates?: number;
   // spell mode
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;

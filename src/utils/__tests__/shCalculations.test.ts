@@ -47,4 +47,30 @@ describe("SH Calculations", () => {
       })
     ).toBe(29);
   });
+
+  test("shield enchant, reflection, residual SH, bone plates, and equipment dex affect SH", () => {
+    const base = calculateSH({
+      shield: "tower_shield",
+      shieldSkill: 27,
+      dexterity: 15,
+      equipmentDex: 0,
+      shieldEnchant: 0,
+      equipmentSH: 0,
+      amuletReflection: 0,
+      largeBonePlates: 0,
+    });
+
+    const modified = calculateSH({
+      shield: "tower_shield",
+      shieldSkill: 27,
+      dexterity: 15,
+      equipmentDex: 6,
+      shieldEnchant: 3,
+      equipmentSH: 4,
+      amuletReflection: 1,
+      largeBonePlates: 2,
+    });
+
+    expect(modified - base).toBe(19);
+  });
 });

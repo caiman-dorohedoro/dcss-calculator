@@ -25,8 +25,10 @@ export type SpellCalculationParams<V extends GameVersion> = {
   version: V;
   species: SpeciesKey<V>;
   strength: number;
+  equipmentStr?: number;
   spellcasting: number;
   intelligence: number;
+  equipmentInt?: number;
   targetSpell: VersionedSpellName<V>;
   schoolSkills: VersionedSchoolSkillLevels<V>;
   spellDifficulty: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
@@ -37,6 +39,11 @@ export type SpellCalculationParams<V extends GameVersion> = {
   armourSkill: number;
   shieldSkill: number;
   wizardry?: number;
+  ringWizardry?: number;
+  bigBrainWizardry?: number;
+  subduedMagic?: number;
+  antiWizardry?: number;
+  runicMagic?: number;
   wildMagic?: number;
   enkindle?: boolean;
 };
@@ -168,6 +175,7 @@ type armourShieldSpellPenaltyParams<V extends GameVersion> = {
   armour: ArmourKey;
   shieldSkill: number;
   shield: ShieldKey;
+  runicMagic?: number;
 };
 
 function calculateArmourShieldSpellPenalty<V extends GameVersion>({
@@ -178,18 +186,24 @@ function calculateArmourShieldSpellPenalty<V extends GameVersion>({
   armour,
   shieldSkill,
   shield,
+  runicMagic = 0,
 }: armourShieldSpellPenaltyParams<V>) {
   const SCALE = 100;
+  let bodyArmourPenalty = calculateArmourPenalty({
+    version,
+    species,
+    armour,
+    armourSkill,
+    strength,
+    SCALE,
+  });
+
+  if (runicMagic > 0) {
+    bodyArmourPenalty = Math.floor(bodyArmourPenalty / 4);
+  }
 
   const totalPenalty =
-    calculateArmourPenalty({
-      version,
-      species,
-      armour,
-      armourSkill,
-      strength,
-      SCALE,
-    }) +
+    bodyArmourPenalty +
     calculateShieldPenalty({
       shield,
       shieldSkill,
@@ -314,7 +328,9 @@ function rawSpellFail<V extends GameVersion>({
   version,
   species,
   strength,
+  equipmentStr = 0,
   intelligence,
+  equipmentInt = 0,
   spellDifficulty,
   armour,
   bodyArmourEgo = "none",
@@ -326,11 +342,19 @@ function rawSpellFail<V extends GameVersion>({
   armourSkill,
   shieldSkill,
   wizardry = 0,
+  ringWizardry = 0,
+  bigBrainWizardry = 0,
+  subduedMagic = 0,
+  antiWizardry = 0,
+  runicMagic = 0,
   wildMagic = 0,
   enkindle = false,
 }: SpellCalculationParams<V>) {
   const config = getVersionConfig(version);
   const formula = getFormulaProfile(config.formulaProfile);
+  const effectiveStrength = strength + equipmentStr;
+  const effectiveIntelligence = intelligence + equipmentInt;
+  const totalWizardry = wizardry + ringWizardry + bigBrainWizardry;
 
   // start with base failure rate of 60%
   let chance = 60;
@@ -345,17 +369,18 @@ function rawSpellFail<V extends GameVersion>({
   chance -= spellPower;
 
   // reduce failure rate with intelligence
-  chance -= intelligence * 2;
+  chance -= effectiveIntelligence * 2;
 
   // calculate armor/shield penalty
   const armourShieldSpellPenalty = calculateArmourShieldSpellPenalty({
     version,
     species,
-    strength: strength,
+    strength: effectiveStrength,
     armourSkill,
     armour,
     shieldSkill,
     shield,
+    runicMagic,
   });
 
   if (!enkindle) {
@@ -376,6 +401,9 @@ function rawSpellFail<V extends GameVersion>({
     chance2 += wildMagic * 4;
   }
 
+  chance2 -= 2 * subduedMagic;
+  chance2 += 4 * antiWizardry;
+
   chance2 = applySpellSuccessBoosts({
     version,
     targetSpell,
@@ -384,7 +412,7 @@ function rawSpellFail<V extends GameVersion>({
     orb,
     armourSkill,
     chance: chance2,
-    wizardry,
+    wizardry: totalWizardry,
   });
 
   if (enkindle) {

@@ -21,25 +21,37 @@ export function calculateEV<V extends GameVersion>(params: {
   version: V;
   dodgingSkill: number;
   dexterity: number;
+  equipmentDex?: number;
   strength: number;
+  equipmentStr?: number;
   species: SpeciesKey<V>;
   shield: ShieldKey;
   armour: ArmourKey;
   barding?: boolean;
   shieldSkill: number;
   armourSkill: number;
+  ringEvasion?: number;
+  equipmentEV?: number;
+  distortionField?: number;
+  tenguFlight?: number;
 }) {
   const {
     version,
     dodgingSkill,
     dexterity,
+    equipmentDex = 0,
     strength,
+    equipmentStr = 0,
     species,
     shield,
     shieldSkill,
     armourSkill,
     armour,
     barding = false,
+    ringEvasion = 0,
+    equipmentEV = 0,
+    distortionField = 0,
+    tenguFlight = 0,
   } = params;
 
   const speciesOpts = speciesOptions(version);
@@ -51,31 +63,38 @@ export function calculateEV<V extends GameVersion>(params: {
   const baseEV = 10 + sizeFactor;
   const shieldEncumbrance = shieldOptions[shield].encumbrance;
   const armourEncumbrance = getArmourEncumbrance(version, armour);
+  const effectiveStrength = strength + equipmentStr;
+  const effectiveDexterity = dexterity + equipmentDex;
 
   // Calculate dodge bonus with armor penalty modifier
   const armorPenaltyForDodge = armourEncumbrance - 3;
   let dodgeModifier = 1;
 
   if (armorPenaltyForDodge > 0) {
-    if (armorPenaltyForDodge >= strength) {
-      dodgeModifier = strength / (armorPenaltyForDodge * 2);
+    if (armorPenaltyForDodge >= effectiveStrength) {
+      dodgeModifier = effectiveStrength / (armorPenaltyForDodge * 2);
     } else {
-      dodgeModifier = 1 - armorPenaltyForDodge / (strength * 2);
+      dodgeModifier = 1 - armorPenaltyForDodge / (effectiveStrength * 2);
     }
   }
 
   const rawDodgeBonus = Math.floor(
-    (8 + dodgingSkill * dexterity * 0.8) / (20 - sizeFactor)
+    (8 + dodgingSkill * effectiveDexterity * 0.8) / (20 - sizeFactor)
   );
   const modifiedDodgeBonus = rawDodgeBonus * dodgeModifier;
   const actualDodgeBonus = Math.floor(modifiedDodgeBonus);
+  const directBonus =
+    ringEvasion +
+    equipmentEV +
+    (distortionField > 0 ? distortionField + 1 : 0) +
+    (tenguFlight > 0 ? 4 : 0);
 
   // Calculate initial EV with dodge bonus
   let currentEV = baseEV + actualDodgeBonus;
 
   // Shield penalty
   const shieldPenalty =
-    (((2 / 5) * Math.pow(shieldEncumbrance, 2)) / (strength + 5)) *
+    (((2 / 5) * Math.pow(shieldEncumbrance, 2)) / (effectiveStrength + 5)) *
     ((27 - shieldSkill) / 27);
 
   // Armour penalty
@@ -83,7 +102,7 @@ export function calculateEV<V extends GameVersion>(params: {
     ((1 / 225) *
       Math.pow(armourEncumbrance, 2) *
       (90 - 2 * armourSkill)) /
-      (strength + 3)
+      (effectiveStrength + 3)
   );
 
   const auxiliaryArmourPenalty = barding
@@ -96,7 +115,8 @@ export function calculateEV<V extends GameVersion>(params: {
     actualDodgeBonus -
     shieldPenalty -
     armourPenalty -
-    auxiliaryArmourPenalty;
+    auxiliaryArmourPenalty +
+    directBonus;
   currentEV = Math.max(1, Math.floor(currentEV));
 
   return {

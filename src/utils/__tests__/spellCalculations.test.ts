@@ -594,6 +594,106 @@ describe("Spell Calculations", () => {
     expect(failureRate).toBe(12);
   });
 
+  test("wizardry slots, big brain, subdued magic, and anti-wizardry affect spell failure", () => {
+    const base = calculateSpellFailureRate({
+      version: "trunk",
+      species: "human",
+      strength: 10,
+      equipmentStr: 0,
+      spellcasting: 8,
+      intelligence: 18,
+      equipmentInt: 0,
+      targetSpell: "Fireball",
+      schoolSkills: { fire: 8, conjuration: 8 } as never,
+      spellDifficulty: 5,
+      armour: "robe",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry: 0,
+      bigBrainWizardry: 0,
+      subduedMagic: 0,
+      antiWizardry: 0,
+      runicMagic: 0,
+      wildMagic: 0,
+    });
+
+    const modified = calculateSpellFailureRate({
+      version: "trunk",
+      species: "human",
+      strength: 10,
+      equipmentStr: 0,
+      spellcasting: 8,
+      intelligence: 18,
+      equipmentInt: 0,
+      targetSpell: "Fireball",
+      schoolSkills: { fire: 8, conjuration: 8 } as never,
+      spellDifficulty: 5,
+      armour: "robe",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry: 2,
+      bigBrainWizardry: 1,
+      subduedMagic: 1,
+      antiWizardry: 1,
+      runicMagic: 0,
+      wildMagic: 0,
+    });
+
+    expect(modified).toBeLessThan(base);
+  });
+
+  test("runic magic reduces the body-armour spell penalty", () => {
+    const base = calculateSpellFailureRate({
+      version: "trunk",
+      species: "human",
+      strength: 24,
+      equipmentStr: 0,
+      spellcasting: 10,
+      intelligence: 20,
+      equipmentInt: 0,
+      targetSpell: "Fireball",
+      schoolSkills: { fire: 14, conjuration: 14 } as never,
+      spellDifficulty: 5,
+      armour: "plate",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry: 0,
+      bigBrainWizardry: 0,
+      subduedMagic: 0,
+      antiWizardry: 0,
+      runicMagic: 0,
+      wildMagic: 0,
+    });
+
+    const modified = calculateSpellFailureRate({
+      version: "trunk",
+      species: "human",
+      strength: 24,
+      equipmentStr: 0,
+      spellcasting: 10,
+      intelligence: 20,
+      equipmentInt: 0,
+      targetSpell: "Fireball",
+      schoolSkills: { fire: 14, conjuration: 14 } as never,
+      spellDifficulty: 5,
+      armour: "plate",
+      shield: "none",
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry: 0,
+      bigBrainWizardry: 0,
+      subduedMagic: 0,
+      antiWizardry: 0,
+      runicMagic: 1,
+      wildMagic: 0,
+    });
+
+    expect(modified).toBeLessThan(base);
+  });
+
   // during personal gameplay
   test("formicid, leather armour, tower shield, 9 level Ice spell (Polar Vortex)", () => {
     const failureRate = calculateSpellFailureRate({

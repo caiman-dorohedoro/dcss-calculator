@@ -207,4 +207,25 @@ describe("AC Calculations", () => {
       })
     ).toBe(18);
   });
+
+  test("signed enchant, protection rings, residual AC, and scales AC all affect AC", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "human",
+        armour: "robe",
+        armourSkill: 0,
+        headgearSlots: [{ present: true, enchant: -1 }],
+        gloveSlots: [{ present: true, enchant: 2 }],
+        boots: true,
+        bootsEnchant: 0,
+        cloak: true,
+        cloakEnchant: -1,
+        bodyArmourEnchant: 0,
+        ringProtection: 4,
+        equipmentAC: 2,
+        scalesAC: 3,
+      })
+    ).toBe(15);
+  });
 });

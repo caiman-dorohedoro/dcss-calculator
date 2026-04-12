@@ -3,6 +3,12 @@ import { calculateMixedAC } from "@/utils/acCalculation";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateSH } from "./shCalculation";
 import {
+  getAmuletReflectionCount,
+  getRingEvasionBonus,
+  getRingProtectionBonus,
+  getRingWizardryCount,
+} from "./equipmentModifiers";
+import {
   calculateSpellFailureRate,
   getSpellData,
   getSpellSchools,
@@ -30,6 +36,7 @@ type ACDataPoint = {
 export const calculateAcData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): ACDataPoint[] => {
+  const ringProtection = getRingProtectionBonus(state.ringSlots);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const armour = index / 10;
@@ -40,12 +47,20 @@ export const calculateAcData = <V extends GameVersion>(
           version: state.version,
           species: state.species,
           armour: state.armour,
+          bodyArmourEnchant: state.bodyArmourEnchant,
+          headgearSlots: state.headgearSlots,
+          gloveSlots: state.gloveSlots,
           helmet: state.helmet,
           gloves: state.gloves,
           boots: state.boots,
+          bootsEnchant: state.bootsEnchant,
           cloak: state.cloak,
+          cloakEnchant: state.cloakEnchant,
           barding: state.barding,
           secondGloves: state.secondGloves,
+          ringProtection,
+          equipmentAC: state.equipmentAC,
+          scalesAC: state.scalesAC,
           armourSkill: armour,
         }),
       };
@@ -58,6 +73,7 @@ export const calculateAcData = <V extends GameVersion>(
 export const calculateEvData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): DataPoint[] => {
+  const ringEvasion = getRingEvasionBonus(state.ringSlots);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const dodgingSkill = index / 10;
@@ -65,13 +81,19 @@ export const calculateEvData = <V extends GameVersion>(
         version: state.version,
         dodgingSkill,
         dexterity: state.dexterity,
+        equipmentDex: state.equipmentDex,
         strength: state.strength,
+        equipmentStr: state.equipmentStr,
         species: state.species,
         shield: state.shield,
         armour: state.armour,
         barding: state.barding,
         shieldSkill: state.shieldSkill,
         armourSkill: state.armourSkill,
+        ringEvasion,
+        equipmentEV: state.equipmentEV,
+        distortionField: state.distortionField,
+        tenguFlight: state.tenguFlight,
       });
 
       return {
@@ -127,6 +149,7 @@ export type SHDataPoint = {
 export const calculateSHData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): SHDataPoint[] => {
+  const amuletReflection = getAmuletReflectionCount(state.amuletSlots);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const shield = index / 10;
@@ -136,6 +159,11 @@ export const calculateSHData = <V extends GameVersion>(
           shield: state.shield,
           shieldSkill: shield,
           dexterity: state.dexterity,
+          equipmentDex: state.equipmentDex,
+          shieldEnchant: state.shieldEnchant,
+          equipmentSH: state.equipmentSH,
+          amuletReflection,
+          largeBonePlates: state.largeBonePlates,
         }),
       };
     }
@@ -188,6 +216,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
     throw new Error("Target spell not found");
   }
   const spellSchools = getSpellSchools<V>(state.version, targetSpell);
+  const ringWizardry = getRingWizardryCount(state.ringSlots);
 
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
@@ -201,7 +230,9 @@ export const calculateAvgSFData = <V extends GameVersion>(
         version: state.version,
         species: state.species,
         strength: state.strength,
+        equipmentStr: state.equipmentStr,
         intelligence: state.intelligence,
+        equipmentInt: state.equipmentInt,
         spellcasting: state.spellcasting ?? 0,
         targetSpell: targetSpell,
         schoolSkills: schoolSkills,
@@ -213,6 +244,11 @@ export const calculateAvgSFData = <V extends GameVersion>(
         armourSkill: state.armourSkill,
         shieldSkill: state.shieldSkill,
         wizardry: state.wizardry,
+        ringWizardry,
+        bigBrainWizardry: state.bigBrainWizardry,
+        subduedMagic: state.subduedMagic,
+        antiWizardry: state.antiWizardry,
+        runicMagic: state.runicMagic,
         wildMagic: state.wildMagic,
       });
 
@@ -224,7 +260,9 @@ export const calculateAvgSFData = <V extends GameVersion>(
           version: state.version,
           species: state.species,
           strength: state.strength,
+          equipmentStr: state.equipmentStr,
           intelligence: state.intelligence,
+          equipmentInt: state.equipmentInt,
           spellcasting: state.spellcasting ?? 0,
           targetSpell: targetSpell,
           schoolSkills: schoolSkills,
@@ -236,6 +274,11 @@ export const calculateAvgSFData = <V extends GameVersion>(
           armourSkill: state.armourSkill,
           shieldSkill: state.shieldSkill,
           wizardry: state.wizardry,
+          ringWizardry,
+          bigBrainWizardry: state.bigBrainWizardry,
+          subduedMagic: state.subduedMagic,
+          antiWizardry: state.antiWizardry,
+          runicMagic: state.runicMagic,
           wildMagic: state.wildMagic,
           enkindle: true,
         });
