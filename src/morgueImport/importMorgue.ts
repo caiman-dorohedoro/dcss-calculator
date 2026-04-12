@@ -5,6 +5,14 @@ import {
 } from "dcss-morgue-parser";
 import type { CalculatorState } from "@/hooks/useCalculatorState.ts";
 import {
+  createDefaultAmuletSlot,
+  createDefaultAuxArmourSlot,
+  createDefaultRingSlot,
+  type AmuletSlotState,
+  type AuxArmourSlotState,
+  type RingSlotState,
+} from "@/types/equipmentSlots";
+import {
   armourOptions,
   orbOptions,
   shieldOptions,
@@ -16,6 +24,7 @@ import {
 import type { GameVersion } from "@/types/game";
 import { speciesOptions } from "@/types/species.ts";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
@@ -102,6 +111,18 @@ const hasBaseType = (
   return (items ?? []).some((item) => item.baseType === targetBaseType);
 };
 
+const hasBooleanProperty = (
+  item: EquipmentItemSnapshot,
+  property: "Reflect" | "Wiz"
+) => {
+  return (
+    item.properties.booleanProps[property] === true ||
+    item.intrinsicProperties.booleanProps[property] === true ||
+    item.egoProperties.booleanProps[property] === true ||
+    item.artifactProperties.booleanProps[property] === true
+  );
+};
+
 const mapArmour = (baseType: string | null | undefined): ArmourKey | null => {
   if (!baseType || baseType === "none") {
     return "none";
@@ -126,13 +147,249 @@ const mapOrb = (baseType: string | null | undefined): OrbKey | null => {
   return orbNameMap[baseType] ?? null;
 };
 
-const countBooleanProperty = (
-  record: ParsedMorgueTextRecord,
-  property: "Wiz"
+const fillRingSlots = (
+  ringSlots: RingSlotState[],
+  details: EquipmentItemSnapshot[] | undefined
 ) => {
+  let nextIndex = 0;
+  let mapped = 0;
+  const unsupported: string[] = [];
+
+  for (const detail of details ?? []) {
+    let nextSlot: RingSlotState | null = null;
+
+    if (detail.subtypeEffect === "protection") {
+      nextSlot = {
+        kind: "protection",
+        plus: detail.enchant ?? 0,
+        displayName: detail.displayName,
+        artifactKind: detail.artifactKind,
+        source: "imported",
+      };
+    } else if (detail.subtypeEffect === "evasion") {
+      nextSlot = {
+        kind: "evasion",
+        plus: detail.enchant ?? 0,
+        displayName: detail.displayName,
+        artifactKind: detail.artifactKind,
+        source: "imported",
+      };
+    } else if (hasBooleanProperty(detail, "Wiz")) {
+      nextSlot = {
+        kind: "wizardry",
+        plus: 0,
+        displayName: detail.displayName,
+        artifactKind: detail.artifactKind,
+        source: "imported",
+      };
+    }
+
+    if (!nextSlot) {
+      unsupported.push(detail.displayName);
+      continue;
+    }
+
+    if (nextIndex >= ringSlots.length) {
+      unsupported.push(detail.displayName);
+      continue;
+    }
+
+    ringSlots[nextIndex] = nextSlot;
+    nextIndex += 1;
+    mapped += 1;
+  }
+
+  return { mapped, unsupported };
+};
+
+const fillAmuletSlots = (
+  amuletSlots: AmuletSlotState[],
+  details: EquipmentItemSnapshot[] | undefined
+) => {
+  let nextIndex = 0;
+  let mapped = 0;
+  const unsupported: string[] = [];
+
+  for (const detail of details ?? []) {
+    if (!hasBooleanProperty(detail, "Reflect")) {
+      unsupported.push(detail.displayName);
+      continue;
+    }
+
+    if (nextIndex >= amuletSlots.length) {
+      unsupported.push(detail.displayName);
+      continue;
+    }
+
+    amuletSlots[nextIndex] = {
+      kind: "reflection",
+      displayName: detail.displayName,
+      artifactKind: detail.artifactKind,
+      source: "imported",
+    };
+    nextIndex += 1;
+    mapped += 1;
+  }
+
+  return { mapped, unsupported };
+};
+
+const fillAuxArmourSlots = (
+  slots: AuxArmourSlotState[],
+  details: EquipmentItemSnapshot[] | undefined
+) => {
+  let nextIndex = 0;
+  let mapped = 0;
+
+  for (const detail of details ?? []) {
+    if (nextIndex >= slots.length) {
+      break;
+    }
+
+    slots[nextIndex] = {
+      present: true,
+      enchant: detail.enchant ?? 0,
+      displayName: detail.displayName,
+      artifactKind: detail.artifactKind,
+      source: "imported",
+    };
+    nextIndex += 1;
+    mapped += 1;
+  }
+
+  return mapped;
+};
+
+const numericEquipmentPropMap = {
+  Str: "equipmentStr",
+  Dex: "equipmentDex",
+  Int: "equipmentInt",
+  AC: "equipmentAC",
+  EV: "equipmentEV",
+  SH: "equipmentSH",
+} as const;
+
+type ResidualNumericField = (typeof numericEquipmentPropMap)[keyof typeof numericEquipmentPropMap];
+
+const getNumericProperty = (
+  item: EquipmentItemSnapshot,
+  property: keyof typeof numericEquipmentPropMap
+) => {
+  return (
+    (item.properties.numeric[property] ?? 0) +
+    (item.intrinsicProperties.numeric[property] ?? 0) +
+    (item.egoProperties.numeric[property] ?? 0) +
+    (item.artifactProperties.numeric[property] ?? 0)
+  );
+};
+
+const applyResidualEquipmentModifiers = (
+  record: ParsedMorgueTextRecord,
+  state: CalculatorState<GameVersion>
+) => {
+  const totals: Record<ResidualNumericField, number> = {
+    equipmentStr: 0,
+    equipmentDex: 0,
+    equipmentInt: 0,
+    equipmentAC: 0,
+    equipmentEV: 0,
+    equipmentSH: 0,
+  };
+
+  for (const item of collectEquippedItems(record)) {
+    for (const [property, field] of Object.entries(numericEquipmentPropMap) as [
+      keyof typeof numericEquipmentPropMap,
+      ResidualNumericField,
+    ][]) {
+      totals[field] += getNumericProperty(item, property);
+    }
+  }
+
+  state.equipmentStr = totals.equipmentStr;
+  state.equipmentDex = totals.equipmentDex;
+  state.equipmentInt = totals.equipmentInt;
+  state.equipmentAC = totals.equipmentAC;
+  state.equipmentEV = totals.equipmentEV;
+  state.equipmentSH = totals.equipmentSH;
+
+  return totals;
+};
+
+const countResidualWizardry = (record: ParsedMorgueTextRecord) => {
   return collectEquippedItems(record).filter(
-    (item) => item.properties.booleanProps[property] === true
+    (item) => item.baseType !== "ring" && hasBooleanProperty(item, "Wiz")
   ).length;
+};
+
+const isActiveMutation = (mutation: ParsedMorgueTextRecord["mutations"][number]) =>
+  mutation.suppressed !== true && mutation.transient !== true;
+
+const applyMutationModifiers = (
+  record: ParsedMorgueTextRecord,
+  state: CalculatorState<GameVersion>
+) => {
+  const applied: string[] = [];
+  const unsupported: string[] = [];
+
+  for (const mutation of record.mutations) {
+    if (!isActiveMutation(mutation)) {
+      continue;
+    }
+
+    if (mutation.name === "subdued magic") {
+      state.subduedMagic = mutation.level ?? 0;
+      applied.push("subdued magic");
+      continue;
+    }
+
+    if (mutation.name === "anti-wizardry") {
+      state.antiWizardry = mutation.level ?? 0;
+      applied.push("anti-wizardry");
+      continue;
+    }
+
+    if (mutation.name === "runic magic") {
+      state.runicMagic = mutation.level ?? 0;
+      applied.push("runic magic");
+      continue;
+    }
+
+    if (mutation.name === "big brain" && mutation.level === 3) {
+      state.bigBrainWizardry = 1;
+      applied.push("big brain");
+      continue;
+    }
+
+    if (mutation.name === "distortion field") {
+      state.distortionField = mutation.level ?? 0;
+      applied.push("distortion field");
+      continue;
+    }
+
+    if (mutation.name === "large bone plates") {
+      state.largeBonePlates = mutation.level ?? 0;
+      applied.push("large bone plates");
+      continue;
+    }
+
+    if (mutation.name === "tengu flight") {
+      state.tenguFlight = mutation.level ?? 1;
+      applied.push("tengu flight");
+      continue;
+    }
+
+    if (mutation.name.endsWith(" scales")) {
+      state.scalesAC = (state.scalesAC ?? 0) + (mutation.level ?? 0);
+      applied.push(mutation.name);
+      continue;
+    }
+
+    if (mutation.name !== "wild magic") {
+      unsupported.push(mutation.name);
+    }
+  }
+
+  return { applied, unsupported };
 };
 
 const deriveBodyArmourEgo = (
@@ -247,6 +504,27 @@ export const buildImportedCalculatorState = (
   importedState.version = detectedVersion;
   importedState.species =
     speciesKey as CalculatorState<GameVersion>["species"];
+  const slotCounts = getDynamicSlotCounts(detectedVersion, importedState.species);
+  importedState.ringSlots = coerceSlotArrayLength(
+    importedState.ringSlots,
+    slotCounts.ringSlots,
+    createDefaultRingSlot
+  );
+  importedState.amuletSlots = coerceSlotArrayLength(
+    importedState.amuletSlots,
+    slotCounts.amuletSlots,
+    createDefaultAmuletSlot
+  );
+  importedState.headgearSlots = coerceSlotArrayLength(
+    importedState.headgearSlots,
+    slotCounts.headgearSlots,
+    createDefaultAuxArmourSlot
+  );
+  importedState.gloveSlots = coerceSlotArrayLength(
+    importedState.gloveSlots,
+    slotCounts.gloveSlots,
+    createDefaultAuxArmourSlot
+  );
   importedState.strength = record.strength;
   importedState.dexterity = record.dexterity;
   importedState.intelligence = record.intelligence;
@@ -304,15 +582,20 @@ export const buildImportedCalculatorState = (
   importedState.boots = hasBaseType(record.footwearDetails, "boots");
   importedState.barding = hasBaseType(record.footwearDetails, "barding");
   importedState.cloak = hasBaseType(record.cloakDetails, "cloak");
+  importedState.bodyArmourEnchant = record.bodyArmourDetails?.enchant ?? 0;
+  importedState.shieldEnchant = record.shieldDetails?.enchant ?? 0;
+  importedState.bootsEnchant =
+    record.footwearDetails?.find((item) => item.baseType === "boots")?.enchant ?? 0;
+  importedState.cloakEnchant = record.cloakDetails?.[0]?.enchant ?? 0;
+  fillAuxArmourSlots(importedState.headgearSlots, record.helmetDetails);
+  fillAuxArmourSlots(importedState.gloveSlots, record.glovesDetails);
+  const residualEquipmentModifiers = applyResidualEquipmentModifiers(
+    record,
+    importedState
+  );
 
   summary.applied.push({ label: "Auxiliary armour" });
 
-  if (record.helmets.some((name) => name.includes("hat"))) {
-    summary.skipped.push({
-      label: "Headgear",
-      detail: "Hat is not modeled separately from helmet.",
-    });
-  }
   if (record.cloaks.some((name) => name.includes("scarf"))) {
     summary.skipped.push({
       label: "Cloaks",
@@ -337,7 +620,35 @@ export const buildImportedCalculatorState = (
     summary.applied.push({ label: "Target spell", detail: targetSpell });
   }
 
-  const wizardry = countBooleanProperty(record, "Wiz");
+  const ringMapping = fillRingSlots(importedState.ringSlots, record.ringDetails);
+  if (ringMapping.mapped > 0) {
+    summary.applied.push({
+      label: "Rings",
+      detail: `${ringMapping.mapped} supported ring effect${ringMapping.mapped === 1 ? "" : "s"} mapped`,
+    });
+  }
+  if (ringMapping.unsupported.length > 0) {
+    summary.skipped.push({
+      label: "Rings",
+      detail: `Unsupported ring effects skipped: ${ringMapping.unsupported.join(", ")}`,
+    });
+  }
+
+  const amuletMapping = fillAmuletSlots(importedState.amuletSlots, record.amuletDetails);
+  if (amuletMapping.mapped > 0) {
+    summary.applied.push({
+      label: "Amulets",
+      detail: `${amuletMapping.mapped} supported amulet effect${amuletMapping.mapped === 1 ? "" : "s"} mapped`,
+    });
+  }
+  if (amuletMapping.unsupported.length > 0) {
+    summary.skipped.push({
+      label: "Amulets",
+      detail: `Unsupported amulet effects skipped: ${amuletMapping.unsupported.join(", ")}`,
+    });
+  }
+
+  const wizardry = countResidualWizardry(record);
   importedState.wizardry = wizardry;
   if (wizardry > 0) {
     summary.applied.push({ label: "Wizardry", detail: `${wizardry}` });
@@ -364,16 +675,13 @@ export const buildImportedCalculatorState = (
     });
   }
 
-  if (record.rings.length > 0) {
-    summary.skipped.push({
-      label: "Rings",
-      detail: "Jewellery is not modeled directly by this calculator.",
-    });
-  }
-  if (record.amulets.length > 0) {
-    summary.skipped.push({
-      label: "Amulets",
-      detail: "Amulets are not modeled directly by this calculator.",
+  const residualModifierSummary = Object.entries(residualEquipmentModifiers)
+    .filter(([, value]) => value !== 0)
+    .map(([key, value]) => `${key} ${value > 0 ? "+" : ""}${value}`);
+  if (residualModifierSummary.length > 0) {
+    summary.applied.push({
+      label: "Equipment modifiers",
+      detail: residualModifierSummary.join(", "),
     });
   }
   if (record.gizmo) {
@@ -394,10 +702,17 @@ export const buildImportedCalculatorState = (
       detail: "Form state is not modeled by this calculator.",
     });
   }
-  if (record.mutations.some((mutation) => mutation.name !== "wild magic")) {
+  const mutationMapping = applyMutationModifiers(record, importedState);
+  if (mutationMapping.applied.length > 0) {
+    summary.applied.push({
+      label: "Mutations",
+      detail: mutationMapping.applied.join(", "),
+    });
+  }
+  if (mutationMapping.unsupported.length > 0) {
     summary.skipped.push({
       label: "Mutations",
-      detail: "Only wild magic is mapped into calculator state today.",
+      detail: `Unsupported mutations skipped: ${mutationMapping.unsupported.join(", ")}`,
     });
   }
 
