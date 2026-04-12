@@ -78,6 +78,35 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
   });
 
+  test("overrides stale populated arrays when the legacy fields were edited after migration", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.ringSlots = [
+      { kind: "protection", plus: 5 },
+      { kind: "evasion", plus: 1 },
+    ];
+    legacy.gloveSlots = [
+      { present: false, enchant: 0 },
+      { present: false, enchant: 0 },
+    ];
+    legacy.headgearSlots = [{ present: false, enchant: 0 }];
+    legacy.wizardry = 1;
+    legacy.gloves = true;
+    legacy.secondGloves = true;
+    legacy.helmet = true;
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.ringSlots).toEqual([{ kind: "wizardry", plus: 0 }, { kind: "none", plus: 0 }]);
+    expect(parsed?.gloveSlots).toEqual([
+      { present: true, enchant: 0 },
+      { present: true, enchant: 0 },
+    ]);
+    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+  });
+
   test("coerces slot arrays to the current species capacity", () => {
     const legacy = {
       ...buildDefaultCalculatorState("trunk"),
