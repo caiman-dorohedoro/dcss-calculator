@@ -12,6 +12,11 @@ import {
 import { act } from "react";
 import type { ComponentType } from "react";
 import { createRoot, type Root } from "react-dom/client";
+import {
+  clearAmuletSlotMetadata,
+  clearAuxArmourSlotMetadata,
+  clearRingSlotMetadata,
+} from "@/types/equipmentSlots";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import AttrInput from "../AttrInput";
 
@@ -37,7 +42,9 @@ const setNumberInputValue = (input: HTMLInputElement, value: string) => {
   input.dispatchEvent(new Event("input", { bubbles: true }));
 };
 
-const { default: DynamicEquipmentControls } = await import("../DynamicEquipmentControls");
+const {
+  default: DynamicEquipmentControls,
+} = await import("../DynamicEquipmentControls");
 
 describe("DynamicEquipmentControls", () => {
   let container: HTMLDivElement;
@@ -114,23 +121,69 @@ describe("DynamicEquipmentControls", () => {
     expect(gloveSection.querySelectorAll('[data-testid^="glove-slot-"]')).toHaveLength(2);
   });
 
-  test("renders fixed cloak boots and barding controls", async () => {
+  test("clears imported metadata when manual slot edits change the slot state", () => {
+    expect(
+      clearRingSlotMetadata({
+        kind: "wizardry",
+        plus: 0,
+        displayName: "ring of wizardry",
+        artifactKind: "randart",
+        source: "imported",
+      })
+    ).toEqual({
+      kind: "wizardry",
+      plus: 0,
+      displayName: undefined,
+      artifactKind: undefined,
+      source: undefined,
+    });
+
+    expect(
+      clearAmuletSlotMetadata({
+        kind: "reflection",
+        displayName: "amulet of reflection",
+        artifactKind: "normal",
+        source: "imported",
+      })
+    ).toEqual({
+      kind: "reflection",
+      displayName: undefined,
+      artifactKind: undefined,
+      source: undefined,
+    });
+
+    expect(
+      clearAuxArmourSlotMetadata(
+        {
+          present: true,
+          enchant: 3,
+          displayName: "helmet",
+          artifactKind: "unrand",
+          source: "imported",
+        },
+        false
+      )
+    ).toEqual({
+      present: false,
+      enchant: 0,
+      displayName: undefined,
+      artifactKind: undefined,
+      source: undefined,
+    });
+  });
+
+  test("does not emit duplicate explicit ids", async () => {
     const state = buildDefaultCalculatorState("trunk");
 
     await act(async () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const fixedSection = container.querySelector(
-      '[data-testid="fixed-equipment-controls"]'
-    ) as HTMLDivElement;
-
-    expect(fixedSection).not.toBeNull();
-    expect(fixedSection.textContent).toContain("Cloak");
-    expect(fixedSection.textContent).toContain("Boots");
-    expect(fixedSection.textContent).toContain("Barding");
-    expect(container.textContent).toContain("cloak enchant");
-    expect(container.textContent).toContain("boots enchant");
+    expect(container.querySelector('[id="headgear-present-0"]')).toBeNull();
+    expect(container.querySelector('[id="glove-present-0"]')).toBeNull();
+    expect(container.querySelector('[id="cloak"]')).toBeNull();
+    expect(container.querySelector('[id="boots"]')).toBeNull();
+    expect(container.querySelector('[id="barding"]')).toBeNull();
   });
 
   test("allows a signed headgear enchant edit when the slot is present", async () => {

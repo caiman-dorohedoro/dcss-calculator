@@ -13,6 +13,9 @@ import {
   createDefaultAmuletSlot,
   createDefaultAuxArmourSlot,
   createDefaultRingSlot,
+  clearAmuletSlotMetadata,
+  clearAuxArmourSlotMetadata,
+  clearRingSlotMetadata,
   type AmuletSlotState,
   type AuxArmourSlotState,
   type RingSlotState,
@@ -158,7 +161,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                     updateRingSlot(index, (current) => {
                       const nextKind = value as RingSlotState["kind"];
                       return {
-                        ...current,
+                        ...clearRingSlotMetadata(current),
                         kind: nextKind,
                         plus: isRingBonusKind(nextKind) ? current.plus : 0,
                       };
@@ -215,7 +218,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                   value={slot.kind}
                   onValueChange={(value) =>
                     updateAmuletSlot(index, (current) => ({
-                      ...current,
+                      ...clearAmuletSlotMetadata(current),
                       kind: value as AmuletSlotState["kind"],
                     }))
                   }
@@ -260,14 +263,10 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                       "headgearSlots",
                       slotCounts.headgearSlots,
                       index,
-                      (current) => ({
-                        ...current,
-                        present: !!checked,
-                        enchant: checked ? current.enchant : 0,
-                      })
+                      (current) =>
+                        clearAuxArmourSlotMetadata(current, !!checked)
                     )
                   }
-                  id={`headgear-present-${index}`}
                 />
                 present
               </label>
@@ -317,14 +316,10 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                       "gloveSlots",
                       slotCounts.gloveSlots,
                       index,
-                      (current) => ({
-                        ...current,
-                        present: !!checked,
-                        enchant: checked ? current.enchant : 0,
-                      })
+                      (current) =>
+                        clearAuxArmourSlotMetadata(current, !!checked)
                     )
                   }
-                  id={`glove-present-${index}`}
                 />
                 present
               </label>
@@ -385,7 +380,6 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                     [key]: !!checked,
                   }))
                 }
-                id={key}
               />
               {label}
             </label>

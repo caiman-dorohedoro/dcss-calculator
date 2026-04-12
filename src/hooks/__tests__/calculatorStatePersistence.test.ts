@@ -63,56 +63,38 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
   });
 
-  test("prefers legacy equipment fields when a mixed-shape save still has default slot arrays", () => {
-    const legacy = buildDefaultCalculatorState("0.34");
+  test("round-trips modern slot edits even when legacy keys are still present", () => {
+    const modern = buildDefaultCalculatorState("0.34");
 
-    legacy.species = "formicid";
-    legacy.wizardry = 2;
-    legacy.gloves = true;
-    legacy.secondGloves = true;
-    legacy.helmet = true;
+    modern.species = "formicid";
+    modern.ringSlots = [
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+    ];
+    modern.amuletSlots = [{ kind: "none" }];
+    modern.headgearSlots = [{ present: true, enchant: 0 }];
+    modern.gloveSlots = [
+      { present: true, enchant: 0 },
+      { present: true, enchant: 0 },
+    ];
+    modern.wizardry = 1;
+    modern.gloves = true;
+    modern.secondGloves = true;
+    modern.helmet = true;
 
-    const parsed = parseSavedState(JSON.stringify(legacy));
+    const parsed = parseSavedState(JSON.stringify(modern));
 
     expect(parsed).not.toBeNull();
     expect(parsed?.ringSlots).toEqual([
       { kind: "wizardry", plus: 0 },
       { kind: "wizardry", plus: 0 },
     ]);
+    expect(parsed?.amuletSlots).toEqual([{ kind: "none" }]);
+    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
     expect(parsed?.gloveSlots).toEqual([
       { present: true, enchant: 0 },
       { present: true, enchant: 0 },
     ]);
-    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
-  });
-
-  test("overrides legacy-compatible slot arrays when the legacy fields were edited after migration", () => {
-    const legacy = buildDefaultCalculatorState("0.34");
-
-    legacy.species = "formicid";
-    legacy.ringSlots = [
-      { kind: "wizardry", plus: 0 },
-      { kind: "wizardry", plus: 0 },
-    ];
-    legacy.gloveSlots = [
-      { present: false, enchant: 0 },
-      { present: false, enchant: 0 },
-    ];
-    legacy.headgearSlots = [{ present: false, enchant: 0 }];
-    legacy.wizardry = 1;
-    legacy.gloves = true;
-    legacy.secondGloves = true;
-    legacy.helmet = true;
-
-    const parsed = parseSavedState(JSON.stringify(legacy));
-
-    expect(parsed).not.toBeNull();
-    expect(parsed?.ringSlots).toEqual([{ kind: "wizardry", plus: 0 }, { kind: "none", plus: 0 }]);
-    expect(parsed?.gloveSlots).toEqual([
-      { present: true, enchant: 0 },
-      { present: true, enchant: 0 },
-    ]);
-    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
   });
 
   test("preserves modern slot data even when legacy keys are present", () => {
@@ -147,19 +129,15 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 3 }]);
   });
 
-  test("clears slot arrays when legacy fields are reset back to defaults", () => {
-    const legacy = buildDefaultCalculatorState("0.34");
+  test("restores default slot arrays when legacy fields are reset and modern arrays are absent", () => {
+    const legacy = omitKeys(buildDefaultCalculatorState("0.34"), [
+      "ringSlots",
+      "amuletSlots",
+      "headgearSlots",
+      "gloveSlots",
+    ]);
 
     legacy.species = "formicid";
-    legacy.ringSlots = [
-      { kind: "wizardry", plus: 0 },
-      { kind: "wizardry", plus: 0 },
-    ];
-    legacy.gloveSlots = [
-      { present: true, enchant: 0 },
-      { present: true, enchant: 0 },
-    ];
-    legacy.headgearSlots = [{ present: true, enchant: 0 }];
     legacy.wizardry = 0;
     legacy.gloves = false;
     legacy.secondGloves = false;
