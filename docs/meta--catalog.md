@@ -39,6 +39,7 @@
 | `2026-04-04-version-registry-design.md` | version registry 레이어 도입 범위와 경계를 정리한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-05-034-trunk-version-update-design.md` | `0.34` stable + trunk snapshot 갱신 범위를 정리한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-10-morgue-import-design.md` | morgue 붙여넣기 기반 calculator 자동 할당과 import summary 흐름을 정의한 설계 문서 | `/docs/superpowers/specs` |
+| `2026-04-12-morgue-import-state-expansion-design.md` | morgue import 후 수동 편집 가능한 동적 슬롯과 parity-relevant modifier 확장을 정의한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-11-desktop-layout-design.md` | PC에서 그래프는 좌측, 컨트롤은 우측 sticky 패널로 분리하는 데스크톱 레이아웃 설계 | `/docs/superpowers/specs` |
 | `2026-04-11-spell-controls-sidebar-design.md` | 주문 선택만 좌측에 남기고 spell 관련 입력을 우측 sidebar로 재배치하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-04-version-registry-refactor.md` | version registry 리팩터링 구현 계획 | `/docs/superpowers/plans` |
