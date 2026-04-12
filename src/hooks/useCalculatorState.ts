@@ -282,25 +282,25 @@ export const parseSavedState = (
     }
 
     const species = parsed.species as SpeciesKey<typeof version>;
-    const slotCounts = getDynamicSlotCounts(
-      version,
-      species
+    const slotCounts = getDynamicSlotCounts(version, species);
+    const hasWizardryKey = Object.prototype.hasOwnProperty.call(
+      parsed,
+      "wizardry"
     );
-    const hasLegacyRingUpgrade =
-      typeof parsed.wizardry === "number" && parsed.wizardry > 0;
-    const hasLegacyGloveUpgrade =
-      parsed.gloves === true || parsed.secondGloves === true;
-    const hasLegacyHeadgearUpgrade = parsed.helmet === true;
+    const hasGloveKeys =
+      Object.prototype.hasOwnProperty.call(parsed, "gloves") ||
+      Object.prototype.hasOwnProperty.call(parsed, "secondGloves");
+    const hasHelmetKey = Object.prototype.hasOwnProperty.call(parsed, "helmet");
 
     const ringSlots =
-      hasLegacyRingUpgrade
+      hasWizardryKey
         ? createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots)
         : Array.isArray(parsed.ringSlots)
         ? coerceLegacySlots(parsed.ringSlots, slotCounts.ringSlots, createDefaultRingSlot)
         : createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots);
 
     const gloveSlots =
-      hasLegacyGloveUpgrade
+      hasGloveKeys
         ? createLegacyAuxArmourSlots(
             parsed.gloves === true,
             slotCounts.gloveSlots,
@@ -319,7 +319,7 @@ export const parseSavedState = (
           );
 
     const headgearSlots =
-      hasLegacyHeadgearUpgrade
+      hasHelmetKey
         ? createLegacyAuxArmourSlots(
             parsed.helmet === true,
             slotCounts.headgearSlots

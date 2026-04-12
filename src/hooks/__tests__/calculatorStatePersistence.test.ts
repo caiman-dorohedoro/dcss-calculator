@@ -107,17 +107,61 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
   });
 
-  test("coerces slot arrays to the current species capacity", () => {
-    const legacy = {
-      ...buildDefaultCalculatorState("trunk"),
-      species: "octopode",
-      ringSlots: [
-        { kind: "wizardry", plus: 0 },
-        { kind: "wizardry", plus: 0 },
-        { kind: "wizardry", plus: 0 },
-      ],
-      gloveSlots: [{ present: true, enchant: 0 }],
-    };
+  test("clears slot arrays when legacy fields are reset back to defaults", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.ringSlots = [
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+    ];
+    legacy.gloveSlots = [
+      { present: true, enchant: 0 },
+      { present: true, enchant: 0 },
+    ];
+    legacy.headgearSlots = [{ present: true, enchant: 0 }];
+    legacy.wizardry = 0;
+    legacy.gloves = false;
+    legacy.secondGloves = false;
+    legacy.helmet = false;
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.ringSlots).toEqual([
+      { kind: "none", plus: 0 },
+      { kind: "none", plus: 0 },
+    ]);
+    expect(parsed?.gloveSlots).toEqual([
+      { present: false, enchant: 0 },
+      { present: false, enchant: 0 },
+    ]);
+    expect(parsed?.headgearSlots).toEqual([{ present: false, enchant: 0 }]);
+  });
+
+  test("coerces slot arrays when the legacy source keys are absent", () => {
+    const {
+      ringSlots: _ringSlots,
+      amuletSlots: _amuletSlots,
+      headgearSlots: _headgearSlots,
+      gloveSlots: _gloveSlots,
+      wizardry: _wizardry,
+      gloves: _gloves,
+      secondGloves: _secondGloves,
+      helmet: _helmet,
+      ...legacy
+    } = buildDefaultCalculatorState("trunk") as unknown as Record<
+      string,
+      unknown
+    >;
+
+    legacy.species = "octopode";
+    legacy.ringSlots = [
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+    ];
+    legacy.gloveSlots = [{ present: true, enchant: 0 }];
 
     const parsed = parseSavedState(JSON.stringify(legacy));
 
