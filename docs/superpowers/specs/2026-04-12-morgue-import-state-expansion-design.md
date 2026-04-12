@@ -154,6 +154,10 @@ The metadata fields are optional and read-only from the calculator's point of
 view. They exist to keep imported randart identity visible without forcing the
 app to become a full item editor.
 
+All enchant fields in this design are signed integers. Crawl enchant can be
+negative, so the calculator must not clamp imported or manually entered enchant
+values to zero.
+
 ### 2. Keep Residual Additive Fields For Non-Slot Effects
 
 Some Crawl-relevant effects are important for parity but do not belong in the
@@ -360,13 +364,13 @@ Specific mapping rules:
 
 - body armour and shield
   - base type still maps to existing `armour` and `shield`
-  - `enchant` maps to `bodyArmourEnchant` and `shieldEnchant`
+  - signed `enchant` maps to `bodyArmourEnchant` and `shieldEnchant`
 - boots and cloak
   - existing worn-state mapping remains in the current fixed controls
-  - `enchant` maps to `bootsEnchant` and `cloakEnchant`
+  - signed `enchant` maps to `bootsEnchant` and `cloakEnchant`
 - headgear and gloves
   - each parsed equipped item fills the next legal slot
-  - slot enchant comes from the parsed item `enchant`
+  - slot enchant comes from the parsed item signed `enchant`
 - rings
   - wizardry / protection / evasion rings map into ring slots
   - plus-valued rings carry their parsed plus value into `plus`
