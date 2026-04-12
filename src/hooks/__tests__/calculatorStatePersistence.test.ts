@@ -209,4 +209,14 @@ describe("calculator saved-state migration", () => {
 
     expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
   });
+
+  test("rejects malformed residual numeric fields", () => {
+    const malformed = {
+      ...buildDefaultCalculatorState("0.34"),
+      bodyArmourEnchant: "7",
+      equipmentEV: "2",
+    };
+
+    expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
+  });
 });

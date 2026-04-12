@@ -196,6 +196,9 @@ const coerceLegacySlots = <T>(
   return coerceSlotArrayLength(Array.isArray(slots) ? (slots as T[]) : [], slotCount, makeDefault);
 };
 
+const isOptionalNumber = (value: unknown) =>
+  value === undefined || typeof value === "number";
+
 const validateState = (state: unknown): state is CalculatorState<GameVersion> => {
   if (!isObject(state)) return false;
 
@@ -255,6 +258,29 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
   if (
     state.secondGloves !== undefined &&
     typeof state.secondGloves !== "boolean"
+  ) {
+    return false;
+  }
+
+  if (
+    !isOptionalNumber(state.bodyArmourEnchant) ||
+    !isOptionalNumber(state.shieldEnchant) ||
+    !isOptionalNumber(state.bootsEnchant) ||
+    !isOptionalNumber(state.cloakEnchant) ||
+    !isOptionalNumber(state.equipmentStr) ||
+    !isOptionalNumber(state.equipmentDex) ||
+    !isOptionalNumber(state.equipmentInt) ||
+    !isOptionalNumber(state.equipmentAC) ||
+    !isOptionalNumber(state.equipmentEV) ||
+    !isOptionalNumber(state.equipmentSH) ||
+    !isOptionalNumber(state.subduedMagic) ||
+    !isOptionalNumber(state.antiWizardry) ||
+    !isOptionalNumber(state.runicMagic) ||
+    !isOptionalNumber(state.bigBrainWizardry) ||
+    !isOptionalNumber(state.scalesAC) ||
+    !isOptionalNumber(state.distortionField) ||
+    !isOptionalNumber(state.tenguFlight) ||
+    !isOptionalNumber(state.largeBonePlates)
   ) {
     return false;
   }

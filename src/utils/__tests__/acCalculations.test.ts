@@ -228,4 +228,16 @@ describe("AC Calculations", () => {
       })
     ).toBe(15);
   });
+
+  test("ignores stale body-armour enchant when no body armour is equipped", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "human",
+        armour: "none",
+        bodyArmourEnchant: 5,
+        armourSkill: 0,
+      })
+    ).toBe(0);
+  });
 });

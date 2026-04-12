@@ -59,11 +59,12 @@ export const calculateMixedAC = <V extends GameVersion>({
   armourSkill,
 }: MixedCalculationsParams<V>): number => {
   const isDeformed = getVersionSpecies(version)[species].deformedBody === true;
+  const hasBodyArmour = armour !== undefined && armour !== "none";
   let baseAC = 0;
   const hasHeadgearSlots = headgearSlots?.some((slot) => slot.present) ?? false;
   const hasGloveSlots = gloveSlots?.some((slot) => slot.present) ?? false;
 
-  if (armour) {
+  if (hasBodyArmour) {
     baseAC += armourOptions[armour].baseAC;
   }
 
@@ -99,11 +100,13 @@ export const calculateMixedAC = <V extends GameVersion>({
 
   const scaledBaseAc = calculateAC(baseAC, armourSkill);
   const deformedPenalty =
-    isDeformed && armour ? Math.floor(armourOptions[armour].baseAC * 0.5) : 0;
+    isDeformed && hasBodyArmour
+      ? Math.floor(armourOptions[armour].baseAC * 0.5)
+      : 0;
 
   return (
     scaledBaseAc +
-    bodyArmourEnchant +
+    (hasBodyArmour ? bodyArmourEnchant : 0) +
     getAuxArmourEnchantTotal(headgearSlots) +
     getAuxArmourEnchantTotal(gloveSlots) +
     (boots === true ? bootsEnchant : 0) +
