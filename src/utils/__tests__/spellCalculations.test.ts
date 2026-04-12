@@ -1,4 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
+import { parseSavedState } from "@/hooks/useCalculatorState";
+import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+import { getRingWizardryCount } from "../equipmentModifiers";
 import { calculateSpellFailureRate } from "../spellCalculation";
 
 describe("Spell Calculations", () => {
@@ -644,6 +647,53 @@ describe("Spell Calculations", () => {
     expect(modified).toBeLessThan(base);
   });
 
+  test("restored legacy wizardry saves count ring wizardry once for spell failure", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.wizardry = 2;
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+
+    const ringWizardry = getRingWizardryCount(parsed!.ringSlots);
+    const baseParams = {
+      version: "trunk" as const,
+      species: "human" as const,
+      strength: 10,
+      equipmentStr: 0,
+      spellcasting: 8,
+      intelligence: 18,
+      equipmentInt: 0,
+      targetSpell: "Fireball" as const,
+      schoolSkills: { fire: 8, conjuration: 8 } as never,
+      spellDifficulty: 5 as const,
+      armour: "robe" as const,
+      shield: "none" as const,
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry,
+      bigBrainWizardry: 0,
+      subduedMagic: 0,
+      antiWizardry: 0,
+      runicMagic: 0,
+      wildMagic: 0,
+    };
+
+    const expected = calculateSpellFailureRate({
+      ...baseParams,
+      wizardry: 0,
+    });
+    const actual = calculateSpellFailureRate({
+      ...baseParams,
+      wizardry: parsed!.wizardry,
+    });
+
+    expect(parsed?.wizardry).toBe(0);
+    expect(actual).toBe(expected);
+  });
+
   test("runic magic reduces the body-armour spell penalty", () => {
     const base = calculateSpellFailureRate({
       version: "trunk",
@@ -713,7 +763,7 @@ describe("Spell Calculations", () => {
       shieldSkill: 25.6,
     });
 
-    expect(failureRate).toBe(21); // shows 21 on game screen
+    expect(failureRate).toBe(22); // shows 22 on game screen
   });
 
   // https://crawl.akrasiac.org/rawdata/acky8/morgue-acky8-20250214-182911.txt

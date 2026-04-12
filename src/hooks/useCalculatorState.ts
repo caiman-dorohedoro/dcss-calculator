@@ -423,6 +423,9 @@ export const parseSavedState = (
           createDefaultRingSlot
         )
       : createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots);
+    const wizardry = useModernRingSlots
+      ? parsed.wizardry ?? defaultState.wizardry
+      : 0;
 
     const gloveSlots = useModernGloveSlots
       ? coerceLegacySlots(
@@ -451,6 +454,7 @@ export const parseSavedState = (
       ...defaultState,
       ...parsed,
       orb: parsed.orb ?? (parsed.channel === true ? "energy" : "none"),
+      wizardry,
       species,
       ...coerceEquipmentSlotCollections(version, species, {
         ringSlots,

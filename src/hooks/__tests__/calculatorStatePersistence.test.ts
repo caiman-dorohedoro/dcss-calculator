@@ -61,6 +61,7 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: 0 },
     ]);
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+    expect(parsed?.wizardry).toBe(0);
   });
 
   test("prefers legacy fields when mixed-shape saves still contain default slot arrays", () => {
@@ -84,6 +85,7 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: 0 },
     ]);
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+    expect(parsed?.wizardry).toBe(0);
   });
 
   test("round-trips modern slot edits even when legacy keys are still present", () => {
@@ -118,6 +120,7 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: 0 },
       { present: true, enchant: 0 },
     ]);
+    expect(parsed?.wizardry).toBe(1);
   });
 
   test("preserves modern slot data even when legacy keys are present", () => {
@@ -150,6 +153,7 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: -1 },
     ]);
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 3 }]);
+    expect(parsed?.wizardry).toBe(2);
   });
 
   test("restores default slot arrays when legacy fields are reset and modern arrays are absent", () => {
