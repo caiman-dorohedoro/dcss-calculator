@@ -7,15 +7,15 @@ import { parseSavedState } from "../useCalculatorState";
 
 describe("calculator saved-state migration", () => {
   test("creates slot arrays when a legacy save does not include them", () => {
-    const legacy = {
-      ...buildDefaultCalculatorState("0.34"),
-      species: "formicid",
-    };
+    const {
+      ringSlots: _ringSlots,
+      amuletSlots: _amuletSlots,
+      headgearSlots: _headgearSlots,
+      gloveSlots: _gloveSlots,
+      ...legacy
+    } = buildDefaultCalculatorState("0.34");
 
-    delete legacy.ringSlots;
-    delete legacy.amuletSlots;
-    delete legacy.headgearSlots;
-    delete legacy.gloveSlots;
+    legacy.species = "formicid";
 
     const parsed = parseSavedState(JSON.stringify(legacy));
 
