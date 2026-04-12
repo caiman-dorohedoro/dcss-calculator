@@ -151,6 +151,15 @@ const fillRingSlots = (
   ringSlots: RingSlotState[],
   details: EquipmentItemSnapshot[] | undefined
 ) => {
+  const parseSubtypePlus = (subtypeEffect: string | null) => {
+    if (!subtypeEffect) {
+      return null;
+    }
+
+    const match = subtypeEffect.match(/([+-]?\d+)$/);
+    return match ? Number(match[1]) : null;
+  };
+
   let nextIndex = 0;
   let mapped = 0;
   const unsupported: string[] = [];
@@ -158,18 +167,18 @@ const fillRingSlots = (
   for (const detail of details ?? []) {
     let nextSlot: RingSlotState | null = null;
 
-    if (detail.subtypeEffect === "protection") {
+    if (detail.subtypeEffect?.startsWith("protection")) {
       nextSlot = {
         kind: "protection",
-        plus: detail.enchant ?? 0,
+        plus: detail.enchant ?? parseSubtypePlus(detail.subtypeEffect) ?? 0,
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",
       };
-    } else if (detail.subtypeEffect === "evasion") {
+    } else if (detail.subtypeEffect?.startsWith("evasion")) {
       nextSlot = {
         kind: "evasion",
-        plus: detail.enchant ?? 0,
+        plus: detail.enchant ?? parseSubtypePlus(detail.subtypeEffect) ?? 0,
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",
@@ -275,8 +284,11 @@ const getNumericProperty = (
   item: EquipmentItemSnapshot,
   property: keyof typeof numericEquipmentPropMap
 ) => {
+  if (property in item.properties.numeric) {
+    return item.properties.numeric[property] ?? 0;
+  }
+
   return (
-    (item.properties.numeric[property] ?? 0) +
     (item.intrinsicProperties.numeric[property] ?? 0) +
     (item.egoProperties.numeric[property] ?? 0) +
     (item.artifactProperties.numeric[property] ?? 0)
@@ -587,7 +599,10 @@ export const buildImportedCalculatorState = (
   importedState.bootsEnchant =
     record.footwearDetails?.find((item) => item.baseType === "boots")?.enchant ?? 0;
   importedState.cloakEnchant = record.cloakDetails?.[0]?.enchant ?? 0;
-  fillAuxArmourSlots(importedState.headgearSlots, record.helmetDetails);
+  fillAuxArmourSlots(
+    importedState.headgearSlots,
+    record.helmetDetails?.filter((item) => item.baseType === "helmet")
+  );
   fillAuxArmourSlots(importedState.gloveSlots, record.glovesDetails);
   const residualEquipmentModifiers = applyResidualEquipmentModifiers(
     record,
@@ -596,6 +611,12 @@ export const buildImportedCalculatorState = (
 
   summary.applied.push({ label: "Auxiliary armour" });
 
+  if (record.helmets.some((name) => name.includes("hat"))) {
+    summary.skipped.push({
+      label: "Headgear",
+      detail: "Hat is not modeled separately from helmet.",
+    });
+  }
   if (record.cloaks.some((name) => name.includes("scarf"))) {
     summary.skipped.push({
       label: "Cloaks",

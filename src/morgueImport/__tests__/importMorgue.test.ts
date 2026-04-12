@@ -303,6 +303,11 @@ describe("morgue import mapper", () => {
           ...makeItem("-1 hat of intelligence", "hat", {
             numeric: { Int: 3 },
           }),
+          egoProperties: {
+            numeric: { Int: 3 },
+            booleanProps: {},
+            opaqueTokens: [],
+          },
           enchant: -1,
         },
       ],
@@ -315,16 +320,16 @@ describe("morgue import mapper", () => {
       ringDetails: [
         {
           ...makeItem("ring of protection +4", "ring"),
-          subtypeEffect: "protection",
-          enchant: 4,
+          subtypeEffect: "protection +4",
+          enchant: null,
         },
         makeItem("ring of wizardry", "ring", {
           booleanProps: { Wiz: true },
         }),
         {
           ...makeItem("ring of evasion +5", "ring"),
-          subtypeEffect: "evasion",
-          enchant: 5,
+          subtypeEffect: "evasion +5",
+          enchant: null,
         },
       ],
       skills: baseSkills,
@@ -364,7 +369,7 @@ describe("morgue import mapper", () => {
     expect(result.importedState.bodyArmourEnchant).toBe(-2);
     expect(result.importedState.shieldEnchant).toBe(3);
     expect(result.importedState.headgearSlots[0]).toEqual(
-      expect.objectContaining({ present: true, enchant: -1 })
+      expect.objectContaining({ present: false, enchant: 0 })
     );
     expect(result.importedState.cloakEnchant).toBe(2);
     expect(result.importedState.equipmentInt).toBe(3);
@@ -379,6 +384,9 @@ describe("morgue import mapper", () => {
     );
     expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Amulets" })])
+    );
+    expect(result.summary.skipped).toEqual(
+      expect.arrayContaining([expect.objectContaining({ label: "Headgear" })])
     );
   });
 
