@@ -110,6 +110,55 @@ const isValidSlotArray = <T>(
   validator: (slot: unknown) => slot is T
 ) => Array.isArray(value) && value.every(validator);
 
+const createLegacyRingSlots = (
+  legacyWizardry: unknown,
+  slotCount: number
+) => {
+  const wizardryCount =
+    typeof legacyWizardry === "number" ? Math.max(0, Math.trunc(legacyWizardry)) : 0;
+  const filledCount = Math.min(wizardryCount, slotCount);
+  const slots: RingSlotState[] = Array.from({ length: filledCount }, () => ({
+    kind: "wizardry",
+    plus: 0,
+  }));
+
+  return coerceSlotArrayLength(
+    slots,
+    slotCount,
+    createDefaultRingSlot
+  );
+};
+
+const createLegacyAuxArmourSlots = (
+  present: boolean,
+  slotCount: number,
+  secondSlotPresent = false
+) => {
+  const slots = Array.from({ length: slotCount }, () =>
+    createDefaultAuxArmourSlot()
+  );
+
+  if (slotCount > 0) {
+    slots[0] = present ? { present: true, enchant: 0 } : createDefaultAuxArmourSlot();
+  }
+
+  if (slotCount > 1) {
+    slots[1] = secondSlotPresent
+      ? { present: true, enchant: 0 }
+      : createDefaultAuxArmourSlot();
+  }
+
+  return slots;
+};
+
+const coerceLegacySlots = <T>(
+  slots: unknown,
+  slotCount: number,
+  makeDefault: () => T
+) => {
+  return coerceSlotArrayLength(Array.isArray(slots) ? (slots as T[]) : [], slotCount, makeDefault);
+};
+
 const validateState = (state: unknown): state is CalculatorState<GameVersion> => {
   if (!isObject(state)) return false;
 
@@ -238,35 +287,50 @@ export const parseSavedState = (
       species
     );
 
+    const ringSlots =
+      Array.isArray(parsed.ringSlots)
+        ? coerceLegacySlots(parsed.ringSlots, slotCounts.ringSlots, createDefaultRingSlot)
+        : createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots);
+
+    const gloveSlots =
+      Array.isArray(parsed.gloveSlots)
+        ? coerceLegacySlots(
+            parsed.gloveSlots,
+            slotCounts.gloveSlots,
+            createDefaultAuxArmourSlot
+          )
+        : createLegacyAuxArmourSlots(
+            parsed.gloves === true,
+            slotCounts.gloveSlots,
+            parsed.secondGloves === true
+          );
+
+    const headgearSlots =
+      Array.isArray(parsed.headgearSlots)
+        ? coerceLegacySlots(
+            parsed.headgearSlots,
+            slotCounts.headgearSlots,
+            createDefaultAuxArmourSlot
+          )
+        : createLegacyAuxArmourSlots(
+            parsed.helmet === true,
+            slotCounts.headgearSlots
+          );
+
     const normalized = {
       ...defaultState,
       ...parsed,
       orb: parsed.orb ?? (parsed.channel === true ? "energy" : "none"),
       species,
-      ringSlots: coerceSlotArrayLength(
-        (parsed as { ringSlots?: RingSlotState[] }).ringSlots ??
-          defaultState.ringSlots,
-        slotCounts.ringSlots,
-        createDefaultRingSlot
-      ),
+      ringSlots,
       amuletSlots: coerceSlotArrayLength(
         (parsed as { amuletSlots?: AmuletSlotState[] }).amuletSlots ??
           defaultState.amuletSlots,
         slotCounts.amuletSlots,
         createDefaultAmuletSlot
       ),
-      headgearSlots: coerceSlotArrayLength(
-        (parsed as { headgearSlots?: AuxArmourSlotState[] }).headgearSlots ??
-          defaultState.headgearSlots,
-        slotCounts.headgearSlots,
-        createDefaultAuxArmourSlot
-      ),
-      gloveSlots: coerceSlotArrayLength(
-        (parsed as { gloveSlots?: AuxArmourSlotState[] }).gloveSlots ??
-          defaultState.gloveSlots,
-        slotCounts.gloveSlots,
-        createDefaultAuxArmourSlot
-      ),
+      headgearSlots,
+      gloveSlots,
     };
 
     return validateState(normalized) ? normalized : null;
