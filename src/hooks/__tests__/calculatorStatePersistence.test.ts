@@ -5,15 +5,24 @@ import { describe, expect, test } from "@jest/globals";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { parseSavedState } from "../useCalculatorState";
 
+const omitKeys = (value: unknown, keys: string[]) => {
+  const next = { ...(value as Record<string, unknown>) };
+
+  for (const key of keys) {
+    delete next[key];
+  }
+
+  return next;
+};
+
 describe("calculator saved-state migration", () => {
   test("creates slot arrays when a legacy save does not include them", () => {
-    const {
-      ringSlots: _ringSlots,
-      amuletSlots: _amuletSlots,
-      headgearSlots: _headgearSlots,
-      gloveSlots: _gloveSlots,
-      ...legacy
-    } = buildDefaultCalculatorState("0.34");
+    const legacy = omitKeys(buildDefaultCalculatorState("0.34"), [
+      "ringSlots",
+      "amuletSlots",
+      "headgearSlots",
+      "gloveSlots",
+    ]);
 
     legacy.species = "formicid";
 
@@ -27,13 +36,12 @@ describe("calculator saved-state migration", () => {
   });
 
   test("migrates legacy scalar and boolean equipment fields into the new slot arrays", () => {
-    const {
-      ringSlots: _ringSlots,
-      amuletSlots: _amuletSlots,
-      headgearSlots: _headgearSlots,
-      gloveSlots: _gloveSlots,
-      ...legacy
-    } = buildDefaultCalculatorState("0.34");
+    const legacy = omitKeys(buildDefaultCalculatorState("0.34"), [
+      "ringSlots",
+      "amuletSlots",
+      "headgearSlots",
+      "gloveSlots",
+    ]);
 
     legacy.species = "formicid";
     legacy.wizardry = 2;
@@ -140,20 +148,16 @@ describe("calculator saved-state migration", () => {
   });
 
   test("coerces slot arrays when the legacy source keys are absent", () => {
-    const {
-      ringSlots: _ringSlots,
-      amuletSlots: _amuletSlots,
-      headgearSlots: _headgearSlots,
-      gloveSlots: _gloveSlots,
-      wizardry: _wizardry,
-      gloves: _gloves,
-      secondGloves: _secondGloves,
-      helmet: _helmet,
-      ...legacy
-    } = buildDefaultCalculatorState("trunk") as unknown as Record<
-      string,
-      unknown
-    >;
+    const legacy = omitKeys(buildDefaultCalculatorState("trunk"), [
+      "ringSlots",
+      "amuletSlots",
+      "headgearSlots",
+      "gloveSlots",
+      "wizardry",
+      "gloves",
+      "secondGloves",
+      "helmet",
+    ]);
 
     legacy.species = "octopode";
     legacy.ringSlots = [
@@ -173,5 +177,16 @@ describe("calculator saved-state migration", () => {
       { kind: "wizardry", plus: 0 },
     ]);
     expect(parsed?.gloveSlots).toHaveLength(1);
+  });
+
+  test("rejects saves with malformed legacy slot source types", () => {
+    const malformed = {
+      ...buildDefaultCalculatorState("0.34"),
+      wizardry: "2",
+      gloves: "yes",
+      helmet: "no",
+    };
+
+    expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
   });
 });

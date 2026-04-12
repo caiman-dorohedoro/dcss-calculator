@@ -203,6 +203,25 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     return false;
   }
 
+  if (state.wizardry !== undefined && typeof state.wizardry !== "number") {
+    return false;
+  }
+
+  if (state.helmet !== undefined && typeof state.helmet !== "boolean") {
+    return false;
+  }
+
+  if (state.gloves !== undefined && typeof state.gloves !== "boolean") {
+    return false;
+  }
+
+  if (
+    state.secondGloves !== undefined &&
+    typeof state.secondGloves !== "boolean"
+  ) {
+    return false;
+  }
+
   if (!isObject(state.schoolSkills)) {
     return false;
   }

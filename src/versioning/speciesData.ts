@@ -56,7 +56,9 @@ export const species034 = {
   ...species033,
 } as const satisfies Record<string, SpeciesOption>;
 
-const { armataur: _armataur, ...species034WithoutArmataur } = species034;
+const species034WithoutArmataur = Object.fromEntries(
+  Object.entries(species034).filter(([key]) => key !== "armataur")
+) as Omit<typeof species034, "armataur">;
 
 export const speciesTrunk = {
   ...species034WithoutArmataur,
