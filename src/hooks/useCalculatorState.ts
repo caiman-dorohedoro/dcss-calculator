@@ -120,6 +120,18 @@ const isRingSlot = (value: unknown): value is RingSlotState => {
   );
 };
 
+const isDefaultRingSlot = (value: unknown): boolean => {
+  if (!isObject(value)) return false;
+
+  return (
+    value.kind === "none" &&
+    value.plus === 0 &&
+    value.displayName === undefined &&
+    value.artifactKind === undefined &&
+    value.source === undefined
+  );
+};
+
 const isAmuletSlot = (value: unknown): value is AmuletSlotState => {
   if (!isObject(value)) return false;
 
@@ -128,6 +140,17 @@ const isAmuletSlot = (value: unknown): value is AmuletSlotState => {
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
     (value.source === undefined || isSlotSource(value.source))
+  );
+};
+
+const isDefaultAmuletSlot = (value: unknown): boolean => {
+  if (!isObject(value)) return false;
+
+  return (
+    value.kind === "none" &&
+    value.displayName === undefined &&
+    value.artifactKind === undefined &&
+    value.source === undefined
   );
 };
 
@@ -140,6 +163,18 @@ const isAuxArmourSlot = (value: unknown): value is AuxArmourSlotState => {
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
     (value.source === undefined || isSlotSource(value.source))
+  );
+};
+
+const isDefaultAuxArmourSlot = (value: unknown): boolean => {
+  if (!isObject(value)) return false;
+
+  return (
+    value.present === false &&
+    value.enchant === 0 &&
+    value.displayName === undefined &&
+    value.artifactKind === undefined &&
+    value.source === undefined
   );
 };
 
@@ -368,7 +403,20 @@ export const parseSavedState = (
 
     const species = parsed.species as SpeciesKey<typeof version>;
     const slotCounts = getDynamicSlotCounts(version, species);
-    const ringSlots = Array.isArray(parsed.ringSlots)
+    const useModernRingSlots =
+      Array.isArray(parsed.ringSlots) &&
+      parsed.ringSlots.some((slot) => !isDefaultRingSlot(slot));
+    const useModernHeadgearSlots =
+      Array.isArray(parsed.headgearSlots) &&
+      parsed.headgearSlots.some((slot) => !isDefaultAuxArmourSlot(slot));
+    const useModernGloveSlots =
+      Array.isArray(parsed.gloveSlots) &&
+      parsed.gloveSlots.some((slot) => !isDefaultAuxArmourSlot(slot));
+    const useModernAmuletSlots =
+      Array.isArray(parsed.amuletSlots) &&
+      parsed.amuletSlots.some((slot) => !isDefaultAmuletSlot(slot));
+
+    const ringSlots = useModernRingSlots
       ? coerceLegacySlots(
           parsed.ringSlots,
           slotCounts.ringSlots,
@@ -376,7 +424,7 @@ export const parseSavedState = (
         )
       : createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots);
 
-    const gloveSlots = Array.isArray(parsed.gloveSlots)
+    const gloveSlots = useModernGloveSlots
       ? coerceLegacySlots(
           parsed.gloveSlots,
           slotCounts.gloveSlots,
@@ -388,7 +436,7 @@ export const parseSavedState = (
           parsed.secondGloves === true
         );
 
-    const headgearSlots = Array.isArray(parsed.headgearSlots)
+    const headgearSlots = useModernHeadgearSlots
       ? coerceLegacySlots(
           parsed.headgearSlots,
           slotCounts.headgearSlots,
@@ -406,12 +454,13 @@ export const parseSavedState = (
       species,
       ...coerceEquipmentSlotCollections(version, species, {
         ringSlots,
-        amuletSlots: coerceSlotArrayLength(
-          (parsed as { amuletSlots?: AmuletSlotState[] }).amuletSlots ??
-            defaultState.amuletSlots,
-          slotCounts.amuletSlots,
-          createDefaultAmuletSlot
-        ),
+        amuletSlots: useModernAmuletSlots
+          ? coerceLegacySlots(
+              parsed.amuletSlots,
+              slotCounts.amuletSlots,
+              createDefaultAmuletSlot
+            )
+          : defaultState.amuletSlots,
         headgearSlots,
         gloveSlots,
       }),

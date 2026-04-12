@@ -63,6 +63,29 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
   });
 
+  test("prefers legacy fields when mixed-shape saves still contain default slot arrays", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.wizardry = 2;
+    legacy.gloves = true;
+    legacy.secondGloves = true;
+    legacy.helmet = true;
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.ringSlots).toEqual([
+      { kind: "wizardry", plus: 0 },
+      { kind: "wizardry", plus: 0 },
+    ]);
+    expect(parsed?.gloveSlots).toEqual([
+      { present: true, enchant: 0 },
+      { present: true, enchant: 0 },
+    ]);
+    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+  });
+
   test("round-trips modern slot edits even when legacy keys are still present", () => {
     const modern = buildDefaultCalculatorState("0.34");
 

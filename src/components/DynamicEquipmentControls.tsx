@@ -92,10 +92,15 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         createDefaultRingSlot
       );
       nextRingSlots[index] = update(nextRingSlots[index] ?? createDefaultRingSlot());
+      const wizardry = nextRingSlots.reduce(
+        (count, slot) => count + (slot.kind === "wizardry" ? 1 : 0),
+        0
+      );
 
       return {
         ...prev,
         ringSlots: nextRingSlots,
+        wizardry,
       };
     });
   };
@@ -134,10 +139,17 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         createDefaultAuxArmourSlot
       );
       nextSlots[index] = update(nextSlots[index] ?? createDefaultAuxArmourSlot());
+      const isHeadgear = key === "headgearSlots";
 
       return {
         ...prev,
         [key]: nextSlots,
+        ...(isHeadgear
+          ? { helmet: nextSlots[0]?.present ?? false }
+          : {
+              gloves: nextSlots[0]?.present ?? false,
+              secondGloves: nextSlots[1]?.present ?? false,
+            }),
       };
     });
   };
