@@ -151,13 +151,17 @@ const fillRingSlots = (
   ringSlots: RingSlotState[],
   details: EquipmentItemSnapshot[] | undefined
 ) => {
-  const parseSubtypePlus = (subtypeEffect: string | null) => {
+  const matchNumericSubtype = (
+    subtypeEffect: string | null,
+    kind: "protection" | "evasion"
+  ) => {
     if (!subtypeEffect) {
       return null;
     }
 
-    const match = subtypeEffect.match(/([+-]?\d+)$/);
-    return match ? Number(match[1]) : null;
+    return subtypeEffect.match(
+      new RegExp(`^${kind}(?:\\s+([+-]?\\d+))?$`)
+    );
   };
 
   let nextIndex = 0;
@@ -167,18 +171,24 @@ const fillRingSlots = (
   for (const detail of details ?? []) {
     let nextSlot: RingSlotState | null = null;
 
-    if (detail.subtypeEffect?.startsWith("protection")) {
+    const protectionMatch = matchNumericSubtype(
+      detail.subtypeEffect,
+      "protection"
+    );
+    const evasionMatch = matchNumericSubtype(detail.subtypeEffect, "evasion");
+
+    if (protectionMatch) {
       nextSlot = {
         kind: "protection",
-        plus: detail.enchant ?? parseSubtypePlus(detail.subtypeEffect) ?? 0,
+        plus: detail.enchant ?? Number(protectionMatch[1] ?? 0),
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",
       };
-    } else if (detail.subtypeEffect?.startsWith("evasion")) {
+    } else if (evasionMatch) {
       nextSlot = {
         kind: "evasion",
-        plus: detail.enchant ?? parseSubtypePlus(detail.subtypeEffect) ?? 0,
+        plus: detail.enchant ?? Number(evasionMatch[1] ?? 0),
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",

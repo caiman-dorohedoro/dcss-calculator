@@ -412,5 +412,16 @@ describe("morgue import mapper", () => {
 
     expect(imported.importedState.version).toBe("trunk");
     expect(imported.importedState.species).toBe("oni");
+    expect(imported.importedState.ringSlots).toEqual(
+      expect.arrayContaining([expect.objectContaining({ kind: "none" })])
+    );
+    expect(imported.summary.skipped).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Rings",
+          detail: expect.stringContaining("ring of protection from fire"),
+        }),
+      ])
+    );
   });
 });
