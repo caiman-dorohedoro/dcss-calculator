@@ -1,6 +1,12 @@
 import type { CalculatorState } from "@/hooks/useCalculatorState";
+import {
+  createDefaultAmuletSlot,
+  createDefaultAuxArmourSlot,
+  createDefaultRingSlot,
+} from "@/types/equipmentSlots";
 import type { GameVersion } from "@/types/game";
 import type { VersionedSchoolSkillLevels } from "@/types/spells";
+import { coerceSlotArrayLength, getDynamicSlotCounts } from "./dynamicSlotCounts";
 import { getVersionConfig } from "./versionRegistry";
 
 const baseDefaultState = {
@@ -45,6 +51,7 @@ export const buildDefaultCalculatorState = <V extends GameVersion>(
   version: V
 ): CalculatorState<V> => {
   const config = getVersionConfig(version);
+  const slotCounts = getDynamicSlotCounts(version, config.defaults.species);
 
   const state: CalculatorState<V> = {
     ...baseDefaultState,
@@ -52,6 +59,26 @@ export const buildDefaultCalculatorState = <V extends GameVersion>(
     species: config.defaults.species,
     targetSpell: config.defaults.targetSpell,
     schoolSkills: buildSchoolDefaults(version),
+    ringSlots: coerceSlotArrayLength(
+      [],
+      slotCounts.ringSlots,
+      createDefaultRingSlot
+    ),
+    amuletSlots: coerceSlotArrayLength(
+      [],
+      slotCounts.amuletSlots,
+      createDefaultAmuletSlot
+    ),
+    headgearSlots: coerceSlotArrayLength(
+      [],
+      slotCounts.headgearSlots,
+      createDefaultAuxArmourSlot
+    ),
+    gloveSlots: coerceSlotArrayLength(
+      [],
+      slotCounts.gloveSlots,
+      createDefaultAuxArmourSlot
+    ),
   };
 
   if (config.features.secondGloves) {

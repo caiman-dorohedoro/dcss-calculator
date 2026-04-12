@@ -6,10 +6,22 @@ import {
   ShieldKey,
   orbOptions,
 } from "@/types/equipment.ts";
+import {
+  createDefaultAmuletSlot,
+  createDefaultAuxArmourSlot,
+  createDefaultRingSlot,
+  type AmuletSlotState,
+  type AuxArmourSlotState,
+  type RingSlotState,
+} from "@/types/equipmentSlots";
 import type { SpeciesKey } from "@/types/species.ts";
 import { isGameVersion, startupRestoreOrder } from "@/types/game";
 import type { GameVersion } from "@/types/game";
 import type { VersionedSchoolSkillLevels, VersionedSpellName } from "@/types/spells";
+import {
+  coerceSlotArrayLength,
+  getDynamicSlotCounts,
+} from "@/versioning/dynamicSlotCounts";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getVersionConfig } from "@/versioning/versionRegistry";
@@ -42,6 +54,10 @@ export interface CalculatorState<V extends GameVersion> {
   cloak?: boolean;
   barding?: boolean;
   secondGloves?: boolean;
+  ringSlots: RingSlotState[];
+  amuletSlots: AmuletSlotState[];
+  headgearSlots: AuxArmourSlotState[];
+  gloveSlots: AuxArmourSlotState[];
   // spell mode
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;
@@ -61,6 +77,38 @@ export const isSchoolSkillKey = <V extends GameVersion>(
 const isObject = (obj: unknown): obj is Record<string, unknown> => {
   return typeof obj === "object" && obj !== null;
 };
+
+const isRingSlot = (value: unknown): value is RingSlotState => {
+  if (!isObject(value)) return false;
+
+  return (
+    (value.kind === "none" ||
+      value.kind === "wizardry" ||
+      value.kind === "protection" ||
+      value.kind === "evasion") &&
+    typeof value.plus === "number"
+  );
+};
+
+const isAmuletSlot = (value: unknown): value is AmuletSlotState => {
+  if (!isObject(value)) return false;
+
+  return (
+    (value.kind === "none" || value.kind === "reflection") &&
+    (value.displayName === undefined || typeof value.displayName === "string")
+  );
+};
+
+const isAuxArmourSlot = (value: unknown): value is AuxArmourSlotState => {
+  if (!isObject(value)) return false;
+
+  return typeof value.present === "boolean" && typeof value.enchant === "number";
+};
+
+const isValidSlotArray = <T>(
+  value: unknown,
+  validator: (slot: unknown) => slot is T
+) => Array.isArray(value) && value.every(validator);
 
 const validateState = (state: unknown): state is CalculatorState<GameVersion> => {
   if (!isObject(state)) return false;
@@ -110,6 +158,39 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     return false;
   }
 
+  const slotCounts = getDynamicSlotCounts(
+    version,
+    state.species as SpeciesKey<typeof version>
+  );
+
+  if (
+    !isValidSlotArray(state.ringSlots, isRingSlot) ||
+    state.ringSlots.length !== slotCounts.ringSlots
+  ) {
+    return false;
+  }
+
+  if (
+    !isValidSlotArray(state.amuletSlots, isAmuletSlot) ||
+    state.amuletSlots.length !== slotCounts.amuletSlots
+  ) {
+    return false;
+  }
+
+  if (
+    !isValidSlotArray(state.headgearSlots, isAuxArmourSlot) ||
+    state.headgearSlots.length !== slotCounts.headgearSlots
+  ) {
+    return false;
+  }
+
+  if (
+    !isValidSlotArray(state.gloveSlots, isAuxArmourSlot) ||
+    state.gloveSlots.length !== slotCounts.gloveSlots
+  ) {
+    return false;
+  }
+
   const validSchoolSkills = new Set(
     Object.keys(defaultState.schoolSkills ?? {})
   );
@@ -122,7 +203,9 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
   return true;
 };
 
-const parseSavedState = (saved: string): CalculatorState<GameVersion> | null => {
+export const parseSavedState = (
+  saved: string
+): CalculatorState<GameVersion> | null => {
   try {
     const parsed = JSON.parse(saved);
 
@@ -130,14 +213,63 @@ const parseSavedState = (saved: string): CalculatorState<GameVersion> | null => 
       return null;
     }
 
-    const migrated = {
+    if (
+      !("version" in parsed) ||
+      typeof parsed.version !== "string" ||
+      !isGameVersion(parsed.version)
+    ) {
+      return null;
+    }
+
+    const version = parsed.version;
+    const config = getVersionConfig(version);
+    const defaultState = buildDefaultCalculatorState(version);
+
+    if (
+      typeof parsed.species !== "string" ||
+      !(parsed.species in config.species)
+    ) {
+      return null;
+    }
+
+    const species = parsed.species as SpeciesKey<typeof version>;
+    const slotCounts = getDynamicSlotCounts(
+      version,
+      species
+    );
+
+    const normalized = {
+      ...defaultState,
       ...parsed,
-      orb:
-        parsed.orb ??
-        (parsed.channel === true ? "energy" : "none"),
+      orb: parsed.orb ?? (parsed.channel === true ? "energy" : "none"),
+      species,
+      ringSlots: coerceSlotArrayLength(
+        (parsed as { ringSlots?: RingSlotState[] }).ringSlots ??
+          defaultState.ringSlots,
+        slotCounts.ringSlots,
+        createDefaultRingSlot
+      ),
+      amuletSlots: coerceSlotArrayLength(
+        (parsed as { amuletSlots?: AmuletSlotState[] }).amuletSlots ??
+          defaultState.amuletSlots,
+        slotCounts.amuletSlots,
+        createDefaultAmuletSlot
+      ),
+      headgearSlots: coerceSlotArrayLength(
+        (parsed as { headgearSlots?: AuxArmourSlotState[] }).headgearSlots ??
+          defaultState.headgearSlots,
+        slotCounts.headgearSlots,
+        createDefaultAuxArmourSlot
+      ),
+      gloveSlots: coerceSlotArrayLength(
+        (parsed as { gloveSlots?: AuxArmourSlotState[] }).gloveSlots ??
+          defaultState.gloveSlots,
+        slotCounts.gloveSlots,
+        createDefaultAuxArmourSlot
+      ),
     };
 
-    return validateState(migrated) ? migrated : null;
+    return validateState(normalized) ? normalized : null;
   } catch {
     return null;
   }

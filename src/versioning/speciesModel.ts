@@ -7,8 +7,16 @@ export enum Size {
   GIANT = "giant",
 }
 
+export type SpeciesSlotOverrides = Partial<{
+  ringSlots: number;
+  amuletSlots: number;
+  headgearSlots: number;
+  gloveSlots: number;
+}>;
+
 export type SpeciesOption = {
   name: string;
   size: Size;
   deformedBody?: boolean;
+  slotOverrides?: SpeciesSlotOverrides;
 };
