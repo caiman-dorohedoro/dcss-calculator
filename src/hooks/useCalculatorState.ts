@@ -147,6 +147,30 @@ const isValidSlotArray = <T>(
   validator: (slot: unknown) => slot is T
 ) => Array.isArray(value) && value.every(validator);
 
+const hasModernRingSlotData = (slots: unknown) =>
+  Array.isArray(slots) &&
+  slots.some(
+    (slot) =>
+      isRingSlot(slot) &&
+      (slot.kind === "protection" ||
+        slot.kind === "evasion" ||
+        slot.plus !== 0 ||
+        slot.displayName !== undefined ||
+        slot.artifactKind !== undefined ||
+        slot.source !== undefined)
+  );
+
+const hasModernAuxSlotData = (slots: unknown) =>
+  Array.isArray(slots) &&
+  slots.some(
+    (slot) =>
+      isAuxArmourSlot(slot) &&
+      (slot.enchant !== 0 ||
+        slot.displayName !== undefined ||
+        slot.artifactKind !== undefined ||
+        slot.source !== undefined)
+  );
+
 const createLegacyRingSlots = (
   legacyWizardry: unknown,
   slotCount: number
@@ -375,14 +399,30 @@ export const parseSavedState = (
     const hasHelmetKey = Object.prototype.hasOwnProperty.call(parsed, "helmet");
 
     const ringSlots =
-      hasWizardryKey
+      hasModernRingSlotData(parsed.ringSlots)
+        ? coerceLegacySlots(
+            parsed.ringSlots,
+            slotCounts.ringSlots,
+            createDefaultRingSlot
+          )
+        : hasWizardryKey
         ? createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots)
         : Array.isArray(parsed.ringSlots)
-        ? coerceLegacySlots(parsed.ringSlots, slotCounts.ringSlots, createDefaultRingSlot)
+        ? coerceLegacySlots(
+            parsed.ringSlots,
+            slotCounts.ringSlots,
+            createDefaultRingSlot
+          )
         : createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots);
 
     const gloveSlots =
-      hasGloveKeys
+      hasModernAuxSlotData(parsed.gloveSlots)
+        ? coerceLegacySlots(
+            parsed.gloveSlots,
+            slotCounts.gloveSlots,
+            createDefaultAuxArmourSlot
+          )
+        : hasGloveKeys
         ? createLegacyAuxArmourSlots(
             parsed.gloves === true,
             slotCounts.gloveSlots,
@@ -401,7 +441,13 @@ export const parseSavedState = (
           );
 
     const headgearSlots =
-      hasHelmetKey
+      hasModernAuxSlotData(parsed.headgearSlots)
+        ? coerceLegacySlots(
+            parsed.headgearSlots,
+            slotCounts.headgearSlots,
+            createDefaultAuxArmourSlot
+          )
+        : hasHelmetKey
         ? createLegacyAuxArmourSlots(
             parsed.helmet === true,
             slotCounts.headgearSlots
