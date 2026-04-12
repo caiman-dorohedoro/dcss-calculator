@@ -110,6 +110,18 @@ const isValidSlotArray = <T>(
   validator: (slot: unknown) => slot is T
 ) => Array.isArray(value) && value.every(validator);
 
+const isDefaultRingSlot = (slot: unknown) =>
+  isRingSlot(slot) && slot.kind === "none" && slot.plus === 0;
+
+const isDefaultAuxArmourSlot = (slot: unknown) =>
+  isAuxArmourSlot(slot) && slot.present === false && slot.enchant === 0;
+
+const hasDefaultRingSlots = (slots: unknown) =>
+  Array.isArray(slots) && slots.every(isDefaultRingSlot);
+
+const hasDefaultAuxArmourSlots = (slots: unknown) =>
+  Array.isArray(slots) && slots.every(isDefaultAuxArmourSlot);
+
 const createLegacyRingSlots = (
   legacyWizardry: unknown,
   slotCount: number
@@ -288,12 +300,25 @@ export const parseSavedState = (
     );
 
     const ringSlots =
-      Array.isArray(parsed.ringSlots)
+      Array.isArray(parsed.ringSlots) &&
+      hasDefaultRingSlots(parsed.ringSlots) &&
+      typeof parsed.wizardry === "number" &&
+      parsed.wizardry > 0
+        ? createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots)
+        : Array.isArray(parsed.ringSlots)
         ? coerceLegacySlots(parsed.ringSlots, slotCounts.ringSlots, createDefaultRingSlot)
         : createLegacyRingSlots(parsed.wizardry, slotCounts.ringSlots);
 
     const gloveSlots =
-      Array.isArray(parsed.gloveSlots)
+      Array.isArray(parsed.gloveSlots) &&
+      hasDefaultAuxArmourSlots(parsed.gloveSlots) &&
+      (parsed.gloves === true || parsed.secondGloves === true)
+        ? createLegacyAuxArmourSlots(
+            parsed.gloves === true,
+            slotCounts.gloveSlots,
+            parsed.secondGloves === true
+          )
+        : Array.isArray(parsed.gloveSlots)
         ? coerceLegacySlots(
             parsed.gloveSlots,
             slotCounts.gloveSlots,
@@ -306,7 +331,14 @@ export const parseSavedState = (
           );
 
     const headgearSlots =
-      Array.isArray(parsed.headgearSlots)
+      Array.isArray(parsed.headgearSlots) &&
+      hasDefaultAuxArmourSlots(parsed.headgearSlots) &&
+      parsed.helmet === true
+        ? createLegacyAuxArmourSlots(
+            parsed.helmet === true,
+            slotCounts.headgearSlots
+          )
+        : Array.isArray(parsed.headgearSlots)
         ? coerceLegacySlots(
             parsed.headgearSlots,
             slotCounts.headgearSlots,
