@@ -251,4 +251,14 @@ describe("calculator saved-state migration", () => {
 
     expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
   });
+
+  test("rejects malformed spell numeric fields", () => {
+    const malformed = {
+      ...buildDefaultCalculatorState("0.34"),
+      spellcasting: "8",
+      wildMagic: "1",
+    };
+
+    expect(parseSavedState(JSON.stringify(malformed))).toBeNull();
+  });
 });

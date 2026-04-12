@@ -304,7 +304,9 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.scalesAC) ||
     !isOptionalNumber(state.distortionField) ||
     !isOptionalNumber(state.tenguFlight) ||
-    !isOptionalNumber(state.largeBonePlates)
+    !isOptionalNumber(state.largeBonePlates) ||
+    !isOptionalNumber(state.spellcasting) ||
+    !isOptionalNumber(state.wildMagic)
   ) {
     return false;
   }
