@@ -46,6 +46,7 @@
 | `2026-04-05-034-trunk-version-update.md` | `0.34.1 -> trunk` 갱신 구현 계획과 검증 순서 | `/docs/superpowers/plans` |
 | `2026-04-10-morgue-import.md` | morgue import feature 구현을 위한 TDD 기반 실행 계획 | `/docs/superpowers/plans` |
 | `2026-04-10-morgue-import-followups.md` | phase 1 이후 morgue parser 기반 확장 포인트와 우선순위를 정리한 후속 메모 | `/docs/superpowers/plans` |
+| `2026-04-12-morgue-import-state-expansion.md` | morgue import state expansion 구현 계획 문서 | `/docs/superpowers/plans` |
 | `2026-04-11-spell-controls-sidebar.md` | spell controls sidebar 재배치와 데스크톱 폭 조정을 위한 구현 계획 | `/docs/superpowers/plans` |
 
 ## 핵심 유지보수 엔트리포인트
