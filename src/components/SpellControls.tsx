@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { GameVersion } from "@/types/game";
 import { VersionedSpellSchool } from "@/types/spells";
-import { getSpellSchools } from "@/utils/spellCalculation";
 import { ChevronsDown } from "lucide-react";
 
 type SpellControlsProps<V extends GameVersion> = {
@@ -36,12 +35,11 @@ export const SpellSkillControls = <V extends GameVersion>({
   testId,
 }: SpellControlsProps<V>) => {
   const [showSpellSkills, setShowSpellSkills] = useState(false);
-  const spellSchools = state.targetSpell
-    ? getSpellSchools(state.version, state.targetSpell)
-    : [];
   const allSpellSchools = Object.keys(
     state.schoolSkills ?? {}
   ) as VersionedSpellSchool<V>[];
+  const hasSpellSkillControls =
+    allSpellSchools.length > 0 || state.spellcasting !== undefined;
   const orderedSpellSchools = [...allSpellSchools].sort((a, b) => {
     const aIndex = crawlSpellSchoolOrder.indexOf(
       a as (typeof crawlSpellSchoolOrder)[number]
@@ -59,20 +57,35 @@ export const SpellSkillControls = <V extends GameVersion>({
 
     return aIndex - bIndex;
   });
+  const spellSkillControls = [
+    {
+      key: "spellcasting",
+      label: "Spellcasting",
+      value: state.spellcasting ?? 0,
+      onChange: (value: number | undefined) =>
+        setState((prev) => ({ ...prev, spellcasting: value })),
+    },
+    ...orderedSpellSchools.map((schoolName) => ({
+      key: schoolName,
+      label: schoolName,
+      value: state.schoolSkills?.[schoolName] ?? 0,
+      onChange: (value: number | undefined) =>
+        setState((prev) => ({
+          ...prev,
+          schoolSkills: {
+            ...prev.schoolSkills,
+            [schoolName]: value === undefined ? 0 : value,
+          },
+        })),
+    })),
+  ];
+  const splitIndex = Math.ceil(spellSkillControls.length / 2);
+  const leftColumnSpellSkills = spellSkillControls.slice(0, splitIndex);
+  const rightColumnSpellSkills = spellSkillControls.slice(splitIndex);
 
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
-      <div className="flex flex-row gap-4 text-sm items-center flex-wrap">
-        <AttrInput
-          label="Spellcasting"
-          value={state.spellcasting ?? 0}
-          type="skill"
-          onChange={(value) =>
-            setState((prev) => ({ ...prev, spellcasting: value }))
-          }
-        />
-      </div>
-      {spellSchools.length > 0 && (
+      {hasSpellSkillControls && (
         <Button
           type="button"
           variant="ghost"
@@ -95,29 +108,41 @@ export const SpellSkillControls = <V extends GameVersion>({
           />
         </Button>
       )}
-      {spellSchools.length > 0 && showSpellSkills && (
+      {hasSpellSkillControls && showSpellSkills && (
         <div
           data-testid="spell-school-grid"
           className="grid grid-cols-2 gap-x-4 gap-y-4 text-sm items-start"
         >
-          {orderedSpellSchools.map((schoolName) => (
-            <div key={schoolName} className="justify-self-start">
-              <AttrInput
-                label={schoolName}
-                value={state.schoolSkills?.[schoolName] ?? 0}
-                type="skill"
-                onChange={(value) =>
-                  setState((prev) => ({
-                    ...prev,
-                    schoolSkills: {
-                      ...prev.schoolSkills,
-                      [schoolName]: value === undefined ? 0 : value,
-                    },
-                  }))
-                }
-              />
-            </div>
-          ))}
+          <div
+            data-testid="spell-school-column-left"
+            className="flex flex-col gap-4 items-start"
+          >
+            {leftColumnSpellSkills.map((skillControl) => (
+              <div key={skillControl.key} className="justify-self-start">
+                <AttrInput
+                  label={skillControl.label}
+                  value={skillControl.value}
+                  type="skill"
+                  onChange={skillControl.onChange}
+                />
+              </div>
+            ))}
+          </div>
+          <div
+            data-testid="spell-school-column-right"
+            className="flex flex-col gap-4 items-start"
+          >
+            {rightColumnSpellSkills.map((skillControl) => (
+              <div key={skillControl.key} className="justify-self-start">
+                <AttrInput
+                  label={skillControl.label}
+                  value={skillControl.value}
+                  type="skill"
+                  onChange={skillControl.onChange}
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

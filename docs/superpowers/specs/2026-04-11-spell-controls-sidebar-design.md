@@ -343,11 +343,16 @@ Mitigation:
 - Keep changes focused on `SpellModeHeader.tsx`, `Calculator.tsx`, and the
   relevant component tests.
 - 2026-04-13 follow-up:
-  - `SpellSkillControls` now keeps school inputs collapsed by default behind a
-    toggle under `Spellcasting`.
+  - The desktop sidebar widened further to `32rem`, and the `Armour /
+    Shield / Dodging` row is kept on a single line at desktop breakpoints.
+  - `SpellSkillControls` now keeps spell-related inputs collapsed by default
+    behind a decorative toggle row rather than keeping `Spellcasting` always
+    visible.
+  - When expanded, `Spellcasting` appears as the first editable item inside the
+    revealed spell-skill block instead of living above the toggle.
   - When expanded, the controls show the full spell-school list in Crawl UI
     order rather than only the selected spell's schools.
-  - The expanded school list uses a 2-column layout to keep the sidebar more
-    compact and scannable.
+  - The expanded school list uses a 2-column layout with column-major filling,
+    so the left column is filled first before the right column.
   - The collapse toggle is styled as a full-width decorative divider row
     instead of an outlined box so it reads more clearly inside the retro UI.

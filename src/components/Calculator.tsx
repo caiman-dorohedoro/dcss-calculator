@@ -230,7 +230,10 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-3"
       >
         <SectionHeading>Skill</SectionHeading>
-        <div className="flex flex-row items-center gap-2 flex-wrap">
+        <div
+          data-testid="skill-stats-row"
+          className="flex flex-row items-center gap-2 flex-wrap lg:flex-nowrap"
+        >
           {skillAttrKeys.map(({ label, key }) => (
             <AttrInput
               key={key}
@@ -460,7 +463,7 @@ const Calculator = <V extends GameVersion>({
   return (
     <div
       data-testid="calculator-layout"
-      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_28rem] lg:items-start lg:gap-2"
+      className="flex flex-col lg:grid lg:grid-cols-[minmax(0,1fr)_32rem] lg:items-start lg:gap-2"
     >
       <Card className="lg:contents">
         <div

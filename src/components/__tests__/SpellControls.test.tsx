@@ -13,12 +13,16 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 
-const crawlSpellSchoolOrder = [
+const leftColumnSpellSkillOrder = [
+  "Spellcasting",
   "conjuration",
   "hexes",
   "summoning",
   "necromancy",
   "forgecraft",
+];
+
+const rightColumnSpellSkillOrder = [
   "translocation",
   "alchemy",
   "fire",
@@ -50,7 +54,7 @@ describe("SpellSkillControls", () => {
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", false);
   });
 
-  test("keeps school skills collapsed by default and reveals them from the button under Spellcasting", async () => {
+  test("keeps spell skills collapsed by default and reveals spellcasting in two column-major columns when expanded", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.targetSpell = "Fireball";
 
@@ -67,9 +71,6 @@ describe("SpellSkillControls", () => {
     const controls = container.querySelector(
       '[data-testid="spell-skill-controls"]'
     ) as HTMLDivElement;
-    const spellcastingInput = controls.querySelector(
-      'input[step="0.1"]'
-    ) as HTMLInputElement;
     const toggleButton = controls.querySelector("button") as HTMLButtonElement;
     const leftLine = controls.querySelector(
       '[data-testid="spell-skill-toggle-line-left"]'
@@ -78,9 +79,8 @@ describe("SpellSkillControls", () => {
       '[data-testid="spell-skill-toggle-line-right"]'
     ) as HTMLSpanElement;
 
-    expect(controls.textContent).toContain("Spellcasting");
-    expect(spellcastingInput.className).toContain("w-[80px]");
     expect(controls.textContent).toContain("Show spell skills");
+    expect(controls.textContent).not.toContain("Spellcasting");
     expect(controls.textContent).not.toContain("conjuration");
     expect(controls.textContent).not.toContain("fire");
     expect(controls.textContent).not.toContain("alchemy");
@@ -88,10 +88,6 @@ describe("SpellSkillControls", () => {
     expect(toggleButton.className).toContain("justify-center");
     expect(leftLine).not.toBeNull();
     expect(rightLine).not.toBeNull();
-    expect(
-      spellcastingInput.compareDocumentPosition(toggleButton) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
     expect(toggleButton.querySelector("svg")).not.toBeNull();
 
     await act(async () => {
@@ -101,16 +97,35 @@ describe("SpellSkillControls", () => {
     const skillGrid = controls.querySelector(
       '[data-testid="spell-school-grid"]'
     ) as HTMLDivElement;
-    const labelTexts = Array.from(controls.querySelectorAll("label")).map((label) =>
-      label.textContent?.replace(":", "")
-    );
+    const leftColumn = controls.querySelector(
+      '[data-testid="spell-school-column-left"]'
+    ) as HTMLDivElement;
+    const rightColumn = controls.querySelector(
+      '[data-testid="spell-school-column-right"]'
+    ) as HTMLDivElement;
+    const spellcastingInput = controls.querySelector(
+      'input[step="0.1"]'
+    ) as HTMLInputElement;
 
     expect(controls.textContent).toContain("Hide spell skills");
+    expect(controls.textContent).toContain("Spellcasting");
     expect(controls.textContent).toContain("alchemy");
     expect(controls.textContent).toContain("air");
     expect(controls.textContent).toContain("conjuration");
     expect(controls.textContent).toContain("fire");
+    expect(spellcastingInput.className).toContain("w-[80px]");
     expect(skillGrid.className).toContain("grid-cols-2");
-    expect(labelTexts.slice(1)).toEqual(crawlSpellSchoolOrder);
+    expect(leftColumn).not.toBeNull();
+    expect(rightColumn).not.toBeNull();
+    expect(
+      Array.from(leftColumn.querySelectorAll("label")).map((label) =>
+        label.textContent?.replace(":", "")
+      )
+    ).toEqual(leftColumnSpellSkillOrder);
+    expect(
+      Array.from(rightColumn.querySelectorAll("label")).map((label) =>
+        label.textContent?.replace(":", "")
+      )
+    ).toEqual(rightColumnSpellSkillOrder);
   });
 });

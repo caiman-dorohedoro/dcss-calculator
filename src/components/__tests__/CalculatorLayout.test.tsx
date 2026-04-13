@@ -102,7 +102,7 @@ describe("Calculator desktop layout", () => {
     ) as HTMLDivElement;
 
     expect(layout.className).toContain("lg:grid");
-    expect(layout.className).toContain("lg:grid-cols-[minmax(0,1fr)_28rem]");
+    expect(layout.className).toContain("lg:grid-cols-[minmax(0,1fr)_32rem]");
     expect(
       container.querySelector('[data-testid="calculator-mobile-card"]')
     ).toBeNull();
@@ -162,6 +162,9 @@ describe("Calculator desktop layout", () => {
     const skillSection = container.querySelector(
       '[data-testid="sidebar-section-skill"]'
     ) as HTMLDivElement;
+    const skillStatsRow = skillSection.querySelector(
+      '[data-testid="skill-stats-row"]'
+    ) as HTMLDivElement;
     const equipmentSection = container.querySelector(
       '[data-testid="sidebar-section-equipment"]'
     ) as HTMLDivElement;
@@ -186,8 +189,8 @@ describe("Calculator desktop layout", () => {
     expect(skillSection.textContent).toContain("Armour");
     expect(skillSection.textContent).toContain("Shield");
     expect(skillSection.textContent).toContain("Dodging");
-    expect(skillSection.textContent).toContain("Spellcasting");
     expect(skillSection.textContent).toContain("Show spell skills");
+    expect(skillSection.textContent).not.toContain("Spellcasting");
     expect(skillSection.textContent).not.toContain("conjuration");
     expect(skillSection.textContent).not.toContain("fire");
     expect(skillSection.textContent).not.toContain("translocation");
@@ -195,10 +198,11 @@ describe("Calculator desktop layout", () => {
     expect(skillSection.textContent).not.toContain("Shield Skill");
     expect(skillSection.textContent).not.toContain("Dodging Skill");
     expect(skillSection.textContent).not.toContain("Spellcasting Skill");
+    expect(skillStatsRow.className).toContain("lg:flex-nowrap");
     expect(desktopSpellSkillControls.className).toContain("hidden");
     expect(desktopSpellSkillControls.className).toContain("lg:flex");
-    expect(desktopSpellSkillControls.textContent).toContain("Spellcasting");
     expect(desktopSpellSkillControls.textContent).toContain("Show spell skills");
+    expect(desktopSpellSkillControls.textContent).not.toContain("Spellcasting");
     expect(desktopSpellSkillControls.textContent).not.toContain("conjuration");
     expect(desktopSpellSkillControls.textContent).not.toContain("fire");
 
