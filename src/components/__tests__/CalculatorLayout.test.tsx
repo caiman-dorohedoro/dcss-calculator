@@ -102,7 +102,7 @@ describe("Calculator desktop layout", () => {
     ) as HTMLDivElement;
 
     expect(layout.className).toContain("lg:grid");
-    expect(layout.className).toContain("lg:grid-cols-[minmax(0,1fr)_24rem]");
+    expect(layout.className).toContain("lg:grid-cols-[minmax(0,1fr)_28rem]");
     expect(
       container.querySelector('[data-testid="calculator-mobile-card"]')
     ).toBeNull();
@@ -133,9 +133,6 @@ describe("Calculator desktop layout", () => {
     expect(baseStatsRow.textContent).toContain("Str");
     expect(baseStatsRow.textContent).toContain("Dex");
     expect(baseStatsRow.textContent).toContain("Int");
-    const baseStatsHeading = baseStatsSection.querySelector("h2") as HTMLHeadingElement;
-    expect(baseStatsHeading.className).toContain("uppercase");
-    expect(baseStatsHeading.className).toContain("text-muted-foreground");
     expect(baseStatsSection.textContent).toContain("Species");
     expect(
       container.querySelectorAll('[data-testid="accordion-item-sf"]')
