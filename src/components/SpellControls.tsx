@@ -77,12 +77,22 @@ export const SpellSkillControls = <V extends GameVersion>({
           type="button"
           variant="ghost"
           size="sm"
-          className="w-fit px-0"
+          className="h-auto w-full gap-3 px-0 py-1 text-muted-foreground hover:bg-transparent hover:text-foreground"
           aria-expanded={showSpellSkills}
           onClick={() => setShowSpellSkills((prev) => !prev)}
         >
-          {showSpellSkills ? "Hide spell skills" : "Show spell skills"}
-          <ChevronsDown className={cn(showSpellSkills && "rotate-180")} />
+          <span
+            data-testid="spell-skill-toggle-line-left"
+            className="h-px flex-1 bg-[repeating-linear-gradient(90deg,hsl(var(--border))_0_10px,transparent_10px_16px)] opacity-70"
+          />
+          <span className="inline-flex items-center gap-2">
+            {showSpellSkills ? "Hide spell skills" : "Show spell skills"}
+            <ChevronsDown className={cn(showSpellSkills && "rotate-180")} />
+          </span>
+          <span
+            data-testid="spell-skill-toggle-line-right"
+            className="h-px flex-1 bg-[repeating-linear-gradient(90deg,hsl(var(--border))_0_10px,transparent_10px_16px)] opacity-70"
+          />
         </Button>
       )}
       {spellSchools.length > 0 && showSpellSkills && (

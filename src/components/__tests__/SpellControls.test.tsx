@@ -71,6 +71,12 @@ describe("SpellSkillControls", () => {
       'input[step="0.1"]'
     ) as HTMLInputElement;
     const toggleButton = controls.querySelector("button") as HTMLButtonElement;
+    const leftLine = controls.querySelector(
+      '[data-testid="spell-skill-toggle-line-left"]'
+    ) as HTMLSpanElement;
+    const rightLine = controls.querySelector(
+      '[data-testid="spell-skill-toggle-line-right"]'
+    ) as HTMLSpanElement;
 
     expect(controls.textContent).toContain("Spellcasting");
     expect(spellcastingInput.className).toContain("w-[80px]");
@@ -78,6 +84,10 @@ describe("SpellSkillControls", () => {
     expect(controls.textContent).not.toContain("conjuration");
     expect(controls.textContent).not.toContain("fire");
     expect(controls.textContent).not.toContain("alchemy");
+    expect(toggleButton.className).toContain("w-full");
+    expect(toggleButton.className).toContain("justify-center");
+    expect(leftLine).not.toBeNull();
+    expect(rightLine).not.toBeNull();
     expect(
       spellcastingInput.compareDocumentPosition(toggleButton) &
         Node.DOCUMENT_POSITION_FOLLOWING

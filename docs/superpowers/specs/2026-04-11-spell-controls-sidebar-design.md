@@ -349,3 +349,5 @@ Mitigation:
     order rather than only the selected spell's schools.
   - The expanded school list uses a 2-column layout to keep the sidebar more
     compact and scannable.
+  - The collapse toggle is styled as a full-width decorative divider row
+    instead of an outlined box so it reads more clearly inside the retro UI.
