@@ -694,6 +694,57 @@ describe("Spell Calculations", () => {
     expect(actual).toBe(expected);
   });
 
+  test("restored stale mirrored wizardry does not double-count when another ring kind is present", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.wizardry = 1;
+    legacy.ringSlots = [
+      { kind: "wizardry", plus: 0 },
+      { kind: "protection", plus: 3 },
+    ];
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+
+    const ringWizardry = getRingWizardryCount(parsed!.ringSlots);
+    const baseParams = {
+      version: "trunk" as const,
+      species: "human" as const,
+      strength: 10,
+      equipmentStr: 0,
+      spellcasting: 8,
+      intelligence: 18,
+      equipmentInt: 0,
+      targetSpell: "Fireball" as const,
+      schoolSkills: { fire: 8, conjuration: 8 } as never,
+      spellDifficulty: 5 as const,
+      armour: "robe" as const,
+      shield: "none" as const,
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry,
+      bigBrainWizardry: 0,
+      subduedMagic: 0,
+      antiWizardry: 0,
+      runicMagic: 0,
+      wildMagic: 0,
+    };
+
+    const expected = calculateSpellFailureRate({
+      ...baseParams,
+      wizardry: 0,
+    });
+    const actual = calculateSpellFailureRate({
+      ...baseParams,
+      wizardry: parsed!.wizardry,
+    });
+
+    expect(parsed?.wizardry).toBe(0);
+    expect(actual).toBe(expected);
+  });
+
   test("runic magic reduces the body-armour spell penalty", () => {
     const base = calculateSpellFailureRate({
       version: "trunk",

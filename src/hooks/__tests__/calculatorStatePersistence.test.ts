@@ -163,6 +163,26 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.wizardry).toBe(0);
   });
 
+  test("clears stale mirrored wizardry when a manual wizardry ring is mixed with another manual ring kind", () => {
+    const legacy = buildDefaultCalculatorState("0.34");
+
+    legacy.species = "formicid";
+    legacy.wizardry = 1;
+    legacy.ringSlots = [
+      { kind: "wizardry", plus: 0 },
+      { kind: "protection", plus: 3 },
+    ];
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed).not.toBeNull();
+    expect(parsed?.ringSlots).toEqual([
+      { kind: "wizardry", plus: 0 },
+      { kind: "protection", plus: 3 },
+    ]);
+    expect(parsed?.wizardry).toBe(0);
+  });
+
   test("preserves residual wizardry when restored wizardry rings carry imported metadata", () => {
     const modern = buildDefaultCalculatorState("0.34");
 

@@ -142,9 +142,6 @@ const isManualWizardryRingSlot = (value: unknown): value is RingSlotState => {
   );
 };
 
-const isDefaultOrManualWizardryRingSlot = (value: unknown) =>
-  isDefaultRingSlot(value) || isManualWizardryRingSlot(value);
-
 const isAmuletSlot = (value: unknown): value is AmuletSlotState => {
   if (!isObject(value)) return false;
 
@@ -442,7 +439,6 @@ export const parseSavedState = (
     const shouldClearMirroredWizardry =
       useModernRingSlots &&
       manualWizardryRingCount > 0 &&
-      ringSlots.every(isDefaultOrManualWizardryRingSlot) &&
       typeof parsed.wizardry === "number" &&
       parsed.wizardry === manualWizardryRingCount;
     const wizardry = shouldClearMirroredWizardry
