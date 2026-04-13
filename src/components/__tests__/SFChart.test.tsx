@@ -86,8 +86,9 @@ describe("SFChart mobile spell controls", () => {
     expect(mobileDynamicEquipmentControls).not.toBeNull();
     expect(container.textContent).toContain("Spell:");
     expect(mobileSpellSkillControls.textContent).toContain("Spellcasting");
-    expect(mobileSpellSkillControls.textContent).toContain("conjuration");
-    expect(mobileSpellSkillControls.textContent).toContain("fire");
+    expect(mobileSpellSkillControls.textContent).toContain("Show spell skills");
+    expect(mobileSpellSkillControls.textContent).not.toContain("conjuration");
+    expect(mobileSpellSkillControls.textContent).not.toContain("fire");
     expect(mobileDynamicEquipmentControls.textContent).toContain("Ring 1");
     expect(mobileDynamicEquipmentControls.textContent).toContain("Amulet 1");
     const mobileHeadgearSection = mobileDynamicEquipmentControls.querySelector(

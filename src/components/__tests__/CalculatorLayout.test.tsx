@@ -187,8 +187,9 @@ describe("Calculator desktop layout", () => {
     expect(skillSection.textContent).toContain("Shield");
     expect(skillSection.textContent).toContain("Dodging");
     expect(skillSection.textContent).toContain("Spellcasting");
-    expect(skillSection.textContent).toContain("conjuration");
-    expect(skillSection.textContent).toContain("fire");
+    expect(skillSection.textContent).toContain("Show spell skills");
+    expect(skillSection.textContent).not.toContain("conjuration");
+    expect(skillSection.textContent).not.toContain("fire");
     expect(skillSection.textContent).not.toContain("translocation");
     expect(skillSection.textContent).not.toContain("Armour Skill");
     expect(skillSection.textContent).not.toContain("Shield Skill");
@@ -197,8 +198,9 @@ describe("Calculator desktop layout", () => {
     expect(desktopSpellSkillControls.className).toContain("hidden");
     expect(desktopSpellSkillControls.className).toContain("lg:flex");
     expect(desktopSpellSkillControls.textContent).toContain("Spellcasting");
-    expect(desktopSpellSkillControls.textContent).toContain("conjuration");
-    expect(desktopSpellSkillControls.textContent).toContain("fire");
+    expect(desktopSpellSkillControls.textContent).toContain("Show spell skills");
+    expect(desktopSpellSkillControls.textContent).not.toContain("conjuration");
+    expect(desktopSpellSkillControls.textContent).not.toContain("fire");
 
     expect(equipmentSection.textContent).toContain("Armour:");
     expect(equipmentSection.textContent).toContain("Shield:");

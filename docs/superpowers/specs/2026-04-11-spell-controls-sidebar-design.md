@@ -342,3 +342,10 @@ Mitigation:
   than inventing parallel helpers unless duplication becomes unavoidable.
 - Keep changes focused on `SpellModeHeader.tsx`, `Calculator.tsx`, and the
   relevant component tests.
+- 2026-04-13 follow-up:
+  - `SpellSkillControls` now keeps school inputs collapsed by default behind a
+    toggle under `Spellcasting`.
+  - When expanded, the controls show the full spell-school list in Crawl UI
+    order rather than only the selected spell's schools.
+  - The expanded school list uses a 2-column layout to keep the sidebar more
+    compact and scannable.
