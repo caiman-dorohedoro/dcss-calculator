@@ -289,7 +289,7 @@ describe("morgue import mapper", () => {
       shield: "kite shield",
       helmets: ["-1 hat of intelligence"],
       gloves: [],
-      footwear: [],
+      footwear: ["+5 barding"],
       cloaks: ["+2 cloak"],
       orb: "none",
       amulets: ["amulet of reflection"],
@@ -311,6 +311,7 @@ describe("morgue import mapper", () => {
           enchant: -1,
         },
       ],
+      footwearDetails: [{ ...makeItem("+5 barding", "barding"), enchant: 5 }],
       cloakDetails: [{ ...makeItem("+2 cloak", "cloak"), enchant: 2 }],
       amuletDetails: [
         makeItem("amulet of reflection", "amulet", {
@@ -369,8 +370,10 @@ describe("morgue import mapper", () => {
     expect(result.importedState.bodyArmourEnchant).toBe(-2);
     expect(result.importedState.shieldEnchant).toBe(3);
     expect(result.importedState.headgearSlots[0]).toEqual(
-      expect.objectContaining({ present: false, enchant: 0 })
+      expect.objectContaining({ present: true, enchant: -1, kind: "hat" })
     );
+    expect(result.importedState.barding).toBe(true);
+    expect(result.importedState.bardingEnchant).toBe(5);
     expect(result.importedState.cloakEnchant).toBe(2);
     expect(result.importedState.equipmentInt).toBe(3);
     expect(result.importedState.subduedMagic).toBe(1);
@@ -385,7 +388,7 @@ describe("morgue import mapper", () => {
     expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Amulets" })])
     );
-    expect(result.summary.skipped).toEqual(
+    expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Headgear" })])
     );
   });

@@ -1,5 +1,6 @@
 import AttrInput from "@/components/AttrInput";
 import { Checkbox } from "@/components/ui/checkbox";
+import EquipmentEnchantInput from "@/components/EquipmentEnchantInput";
 import {
   Select,
   SelectContent,
@@ -21,10 +22,8 @@ import {
   type AuxArmourSlotState,
   type RingSlotState,
 } from "@/types/equipmentSlots";
-import { BodyArmourEgoKey } from "@/types/equipment.ts";
 import { GameVersion } from "@/types/game";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 
 type DynamicEquipmentControlsProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -44,6 +43,8 @@ const SectionHeading = ({ children }: { children: string }) => (
 
 const ringKinds = ["none", "wizardry", "protection", "evasion"] as const;
 const amuletKinds = ["none", "reflection"] as const;
+const headgearKinds = ["none", "hat", "helmet"] as const;
+const gloveKinds = ["none", "gloves"] as const;
 
 const isRingBonusKind = (kind: RingSlotState["kind"]) =>
   kind === "protection" || kind === "evasion";
@@ -55,11 +56,6 @@ const DynamicEquipmentControls = <V extends GameVersion>({
   testId,
 }: DynamicEquipmentControlsProps<V>) => {
   const slotCounts = getDynamicSlotCounts(state.version, state.species);
-  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
-  const selectedBodyArmourEgo =
-    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
-      ? state.bodyArmourEgo
-      : "none";
 
   const ringSlots = coerceSlotArrayLength(
     state.ringSlots,
@@ -142,7 +138,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         ...prev,
         [key]: nextSlots,
         ...(isHeadgear
-          ? { helmet: nextSlots[0]?.present ?? false }
+          ? { helmet: nextSlots[0]?.kind === "helmet" }
           : {
               gloves: nextSlots[0]?.present ?? false,
               secondGloves: nextSlots[1]?.present ?? false,
@@ -154,13 +150,13 @@ const DynamicEquipmentControls = <V extends GameVersion>({
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
       <section data-testid="dynamic-equipment-rings" className="flex flex-col gap-3">
-        <SectionHeading>Jewellery</SectionHeading>
+        <SectionHeading>Rings</SectionHeading>
         <div className="flex flex-col gap-3">
           {ringSlots.map((slot, index) => (
             <div
               key={`ring-${index}`}
               data-testid={`ring-slot-${index}`}
-              className="flex flex-col gap-2 rounded-md border border-border/60 px-3 py-2"
+              className="flex flex-col gap-2"
             >
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium">Ring {index + 1}</span>
@@ -219,7 +215,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
             <div
               key={`amulet-${index}`}
               data-testid={`amulet-slot-${index}`}
-              className="flex flex-col gap-2 rounded-md border border-border/60 px-3 py-2"
+              className="flex flex-col gap-2"
             >
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-sm font-medium">Amulet {index + 1}</span>
@@ -261,42 +257,63 @@ const DynamicEquipmentControls = <V extends GameVersion>({
             <div
               key={`headgear-${index}`}
               data-testid={`headgear-slot-${index}`}
-              className="flex flex-wrap items-center gap-3 rounded-md border border-border/60 px-3 py-2"
+              className="flex flex-wrap items-center gap-3"
             >
-              <span className="text-sm font-medium">Headgear {index + 1}</span>
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={slot.present}
-                  onCheckedChange={(checked) =>
-                    updateAuxSlot(
-                      "headgearSlots",
-                      slotCounts.headgearSlots,
-                      index,
-                      (current) =>
-                        clearAuxArmourSlotMetadata(current, !!checked)
-                    )
-                  }
-                />
-                present
-              </label>
+              <span className="text-sm font-medium">
+                {slotCounts.headgearSlots === 1
+                  ? "Headgear:"
+                  : `Headgear ${index + 1}`}
+              </span>
               {slot.present && (
-                <AttrInput
-                  label="Enchant"
+                <EquipmentEnchantInput
+                  ariaLabel={`Headgear ${index + 1} enchant`}
                   value={slot.enchant}
-                  type="number"
-                  onChange={(value) =>
+                  onChange={(nextEnchant) =>
                     updateAuxSlot(
                       "headgearSlots",
                       slotCounts.headgearSlots,
                       index,
                       (current) => ({
                         ...current,
-                        enchant: value,
+                        enchant: nextEnchant,
                       })
                     )
                   }
                 />
               )}
+              <Select
+                value={slot.present ? slot.kind ?? "helmet" : "none"}
+                onValueChange={(value) =>
+                  updateAuxSlot(
+                    "headgearSlots",
+                    slotCounts.headgearSlots,
+                    index,
+                    (current) => {
+                      const nextKind = value as (typeof headgearKinds)[number];
+                      if (nextKind === "none") {
+                        return clearAuxArmourSlotMetadata(current, false);
+                      }
+
+                      return {
+                        ...clearAuxArmourSlotMetadata(current, true),
+                        present: true,
+                        kind: nextKind,
+                      };
+                    }
+                  )
+                }
+              >
+                <SelectTrigger className="h-6 w-[160px] gap-2">
+                  <SelectValue placeholder="none" />
+                </SelectTrigger>
+                <SelectContent>
+                  {headgearKinds.map((kind) => (
+                    <SelectItem key={kind} value={kind}>
+                      {kind}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {slot.displayName && (
                 <span className="text-xs text-muted-foreground">
                   {slot.displayName}
@@ -314,42 +331,52 @@ const DynamicEquipmentControls = <V extends GameVersion>({
             <div
               key={`glove-${index}`}
               data-testid={`glove-slot-${index}`}
-              className="flex flex-wrap items-center gap-3 rounded-md border border-border/60 px-3 py-2"
+              className="flex flex-wrap items-center gap-3"
             >
               <span className="text-sm font-medium">Glove {index + 1}</span>
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={slot.present}
-                  onCheckedChange={(checked) =>
-                    updateAuxSlot(
-                      "gloveSlots",
-                      slotCounts.gloveSlots,
-                      index,
-                      (current) =>
-                        clearAuxArmourSlotMetadata(current, !!checked)
-                    )
-                  }
-                />
-                present
-              </label>
               {slot.present && (
-                <AttrInput
-                  label="Enchant"
+                <EquipmentEnchantInput
+                  ariaLabel={`Glove ${index + 1} enchant`}
                   value={slot.enchant}
-                  type="number"
-                  onChange={(value) =>
+                  onChange={(nextEnchant) =>
                     updateAuxSlot(
                       "gloveSlots",
                       slotCounts.gloveSlots,
                       index,
                       (current) => ({
                         ...current,
-                        enchant: value,
+                        enchant: nextEnchant,
                       })
                     )
                   }
                 />
               )}
+              <Select
+                value={slot.present ? "gloves" : "none"}
+                onValueChange={(value) =>
+                  updateAuxSlot(
+                    "gloveSlots",
+                    slotCounts.gloveSlots,
+                    index,
+                    (current) =>
+                      clearAuxArmourSlotMetadata(
+                        current,
+                        (value as (typeof gloveKinds)[number]) === "gloves"
+                      )
+                  )
+                }
+              >
+                <SelectTrigger className="h-6 w-[160px] gap-2">
+                  <SelectValue placeholder="none" />
+                </SelectTrigger>
+                <SelectContent>
+                  {gloveKinds.map((kind) => (
+                    <SelectItem key={kind} value={kind}>
+                      {kind}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {slot.displayName && (
                 <span className="text-xs text-muted-foreground">
                   {slot.displayName}
@@ -368,20 +395,40 @@ const DynamicEquipmentControls = <V extends GameVersion>({
               key: "cloak" as const,
               label: "Cloak",
               value: state.cloak ?? false,
+              enchant: state.cloakEnchant ?? 0,
+              enchantKey: "cloakEnchant" as const,
             },
             {
               key: "boots" as const,
               label: "Boots",
               value: state.boots ?? false,
+              enchant: state.bootsEnchant ?? 0,
+              enchantKey: "bootsEnchant" as const,
             },
             {
               key: "barding" as const,
               label: "Barding",
               value: state.barding ?? false,
+              enchant: state.bardingEnchant ?? 0,
+              enchantKey: "bardingEnchant" as const,
             },
-          ].map(({ key, label, value }) => (
-            <label key={key} className="flex items-center gap-2 text-sm">
+          ].map(({ key, label, value, enchant, enchantKey }) => (
+            <div key={key} className="flex items-center gap-2 text-sm">
+              <span>{label}</span>
+              {value && (
+                <EquipmentEnchantInput
+                  ariaLabel={`${label} enchant`}
+                  value={enchant}
+                  onChange={(nextEnchant) =>
+                    setState((prev) => ({
+                      ...prev,
+                      [enchantKey]: nextEnchant,
+                    }))
+                  }
+                />
+              )}
               <Checkbox
+                aria-label={`${label} equipped`}
                 checked={value}
                 onCheckedChange={(checked) =>
                   setState((prev) => ({
@@ -390,8 +437,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                   }))
                 }
               />
-              {label}
-            </label>
+            </div>
           ))}
         </div>
       </section>
@@ -399,38 +445,6 @@ const DynamicEquipmentControls = <V extends GameVersion>({
       <section data-testid="dynamic-equipment-modifiers" className="flex flex-col gap-3">
         <SectionHeading>Modifiers</SectionHeading>
         <div className="flex flex-wrap gap-4">
-          <AttrInput
-            label="body armour enchant"
-            value={state.bodyArmourEnchant ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, bodyArmourEnchant: value }))
-            }
-          />
-          <AttrInput
-            label="shield enchant"
-            value={state.shieldEnchant ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, shieldEnchant: value }))
-            }
-          />
-          <AttrInput
-            label="boots enchant"
-            value={state.bootsEnchant ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, bootsEnchant: value }))
-            }
-          />
-          <AttrInput
-            label="cloak enchant"
-            value={state.cloakEnchant ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, cloakEnchant: value }))
-            }
-          />
           <AttrInput
             label="Str"
             value={state.equipmentStr ?? 0}
@@ -561,33 +575,6 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         </div>
       </section>
 
-      <section data-testid="dynamic-equipment-body-armour-ego" className="flex flex-col gap-3">
-        <SectionHeading>Body Armour</SectionHeading>
-        <div className="flex flex-row items-center gap-2 flex-wrap">
-          <span>body armour ego</span>
-          <Select
-            disabled={state.armour === "none"}
-            value={selectedBodyArmourEgo}
-            onValueChange={(value) =>
-              setState((prev) => ({
-                ...prev,
-                bodyArmourEgo: value as BodyArmourEgoKey,
-              }))
-            }
-          >
-            <SelectTrigger className="min-w-[120px] h-6 w-auto gap-2">
-              <SelectValue placeholder="None" />
-            </SelectTrigger>
-            <SelectContent>
-              {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map((key) => (
-                <SelectItem key={key} value={key}>
-                  {bodyArmourEgos[key]?.name ?? key}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </section>
     </div>
   );
 };

@@ -57,6 +57,7 @@ export const calculateAcData = <V extends GameVersion>(
           cloak: state.cloak,
           cloakEnchant: state.cloakEnchant,
           barding: state.barding,
+          bardingEnchant: state.bardingEnchant,
           secondGloves: state.secondGloves,
           ringProtection,
           equipmentAC: state.equipmentAC,

@@ -29,3 +29,17 @@ export const getAuxArmourBaseAc = (
   slots: AuxArmourSlotState[] = [],
   baseAcPerPiece: number
 ) => slots.filter((slot) => slot.present).length * baseAcPerPiece;
+
+export const getHeadgearEnchantTotal = (slots: AuxArmourSlotState[] = []) =>
+  slots
+    .filter((slot) => slot.present)
+    .reduce((sum, slot) => sum + slot.enchant, 0);
+
+export const getHeadgearBaseAc = (slots: AuxArmourSlotState[] = []) =>
+  slots.reduce((sum, slot) => {
+    if (!slot.present) {
+      return sum;
+    }
+
+    return sum + (slot.kind === "hat" ? 0 : 1);
+  }, 0);

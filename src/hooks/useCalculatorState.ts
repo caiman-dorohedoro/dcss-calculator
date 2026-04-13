@@ -63,6 +63,7 @@ export interface CalculatorState<V extends GameVersion> {
   shieldEnchant?: number;
   bootsEnchant?: number;
   cloakEnchant?: number;
+  bardingEnchant?: number;
   equipmentStr?: number;
   equipmentDex?: number;
   equipmentInt?: number;
@@ -170,6 +171,9 @@ const isAuxArmourSlot = (value: unknown): value is AuxArmourSlotState => {
   return (
     typeof value.present === "boolean" &&
     typeof value.enchant === "number" &&
+    (value.kind === undefined ||
+      value.kind === "helmet" ||
+      value.kind === "hat") &&
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
     (value.source === undefined || isSlotSource(value.source))
@@ -182,9 +186,47 @@ const isDefaultAuxArmourSlot = (value: unknown): boolean => {
   return (
     value.present === false &&
     value.enchant === 0 &&
+    value.kind === undefined &&
     value.displayName === undefined &&
     value.artifactKind === undefined &&
     value.source === undefined
+  );
+};
+
+const createLegacyHeadgearSlots = (present: boolean, slotCount: number) => {
+  const slots = Array.from({ length: slotCount }, () =>
+    createDefaultAuxArmourSlot()
+  );
+
+  if (slotCount > 0) {
+    slots[0] = present
+      ? { present: true, enchant: 0, kind: "helmet" }
+      : createDefaultAuxArmourSlot();
+  }
+
+  return slots;
+};
+
+const coerceLegacyHeadgearSlots = (
+  slots: unknown,
+  slotCount: number
+) => {
+  const coerced = coerceSlotArrayLength(
+    Array.isArray(slots) ? (slots as AuxArmourSlotState[]) : [],
+    slotCount,
+    createDefaultAuxArmourSlot
+  );
+
+  return coerced.map((slot) =>
+    slot.present
+      ? {
+          ...slot,
+          kind: slot.kind ?? "helmet",
+        }
+      : {
+          ...slot,
+          kind: undefined,
+        }
   );
 };
 
@@ -313,6 +355,7 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.shieldEnchant) ||
     !isOptionalNumber(state.bootsEnchant) ||
     !isOptionalNumber(state.cloakEnchant) ||
+    !isOptionalNumber(state.bardingEnchant) ||
     !isOptionalNumber(state.equipmentStr) ||
     !isOptionalNumber(state.equipmentDex) ||
     !isOptionalNumber(state.equipmentInt) ||
@@ -460,12 +503,11 @@ export const parseSavedState = (
         );
 
     const headgearSlots = useModernHeadgearSlots
-      ? coerceLegacySlots(
+      ? coerceLegacyHeadgearSlots(
           parsed.headgearSlots,
-          slotCounts.headgearSlots,
-          createDefaultAuxArmourSlot
+          slotCounts.headgearSlots
         )
-      : createLegacyAuxArmourSlots(
+      : createLegacyHeadgearSlots(
           parsed.helmet === true,
           slotCounts.headgearSlots
         );

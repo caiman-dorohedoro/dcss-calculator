@@ -30,6 +30,7 @@ const baseDefaultState = {
   shieldEnchant: 0,
   bootsEnchant: 0,
   cloakEnchant: 0,
+  bardingEnchant: 0,
   equipmentStr: 0,
   equipmentDex: 0,
   equipmentInt: 0,

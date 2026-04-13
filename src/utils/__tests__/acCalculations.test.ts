@@ -229,6 +229,30 @@ describe("AC Calculations", () => {
     ).toBe(15);
   });
 
+  test("applies barding enchant only when barding is equipped", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "naga",
+        armour: "none",
+        armourSkill: 0,
+        barding: true,
+        bardingEnchant: 4,
+      })
+    ).toBe(8);
+
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "naga",
+        armour: "none",
+        armourSkill: 0,
+        barding: false,
+        bardingEnchant: 4,
+      })
+    ).toBe(0);
+  });
+
   test("ignores legacy helmet and glove booleans when slot arrays are present", () => {
     expect(
       calculateMixedAC({
@@ -255,5 +279,17 @@ describe("AC Calculations", () => {
         armourSkill: 0,
       })
     ).toBe(0);
+  });
+
+  test("treats hats as 0 base AC while still applying headgear enchant", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "human",
+        armour: "none",
+        armourSkill: 0,
+        headgearSlots: [{ present: true, enchant: 4, kind: "hat" } as never],
+      })
+    ).toBe(4);
   });
 });

@@ -90,9 +90,13 @@ describe("SFChart mobile spell controls", () => {
     expect(mobileSpellSkillControls.textContent).toContain("fire");
     expect(mobileDynamicEquipmentControls.textContent).toContain("Ring 1");
     expect(mobileDynamicEquipmentControls.textContent).toContain("Amulet 1");
-    expect(mobileDynamicEquipmentControls.textContent).toContain("Headgear 1");
+    const mobileHeadgearSection = mobileDynamicEquipmentControls.querySelector(
+      '[data-testid="dynamic-equipment-headgear"]'
+    ) as HTMLDivElement;
+    expect(mobileHeadgearSection.textContent).toContain("Headgear:");
+    expect(mobileHeadgearSection.textContent).not.toContain("present");
     expect(mobileDynamicEquipmentControls.textContent).toContain("Glove 1");
-    expect(mobileDynamicEquipmentControls.textContent).toContain(
+    expect(mobileDynamicEquipmentControls.textContent).not.toContain(
       "body armour ego"
     );
   });

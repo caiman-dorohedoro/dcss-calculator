@@ -167,6 +167,7 @@ describe("DynamicEquipmentControls", () => {
     ).toEqual({
       present: false,
       enchant: 0,
+      kind: undefined,
       displayName: undefined,
       artifactKind: undefined,
       source: undefined,
@@ -189,18 +190,29 @@ describe("DynamicEquipmentControls", () => {
 
   test("allows a signed headgear enchant edit when the slot is present", async () => {
     const state = buildDefaultCalculatorState("trunk");
-    state.headgearSlots = [{ present: true, enchant: 0 }];
+    state.headgearSlots = [{ present: true, enchant: 0, kind: "helmet" }];
 
     await act(async () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const headgearSection = container.querySelector(
-      '[data-testid="dynamic-equipment-headgear"]'
+    const headgearSlot = container.querySelector(
+      '[data-testid="headgear-slot-0"]'
     ) as HTMLDivElement;
-    const enchantInput = headgearSection.querySelector(
+    const enchantInput = headgearSlot.querySelector(
       'input[type="number"]'
     ) as HTMLInputElement;
+    const selector = headgearSlot.querySelector(
+      'button[role="combobox"]'
+    ) as HTMLButtonElement;
+
+    expect(headgearSlot.textContent).toContain("Headgear:");
+    expect(headgearSlot.textContent).not.toContain("Enchant:");
+    expect(enchantInput.className).toContain("w-14");
+    expect(
+      enchantInput.compareDocumentPosition(selector) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
 
     await act(async () => {
       setNumberInputValue(enchantInput, "-2");
@@ -213,6 +225,72 @@ describe("DynamicEquipmentControls", () => {
     const nextState = updater(state);
 
     expect(nextState.headgearSlots[0].enchant).toBe(-2);
+  });
+
+  test("renders glove controls with selector-based input and no enchant label", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.gloveSlots = [{ present: true, enchant: 1 }];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const gloveSlot = container.querySelector(
+      '[data-testid="glove-slot-0"]'
+    ) as HTMLDivElement;
+    const enchantInput = gloveSlot.querySelector(
+      'input[type="number"]'
+    ) as HTMLInputElement;
+    const selector = gloveSlot.querySelector(
+      'button[role="combobox"]'
+    ) as HTMLButtonElement;
+
+    expect(gloveSlot.textContent).toContain("Glove 1");
+    expect(gloveSlot.textContent).not.toContain("Enchant:");
+    expect(gloveSlot.textContent).not.toContain("present");
+    expect(gloveSlot.querySelector('input[type="checkbox"]')).toBeNull();
+    expect(enchantInput.className).toContain("w-14");
+    expect(
+      enchantInput.compareDocumentPosition(selector) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
+  test("renders fixed equipment enchant inputs with the shared width and removes old modifier labels", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.cloak = true;
+    state.cloakEnchant = 2;
+    state.boots = true;
+    state.bootsEnchant = -1;
+    state.barding = true;
+    state.bardingEnchant = 5;
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const fixedEquipmentSection = container.querySelector(
+      '[data-testid="fixed-equipment-controls"]'
+    ) as HTMLDivElement;
+    const modifierSection = container.querySelector(
+      '[data-testid="dynamic-equipment-modifiers"]'
+    ) as HTMLDivElement;
+
+    const cloakEnchantInput = fixedEquipmentSection.querySelector(
+      'input[aria-label="Cloak enchant"]'
+    ) as HTMLInputElement;
+    const bootsEnchantInput = fixedEquipmentSection.querySelector(
+      'input[aria-label="Boots enchant"]'
+    ) as HTMLInputElement;
+    const bardingEnchantInput = fixedEquipmentSection.querySelector(
+      'input[aria-label="Barding enchant"]'
+    ) as HTMLInputElement;
+
+    expect(cloakEnchantInput.className).toContain("w-14");
+    expect(bootsEnchantInput.className).toContain("w-14");
+    expect(bardingEnchantInput.className).toContain("w-14");
+    expect(modifierSection.textContent).not.toContain("boots enchant");
+    expect(modifierSection.textContent).not.toContain("cloak enchant");
   });
 
   test("ring slot updates do not overwrite legacy wizardry", () => {

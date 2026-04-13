@@ -17,9 +17,12 @@ export type AmuletSlotState = {
   source?: "manual" | "imported";
 };
 
+export type HeadgearKind = "helmet" | "hat";
+
 export type AuxArmourSlotState = {
   present: boolean;
   enchant: number;
+  kind?: HeadgearKind;
   displayName?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
@@ -50,6 +53,7 @@ export const createDefaultAmuletSlot = (): AmuletSlotState => ({
 export const createDefaultAuxArmourSlot = (): AuxArmourSlotState => ({
   present: false,
   enchant: 0,
+  kind: undefined,
 });
 
 export const clearRingSlotMetadata = (slot: RingSlotState): RingSlotState =>
@@ -66,6 +70,7 @@ export const clearAuxArmourSlotMetadata = (
   ...clearSlotMetadata(slot),
   present,
   enchant: present ? slot.enchant : 0,
+  kind: present ? slot.kind : undefined,
 });
 
 export const applyRingSlotUpdate = <T extends { ringSlots: RingSlotState[] }>(

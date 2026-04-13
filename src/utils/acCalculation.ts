@@ -11,6 +11,8 @@ import { getVersionSpecies } from "@/versioning/versionRegistry";
 import {
   getAuxArmourBaseAc,
   getAuxArmourEnchantTotal,
+  getHeadgearBaseAc,
+  getHeadgearEnchantTotal,
 } from "./equipmentModifiers";
 
 export const calculateAC = (baseAC: number, skill: number): number => {
@@ -31,6 +33,7 @@ type MixedCalculationsParams<V extends GameVersion> = {
   cloak?: boolean;
   cloakEnchant?: number;
   barding?: boolean;
+  bardingEnchant?: number;
   secondGloves?: boolean;
   ringProtection?: number;
   equipmentAC?: number;
@@ -52,6 +55,7 @@ export const calculateMixedAC = <V extends GameVersion>({
   cloak,
   cloakEnchant = 0,
   barding,
+  bardingEnchant = 0,
   secondGloves,
   ringProtection = 0,
   equipmentAC = 0,
@@ -69,7 +73,8 @@ export const calculateMixedAC = <V extends GameVersion>({
   }
 
   if (hasHeadgearSlots) {
-    baseAC += getAuxArmourBaseAc(headgearSlots, headgearOptions.helmet.baseAC);
+    baseAC +=
+      getHeadgearBaseAc(headgearSlots) * headgearOptions.helmet.baseAC;
   } else if (helmet) {
     baseAC += headgearOptions.helmet.baseAC;
   }
@@ -107,10 +112,11 @@ export const calculateMixedAC = <V extends GameVersion>({
   return (
     scaledBaseAc +
     (hasBodyArmour ? bodyArmourEnchant : 0) +
-    getAuxArmourEnchantTotal(headgearSlots) +
+    getHeadgearEnchantTotal(headgearSlots) +
     getAuxArmourEnchantTotal(gloveSlots) +
     (boots === true ? bootsEnchant : 0) +
     (cloak === true ? cloakEnchant : 0) +
+    (barding === true ? bardingEnchant : 0) +
     ringProtection +
     equipmentAC +
     scalesAC -

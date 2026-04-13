@@ -207,19 +207,176 @@ describe("Calculator desktop layout", () => {
     expect(desktopDynamicEquipmentControls.className).toContain("lg:flex");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Ring 1");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Amulet 1");
-    expect(desktopDynamicEquipmentControls.textContent).toContain("Headgear 1");
+    const desktopHeadgearSection = desktopDynamicEquipmentControls.querySelector(
+      '[data-testid="dynamic-equipment-headgear"]'
+    ) as HTMLDivElement;
+    expect(desktopHeadgearSection.textContent).toContain("Headgear:");
+    expect(desktopHeadgearSection.textContent).not.toContain("present");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Glove 1");
-    expect(desktopDynamicEquipmentControls.textContent).toContain(
+    expect(desktopDynamicEquipmentControls.textContent).not.toContain(
       "body armour ego"
+    );
+    expect(desktopDynamicEquipmentControls.textContent).not.toContain(
+      "body armour enchant"
+    );
+    expect(desktopDynamicEquipmentControls.textContent).not.toContain(
+      "shield enchant"
     );
 
     expect(equipmentSection.textContent).toContain("Ring 1");
     expect(equipmentSection.textContent).toContain("Amulet 1");
-    expect(equipmentSection.textContent).toContain("Headgear 1");
+    expect(equipmentSection.textContent).toContain("Headgear:");
     expect(equipmentSection.textContent).toContain("Glove 1");
     expect(equipmentSection.textContent).toContain("Cloak");
     expect(equipmentSection.textContent).toContain("Boots");
     expect(equipmentSection.textContent).toContain("Barding");
-    expect(equipmentSection.textContent).toContain("body armour ego");
+    expect(equipmentSection.textContent).not.toContain("body armour enchant");
+    expect(equipmentSection.textContent).not.toContain("body armour ego");
+    expect(equipmentSection.textContent).not.toContain("shield enchant");
+  });
+
+  test("shows body armour enchant and ego only when body armour is equipped", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+    const none = buildDefaultCalculatorState("trunk");
+    none.armour = "none";
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    expect(
+      container.querySelector('[data-testid="body-armour-enchant-control"]')
+    ).not.toBeNull();
+    expect(
+      container.querySelector('[data-testid="body-armour-ego-control"]')
+    ).not.toBeNull();
+    expect(container.textContent).not.toContain("body armour enchant");
+    expect(container.textContent).not.toContain("body armour ego");
+
+    await act(async () => {
+      root.render(<Calculator state={none} setState={mockSetState} />);
+    });
+
+    expect(container.textContent).not.toContain("body armour enchant");
+    expect(container.textContent).not.toContain("body armour ego");
+  });
+
+  test("places body armour controls in the requested order", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    const equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+    const bodyArmourControls = equipmentSection.querySelector(
+      '[data-testid="body-armour-controls"]'
+    ) as HTMLDivElement;
+
+    expect(bodyArmourControls).not.toBeNull();
+    expect(bodyArmourControls.className).toContain("flex-nowrap");
+
+    const armourLabel = equipmentSection.querySelector(
+      '[data-testid="body-armour-label"]'
+    ) as HTMLElement;
+    const enchantControl = equipmentSection.querySelector(
+      '[data-testid="body-armour-enchant-control"]'
+    ) as HTMLElement;
+    const selectorControl = equipmentSection.querySelector(
+      '[data-testid="body-armour-selector-control"]'
+    ) as HTMLElement;
+    const egoControl = equipmentSection.querySelector(
+      '[data-testid="body-armour-ego-control"]'
+    ) as HTMLElement;
+
+    expect(armourLabel.compareDocumentPosition(enchantControl)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(enchantControl.compareDocumentPosition(selectorControl)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(selectorControl.compareDocumentPosition(egoControl)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+  });
+
+  test("keeps the body armour selector shrinkable for long armour names", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+    equipped.armour = "quicksilver_dragon";
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    const bodyArmourControls = container.querySelector(
+      '[data-testid="body-armour-controls"]'
+    ) as HTMLDivElement;
+    const selectorControl = container.querySelector(
+      '[data-testid="body-armour-selector-control"]'
+    ) as HTMLDivElement;
+    const selectorTrigger = selectorControl.querySelector("button") as HTMLButtonElement;
+
+    expect(bodyArmourControls.className).toContain("min-w-0");
+    expect(bodyArmourControls.className).toContain("max-w-full");
+    expect(selectorControl.className).toContain("min-w-0");
+    expect(selectorControl.className).toContain("flex-1");
+    expect(selectorTrigger.className).toContain("min-w-0");
+    expect(selectorTrigger.className).toContain("max-w-full");
+  });
+
+  test("shows shield enchant only when a shield is equipped", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+    equipped.shield = "buckler";
+    const none = buildDefaultCalculatorState("trunk");
+    none.shield = "none";
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    expect(
+      container.querySelector('[data-testid="shield-enchant-control"]')
+    ).not.toBeNull();
+    expect(container.textContent).not.toContain("shield enchant");
+
+    await act(async () => {
+      root.render(<Calculator state={none} setState={mockSetState} />);
+    });
+
+    expect(
+      container.querySelector('[data-testid="shield-enchant-control"]')
+    ).toBeNull();
+    expect(container.textContent).not.toContain("shield enchant");
+  });
+
+  test("places shield controls with enchant before the shield selector", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+    equipped.shield = "buckler";
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    const equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+    const shieldLabel = equipmentSection.querySelector(
+      '[data-testid="shield-label"]'
+    ) as HTMLElement;
+    const enchantControl = equipmentSection.querySelector(
+      '[data-testid="shield-enchant-control"]'
+    ) as HTMLElement;
+    const selectorControl = equipmentSection.querySelector(
+      '[data-testid="shield-selector-control"]'
+    ) as HTMLElement;
+
+    expect(shieldLabel.compareDocumentPosition(enchantControl)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
+    expect(enchantControl.compareDocumentPosition(selectorControl)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    );
   });
 });

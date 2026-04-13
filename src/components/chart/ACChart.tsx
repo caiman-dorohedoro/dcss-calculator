@@ -14,6 +14,7 @@ import renderDot from "@/components/chart/SkillDotRenderer";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { calculateAcData, calculateAcTicks } from "@/utils/calculatorUtils";
 import { GameVersion } from "@/types/game";
+import { getHeadgearBaseAc } from "@/utils/equipmentModifiers";
 
 type ACChartProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -31,7 +32,7 @@ const ACChart = <V extends GameVersion>({ state }: ACChartProps<V>) => {
 
   const zeroBaseAC =
     state.armour === "none" &&
-    !state.headgearSlots.some((slot) => slot.present) &&
+    getHeadgearBaseAc(state.headgearSlots) === 0 &&
     !state.gloveSlots.some((slot) => slot.present) &&
     !state.boots &&
     !state.cloak &&

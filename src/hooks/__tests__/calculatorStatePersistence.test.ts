@@ -60,7 +60,9 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: 0 },
       { present: true, enchant: 0 },
     ]);
-    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+    expect(parsed?.headgearSlots).toEqual([
+      { present: true, enchant: 0, kind: "helmet" },
+    ]);
     expect(parsed?.wizardry).toBe(0);
   });
 
@@ -84,7 +86,9 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: 0 },
       { present: true, enchant: 0 },
     ]);
-    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+    expect(parsed?.headgearSlots).toEqual([
+      { present: true, enchant: 0, kind: "helmet" },
+    ]);
     expect(parsed?.wizardry).toBe(0);
   });
 
@@ -115,7 +119,9 @@ describe("calculator saved-state migration", () => {
       { kind: "wizardry", plus: 0 },
     ]);
     expect(parsed?.amuletSlots).toEqual([{ kind: "none" }]);
-    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 0 }]);
+    expect(parsed?.headgearSlots).toEqual([
+      { present: true, enchant: 0, kind: "helmet" },
+    ]);
     expect(parsed?.gloveSlots).toEqual([
       { present: true, enchant: 0 },
       { present: true, enchant: 0 },
@@ -256,7 +262,9 @@ describe("calculator saved-state migration", () => {
       { present: true, enchant: 2 },
       { present: true, enchant: -1 },
     ]);
-    expect(parsed?.headgearSlots).toEqual([{ present: true, enchant: 3 }]);
+    expect(parsed?.headgearSlots).toEqual([
+      { present: true, enchant: 3, kind: "helmet" },
+    ]);
     expect(parsed?.wizardry).toBe(2);
   });
 

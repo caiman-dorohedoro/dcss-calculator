@@ -66,6 +66,19 @@
 - Keep `boots`, `cloak`, and `barding` as the current fixed controls, but add
   signed enchant inputs for boots and cloak.
 
+### Implementation Notes
+
+- 2026-04-13 update:
+  - Headgear now models `hat` and `helmet` separately so imported hats keep
+    signed enchant without gaining helmet base AC.
+  - Headgear and glove editing now use selector-based controls with the signed
+    enchant input rendered before the selector.
+  - Body armour, shield, cloak, boots, and barding now share the same compact
+    enchant input component so the equipment controls use a consistent width.
+  - `bardingEnchant` was added to calculator state, AC calculation plumbing,
+    and morgue import normalization so barding enchant remains editable after
+    import.
+
 ## Task 1: Add Dynamic Slot State, Defaults, And Saved-State Migration
 
 **Files:**
