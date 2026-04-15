@@ -4,6 +4,7 @@ import {
   type ParsedMorgueTextRecord,
 } from "dcss-morgue-parser";
 import type { CalculatorState } from "@/hooks/useCalculatorState.ts";
+import type { EquipmentModifierBag } from "@/types/equipmentItems";
 import {
   createDefaultAmuletSlot,
   createDefaultAuxArmourSlot,
@@ -147,6 +148,45 @@ const mapOrb = (baseType: string | null | undefined): OrbKey | null => {
   return orbNameMap[baseType] ?? null;
 };
 
+const numericItemModifierMap = {
+  Str: "str",
+  Dex: "dex",
+  Int: "int",
+  AC: "ac",
+  EV: "ev",
+  SH: "sh",
+} as const;
+
+const buildModifierBagFromItem = (
+  item: EquipmentItemSnapshot,
+  options?: {
+    ignoreNumeric?: Array<keyof typeof numericItemModifierMap>;
+    ignoreWiz?: boolean;
+  }
+): EquipmentModifierBag | undefined => {
+  const modifiers: EquipmentModifierBag = {};
+
+  for (const [property, key] of Object.entries(numericItemModifierMap) as [
+    keyof typeof numericItemModifierMap,
+    keyof EquipmentModifierBag,
+  ][]) {
+    if (options?.ignoreNumeric?.includes(property)) {
+      continue;
+    }
+
+    const value = item.properties.numeric[property];
+    if (typeof value === "number" && value !== 0) {
+      modifiers[key] = value;
+    }
+  }
+
+  if (!options?.ignoreWiz && item.properties.booleanProps.Wiz === true) {
+    modifiers.wizardry = 1;
+  }
+
+  return Object.keys(modifiers).length > 0 ? modifiers : undefined;
+};
+
 const fillRingSlots = (
   ringSlots: RingSlotState[],
   details: EquipmentItemSnapshot[] | undefined
@@ -181,6 +221,9 @@ const fillRingSlots = (
       nextSlot = {
         kind: "protection",
         plus: detail.enchant ?? Number(protectionMatch[1] ?? 0),
+        modifiers: buildModifierBagFromItem(detail, {
+          ignoreNumeric: ["AC"],
+        }),
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",
@@ -189,6 +232,9 @@ const fillRingSlots = (
       nextSlot = {
         kind: "evasion",
         plus: detail.enchant ?? Number(evasionMatch[1] ?? 0),
+        modifiers: buildModifierBagFromItem(detail, {
+          ignoreNumeric: ["EV"],
+        }),
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",
@@ -197,10 +243,25 @@ const fillRingSlots = (
       nextSlot = {
         kind: "wizardry",
         plus: 0,
+        modifiers: buildModifierBagFromItem(detail, {
+          ignoreWiz: true,
+        }),
         displayName: detail.displayName,
         artifactKind: detail.artifactKind,
         source: "imported",
       };
+    } else {
+      const modifiers = buildModifierBagFromItem(detail);
+      if (modifiers) {
+        nextSlot = {
+          kind: "none",
+          plus: 0,
+          modifiers,
+          displayName: detail.displayName,
+          artifactKind: detail.artifactKind,
+          source: "imported",
+        };
+      }
     }
 
     if (!nextSlot) {
@@ -230,7 +291,26 @@ const fillAmuletSlots = (
   const unsupported: string[] = [];
 
   for (const detail of details ?? []) {
-    if (!hasBooleanProperty(detail, "Reflect")) {
+    const modifiers = buildModifierBagFromItem(detail);
+    const nextSlot: AmuletSlotState | null = hasBooleanProperty(detail, "Reflect")
+      ? {
+          kind: "reflection",
+          modifiers,
+          displayName: detail.displayName,
+          artifactKind: detail.artifactKind,
+          source: "imported",
+        }
+      : modifiers
+        ? {
+            kind: "none",
+            modifiers,
+            displayName: detail.displayName,
+            artifactKind: detail.artifactKind,
+            source: "imported",
+          }
+        : null;
+
+    if (!nextSlot) {
       unsupported.push(detail.displayName);
       continue;
     }
@@ -240,12 +320,7 @@ const fillAmuletSlots = (
       continue;
     }
 
-    amuletSlots[nextIndex] = {
-      kind: "reflection",
-      displayName: detail.displayName,
-      artifactKind: detail.artifactKind,
-      source: "imported",
-    };
+    amuletSlots[nextIndex] = nextSlot;
     nextIndex += 1;
     mapped += 1;
   }
@@ -268,6 +343,7 @@ const fillAuxArmourSlots = (
     slots[nextIndex] = {
       present: true,
       enchant: detail.enchant ?? 0,
+      modifiers: buildModifierBagFromItem(detail),
       displayName: detail.displayName,
       artifactKind: detail.artifactKind,
       source: "imported",
@@ -295,6 +371,7 @@ const fillHeadgearSlots = (
       present: true,
       enchant: detail.enchant ?? 0,
       kind: detail.baseType === "hat" ? "hat" : "helmet",
+      modifiers: buildModifierBagFromItem(detail),
       displayName: detail.displayName,
       artifactKind: detail.artifactKind,
       source: "imported",
@@ -304,70 +381,6 @@ const fillHeadgearSlots = (
   }
 
   return mapped;
-};
-
-const numericEquipmentPropMap = {
-  Str: "equipmentStr",
-  Dex: "equipmentDex",
-  Int: "equipmentInt",
-  AC: "equipmentAC",
-  EV: "equipmentEV",
-  SH: "equipmentSH",
-} as const;
-
-type ResidualNumericField = (typeof numericEquipmentPropMap)[keyof typeof numericEquipmentPropMap];
-
-const getNumericProperty = (
-  item: EquipmentItemSnapshot,
-  property: keyof typeof numericEquipmentPropMap
-) => {
-  if (property in item.properties.numeric) {
-    return item.properties.numeric[property] ?? 0;
-  }
-
-  return (
-    (item.intrinsicProperties.numeric[property] ?? 0) +
-    (item.egoProperties.numeric[property] ?? 0) +
-    (item.artifactProperties.numeric[property] ?? 0)
-  );
-};
-
-const applyResidualEquipmentModifiers = (
-  record: ParsedMorgueTextRecord,
-  state: CalculatorState<GameVersion>
-) => {
-  const totals: Record<ResidualNumericField, number> = {
-    equipmentStr: 0,
-    equipmentDex: 0,
-    equipmentInt: 0,
-    equipmentAC: 0,
-    equipmentEV: 0,
-    equipmentSH: 0,
-  };
-
-  for (const item of collectEquippedItems(record)) {
-    for (const [property, field] of Object.entries(numericEquipmentPropMap) as [
-      keyof typeof numericEquipmentPropMap,
-      ResidualNumericField,
-    ][]) {
-      totals[field] += getNumericProperty(item, property);
-    }
-  }
-
-  state.equipmentStr = totals.equipmentStr;
-  state.equipmentDex = totals.equipmentDex;
-  state.equipmentInt = totals.equipmentInt;
-  state.equipmentAC = totals.equipmentAC;
-  state.equipmentEV = totals.equipmentEV;
-  state.equipmentSH = totals.equipmentSH;
-
-  return totals;
-};
-
-const countResidualWizardry = (record: ParsedMorgueTextRecord) => {
-  return collectEquippedItems(record).filter(
-    (item) => item.baseType !== "ring" && hasBooleanProperty(item, "Wiz")
-  ).length;
 };
 
 const isActiveMutation = (mutation: ParsedMorgueTextRecord["mutations"][number]) =>
@@ -598,24 +611,67 @@ export const buildImportedCalculatorState = (
   const armour = mapArmour(record.bodyArmourDetails?.baseType ?? record.bodyArmour);
   if (armour) {
     importedState.armour = armour;
+    importedState.bodyArmour = {
+      kind: armour,
+      enchant: record.bodyArmourDetails?.enchant ?? 0,
+      ego: "none",
+      modifiers: record.bodyArmourDetails
+        ? buildModifierBagFromItem(record.bodyArmourDetails)
+        : undefined,
+      displayName: record.bodyArmourDetails?.displayName,
+      artifactKind: record.bodyArmourDetails?.artifactKind,
+      source: record.bodyArmourDetails ? "imported" : undefined,
+    };
     summary.applied.push({ label: "Body armour", detail: record.bodyArmour });
   }
 
   const shield = mapShield(record.shieldDetails?.baseType ?? record.shield);
   if (shield) {
     importedState.shield = shield;
+    importedState.shieldItem = {
+      kind: shield,
+      enchant: record.shieldDetails?.enchant ?? 0,
+      modifiers: record.shieldDetails
+        ? buildModifierBagFromItem(record.shieldDetails)
+        : undefined,
+      displayName: record.shieldDetails?.displayName,
+      artifactKind: record.shieldDetails?.artifactKind,
+      source: record.shieldDetails ? "imported" : undefined,
+    };
   }
 
   const orb = mapOrb(record.orbDetails?.baseType ?? record.orb);
   if (orb) {
     importedState.orb = orb;
+    importedState.orbItem = {
+      kind: orb,
+      modifiers: record.orbDetails
+        ? buildModifierBagFromItem(record.orbDetails)
+        : undefined,
+      displayName: record.orbDetails?.displayName,
+      artifactKind: record.orbDetails?.artifactKind,
+      source: record.orbDetails ? "imported" : undefined,
+    };
   }
 
   if (importedState.shield !== "none") {
     importedState.orb = "none";
+    importedState.orbItem = {
+      ...importedState.orbItem,
+      kind: "none",
+    };
   }
   if (importedState.orb !== "none") {
     importedState.shield = "none";
+    importedState.shieldItem = {
+      ...importedState.shieldItem,
+      kind: "none",
+      enchant: 0,
+      modifiers: undefined,
+      displayName: undefined,
+      artifactKind: undefined,
+      source: undefined,
+    };
   }
 
   summary.applied.push({
@@ -638,6 +694,38 @@ export const buildImportedCalculatorState = (
   importedState.bardingEnchant =
     record.footwearDetails?.find((item) => item.baseType === "barding")?.enchant ?? 0;
   importedState.cloakEnchant = record.cloakDetails?.[0]?.enchant ?? 0;
+  const bootsDetail = record.footwearDetails?.find((item) => item.baseType === "boots");
+  const bardingDetail = record.footwearDetails?.find(
+    (item) => item.baseType === "barding"
+  );
+  const cloakDetail = record.cloakDetails?.[0];
+  importedState.bootsItem = {
+    kind: "boots",
+    present: importedState.boots,
+    enchant: bootsDetail?.enchant ?? 0,
+    modifiers: bootsDetail ? buildModifierBagFromItem(bootsDetail) : undefined,
+    displayName: bootsDetail?.displayName,
+    artifactKind: bootsDetail?.artifactKind,
+    source: bootsDetail ? "imported" : undefined,
+  };
+  importedState.bardingItem = {
+    kind: "barding",
+    present: importedState.barding,
+    enchant: bardingDetail?.enchant ?? 0,
+    modifiers: bardingDetail ? buildModifierBagFromItem(bardingDetail) : undefined,
+    displayName: bardingDetail?.displayName,
+    artifactKind: bardingDetail?.artifactKind,
+    source: bardingDetail ? "imported" : undefined,
+  };
+  importedState.cloakItem = {
+    kind: "cloak",
+    present: importedState.cloak,
+    enchant: cloakDetail?.enchant ?? 0,
+    modifiers: cloakDetail ? buildModifierBagFromItem(cloakDetail) : undefined,
+    displayName: cloakDetail?.displayName,
+    artifactKind: cloakDetail?.artifactKind,
+    source: cloakDetail ? "imported" : undefined,
+  };
   fillHeadgearSlots(
     importedState.headgearSlots,
     record.helmetDetails?.filter(
@@ -645,10 +733,6 @@ export const buildImportedCalculatorState = (
     )
   );
   fillAuxArmourSlots(importedState.gloveSlots, record.glovesDetails);
-  const residualEquipmentModifiers = applyResidualEquipmentModifiers(
-    record,
-    importedState
-  );
 
   summary.applied.push({ label: "Auxiliary armour" });
 
@@ -704,12 +788,6 @@ export const buildImportedCalculatorState = (
     });
   }
 
-  const wizardry = countResidualWizardry(record);
-  importedState.wizardry = wizardry;
-  if (wizardry > 0) {
-    summary.applied.push({ label: "Wizardry", detail: `${wizardry}` });
-  }
-
   const wildMagic = deriveWildMagic(record);
   if (wildMagic !== null) {
     importedState.wildMagic = wildMagic;
@@ -725,19 +803,10 @@ export const buildImportedCalculatorState = (
   const bodyArmourEgo = deriveBodyArmourEgo(record, detectedVersion);
   if (bodyArmourEgo) {
     importedState.bodyArmourEgo = bodyArmourEgo;
+    importedState.bodyArmour.ego = bodyArmourEgo;
     summary.applied.push({
       label: "Body armour ego",
       detail: bodyArmourEgo,
-    });
-  }
-
-  const residualModifierSummary = Object.entries(residualEquipmentModifiers)
-    .filter(([, value]) => value !== 0)
-    .map(([key, value]) => `${key} ${value > 0 ? "+" : ""}${value}`);
-  if (residualModifierSummary.length > 0) {
-    summary.applied.push({
-      label: "Equipment modifiers",
-      detail: residualModifierSummary.join(", "),
     });
   }
   if (record.gizmo) {

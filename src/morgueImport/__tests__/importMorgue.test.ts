@@ -125,7 +125,6 @@ describe("morgue import mapper", () => {
       shieldSkill: 0,
       dodgingSkill: 2.4,
       spellcasting: 8.1,
-      wizardry: 0,
       wildMagic: 0,
       targetSpell: "Magic Dart",
     });
@@ -266,7 +265,12 @@ describe("morgue import mapper", () => {
 
     expect(result.detectedVersion).toBe("trunk");
     expect(result.importedState.bodyArmourEgo).toBe("resonance");
-    expect(result.importedState.wizardry).toBe(1);
+    expect(result.importedState.amuletSlots[0]).toEqual(
+      expect.objectContaining({
+        kind: "none",
+        modifiers: { wizardry: 1 },
+      })
+    );
     expect(result.importedState.wildMagic).toBe(2);
   });
 
@@ -370,12 +374,28 @@ describe("morgue import mapper", () => {
     expect(result.importedState.bodyArmourEnchant).toBe(-2);
     expect(result.importedState.shieldEnchant).toBe(3);
     expect(result.importedState.headgearSlots[0]).toEqual(
-      expect.objectContaining({ present: true, enchant: -1, kind: "hat" })
+      expect.objectContaining({
+        present: true,
+        enchant: -1,
+        kind: "hat",
+        modifiers: { int: 3 },
+      })
     );
     expect(result.importedState.barding).toBe(true);
     expect(result.importedState.bardingEnchant).toBe(5);
     expect(result.importedState.cloakEnchant).toBe(2);
-    expect(result.importedState.equipmentInt).toBe(3);
+    expect(result.importedState.bardingItem).toEqual(
+      expect.objectContaining({
+        present: true,
+        enchant: 5,
+      })
+    );
+    expect(result.importedState.cloakItem).toEqual(
+      expect.objectContaining({
+        present: true,
+        enchant: 2,
+      })
+    );
     expect(result.importedState.subduedMagic).toBe(1);
     expect(result.importedState.antiWizardry).toBe(2);
     expect(result.importedState.runicMagic).toBe(1);
@@ -391,6 +411,118 @@ describe("morgue import mapper", () => {
     expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Headgear" })])
     );
+  });
+
+  test("maps parser detail modifiers onto the owning equipment item", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Octopode",
+      speciesVariant: null,
+      background: "Conjurer",
+      god: null,
+      xl: 12,
+      ac: 17,
+      ev: 20,
+      sh: 11,
+      strength: 8,
+      intelligence: 23,
+      dexterity: 14,
+      bodyArmour: "robe",
+      shield: "none",
+      helmets: ["-1 hat of intelligence"],
+      gloves: [],
+      footwear: ["+5 barding"],
+      cloaks: ["+2 cloak"],
+      orb: "orb of energy",
+      amulets: ["amulet of reflection"],
+      rings: ["ring of protection +4", "ring of wizardry"],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: {
+        ...makeItem("+2 robe of intelligence", "robe", {
+          numeric: { Int: 3 },
+        }),
+        objectClass: "armour",
+        enchant: 2,
+      },
+      helmetDetails: [
+        {
+          ...makeItem("-1 hat of intelligence", "hat", {
+            numeric: { Int: 3 },
+          }),
+          objectClass: "armour",
+          enchant: -1,
+        },
+      ],
+      footwearDetails: [{ ...makeItem("+5 barding", "barding"), objectClass: "armour", enchant: 5 }],
+      cloakDetails: [{ ...makeItem("+2 cloak", "cloak"), objectClass: "armour", enchant: 2 }],
+      orbDetails: makeItem("orb of energy", "orb of energy", {
+        booleanProps: { Energy: true, Wiz: true },
+      }),
+      amuletDetails: [
+        makeItem("amulet of reflection", "amulet", {
+          booleanProps: { Reflect: true },
+        }),
+      ],
+      ringDetails: [
+        {
+          ...makeItem("ring of protection +4", "ring", {
+            numeric: { Int: 1 },
+          }),
+          subtypeEffect: "protection +4",
+          enchant: null,
+        },
+        makeItem("ring of wizardry", "ring", {
+          booleanProps: { Wiz: true },
+        }),
+      ],
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Magic Dart",
+          failurePercent: 2,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.bodyArmour).toEqual(
+      expect.objectContaining({
+        kind: "robe",
+        enchant: 2,
+        ego: "none",
+        modifiers: { int: 3 },
+      })
+    );
+    expect(result.importedState.orbItem).toEqual(
+      expect.objectContaining({
+        kind: "energy",
+        modifiers: { wizardry: 1 },
+      })
+    );
+    expect(result.importedState.headgearSlots[0]).toEqual(
+      expect.objectContaining({
+        present: true,
+        enchant: -1,
+        kind: "hat",
+        modifiers: { int: 3 },
+      })
+    );
+    expect(result.importedState.ringSlots.slice(0, 2)).toEqual([
+      expect.objectContaining({ kind: "protection", plus: 4, modifiers: { int: 1 } }),
+      expect.objectContaining({ kind: "wizardry", plus: 0 }),
+    ]);
+    expect(result.importedState.unattributedGear).toBeUndefined();
   });
 
   test("returns a parser failure record for invalid text", () => {
