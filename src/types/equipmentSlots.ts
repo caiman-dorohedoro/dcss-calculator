@@ -1,8 +1,11 @@
+import type { EquipmentModifierBag } from "@/types/equipmentItems";
+
 export type RingSlotKind = "none" | "wizardry" | "protection" | "evasion";
 
 export type RingSlotState = {
   kind: RingSlotKind;
   plus: number;
+  modifiers?: EquipmentModifierBag;
   displayName?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
@@ -12,6 +15,7 @@ export type AmuletSlotKind = "none" | "reflection";
 
 export type AmuletSlotState = {
   kind: AmuletSlotKind;
+  modifiers?: EquipmentModifierBag;
   displayName?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
@@ -23,6 +27,7 @@ export type AuxArmourSlotState = {
   present: boolean;
   enchant: number;
   kind?: HeadgearKind;
+  modifiers?: EquipmentModifierBag;
   displayName?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";

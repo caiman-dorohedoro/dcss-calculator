@@ -1,5 +1,11 @@
 import type { CalculatorState } from "@/hooks/useCalculatorState";
 import {
+  createDefaultBodyArmourItem,
+  createDefaultFixedAuxItem,
+  createDefaultOrbItem,
+  createDefaultShieldItem,
+} from "@/types/equipmentItems";
+import {
   createDefaultAmuletSlot,
   createDefaultAuxArmourSlot,
   createDefaultRingSlot,
@@ -15,6 +21,12 @@ const baseDefaultState = {
   dexterity: 10,
   strength: 10,
   intelligence: 10,
+  bodyArmour: createDefaultBodyArmourItem(),
+  shieldItem: createDefaultShieldItem(),
+  orbItem: createDefaultOrbItem(),
+  cloakItem: createDefaultFixedAuxItem("cloak"),
+  bootsItem: createDefaultFixedAuxItem("boots"),
+  bardingItem: createDefaultFixedAuxItem("barding"),
   shield: "none" as const,
   orb: "none" as const,
   armour: "robe" as const,
@@ -31,12 +43,6 @@ const baseDefaultState = {
   bootsEnchant: 0,
   cloakEnchant: 0,
   bardingEnchant: 0,
-  equipmentStr: 0,
-  equipmentDex: 0,
-  equipmentInt: 0,
-  equipmentAC: 0,
-  equipmentEV: 0,
-  equipmentSH: 0,
   subduedMagic: 0,
   antiWizardry: 0,
   runicMagic: 0,
@@ -46,7 +52,6 @@ const baseDefaultState = {
   tenguFlight: 0,
   largeBonePlates: 0,
   spellcasting: 0,
-  wizardry: 0,
   wildMagic: 0,
 };
 

@@ -26,6 +26,13 @@ import {
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getVersionConfig } from "@/versioning/versionRegistry";
+import type {
+  BodyArmourItemState,
+  FixedAuxItemState,
+  OrbItemState,
+  ShieldItemState,
+  UnattributedGearState,
+} from "@/types/equipmentItems";
 
 const STORAGE_KEY = "calculator";
 
@@ -42,6 +49,13 @@ export interface CalculatorState<V extends GameVersion> {
   strength: number;
   intelligence: number;
   species: SpeciesKey<V>;
+  bodyArmour: BodyArmourItemState;
+  shieldItem: ShieldItemState;
+  orbItem: OrbItemState;
+  cloakItem: FixedAuxItemState;
+  bootsItem: FixedAuxItemState;
+  bardingItem: FixedAuxItemState;
+  unattributedGear?: UnattributedGearState;
   shield: ShieldKey;
   orb: OrbKey;
   armour: ArmourKey;
@@ -64,12 +78,6 @@ export interface CalculatorState<V extends GameVersion> {
   bootsEnchant?: number;
   cloakEnchant?: number;
   bardingEnchant?: number;
-  equipmentStr?: number;
-  equipmentDex?: number;
-  equipmentInt?: number;
-  equipmentAC?: number;
-  equipmentEV?: number;
-  equipmentSH?: number;
   subduedMagic?: number;
   antiWizardry?: number;
   runicMagic?: number;
@@ -82,7 +90,6 @@ export interface CalculatorState<V extends GameVersion> {
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;
   spellcasting?: number;
-  wizardry?: number;
   wildMagic?: number;
 }
 

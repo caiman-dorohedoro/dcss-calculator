@@ -42,6 +42,49 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.orb).toBe("none");
   });
 
+  test("builds itemized equipment defaults and removes flat gear totals", () => {
+    const state = buildDefaultCalculatorState("trunk") as unknown as Record<
+      string,
+      unknown
+    > & {
+      ringSlots: Array<Record<string, unknown>>;
+    };
+
+    expect(state.bodyArmour).toEqual({
+      kind: "robe",
+      enchant: 0,
+      ego: "none",
+    });
+    expect(state.shieldItem).toEqual({
+      kind: "none",
+      enchant: 0,
+    });
+    expect(state.orbItem).toEqual({
+      kind: "none",
+    });
+    expect(state.cloakItem).toEqual({
+      kind: "cloak",
+      present: false,
+      enchant: 0,
+    });
+    expect(state.bootsItem).toEqual({
+      kind: "boots",
+      present: false,
+      enchant: 0,
+    });
+    expect(state.bardingItem).toEqual({
+      kind: "barding",
+      present: false,
+      enchant: 0,
+    });
+    expect(state.unattributedGear).toBeUndefined();
+    expect("equipmentStr" in state).toBe(false);
+    expect("equipmentAC" in state).toBe(false);
+    expect("wizardry" in state).toBe(false);
+    expect(state.ringSlots[0]).toEqual({ kind: "none", plus: 0 });
+    expect(state.ringSlots[0]?.modifiers).toBeUndefined();
+  });
+
   test("uses gale centaur for trunk defaults", () => {
     const state = buildDefaultCalculatorState("trunk");
 
