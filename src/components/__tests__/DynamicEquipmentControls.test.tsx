@@ -260,10 +260,25 @@ describe("DynamicEquipmentControls", () => {
     const state = buildDefaultCalculatorState("trunk");
     state.cloak = true;
     state.cloakEnchant = 2;
+    state.cloakItem = {
+      ...state.cloakItem,
+      present: true,
+      enchant: 2,
+    };
     state.boots = true;
     state.bootsEnchant = -1;
+    state.bootsItem = {
+      ...state.bootsItem,
+      present: true,
+      enchant: -1,
+    };
     state.barding = true;
     state.bardingEnchant = 5;
+    state.bardingItem = {
+      ...state.bardingItem,
+      present: true,
+      enchant: 5,
+    };
 
     await act(async () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
@@ -271,9 +286,6 @@ describe("DynamicEquipmentControls", () => {
 
     const fixedEquipmentSection = container.querySelector(
       '[data-testid="fixed-equipment-controls"]'
-    ) as HTMLDivElement;
-    const modifierSection = container.querySelector(
-      '[data-testid="dynamic-equipment-modifiers"]'
     ) as HTMLDivElement;
 
     const cloakEnchantInput = fixedEquipmentSection.querySelector(
@@ -289,8 +301,32 @@ describe("DynamicEquipmentControls", () => {
     expect(cloakEnchantInput.className).toContain("w-14");
     expect(bootsEnchantInput.className).toContain("w-14");
     expect(bardingEnchantInput.className).toContain("w-14");
-    expect(modifierSection.textContent).not.toContain("boots enchant");
-    expect(modifierSection.textContent).not.toContain("cloak enchant");
+    expect(
+      container.querySelector('[data-testid="dynamic-equipment-modifiers"]')
+    ).toBeNull();
+  });
+
+  test("renders item modifier inputs next to rings and removes the old Modifiers section", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.ringSlots = [
+      {
+        kind: "protection",
+        plus: 4,
+        modifiers: { int: 3 },
+        displayName: "ring of intelligence",
+        source: "imported",
+      },
+      { kind: "wizardry", plus: 0 },
+    ];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    expect(container.textContent).toContain("Ring 1");
+    expect(container.textContent).toContain("ring of intelligence");
+    expect(container.textContent).toContain("Int");
+    expect(container.textContent).not.toContain("Modifiers");
   });
 
   test("ring slot updates do not overwrite legacy wizardry", () => {

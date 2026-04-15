@@ -332,6 +332,39 @@ describe("Calculator desktop layout", () => {
     expect(selectorTrigger.className).toContain("max-w-full");
   });
 
+  test("renders body armour, shield, and orb modifier inputs in the equipment section", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+    equipped.bodyArmour = {
+      ...equipped.bodyArmour,
+      modifiers: { int: 3 },
+    };
+    equipped.shield = "none";
+    equipped.shieldItem = {
+      ...equipped.shieldItem,
+      modifiers: { sh: 2 },
+    };
+    equipped.orb = "energy";
+    equipped.orbItem = {
+      ...equipped.orbItem,
+      kind: "energy",
+      modifiers: { wizardry: 1 },
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    const equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+
+    expect(equipmentSection.textContent).toContain("Armour");
+    expect(equipmentSection.textContent).toContain("Shield");
+    expect(equipmentSection.textContent).toContain("Orb");
+    expect(equipmentSection.textContent).toContain("Wiz");
+    expect(equipmentSection.textContent).not.toContain("Modifiers");
+  });
+
   test("shows shield enchant only when a shield is equipped", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.shield = "buckler";

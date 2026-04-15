@@ -44,7 +44,9 @@ import {
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
 import { SpellSkillControls } from "@/components/SpellControls";
-import DynamicEquipmentControls from "@/components/DynamicEquipmentControls";
+import DynamicEquipmentControls, {
+  EquipmentModifierInputs,
+} from "@/components/DynamicEquipmentControls";
 import { coerceEquipmentSlotCollections } from "@/versioning/dynamicSlotCounts";
 
 type CalculatorProps<V extends GameVersion> = {
@@ -61,13 +63,25 @@ const SectionHeading = ({ children }: { children: string }) => (
   </div>
 );
 
+const hasModifierValues = (
+  modifiers?: CalculatorState<GameVersion>["bodyArmour"]["modifiers"]
+) => modifiers !== undefined && Object.keys(modifiers).length > 0;
+
+const shouldShowModifierInputs = (
+  equipped: boolean,
+  modifiers?: CalculatorState<GameVersion>["bodyArmour"]["modifiers"],
+  displayName?: string
+) => equipped || hasModifierValues(modifiers) || displayName !== undefined;
+
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
   const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
   const selectedBodyArmourEgo =
-    state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
+    state.bodyArmour.ego in bodyArmourEgos
+      ? state.bodyArmour.ego
+      : state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
       ? state.bodyArmourEgo
       : "none";
 
@@ -258,154 +272,294 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-3"
       >
         <SectionHeading>Equipment</SectionHeading>
-        <div className="flex items-center flex-row gap-4 flex-wrap">
-          <div
-            data-testid="body-armour-controls"
-            className="flex min-w-0 max-w-full flex-row items-center gap-2 flex-nowrap"
-          >
-            <span data-testid="body-armour-label" className="shrink-0 text-sm">
-              Armour:
-            </span>
-            {state.armour !== "none" && (
-              <div
-                data-testid="body-armour-enchant-control"
-                className="shrink-0"
-              >
-                <EquipmentEnchantInput
-                  ariaLabel="Body armour enchant"
-                  value={state.bodyArmourEnchant ?? 0}
-                  onChange={(value) =>
-                    setState((prev) => ({
-                      ...prev,
-                      bodyArmourEnchant: value,
-                    }))
-                  }
-                />
-              </div>
-            )}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
             <div
-              data-testid="body-armour-selector-control"
-              className="min-w-0 flex-1"
+              data-testid="body-armour-controls"
+              className="flex min-w-0 max-w-full flex-row items-center gap-2 flex-nowrap"
             >
-              <Select
-                value={state.armour}
-                onValueChange={(value) =>
-                  setState((prev) => ({ ...prev, armour: value as ArmourKey }))
-                }
-              >
-                <SelectTrigger
-                  aria-label="Armour"
-                  className="h-6 min-w-0 max-w-full gap-2"
+              <span data-testid="body-armour-label" className="shrink-0 text-sm">
+                Armour:
+              </span>
+              {state.armour !== "none" && (
+                <div
+                  data-testid="body-armour-enchant-control"
+                  className="shrink-0"
                 >
-                  <SelectValue placeholder="Armour" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(armourOptions).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {value.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            {state.armour !== "none" && (
-              <div data-testid="body-armour-ego-control" className="shrink-0">
+                  <EquipmentEnchantInput
+                    ariaLabel="Body armour enchant"
+                    value={
+                      state.bodyArmour.enchant !== 0
+                        ? state.bodyArmour.enchant
+                        : state.bodyArmourEnchant ?? 0
+                    }
+                    onChange={(value) =>
+                      setState((prev) => ({
+                        ...prev,
+                        bodyArmourEnchant: value,
+                        bodyArmour: {
+                          ...prev.bodyArmour,
+                          enchant: value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              )}
+              <div
+                data-testid="body-armour-selector-control"
+                className="min-w-0 flex-1"
+              >
                 <Select
-                  value={selectedBodyArmourEgo}
+                  value={state.armour}
                   onValueChange={(value) =>
-                    setState((prev) => ({
-                      ...prev,
-                      bodyArmourEgo: value as BodyArmourEgoKey,
-                    }))
+                    setState((prev) => {
+                      const nextArmour = value as ArmourKey;
+
+                      return {
+                        ...prev,
+                        armour: nextArmour,
+                        bodyArmourEgo:
+                          nextArmour === "none" ? "none" : prev.bodyArmourEgo,
+                        bodyArmour: {
+                          ...prev.bodyArmour,
+                          kind: nextArmour,
+                          ego:
+                            nextArmour === "none" ? "none" : prev.bodyArmour.ego,
+                        },
+                      };
+                    })
                   }
                 >
                   <SelectTrigger
-                    aria-label="Body armour ego"
-                    className="min-w-[120px] h-6 w-auto gap-2"
+                    aria-label="Armour"
+                    className="h-6 min-w-0 max-w-full gap-2"
                   >
-                    <SelectValue placeholder="None" />
+                    <SelectValue placeholder="Armour" />
                   </SelectTrigger>
                   <SelectContent>
-                    {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map(
-                      (key) => (
-                        <SelectItem key={key} value={key}>
-                          {bodyArmourEgos[key]?.name ?? key}
-                        </SelectItem>
-                      ),
-                    )}
+                    {Object.entries(armourOptions).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        {value.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
+              {state.armour !== "none" && (
+                <div data-testid="body-armour-ego-control" className="shrink-0">
+                  <Select
+                    value={selectedBodyArmourEgo}
+                    onValueChange={(value) =>
+                      setState((prev) => ({
+                        ...prev,
+                        bodyArmourEgo: value as BodyArmourEgoKey,
+                        bodyArmour: {
+                          ...prev.bodyArmour,
+                          ego: value as BodyArmourEgoKey,
+                        },
+                      }))
+                    }
+                  >
+                    <SelectTrigger
+                      aria-label="Body armour ego"
+                      className="min-w-[120px] h-6 w-auto gap-2"
+                    >
+                      <SelectValue placeholder="None" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map(
+                        (key) => (
+                          <SelectItem key={key} value={key}>
+                            {bodyArmourEgos[key]?.name ?? key}
+                          </SelectItem>
+                        ),
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+            {state.bodyArmour.displayName && (
+              <span className="text-xs text-muted-foreground">
+                {state.bodyArmour.displayName}
+              </span>
             )}
-          </div>
-          <div className="flex flex-row items-center gap-2 flex-nowrap">
-            <span data-testid="shield-label" className="shrink-0 text-sm">
-              Shield:
-            </span>
-            {state.shield !== "none" && (
-              <div data-testid="shield-enchant-control" className="shrink-0">
-                <EquipmentEnchantInput
-                  ariaLabel="Shield enchant"
-                  value={state.shieldEnchant ?? 0}
-                  onChange={(value) =>
-                    setState((prev) => ({
-                      ...prev,
-                      shieldEnchant: value,
-                    }))
-                  }
-                />
-              </div>
-            )}
-            <div data-testid="shield-selector-control">
-              <Select
-                disabled={state.orb !== "none"}
-                value={state.shield}
-                onValueChange={(value) =>
+            {shouldShowModifierInputs(
+              state.armour !== "none",
+              state.bodyArmour.modifiers,
+              state.bodyArmour.displayName
+            ) && (
+              <EquipmentModifierInputs
+                modifiers={state.bodyArmour.modifiers}
+                onChange={(modifiers) =>
                   setState((prev) => ({
                     ...prev,
-                    shield: value as ShieldKey,
-                    orb: value === "none" ? prev.orb : "none",
+                    bodyArmour: {
+                      ...prev.bodyArmour,
+                      modifiers,
+                    },
                   }))
                 }
+              />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row items-center gap-2 flex-nowrap">
+              <span data-testid="shield-label" className="shrink-0 text-sm">
+                Shield:
+              </span>
+              {state.shield !== "none" && (
+                <div data-testid="shield-enchant-control" className="shrink-0">
+                  <EquipmentEnchantInput
+                    ariaLabel="Shield enchant"
+                    value={
+                      state.shieldItem.enchant !== 0
+                        ? state.shieldItem.enchant
+                        : state.shieldEnchant ?? 0
+                    }
+                    onChange={(value) =>
+                      setState((prev) => ({
+                        ...prev,
+                        shieldEnchant: value,
+                        shieldItem: {
+                          ...prev.shieldItem,
+                          enchant: value,
+                        },
+                      }))
+                    }
+                  />
+                </div>
+              )}
+              <div data-testid="shield-selector-control">
+                <Select
+                  disabled={state.orb !== "none"}
+                  value={state.shield}
+                  onValueChange={(value) =>
+                    setState((prev) => {
+                      const nextShield = value as ShieldKey;
+
+                      return {
+                        ...prev,
+                        shield: nextShield,
+                        shieldItem: {
+                          ...prev.shieldItem,
+                          kind: nextShield,
+                        },
+                        orb: nextShield === "none" ? prev.orb : "none",
+                        orbItem:
+                          nextShield === "none"
+                            ? prev.orbItem
+                            : {
+                                ...prev.orbItem,
+                                kind: "none",
+                              },
+                      };
+                    })
+                  }
+                >
+                  <SelectTrigger aria-label="Shield" className="w-[160px] h-6">
+                    <SelectValue placeholder="Shield" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(shieldOptions).map(([key, value]) => (
+                      <SelectItem key={key} value={key}>
+                        {value.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+          </div>
+            {state.shieldItem.displayName && (
+              <span className="text-xs text-muted-foreground">
+                {state.shieldItem.displayName}
+              </span>
+            )}
+            {shouldShowModifierInputs(
+              state.shield !== "none",
+              state.shieldItem.modifiers,
+              state.shieldItem.displayName
+            ) && (
+              <EquipmentModifierInputs
+                modifiers={state.shieldItem.modifiers}
+                onChange={(modifiers) =>
+                  setState((prev) => ({
+                    ...prev,
+                    shieldItem: {
+                      ...prev.shieldItem,
+                      modifiers,
+                    },
+                  }))
+                }
+              />
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="flex flex-row items-center gap-2 text-sm">
+              Orb:
+              <Select
+                disabled={state.shield !== "none"}
+                value={state.orb}
+                onValueChange={(value) =>
+                  setState((prev) => {
+                    const nextOrb = value as OrbKey;
+
+                    return {
+                      ...prev,
+                      orb: nextOrb,
+                      orbItem: {
+                        ...prev.orbItem,
+                        kind: nextOrb,
+                      },
+                      shield: nextOrb === "none" ? prev.shield : "none",
+                      shieldItem:
+                        nextOrb === "none"
+                          ? prev.shieldItem
+                          : {
+                              ...prev.shieldItem,
+                              kind: "none",
+                            },
+                    };
+                  })
+                }
               >
-                <SelectTrigger aria-label="Shield" className="w-[160px] h-6">
-                  <SelectValue placeholder="Shield" />
+                <SelectTrigger className="w-[160px] h-6">
+                  <SelectValue placeholder="Orb" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(shieldOptions).map(([key, value]) => (
+                  {Object.entries(orbOptions).map(([key, value]) => (
                     <SelectItem key={key} value={key}>
                       {value.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </label>
+            {state.orbItem.displayName && (
+              <span className="text-xs text-muted-foreground">
+                {state.orbItem.displayName}
+              </span>
+            )}
+            {shouldShowModifierInputs(
+              state.orb !== "none",
+              state.orbItem.modifiers,
+              state.orbItem.displayName
+            ) && (
+              <EquipmentModifierInputs
+                modifiers={state.orbItem.modifiers}
+                onChange={(modifiers) =>
+                  setState((prev) => ({
+                    ...prev,
+                    orbItem: {
+                      ...prev.orbItem,
+                      modifiers,
+                    },
+                  }))
+                }
+              />
+            )}
           </div>
-          <label className="flex flex-row items-center gap-2 text-sm">
-            Orb:
-            <Select
-              disabled={state.shield !== "none"}
-              value={state.orb}
-              onValueChange={(value) =>
-                setState((prev) => ({
-                  ...prev,
-                  orb: value as OrbKey,
-                  shield: value === "none" ? prev.shield : "none",
-                }))
-              }
-            >
-              <SelectTrigger className="w-[160px] h-6">
-                <SelectValue placeholder="Orb" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(orbOptions).map(([key, value]) => (
-                  <SelectItem key={key} value={key}>
-                    {value.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </label>
         </div>
         <DynamicEquipmentControls
           state={state}
