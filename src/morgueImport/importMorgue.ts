@@ -89,22 +89,6 @@ const armourNameMap = makeNameMap(armourOptions);
 const shieldNameMap = makeNameMap(shieldOptions);
 const orbNameMap = makeNameMap(orbOptions);
 
-const collectEquippedItems = (record: ParsedMorgueTextRecord) => {
-  return [
-    record.bodyArmourDetails,
-    record.shieldDetails,
-    ...(record.helmetDetails ?? []),
-    ...(record.glovesDetails ?? []),
-    ...(record.footwearDetails ?? []),
-    ...(record.cloakDetails ?? []),
-    record.orbDetails,
-    ...(record.amuletDetails ?? []),
-    ...(record.ringDetails ?? []),
-    record.gizmoDetails,
-    record.talismanDetails,
-  ].filter((item): item is EquipmentItemSnapshot => item !== undefined);
-};
-
 const hasBaseType = (
   items: EquipmentItemSnapshot[] | undefined,
   targetBaseType: string

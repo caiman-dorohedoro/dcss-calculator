@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { CalculatorState } from "@/hooks/useCalculatorState";
+import type { EquipmentModifierBag } from "@/types/equipmentItems";
 import {
-  type EquipmentModifierBag,
   createDefaultAmuletSlot,
   createDefaultAuxArmourSlot,
   createDefaultRingSlot,

@@ -63,6 +63,7 @@ export interface CalculatorState<V extends GameVersion> {
   orb: OrbKey;
   armour: ArmourKey;
   bodyArmourEgo?: BodyArmourEgoKey;
+  wizardry?: number;
   shieldSkill: number;
   armourSkill: number;
   dodgingSkill: number;
@@ -509,6 +510,7 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.equipmentAC) ||
     !isOptionalNumber(state.equipmentEV) ||
     !isOptionalNumber(state.equipmentSH) ||
+    !isOptionalNumber(state.wizardry) ||
     !isOptionalNumber(state.subduedMagic) ||
     !isOptionalNumber(state.antiWizardry) ||
     !isOptionalNumber(state.runicMagic) ||
