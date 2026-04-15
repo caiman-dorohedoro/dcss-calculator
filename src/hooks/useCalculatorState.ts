@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import {
   ArmourKey,
+  armourOptions,
   BodyArmourEgoKey,
   OrbKey,
   ShieldKey,
   orbOptions,
+  shieldOptions,
 } from "@/types/equipment.ts";
 import {
   createDefaultAmuletSlot,
@@ -28,6 +30,7 @@ import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 import type {
   BodyArmourItemState,
+  EquipmentModifierBag,
   FixedAuxItemState,
   OrbItemState,
   ShieldItemState,
@@ -294,6 +297,116 @@ const coerceLegacySlots = <T>(
 const isOptionalNumber = (value: unknown) =>
   value === undefined || typeof value === "number";
 
+const isModifierBag = (value: unknown): value is EquipmentModifierBag => {
+  if (!isObject(value)) return false;
+
+  return (
+    isOptionalNumber(value.str) &&
+    isOptionalNumber(value.dex) &&
+    isOptionalNumber(value.int) &&
+    isOptionalNumber(value.ac) &&
+    isOptionalNumber(value.ev) &&
+    isOptionalNumber(value.sh) &&
+    isOptionalNumber(value.wizardry)
+  );
+};
+
+const isEquipmentItemSource = (
+  value: unknown
+): value is "manual" | "imported" | "legacy" =>
+  value === "manual" || value === "imported" || value === "legacy";
+
+const isEquipmentMeta = (
+  value: Record<string, unknown>
+) =>
+  (value.displayName === undefined || typeof value.displayName === "string") &&
+  (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
+  (value.source === undefined || isEquipmentItemSource(value.source)) &&
+  (value.modifiers === undefined || isModifierBag(value.modifiers));
+
+const isBodyArmourItem = (value: unknown): value is BodyArmourItemState => {
+  if (!isObject(value)) return false;
+
+  return (
+    typeof value.kind === "string" &&
+    value.kind in armourOptions &&
+    typeof value.enchant === "number" &&
+    typeof value.ego === "string" &&
+    isEquipmentMeta(value)
+  );
+};
+
+const isShieldItem = (value: unknown): value is ShieldItemState => {
+  if (!isObject(value)) return false;
+
+  return (
+    typeof value.kind === "string" &&
+    value.kind in shieldOptions &&
+    typeof value.enchant === "number" &&
+    isEquipmentMeta(value)
+  );
+};
+
+const isOrbItem = (value: unknown): value is OrbItemState => {
+  if (!isObject(value)) return false;
+
+  return (
+    typeof value.kind === "string" &&
+    value.kind in orbOptions &&
+    isEquipmentMeta(value)
+  );
+};
+
+const isFixedAuxItem = (value: unknown): value is FixedAuxItemState => {
+  if (!isObject(value)) return false;
+
+  return (
+    (value.kind === "cloak" || value.kind === "boots" || value.kind === "barding") &&
+    typeof value.present === "boolean" &&
+    typeof value.enchant === "number" &&
+    isEquipmentMeta(value)
+  );
+};
+
+const isUnattributedGear = (value: unknown): value is UnattributedGearState => {
+  if (!isObject(value)) return false;
+
+  return (
+    value.label === "legacy gear" &&
+    value.source === "legacy" &&
+    isModifierBag(value.modifiers)
+  );
+};
+
+const buildLegacyModifierBag = (parsed: Record<string, unknown>) => {
+  const modifiers: EquipmentModifierBag = {};
+
+  if (typeof parsed.equipmentStr === "number") modifiers.str = parsed.equipmentStr;
+  if (typeof parsed.equipmentDex === "number") modifiers.dex = parsed.equipmentDex;
+  if (typeof parsed.equipmentInt === "number") modifiers.int = parsed.equipmentInt;
+  if (typeof parsed.equipmentAC === "number") modifiers.ac = parsed.equipmentAC;
+  if (typeof parsed.equipmentEV === "number") modifiers.ev = parsed.equipmentEV;
+  if (typeof parsed.equipmentSH === "number") modifiers.sh = parsed.equipmentSH;
+
+  return Object.keys(modifiers).length > 0 ? modifiers : undefined;
+};
+
+const buildLegacyUnattributedGear = (
+  parsed: Record<string, unknown>
+): UnattributedGearState | undefined => {
+  const modifiers = buildLegacyModifierBag(parsed);
+
+  if (!modifiers) {
+    return undefined;
+  }
+
+  return {
+    label: "legacy gear",
+    modifiers,
+    source: "legacy",
+  };
+};
+
 const validateState = (state: unknown): state is CalculatorState<GameVersion> => {
   if (!isObject(state)) return false;
 
@@ -338,7 +451,34 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     return false;
   }
 
-  if (state.wizardry !== undefined && typeof state.wizardry !== "number") {
+  if (!isBodyArmourItem(state.bodyArmour)) {
+    return false;
+  }
+
+  if (!isShieldItem(state.shieldItem)) {
+    return false;
+  }
+
+  if (!isOrbItem(state.orbItem)) {
+    return false;
+  }
+
+  if (!isFixedAuxItem(state.cloakItem)) {
+    return false;
+  }
+
+  if (!isFixedAuxItem(state.bootsItem)) {
+    return false;
+  }
+
+  if (!isFixedAuxItem(state.bardingItem)) {
+    return false;
+  }
+
+  if (
+    state.unattributedGear !== undefined &&
+    !isUnattributedGear(state.unattributedGear)
+  ) {
     return false;
   }
 
@@ -494,7 +634,7 @@ export const parseSavedState = (
     const wizardry = shouldClearMirroredWizardry
       ? 0
       : useModernRingSlots
-        ? parsed.wizardry ?? defaultState.wizardry
+        ? parsed.wizardry ?? 0
         : 0;
 
     const gloveSlots = useModernGloveSlots
@@ -537,6 +677,9 @@ export const parseSavedState = (
         headgearSlots,
         gloveSlots,
       }),
+      unattributedGear: isUnattributedGear(parsed.unattributedGear)
+        ? parsed.unattributedGear
+        : buildLegacyUnattributedGear(parsed),
     };
 
     return validateState(normalized) ? normalized : null;

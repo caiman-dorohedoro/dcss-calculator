@@ -16,6 +16,65 @@ const omitKeys = (value: unknown, keys: string[]) => {
 };
 
 describe("calculator saved-state migration", () => {
+  test("restores modern itemized equipment saves", () => {
+    const modern = {
+      ...buildDefaultCalculatorState("trunk"),
+      bodyArmour: {
+        kind: "ring_mail",
+        enchant: 2,
+        ego: "none",
+        modifiers: { int: 3 },
+      },
+      shieldItem: {
+        kind: "buckler",
+        enchant: 1,
+        modifiers: { sh: 2 },
+      },
+      orbItem: {
+        kind: "energy",
+        modifiers: { wizardry: 1 },
+      },
+    };
+
+    const parsed = parseSavedState(JSON.stringify(modern));
+
+    expect(parsed?.bodyArmour.modifiers).toEqual({ int: 3 });
+    expect(parsed?.shieldItem.modifiers).toEqual({ sh: 2 });
+    expect(parsed?.orbItem.modifiers).toEqual({ wizardry: 1 });
+  });
+
+  test("migrates legacy flat gear totals into rings and explicit fallback gear", () => {
+    const legacy = {
+      version: "trunk",
+      species: "human",
+      armour: "ring_mail",
+      bodyArmourEnchant: 2,
+      shield: "buckler",
+      shieldEnchant: 1,
+      orb: "energy",
+      ringSlots: [],
+      amuletSlots: [],
+      headgearSlots: [],
+      gloveSlots: [],
+      equipmentInt: 3,
+      equipmentSH: 2,
+      equipmentDex: 1,
+      wizardry: 2,
+    };
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed?.ringSlots.slice(0, 2)).toEqual([
+      expect.objectContaining({ kind: "wizardry" }),
+      expect.objectContaining({ kind: "wizardry" }),
+    ]);
+    expect(parsed?.unattributedGear).toEqual({
+      label: "legacy gear",
+      modifiers: { int: 3, sh: 2, dex: 1 },
+      source: "legacy",
+    });
+  });
+
   test("creates slot arrays when a legacy save does not include them", () => {
     const legacy = omitKeys(buildDefaultCalculatorState("0.34"), [
       "ringSlots",
