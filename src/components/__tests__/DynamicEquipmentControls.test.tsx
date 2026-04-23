@@ -121,7 +121,9 @@ describe("DynamicEquipmentControls", () => {
 
     expect(gloveSection.textContent).toContain("Glove 1");
     expect(gloveSection.textContent).toContain("Glove 2");
-    expect(gloveSection.querySelectorAll('[data-testid^="glove-slot-"]')).toHaveLength(2);
+    expect(
+      gloveSection.querySelectorAll('[data-testid^="equipment-row-glove-"]')
+    ).toHaveLength(2);
   });
 
   test("clears imported metadata when manual slot edits change the slot state", () => {
@@ -190,7 +192,7 @@ describe("DynamicEquipmentControls", () => {
     expect(container.querySelector('[id="barding"]')).toBeNull();
   });
 
-  test("allows a signed headgear enchant edit when the slot is present", async () => {
+  test("allows a signed headgear enchant edit from the modal when the slot is present", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.headgearSlots = [{ present: true, enchant: 0, kind: "helmet" }];
 
@@ -198,26 +200,33 @@ describe("DynamicEquipmentControls", () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const headgearSlot = container.querySelector(
-      '[data-testid="headgear-slot-0"]'
-    ) as HTMLDivElement;
-    const enchantInput = headgearSlot.querySelector(
-      'input[type="number"]'
-    ) as HTMLInputElement;
-    const selector = headgearSlot.querySelector(
-      'button[role="combobox"]'
+    const headgearRow = container.querySelector(
+      '[data-testid="equipment-row-headgear-0"]'
     ) as HTMLButtonElement;
 
-    expect(headgearSlot.textContent).toContain("Headgear:");
-    expect(headgearSlot.textContent).not.toContain("Enchant:");
+    expect(headgearRow.textContent).toContain("Headgear:");
+    expect(headgearRow.textContent).toContain("helmet");
+    expect(headgearRow.querySelector('input[type="number"]')).toBeNull();
+
+    await act(async () => {
+      headgearRow.click();
+    });
+
+    const enchantInput = document.body.querySelector(
+      'input[aria-label="Headgear enchant"]'
+    ) as HTMLInputElement;
     expect(enchantInput.className).toContain("w-14");
-    expect(
-      enchantInput.compareDocumentPosition(selector) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
 
     await act(async () => {
       setNumberInputValue(enchantInput, "-2");
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="save-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
     });
 
     expect(setState).toHaveBeenCalledTimes(1);
@@ -229,7 +238,7 @@ describe("DynamicEquipmentControls", () => {
     expect(nextState.headgearSlots[0].enchant).toBe(-2);
   });
 
-  test("renders glove controls with selector-based input and no enchant label", async () => {
+  test("renders glove summary row and opens modal enchant input", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.gloveSlots = [{ present: true, enchant: 1 }];
 
@@ -237,28 +246,28 @@ describe("DynamicEquipmentControls", () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const gloveSlot = container.querySelector(
-      '[data-testid="glove-slot-0"]'
-    ) as HTMLDivElement;
-    const enchantInput = gloveSlot.querySelector(
-      'input[type="number"]'
-    ) as HTMLInputElement;
-    const selector = gloveSlot.querySelector(
-      'button[role="combobox"]'
+    const gloveRow = container.querySelector(
+      '[data-testid="equipment-row-glove-0"]'
     ) as HTMLButtonElement;
 
-    expect(gloveSlot.textContent).toContain("Glove 1");
-    expect(gloveSlot.textContent).not.toContain("Enchant:");
-    expect(gloveSlot.textContent).not.toContain("present");
-    expect(gloveSlot.querySelector('input[type="checkbox"]')).toBeNull();
+    expect(gloveRow.textContent).toContain("Glove 1");
+    expect(gloveRow.textContent).toContain("+1 pair of gloves");
+    expect(gloveRow.textContent).not.toContain("Enchant:");
+    expect(gloveRow.querySelector('input[type="checkbox"]')).toBeNull();
+    expect(gloveRow.querySelector('input[type="number"]')).toBeNull();
+
+    await act(async () => {
+      gloveRow.click();
+    });
+
+    const enchantInput = document.body.querySelector(
+      'input[aria-label="Gloves enchant"]'
+    ) as HTMLInputElement;
+
     expect(enchantInput.className).toContain("w-14");
-    expect(
-      enchantInput.compareDocumentPosition(selector) &
-        Node.DOCUMENT_POSITION_FOLLOWING
-    ).toBeTruthy();
   });
 
-  test("renders fixed equipment enchant inputs with the shared width and removes old modifier labels", async () => {
+  test("renders fixed equipment summary rows and removes old modifier labels", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.cloak = true;
     state.cloakEnchant = 2;
@@ -290,22 +299,75 @@ describe("DynamicEquipmentControls", () => {
       '[data-testid="fixed-equipment-controls"]'
     ) as HTMLDivElement;
 
-    const cloakEnchantInput = fixedEquipmentSection.querySelector(
-      'input[aria-label="Cloak enchant"]'
-    ) as HTMLInputElement;
-    const bootsEnchantInput = fixedEquipmentSection.querySelector(
-      'input[aria-label="Boots enchant"]'
-    ) as HTMLInputElement;
-    const bardingEnchantInput = fixedEquipmentSection.querySelector(
-      'input[aria-label="Barding enchant"]'
-    ) as HTMLInputElement;
-
-    expect(cloakEnchantInput.className).toContain("w-14");
-    expect(bootsEnchantInput.className).toContain("w-14");
-    expect(bardingEnchantInput.className).toContain("w-14");
+    expect(
+      fixedEquipmentSection.querySelector('[data-testid="equipment-row-cloak"]')
+        ?.textContent
+    ).toContain("+2 cloak");
+    expect(
+      fixedEquipmentSection.querySelector('[data-testid="equipment-row-boots"]')
+        ?.textContent
+    ).toContain("-1 pair of boots");
+    expect(
+      fixedEquipmentSection.querySelector('[data-testid="equipment-row-barding"]')
+        ?.textContent
+    ).toContain("+5 barding");
+    expect(fixedEquipmentSection.querySelector('input[type="number"]')).toBeNull();
+    expect(fixedEquipmentSection.querySelector('input[type="checkbox"]')).toBeNull();
     expect(
       container.querySelector('[data-testid="dynamic-equipment-modifiers"]')
     ).toBeNull();
+  });
+
+  test("renders dynamic equipment and fixed auxiliary equipment as summary rows", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "formicid";
+    state.amuletSlots = [{ kind: "reflection" }];
+    state.headgearSlots = [{ present: true, enchant: 2, kind: "helmet" }];
+    state.gloveSlots = [
+      {
+        present: true,
+        enchant: 5,
+        modifiers: { str: 2 },
+      },
+      { present: false, enchant: 0 },
+    ];
+    state.cloak = true;
+    state.cloakItem = { ...state.cloakItem, present: true, enchant: 1 };
+    state.boots = true;
+    state.bootsItem = { ...state.bootsItem, present: true };
+    state.barding = false;
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    expect(
+      container.querySelector('[data-testid="equipment-row-amulet-0"]')
+        ?.textContent
+    ).toContain("amulet of reflection");
+    expect(
+      container.querySelector('[data-testid="equipment-row-headgear-0"]')
+        ?.textContent
+    ).toContain("+2 helmet");
+    expect(
+      container.querySelector('[data-testid="equipment-row-glove-0"]')
+        ?.textContent
+    ).toContain("+5 pair of gloves {Str+2}");
+    expect(
+      container.querySelector('[data-testid="equipment-row-glove-1"]')
+        ?.textContent
+    ).toContain("none");
+    expect(
+      container.querySelector('[data-testid="equipment-row-cloak"]')?.textContent
+    ).toContain("+1 cloak");
+    expect(
+      container.querySelector('[data-testid="equipment-row-boots"]')?.textContent
+    ).toContain("pair of boots");
+    expect(
+      container.querySelector('[data-testid="equipment-row-barding"]')?.textContent
+    ).toContain("none");
+    expect(container.querySelector('button[role="combobox"]')).toBeNull();
+    expect(container.querySelector('input[type="checkbox"]')).toBeNull();
   });
 
   test("renders imported ring text as a summary row and removes the old Modifiers section", async () => {

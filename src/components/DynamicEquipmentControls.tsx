@@ -1,34 +1,27 @@
 import { useState } from "react";
 import AttrInput from "@/components/AttrInput";
-import { Checkbox } from "@/components/ui/checkbox";
 import EquipmentEditModal from "@/components/equipment/EquipmentEditModal";
-import EquipmentModifierInputs from "@/components/equipment/EquipmentModifierInputs";
 import EquipmentSummaryRow from "@/components/equipment/EquipmentSummaryRow";
-import EquipmentEnchantInput from "@/components/EquipmentEnchantInput";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { CalculatorState } from "@/hooks/useCalculatorState";
-import type { EquipmentModifierBag } from "@/types/equipmentItems";
+import type { FixedAuxItemState } from "@/types/equipmentItems";
 import {
   createDefaultAmuletSlot,
   createDefaultAuxArmourSlot,
   createDefaultRingSlot,
   applyRingSlotUpdate,
-  clearAmuletSlotMetadata,
-  clearAuxArmourSlotMetadata,
-  clearRingSlotMetadata,
   type AmuletSlotState,
   type AuxArmourSlotState,
   type RingSlotState,
 } from "@/types/equipmentSlots";
 import { GameVersion } from "@/types/game";
-import { formatRingSummary } from "@/utils/equipmentSummaryText";
+import {
+  formatAmuletSummary,
+  formatFixedAuxSummary,
+  formatGlovesSummary,
+  formatHeadgearSummary,
+  formatRingSummary,
+} from "@/utils/equipmentSummaryText";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 
 type DynamicEquipmentControlsProps<V extends GameVersion> = {
@@ -38,6 +31,20 @@ type DynamicEquipmentControlsProps<V extends GameVersion> = {
   testId?: string;
 };
 
+type FixedAuxEquipmentConfig = {
+  key: "cloak" | "boots" | "barding";
+  itemKey: "cloakItem" | "bootsItem" | "bardingItem";
+  enchantKey: "cloakEnchant" | "bootsEnchant" | "bardingEnchant";
+  label: "Cloak" | "Boots" | "Barding";
+};
+
+type OpenEquipment =
+  | { type: "ring"; index: number }
+  | { type: "amulet"; index: number }
+  | { type: "headgear"; index: number }
+  | { type: "gloves"; index: number }
+  | { type: "fixedAux"; config: FixedAuxEquipmentConfig };
+
 const SectionHeading = ({ children }: { children: string }) => (
   <div className="flex items-center gap-3">
     <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -46,23 +53,6 @@ const SectionHeading = ({ children }: { children: string }) => (
     <div className="h-px flex-1 bg-border/60" />
   </div>
 );
-
-const ringKinds = ["none", "wizardry", "protection", "evasion"] as const;
-const amuletKinds = ["none", "reflection"] as const;
-const headgearKinds = ["none", "hat", "helmet"] as const;
-const gloveKinds = ["none", "gloves"] as const;
-
-const isRingBonusKind = (kind: RingSlotState["kind"]) =>
-  kind === "protection" || kind === "evasion";
-
-const hasModifierValues = (modifiers?: EquipmentModifierBag) =>
-  modifiers !== undefined && Object.keys(modifiers).length > 0;
-
-const shouldShowModifierInputs = (
-  occupied: boolean,
-  modifiers?: EquipmentModifierBag,
-  displayName?: string
-) => occupied || hasModifierValues(modifiers) || displayName !== undefined;
 
 const clearImportedItemMetadata = <T extends {
   displayName?: string;
@@ -90,7 +80,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
   testId,
 }: DynamicEquipmentControlsProps<V>) => {
   const slotCounts = getDynamicSlotCounts(state.version, state.species);
-  const [openRingIndex, setOpenRingIndex] = useState<number | null>(null);
+  const [openEquipment, setOpenEquipment] = useState<OpenEquipment | null>(null);
 
   const ringSlots = coerceSlotArrayLength(
     state.ringSlots,
@@ -112,6 +102,26 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     slotCounts.gloveSlots,
     createDefaultAuxArmourSlot
   );
+  const fixedAuxEquipmentConfigs: FixedAuxEquipmentConfig[] = [
+    {
+      key: "cloak",
+      itemKey: "cloakItem",
+      label: "Cloak",
+      enchantKey: "cloakEnchant",
+    },
+    {
+      key: "boots",
+      itemKey: "bootsItem",
+      label: "Boots",
+      enchantKey: "bootsEnchant",
+    },
+    {
+      key: "barding",
+      itemKey: "bardingItem",
+      label: "Barding",
+      enchantKey: "bardingEnchant",
+    },
+  ];
 
   const updateRingSlot = (
     index: number,
@@ -182,6 +192,127 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     });
   };
 
+  const updateFixedAuxItem = (
+    config: FixedAuxEquipmentConfig,
+    next: FixedAuxItemState,
+    changed: boolean
+  ) => {
+    const nextItem = clearImportedItemMetadata(next, changed);
+
+    setState((prev) => ({
+      ...prev,
+      [config.key]: nextItem.present,
+      [config.enchantKey]: nextItem.enchant,
+      [config.itemKey]: nextItem,
+    }));
+  };
+
+  const renderOpenEquipmentModal = () => {
+    if (!openEquipment) {
+      return null;
+    }
+
+    switch (openEquipment.type) {
+      case "ring":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "ring",
+              title: `Ring ${openEquipment.index + 1}`,
+              value: ringSlots[openEquipment.index] ?? createDefaultRingSlot(),
+              onSave: (next, changed) => {
+                updateRingSlot(openEquipment.index, () =>
+                  clearImportedItemMetadata(next, changed)
+                );
+                setOpenEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenEquipment(null)}
+          />
+        );
+      case "amulet":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "amulet",
+              title: `Amulet ${openEquipment.index + 1}`,
+              value:
+                amuletSlots[openEquipment.index] ?? createDefaultAmuletSlot(),
+              onSave: (next, changed) => {
+                updateAmuletSlot(openEquipment.index, () =>
+                  clearImportedItemMetadata(next, changed)
+                );
+                setOpenEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenEquipment(null)}
+          />
+        );
+      case "headgear":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "headgear",
+              title:
+                slotCounts.headgearSlots === 1
+                  ? "Headgear"
+                  : `Headgear ${openEquipment.index + 1}`,
+              value:
+                headgearSlots[openEquipment.index] ??
+                createDefaultAuxArmourSlot(),
+              onSave: (next, changed) => {
+                updateAuxSlot(
+                  "headgearSlots",
+                  slotCounts.headgearSlots,
+                  openEquipment.index,
+                  () => clearImportedItemMetadata(next, changed)
+                );
+                setOpenEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenEquipment(null)}
+          />
+        );
+      case "gloves":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "gloves",
+              title: `Glove ${openEquipment.index + 1}`,
+              value:
+                gloveSlots[openEquipment.index] ??
+                createDefaultAuxArmourSlot(),
+              onSave: (next, changed) => {
+                updateAuxSlot(
+                  "gloveSlots",
+                  slotCounts.gloveSlots,
+                  openEquipment.index,
+                  () => clearImportedItemMetadata(next, changed)
+                );
+                setOpenEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenEquipment(null)}
+          />
+        );
+      case "fixedAux":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "fixedAux",
+              title: openEquipment.config.label,
+              value: state[openEquipment.config.itemKey],
+              onSave: (next, changed) => {
+                updateFixedAuxItem(openEquipment.config, next, changed);
+                setOpenEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenEquipment(null)}
+          />
+        );
+    }
+  };
+
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
       <section data-testid="dynamic-equipment-rings" className="flex flex-col gap-3">
@@ -193,81 +324,23 @@ const DynamicEquipmentControls = <V extends GameVersion>({
               testId={`equipment-row-ring-${index}`}
               label={`Ring ${index + 1}`}
               summary={formatRingSummary(slot)}
-              onOpen={() => setOpenRingIndex(index)}
+              onOpen={() => setOpenEquipment({ type: "ring", index })}
             />
           ))}
         </div>
-        {openRingIndex !== null ? (
-          <EquipmentEditModal
-            config={{
-              type: "ring",
-              title: `Ring ${openRingIndex + 1}`,
-              value: ringSlots[openRingIndex] ?? createDefaultRingSlot(),
-              onSave: (next, changed) => {
-                updateRingSlot(openRingIndex, () =>
-                  clearImportedItemMetadata(next, changed)
-                );
-                setOpenRingIndex(null);
-              },
-            }}
-            onCancel={() => setOpenRingIndex(null)}
-          />
-        ) : null}
       </section>
 
       <section data-testid="dynamic-equipment-amulets" className="flex flex-col gap-3">
         <SectionHeading>Amulets</SectionHeading>
         <div className="flex flex-col gap-3">
           {amuletSlots.map((slot, index) => (
-            <div
+            <EquipmentSummaryRow
               key={`amulet-${index}`}
-              data-testid={`amulet-slot-${index}`}
-              className="flex flex-col gap-2"
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium">Amulet {index + 1}</span>
-                <Select
-                  value={slot.kind}
-                  onValueChange={(value) =>
-                    updateAmuletSlot(index, (current) => ({
-                      ...clearAmuletSlotMetadata(current),
-                      kind: value as AmuletSlotState["kind"],
-                    }))
-                  }
-                >
-                  <SelectTrigger className="h-6 w-[160px] gap-2">
-                    <SelectValue placeholder="none" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {amuletKinds.map((kind) => (
-                      <SelectItem key={kind} value={kind}>
-                        {kind}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {slot.displayName && (
-                <span className="text-xs text-muted-foreground">
-                  {slot.displayName}
-                </span>
-              )}
-              {shouldShowModifierInputs(
-                slot.kind !== "none",
-                slot.modifiers,
-                slot.displayName
-              ) && (
-                <EquipmentModifierInputs
-                  modifiers={slot.modifiers}
-                  onChange={(modifiers) =>
-                    updateAmuletSlot(index, (current) => ({
-                      ...current,
-                      modifiers,
-                    }))
-                  }
-                />
-              )}
-            </div>
+              testId={`equipment-row-amulet-${index}`}
+              label={`Amulet ${index + 1}`}
+              summary={formatAmuletSummary(slot)}
+              onOpen={() => setOpenEquipment({ type: "amulet", index })}
+            />
           ))}
         </div>
       </section>
@@ -276,94 +349,17 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         <SectionHeading>Headgear</SectionHeading>
         <div className="flex flex-col gap-3">
           {headgearSlots.map((slot, index) => (
-            <div
+            <EquipmentSummaryRow
               key={`headgear-${index}`}
-              data-testid={`headgear-slot-${index}`}
-              className="flex flex-col gap-2"
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium">
-                  {slotCounts.headgearSlots === 1
-                    ? "Headgear:"
-                    : `Headgear ${index + 1}`}
-                </span>
-                {slot.present && (
-                  <EquipmentEnchantInput
-                    ariaLabel={`Headgear ${index + 1} enchant`}
-                    value={slot.enchant}
-                    onChange={(nextEnchant) =>
-                      updateAuxSlot(
-                        "headgearSlots",
-                        slotCounts.headgearSlots,
-                        index,
-                        (current) => ({
-                          ...current,
-                          enchant: nextEnchant,
-                        })
-                      )
-                    }
-                  />
-                )}
-                <Select
-                  value={slot.present ? slot.kind ?? "helmet" : "none"}
-                  onValueChange={(value) =>
-                    updateAuxSlot(
-                      "headgearSlots",
-                      slotCounts.headgearSlots,
-                      index,
-                      (current) => {
-                        const nextKind = value as (typeof headgearKinds)[number];
-                        if (nextKind === "none") {
-                          return clearAuxArmourSlotMetadata(current, false);
-                        }
-
-                        return {
-                          ...clearAuxArmourSlotMetadata(current, true),
-                          present: true,
-                          kind: nextKind,
-                        };
-                      }
-                    )
-                  }
-                >
-                  <SelectTrigger className="h-6 w-[160px] gap-2">
-                    <SelectValue placeholder="none" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {headgearKinds.map((kind) => (
-                      <SelectItem key={kind} value={kind}>
-                        {kind}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {slot.displayName && (
-                <span className="text-xs text-muted-foreground">
-                  {slot.displayName}
-                </span>
-              )}
-              {shouldShowModifierInputs(
-                slot.present,
-                slot.modifiers,
-                slot.displayName
-              ) && (
-                <EquipmentModifierInputs
-                  modifiers={slot.modifiers}
-                  onChange={(modifiers) =>
-                    updateAuxSlot(
-                      "headgearSlots",
-                      slotCounts.headgearSlots,
-                      index,
-                      (current) => ({
-                        ...current,
-                        modifiers,
-                      })
-                    )
-                  }
-                />
-              )}
-            </div>
+              testId={`equipment-row-headgear-${index}`}
+              label={
+                slotCounts.headgearSlots === 1
+                  ? "Headgear"
+                  : `Headgear ${index + 1}`
+              }
+              summary={formatHeadgearSummary(slot)}
+              onOpen={() => setOpenEquipment({ type: "headgear", index })}
+            />
           ))}
         </div>
       </section>
@@ -372,177 +368,33 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         <SectionHeading>Gloves</SectionHeading>
         <div className="flex flex-col gap-3">
           {gloveSlots.map((slot, index) => (
-            <div
+            <EquipmentSummaryRow
               key={`glove-${index}`}
-              data-testid={`glove-slot-${index}`}
-              className="flex flex-col gap-2"
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium">Glove {index + 1}</span>
-                {slot.present && (
-                  <EquipmentEnchantInput
-                    ariaLabel={`Glove ${index + 1} enchant`}
-                    value={slot.enchant}
-                    onChange={(nextEnchant) =>
-                      updateAuxSlot(
-                        "gloveSlots",
-                        slotCounts.gloveSlots,
-                        index,
-                        (current) => ({
-                          ...current,
-                          enchant: nextEnchant,
-                        })
-                      )
-                    }
-                  />
-                )}
-                <Select
-                  value={slot.present ? "gloves" : "none"}
-                  onValueChange={(value) =>
-                    updateAuxSlot(
-                      "gloveSlots",
-                      slotCounts.gloveSlots,
-                      index,
-                      (current) =>
-                        clearAuxArmourSlotMetadata(
-                          current,
-                          (value as (typeof gloveKinds)[number]) === "gloves"
-                        )
-                    )
-                  }
-                >
-                  <SelectTrigger className="h-6 w-[160px] gap-2">
-                    <SelectValue placeholder="none" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {gloveKinds.map((kind) => (
-                      <SelectItem key={kind} value={kind}>
-                        {kind}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {slot.displayName && (
-                <span className="text-xs text-muted-foreground">
-                  {slot.displayName}
-                </span>
-              )}
-              {shouldShowModifierInputs(
-                slot.present,
-                slot.modifiers,
-                slot.displayName
-              ) && (
-                <EquipmentModifierInputs
-                  modifiers={slot.modifiers}
-                  onChange={(modifiers) =>
-                    updateAuxSlot(
-                      "gloveSlots",
-                      slotCounts.gloveSlots,
-                      index,
-                      (current) => ({
-                        ...current,
-                        modifiers,
-                      })
-                    )
-                  }
-                />
-              )}
-            </div>
+              testId={`equipment-row-glove-${index}`}
+              label={`Glove ${index + 1}`}
+              summary={formatGlovesSummary(slot)}
+              onOpen={() => setOpenEquipment({ type: "gloves", index })}
+            />
           ))}
         </div>
       </section>
 
       <section data-testid="fixed-equipment-controls" className="flex flex-col gap-3">
         <SectionHeading>Fixed Equipment</SectionHeading>
-        <div className="flex flex-wrap items-start gap-4">
-          {[
-            {
-              key: "cloak" as const,
-              itemKey: "cloakItem" as const,
-              label: "Cloak",
-              value: state.cloak ?? false,
-              enchant: state.cloakEnchant ?? 0,
-              enchantKey: "cloakEnchant" as const,
-            },
-            {
-              key: "boots" as const,
-              itemKey: "bootsItem" as const,
-              label: "Boots",
-              value: state.boots ?? false,
-              enchant: state.bootsEnchant ?? 0,
-              enchantKey: "bootsEnchant" as const,
-            },
-            {
-              key: "barding" as const,
-              itemKey: "bardingItem" as const,
-              label: "Barding",
-              value: state.barding ?? false,
-              enchant: state.bardingEnchant ?? 0,
-              enchantKey: "bardingEnchant" as const,
-            },
-          ].map(({ key, itemKey, label, value, enchant, enchantKey }) => (
-            <div key={key} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-sm">
-                <span>{label}</span>
-                {value && (
-                  <EquipmentEnchantInput
-                    ariaLabel={`${label} enchant`}
-                    value={enchant}
-                    onChange={(nextEnchant) =>
-                      setState((prev) => ({
-                        ...prev,
-                        [enchantKey]: nextEnchant,
-                        [itemKey]: {
-                          ...prev[itemKey],
-                          enchant: nextEnchant,
-                        },
-                      }))
-                    }
-                  />
-                )}
-                <Checkbox
-                  aria-label={`${label} equipped`}
-                  checked={value}
-                  onCheckedChange={(checked) =>
-                    setState((prev) => ({
-                      ...prev,
-                      [key]: !!checked,
-                      [itemKey]: {
-                        ...prev[itemKey],
-                        present: !!checked,
-                      },
-                    }))
-                  }
-                />
-              </div>
-              {state[itemKey].displayName && (
-                <span className="text-xs text-muted-foreground">
-                  {state[itemKey].displayName}
-                </span>
-              )}
-              {shouldShowModifierInputs(
-                value,
-                state[itemKey].modifiers,
-                state[itemKey].displayName
-              ) && (
-                <EquipmentModifierInputs
-                  modifiers={state[itemKey].modifiers}
-                  onChange={(modifiers) =>
-                    setState((prev) => ({
-                      ...prev,
-                      [itemKey]: {
-                        ...prev[itemKey],
-                        modifiers,
-                      },
-                    }))
-                  }
-                />
-              )}
-            </div>
+        <div className="flex flex-col gap-3">
+          {fixedAuxEquipmentConfigs.map((config) => (
+            <EquipmentSummaryRow
+              key={config.key}
+              testId={`equipment-row-${config.key}`}
+              label={config.label}
+              summary={formatFixedAuxSummary(state[config.itemKey])}
+              onOpen={() => setOpenEquipment({ type: "fixedAux", config })}
+            />
           ))}
         </div>
       </section>
+
+      {renderOpenEquipmentModal()}
 
       <section data-testid="dynamic-equipment-mutations" className="flex flex-col gap-3">
         <SectionHeading>Mutations</SectionHeading>
