@@ -84,8 +84,7 @@ while the editing UI is still available one click away.
 Rows should cover all currently supported equipment:
 
 - body armour
-- shield
-- orb
+- offhand, backed by shield or orb state
 - rings
 - amulets
 - headgear
@@ -102,7 +101,7 @@ equipment section, rows should read as one continuous equipment list.
 The list should be ordered to resemble Crawl's in-game equipment status view,
 without trying to reproduce unsupported inventory concepts:
 
-1. offhand equipment: shield, then orb
+1. offhand equipment
 2. body armour
 3. headgear
 4. cloak
@@ -115,6 +114,13 @@ without trying to reproduce unsupported inventory concepts:
 Weapon or staff rows are out of scope because the current calculator state does
 not model a weapon slot.
 
+Shield and orb state remain separate internally because they use different
+modal fields and state keys, but the main equipment list should show one
+`Offhand:` row. If a shield is equipped, the row displays the shield summary and
+opens the shield modal. If no shield is equipped and an orb is equipped, the row
+displays the orb summary and opens the orb modal. If both are empty, the row
+shows `none` and opens the shield modal as the default offhand editor.
+
 All dynamic slots stay visible even when empty. For example, octopodes still see
 all ring rows, and formicids still see both glove rows. Empty slots should use a
 clear fallback such as `none`.
@@ -124,14 +130,19 @@ an in-game item name. Rows should keep the existing `Label: item text` shape;
 the UI should not switch to `label - item text`. For example:
 
 - `Armour: the +4 leather armour of the Plethaurus {Will+ Str+2 Dex+5}`
+- `Offhand: +2 kite shield`
+- `Offhand: orb of energy`
 - `Ring 1: a ring of protection +4`
 - `Glove 1: +5 pair of gloves {Str+2}`
 - `Cloak: +0 cloak`
-- `Orb: an orb of energy`
 - `Boots: none`
 
 The app does not need to reproduce Crawl inventory letters such as `a -` or
 `p -`. Slot labels are enough context for this calculator.
+
+Equipment rows should be visually compact. Keep enough hover/focus affordance
+to make rows clickable, but use tighter vertical padding and smaller gaps than
+form controls so the list scans more like an in-game equipment readout.
 
 ## Summary Text Rules
 
