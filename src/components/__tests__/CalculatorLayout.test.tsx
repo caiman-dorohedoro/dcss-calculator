@@ -20,6 +20,20 @@ type SortableAccordionItemMockProps = {
   content: ReactNode;
 };
 
+const setNumberInputValue = (input: HTMLInputElement, value: string) => {
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    "value"
+  )?.set;
+
+  if (!valueSetter) {
+    throw new Error("Could not find input value setter");
+  }
+
+  valueSetter.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+};
+
 await jest.unstable_mockModule("@/components/chart/SFChart", () => ({
   __esModule: true,
   default: () => <div data-testid="sf-chart">sf chart</div>,
@@ -526,5 +540,63 @@ describe("Calculator desktop layout", () => {
     expect(
       document.body.querySelector('input[aria-label="Shield enchant"]')
     ).not.toBeNull();
+  });
+
+  test("clears imported body armour display metadata only after a saved edit", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.armour = "leather_armour";
+    state.bodyArmour = {
+      kind: "leather_armour",
+      enchant: 4,
+      ego: "none",
+      displayName: "the +4 leather armour of the Plethaurus {Will+ Str+2 Dex+5}",
+      artifactKind: "randart",
+      source: "imported",
+      modifiers: { str: 2, dex: 5 },
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={state} setState={mockSetState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-body-armour"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      setNumberInputValue(
+        document.body.querySelector(
+          'input[aria-label="Body armour enchant"]'
+        ) as HTMLInputElement,
+        "5"
+      );
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="save-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(mockSetState).toHaveBeenCalledTimes(1);
+    const updater = mockSetState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+    const nextState = updater(state);
+
+    expect(nextState.bodyArmour).toMatchObject({
+      kind: "leather_armour",
+      enchant: 5,
+      ego: "none",
+      displayName: undefined,
+      artifactKind: undefined,
+      source: undefined,
+    });
   });
 });
