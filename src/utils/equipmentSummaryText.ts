@@ -27,10 +27,10 @@ const modifierDisplayOrder: Array<[keyof EquipmentModifierBag, string]> = [
   ["wizardry", "Wiz"],
 ];
 
-const signed = (value: number) => (value > 0 ? `+${value}` : `${value}`);
+const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
 
 const withEnchant = (enchant: number, itemName: string) =>
-  enchant === 0 ? itemName : `${signed(enchant)} ${itemName}`;
+  `${signed(enchant)} ${itemName}`;
 
 const withModifiers = (
   itemName: string,

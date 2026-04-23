@@ -46,8 +46,16 @@ describe("equipment summary text", () => {
       })
     ).toBe("+4 leather armour (Resonance) {Int+3}");
 
-    expect(formatShieldSummary({ kind: "kite_shield", enchant: 2 })).toBe(
-      "+2 kite shield"
+    expect(
+      formatBodyArmourSummary({
+        kind: "leather_armour",
+        enchant: 0,
+        ego: "none",
+      })
+    ).toBe("+0 leather armour");
+
+    expect(formatShieldSummary({ kind: "kite_shield", enchant: 0 })).toBe(
+      "+0 kite shield"
     );
     expect(formatOrbSummary({ kind: "energy", modifiers: { wizardry: 1 } })).toBe(
       "orb of energy {Wiz+1}"
@@ -58,23 +66,23 @@ describe("equipment summary text", () => {
     expect(formatAmuletSummary({ kind: "reflection" })).toBe(
       "amulet of reflection"
     );
-    expect(formatHeadgearSummary({ present: true, kind: "helmet", enchant: 2 })).toBe(
-      "+2 helmet"
+    expect(formatHeadgearSummary({ present: true, kind: "helmet", enchant: 0 })).toBe(
+      "+0 helmet"
     );
     expect(
       formatGlovesSummary({
         present: true,
-        enchant: 5,
+        enchant: 0,
         modifiers: { str: 2 },
       })
-    ).toBe("+5 pair of gloves {Str+2}");
+    ).toBe("+0 pair of gloves {Str+2}");
     expect(
       formatFixedAuxSummary({
         kind: "boots",
         present: true,
         enchant: 0,
       })
-    ).toBe("pair of boots");
+    ).toBe("+0 pair of boots");
   });
 
   test("uses none for empty equipment slots", () => {
