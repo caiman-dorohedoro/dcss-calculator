@@ -102,7 +102,9 @@ describe("DynamicEquipmentControls", () => {
 
     expect(ringSection.textContent).toContain("Ring 1");
     expect(ringSection.textContent).toContain("Ring 8");
-    expect(ringSection.querySelectorAll('[data-testid^="ring-slot-"]')).toHaveLength(8);
+    expect(
+      ringSection.querySelectorAll('[data-testid^="equipment-row-ring-"]')
+    ).toHaveLength(8);
   });
 
   test("renders formicid glove slots from dynamic counts", async () => {
@@ -306,7 +308,7 @@ describe("DynamicEquipmentControls", () => {
     ).toBeNull();
   });
 
-  test("renders item modifier inputs next to rings and removes the old Modifiers section", async () => {
+  test("renders imported ring text as a summary row and removes the old Modifiers section", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.ringSlots = [
       {
@@ -325,8 +327,47 @@ describe("DynamicEquipmentControls", () => {
 
     expect(container.textContent).toContain("Ring 1");
     expect(container.textContent).toContain("ring of intelligence");
-    expect(container.textContent).toContain("Int");
     expect(container.textContent).not.toContain("Modifiers");
+    const ringSection = container.querySelector(
+      '[data-testid="dynamic-equipment-rings"]'
+    ) as HTMLDivElement;
+    expect(ringSection.querySelector('button[role="combobox"]')).toBeNull();
+  });
+
+  test("renders equipment rows as plain text and opens a portal modal", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.ringSlots = [
+      {
+        kind: "protection",
+        plus: 4,
+        displayName: "the ring of Robustness {AC+8}",
+        source: "imported",
+      },
+    ];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const ringRow = container.querySelector(
+      '[data-testid="equipment-row-ring-0"]'
+    ) as HTMLButtonElement;
+
+    expect(ringRow).not.toBeNull();
+    expect(ringRow.textContent).toContain("Ring 1");
+    expect(ringRow.textContent).toContain("the ring of Robustness {AC+8}");
+    expect(ringRow.querySelector('button[role="combobox"]')).toBeNull();
+    expect(ringRow.querySelector('input[type="number"]')).toBeNull();
+
+    await act(async () => {
+      ringRow.click();
+    });
+
+    expect(
+      document.body.querySelector('[data-testid="equipment-edit-modal"]')
+    ).not.toBeNull();
+    expect(document.body.textContent).toContain("Equipment Details");
+    expect(document.body.textContent).toContain("Ring 1");
   });
 
   test("ring slot updates do not overwrite legacy wizardry", () => {

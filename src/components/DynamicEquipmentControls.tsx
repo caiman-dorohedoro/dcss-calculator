@@ -1,5 +1,8 @@
+import { useState } from "react";
 import AttrInput from "@/components/AttrInput";
 import { Checkbox } from "@/components/ui/checkbox";
+import EquipmentEditModal from "@/components/equipment/EquipmentEditModal";
+import EquipmentSummaryRow from "@/components/equipment/EquipmentSummaryRow";
 import EquipmentEnchantInput from "@/components/EquipmentEnchantInput";
 import {
   Select,
@@ -24,6 +27,7 @@ import {
   type RingSlotState,
 } from "@/types/equipmentSlots";
 import { GameVersion } from "@/types/game";
+import { formatRingSummary } from "@/utils/equipmentSummaryText";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 
 type DynamicEquipmentControlsProps<V extends GameVersion> = {
@@ -113,6 +117,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
   testId,
 }: DynamicEquipmentControlsProps<V>) => {
   const slotCounts = getDynamicSlotCounts(state.version, state.species);
+  const [openDraftTitle, setOpenDraftTitle] = useState<string | null>(null);
 
   const ringSlots = coerceSlotArrayLength(
     state.ringSlots,
@@ -210,74 +215,26 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         <SectionHeading>Rings</SectionHeading>
         <div className="flex flex-col gap-3">
           {ringSlots.map((slot, index) => (
-            <div
+            <EquipmentSummaryRow
               key={`ring-${index}`}
-              data-testid={`ring-slot-${index}`}
-              className="flex flex-col gap-2"
-            >
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium">Ring {index + 1}</span>
-                <Select
-                  value={slot.kind}
-                  onValueChange={(value) =>
-                    updateRingSlot(index, (current) => {
-                      const nextKind = value as RingSlotState["kind"];
-                      return {
-                        ...clearRingSlotMetadata(current),
-                        kind: nextKind,
-                        plus: isRingBonusKind(nextKind) ? current.plus : 0,
-                      };
-                    })
-                  }
-                >
-                  <SelectTrigger className="h-6 w-[160px] gap-2">
-                    <SelectValue placeholder="none" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ringKinds.map((kind) => (
-                      <SelectItem key={kind} value={kind}>
-                        {kind}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {isRingBonusKind(slot.kind) && (
-                  <AttrInput
-                    label="Plus"
-                    value={slot.plus}
-                    type="number"
-                    onChange={(value) =>
-                      updateRingSlot(index, (current) => ({
-                        ...current,
-                        plus: value,
-                      }))
-                    }
-                  />
-                )}
-              </div>
-              {slot.displayName && (
-                <span className="text-xs text-muted-foreground">
-                  {slot.displayName}
-                </span>
-              )}
-              {shouldShowModifierInputs(
-                slot.kind !== "none",
-                slot.modifiers,
-                slot.displayName
-              ) && (
-                <EquipmentModifierInputs
-                  modifiers={slot.modifiers}
-                  onChange={(modifiers) =>
-                    updateRingSlot(index, (current) => ({
-                      ...current,
-                      modifiers,
-                    }))
-                  }
-                />
-              )}
-            </div>
+              testId={`equipment-row-ring-${index}`}
+              label={`Ring ${index + 1}`}
+              summary={formatRingSummary(slot)}
+              onOpen={() => setOpenDraftTitle(`Ring ${index + 1}`)}
+            />
           ))}
         </div>
+        {openDraftTitle ? (
+          <EquipmentEditModal
+            title={openDraftTitle}
+            onCancel={() => setOpenDraftTitle(null)}
+            onSave={() => setOpenDraftTitle(null)}
+          >
+            <div className="text-sm text-muted-foreground">
+              Ring editor shell
+            </div>
+          </EquipmentEditModal>
+        ) : null}
       </section>
 
       <section data-testid="dynamic-equipment-amulets" className="flex flex-col gap-3">
