@@ -71,8 +71,6 @@ const clearImportedItemMetadata = <T extends {
       }
     : item;
 
-export { default as EquipmentModifierInputs } from "@/components/equipment/EquipmentModifierInputs";
-
 const DynamicEquipmentControls = <V extends GameVersion>({
   state,
   setState,
