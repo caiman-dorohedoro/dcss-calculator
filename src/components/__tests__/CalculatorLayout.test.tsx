@@ -227,11 +227,14 @@ describe("Calculator desktop layout", () => {
     expect(desktopDynamicEquipmentControls.className).toContain("lg:flex");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Ring 1");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Amulet 1");
-    const desktopHeadgearSection = desktopDynamicEquipmentControls.querySelector(
-      '[data-testid="dynamic-equipment-headgear"]'
+    const desktopDynamicEquipmentList = desktopDynamicEquipmentControls.querySelector(
+      '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
-    expect(desktopHeadgearSection.textContent).toContain("Headgear:");
-    expect(desktopHeadgearSection.textContent).not.toContain("present");
+    const desktopHeadgearRow = desktopDynamicEquipmentList.querySelector(
+      '[data-testid="equipment-row-headgear-0"]'
+    ) as HTMLButtonElement;
+    expect(desktopHeadgearRow.textContent).toContain("Headgear:");
+    expect(desktopHeadgearRow.textContent).not.toContain("present");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Glove 1");
     expect(desktopDynamicEquipmentControls.textContent).not.toContain(
       "body armour ego"
@@ -250,9 +253,53 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).toContain("Cloak");
     expect(equipmentSection.textContent).toContain("Boots");
     expect(equipmentSection.textContent).toContain("Barding");
+    const equipmentHeadings = Array.from(
+      equipmentSection.querySelectorAll("h2")
+    ).map((heading) => heading.textContent);
+    expect(equipmentHeadings).not.toEqual(
+      expect.arrayContaining([
+        "Rings",
+        "Amulets",
+        "Headgear",
+        "Gloves",
+        "Fixed Equipment",
+      ])
+    );
     expect(equipmentSection.textContent).not.toContain("body armour enchant");
     expect(equipmentSection.textContent).not.toContain("body armour ego");
     expect(equipmentSection.textContent).not.toContain("shield enchant");
+  });
+
+  test("orders equipment rows like the supported subset of Crawl status equipment", async () => {
+    await act(async () => {
+      root.render(
+        <Calculator
+          state={buildDefaultCalculatorState("trunk")}
+          setState={mockSetState}
+        />
+      );
+    });
+
+    const equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+    const rowIds = Array.from(
+      equipmentSection.querySelectorAll('[data-testid^="equipment-row-"]')
+    ).map((row) => row.getAttribute("data-testid"));
+
+    expect(rowIds.slice(0, 11)).toEqual([
+      "equipment-row-shield",
+      "equipment-row-orb",
+      "equipment-row-body-armour",
+      "equipment-row-headgear-0",
+      "equipment-row-cloak",
+      "equipment-row-glove-0",
+      "equipment-row-boots",
+      "equipment-row-barding",
+      "equipment-row-amulet-0",
+      "equipment-row-ring-0",
+      "equipment-row-ring-1",
+    ]);
   });
 
   test("renders body armour, shield, and orb as summary rows", async () => {

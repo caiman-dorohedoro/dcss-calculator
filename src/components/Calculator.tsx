@@ -390,12 +390,6 @@ const Calculator = <V extends GameVersion>({
         <SectionHeading>Equipment</SectionHeading>
         <div className="flex flex-col gap-3">
           <EquipmentSummaryRow
-            testId="equipment-row-body-armour"
-            label="Armour"
-            summary={formatBodyArmourSummary(primaryBodyArmour)}
-            onOpen={() => setOpenPrimaryEquipment("bodyArmour")}
-          />
-          <EquipmentSummaryRow
             testId="equipment-row-shield"
             label="Shield"
             summary={formatShieldSummary(primaryShieldItem)}
@@ -406,6 +400,12 @@ const Calculator = <V extends GameVersion>({
             label="Orb"
             summary={formatOrbSummary(primaryOrbItem)}
             onOpen={() => setOpenPrimaryEquipment("orb")}
+          />
+          <EquipmentSummaryRow
+            testId="equipment-row-body-armour"
+            label="Armour"
+            summary={formatBodyArmourSummary(primaryBodyArmour)}
+            onOpen={() => setOpenPrimaryEquipment("bodyArmour")}
           />
         </div>
         <DynamicEquipmentControls
