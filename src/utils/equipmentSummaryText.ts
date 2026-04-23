@@ -32,6 +32,13 @@ const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
 const withEnchant = (enchant: number, itemName: string) =>
   `${signed(enchant)} ${itemName}`;
 
+const leadingEnchantPattern = /^(?:(?:the|a|an)\s+)?[+-]\d+\b/;
+
+const withDisplayNameEnchant = (displayName: string, enchant: number) =>
+  leadingEnchantPattern.test(displayName)
+    ? displayName
+    : withEnchant(enchant, displayName);
+
 const withModifiers = (
   itemName: string,
   modifiers?: EquipmentModifierBag
@@ -55,7 +62,7 @@ export const formatModifierSummary = (modifiers?: EquipmentModifierBag) => {
 
 export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
   if (item.displayName) {
-    return item.displayName;
+    return withDisplayNameEnchant(item.displayName, item.enchant);
   }
   if (item.kind === "none") {
     return "none";
@@ -73,7 +80,7 @@ export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
 
 export const formatShieldSummary = (item: ShieldItemState) => {
   if (item.displayName) {
-    return item.displayName;
+    return withDisplayNameEnchant(item.displayName, item.enchant);
   }
   if (item.kind === "none") {
     return "none";
@@ -127,7 +134,7 @@ export const formatAmuletSummary = (slot: AmuletSlotState) => {
 
 export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
   if (slot.displayName) {
-    return slot.displayName;
+    return withDisplayNameEnchant(slot.displayName, slot.enchant);
   }
   if (!slot.present) {
     return "none";
@@ -141,7 +148,7 @@ export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
 
 export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
   if (slot.displayName) {
-    return slot.displayName;
+    return withDisplayNameEnchant(slot.displayName, slot.enchant);
   }
   if (!slot.present) {
     return "none";
@@ -155,7 +162,7 @@ export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
 
 export const formatFixedAuxSummary = (item: FixedAuxItemState) => {
   if (item.displayName) {
-    return item.displayName;
+    return withDisplayNameEnchant(item.displayName, item.enchant);
   }
   if (!item.present) {
     return "none";

@@ -137,13 +137,16 @@ The app does not need to reproduce Crawl inventory letters such as `a -` or
 
 Summary text should be generated with this priority:
 
-1. Use `displayName` exactly when it exists.
+1. Use `displayName` when it exists.
 2. Otherwise build a fallback from the current item state.
 3. If the slot is empty, show `none`.
 
-Imported `displayName` is authoritative for display. The UI should not rewrite
-or decorate it, because the parser already provides the closest in-game item
-text.
+Imported `displayName` is authoritative for item identity. For enchantable
+equipment, if the imported display name does not already start with an
+enchantment such as `+0`, `+4`, or `-2`, prefix the state enchantment before
+displaying it. This preserves imported artifact names like `the +4 leather
+armour of the Plethaurus ...` while still showing `+0 pair of boots` when the
+parser provides `pair of boots`.
 
 Fallback text should stay intentionally narrow. It should use known equipment
 names from the app's option tables and item state, then append calculation

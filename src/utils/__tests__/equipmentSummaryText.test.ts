@@ -12,7 +12,7 @@ import {
 } from "../equipmentSummaryText";
 
 describe("equipment summary text", () => {
-  test("uses imported display names exactly", () => {
+  test("preserves imported display names that already include enchantments", () => {
     expect(
       formatBodyArmourSummary({
         kind: "leather_armour",
@@ -34,6 +34,28 @@ describe("equipment summary text", () => {
         source: "imported",
       })
     ).toBe("the +5 pair of gloves of Vipholopp {Str+7 Dex+3 SInv}");
+  });
+
+  test("adds state enchantment to imported enchantable names when missing", () => {
+    expect(
+      formatFixedAuxSummary({
+        kind: "boots",
+        present: true,
+        enchant: 0,
+        displayName: "pair of boots",
+        source: "imported",
+      })
+    ).toBe("+0 pair of boots");
+
+    expect(
+      formatBodyArmourSummary({
+        kind: "robe",
+        enchant: -2,
+        ego: "none",
+        displayName: "robe",
+        source: "imported",
+      })
+    ).toBe("-2 robe");
   });
 
   test("builds in-game-style fallback summaries", () => {
