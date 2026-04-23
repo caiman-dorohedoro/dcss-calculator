@@ -241,33 +241,117 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).not.toContain("shield enchant");
   });
 
-  test("shows body armour enchant and ego only when body armour is equipped", async () => {
+  test("renders body armour, shield, and orb as summary rows", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.armour = "leather_armour";
+    state.bodyArmour = {
+      ...state.bodyArmour,
+      kind: "leather_armour",
+      enchant: 4,
+      ego: "resonance",
+      modifiers: { int: 3 },
+    };
+    state.shield = "kite_shield";
+    state.shieldItem = {
+      ...state.shieldItem,
+      kind: "kite_shield",
+      enchant: 2,
+    };
+    state.orb = "none";
+
+    await act(async () => {
+      root.render(<Calculator state={state} setState={mockSetState} />);
+    });
+
+    const equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+
+    expect(
+      equipmentSection.querySelector('[data-testid="equipment-row-body-armour"]')
+        ?.textContent
+    ).toContain("+4 leather armour (Resonance) {Int+3}");
+    expect(
+      equipmentSection.querySelector('[data-testid="equipment-row-shield"]')
+        ?.textContent
+    ).toContain("+2 kite shield");
+    expect(
+      equipmentSection.querySelector('[data-testid="equipment-row-orb"]')
+        ?.textContent
+    ).toContain("none");
+    expect(
+      equipmentSection.querySelector(
+        '[data-testid="body-armour-selector-control"]'
+      )
+    ).toBeNull();
+    expect(
+      equipmentSection.querySelector('[data-testid="shield-selector-control"]')
+    ).toBeNull();
+  });
+
+  test("shows body armour enchant and ego in the modal only when body armour is equipped", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     const none = buildDefaultCalculatorState("trunk");
     none.armour = "none";
+    none.bodyArmour = {
+      ...none.bodyArmour,
+      kind: "none",
+      enchant: 0,
+      ego: "none",
+    };
 
     await act(async () => {
       root.render(<Calculator state={equipped} setState={mockSetState} />);
     });
 
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-body-armour"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
     expect(
-      container.querySelector('[data-testid="body-armour-enchant-control"]')
+      document.body.querySelector('input[aria-label="Body armour enchant"]')
     ).not.toBeNull();
     expect(
-      container.querySelector('[data-testid="body-armour-ego-control"]')
+      document.body.querySelector('button[aria-label="Body armour ego"]')
     ).not.toBeNull();
     expect(container.textContent).not.toContain("body armour enchant");
     expect(container.textContent).not.toContain("body armour ego");
 
     await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
       root.render(<Calculator state={none} setState={mockSetState} />);
     });
 
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-body-armour"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(
+      document.body.querySelector('input[aria-label="Body armour enchant"]')
+    ).toBeNull();
+    expect(
+      document.body.querySelector('button[aria-label="Body armour ego"]')
+    ).toBeNull();
     expect(container.textContent).not.toContain("body armour enchant");
     expect(container.textContent).not.toContain("body armour ego");
   });
 
-  test("places body armour controls in the requested order", async () => {
+  test("places body armour in a single summary row", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
 
     await act(async () => {
@@ -277,70 +361,46 @@ describe("Calculator desktop layout", () => {
     const equipmentSection = container.querySelector(
       '[data-testid="sidebar-section-equipment"]'
     ) as HTMLDivElement;
-    const bodyArmourControls = equipmentSection.querySelector(
-      '[data-testid="body-armour-controls"]'
-    ) as HTMLDivElement;
+    const bodyArmourRow = equipmentSection.querySelector(
+      '[data-testid="equipment-row-body-armour"]'
+    ) as HTMLButtonElement;
 
-    expect(bodyArmourControls).not.toBeNull();
-    expect(bodyArmourControls.className).toContain("flex-nowrap");
-
-    const armourLabel = equipmentSection.querySelector(
-      '[data-testid="body-armour-label"]'
-    ) as HTMLElement;
-    const enchantControl = equipmentSection.querySelector(
-      '[data-testid="body-armour-enchant-control"]'
-    ) as HTMLElement;
-    const selectorControl = equipmentSection.querySelector(
-      '[data-testid="body-armour-selector-control"]'
-    ) as HTMLElement;
-    const egoControl = equipmentSection.querySelector(
-      '[data-testid="body-armour-ego-control"]'
-    ) as HTMLElement;
-
-    expect(armourLabel.compareDocumentPosition(enchantControl)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
-    );
-    expect(enchantControl.compareDocumentPosition(selectorControl)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
-    );
-    expect(selectorControl.compareDocumentPosition(egoControl)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
-    );
+    expect(bodyArmourRow).not.toBeNull();
+    expect(bodyArmourRow.textContent).toContain("Armour:");
+    expect(bodyArmourRow.querySelector('input[type="number"]')).toBeNull();
+    expect(bodyArmourRow.querySelector('button[role="combobox"]')).toBeNull();
   });
 
-  test("keeps the body armour selector shrinkable for long armour names", async () => {
+  test("keeps the body armour row shrinkable for long armour names", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.armour = "quicksilver_dragon";
+    equipped.bodyArmour = {
+      ...equipped.bodyArmour,
+      kind: "quicksilver_dragon",
+    };
 
     await act(async () => {
       root.render(<Calculator state={equipped} setState={mockSetState} />);
     });
 
-    const bodyArmourControls = container.querySelector(
-      '[data-testid="body-armour-controls"]'
-    ) as HTMLDivElement;
-    const selectorControl = container.querySelector(
-      '[data-testid="body-armour-selector-control"]'
-    ) as HTMLDivElement;
-    const selectorTrigger = selectorControl.querySelector("button") as HTMLButtonElement;
+    const bodyArmourRow = container.querySelector(
+      '[data-testid="equipment-row-body-armour"]'
+    ) as HTMLButtonElement;
 
-    expect(bodyArmourControls.className).toContain("min-w-0");
-    expect(bodyArmourControls.className).toContain("max-w-full");
-    expect(selectorControl.className).toContain("min-w-0");
-    expect(selectorControl.className).toContain("flex-1");
-    expect(selectorTrigger.className).toContain("min-w-0");
-    expect(selectorTrigger.className).toContain("max-w-full");
+    expect(bodyArmourRow.className).toContain("min-w-0");
+    expect(bodyArmourRow.textContent).toContain("quicksilver dragon scales");
   });
 
-  test("renders body armour, shield, and orb modifier inputs in the equipment section", async () => {
+  test("renders body armour, shield, and orb modifiers in summary rows", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.bodyArmour = {
       ...equipped.bodyArmour,
       modifiers: { int: 3 },
     };
-    equipped.shield = "none";
+    equipped.shield = "kite_shield";
     equipped.shieldItem = {
       ...equipped.shieldItem,
+      kind: "kite_shield",
       modifiers: { sh: 2 },
     };
     equipped.orb = "energy";
@@ -361,13 +421,34 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).toContain("Armour");
     expect(equipmentSection.textContent).toContain("Shield");
     expect(equipmentSection.textContent).toContain("Orb");
+    expect(equipmentSection.textContent).toContain("Int+3");
+    expect(equipmentSection.textContent).toContain("SH+2");
     expect(equipmentSection.textContent).toContain("Wiz");
     expect(equipmentSection.textContent).not.toContain("Modifiers");
+    expect(
+      equipmentSection
+        .querySelector('[data-testid="equipment-row-body-armour"]')
+        ?.querySelector('input[type="number"]')
+    ).toBeNull();
+    expect(
+      equipmentSection
+        .querySelector('[data-testid="equipment-row-shield"]')
+        ?.querySelector('input[type="number"]')
+    ).toBeNull();
+    expect(
+      equipmentSection
+        .querySelector('[data-testid="equipment-row-orb"]')
+        ?.querySelector('input[type="number"]')
+    ).toBeNull();
   });
 
-  test("shows shield enchant only when a shield is equipped", async () => {
+  test("shows shield enchant in the modal only when a shield is equipped", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.shield = "buckler";
+    equipped.shieldItem = {
+      ...equipped.shieldItem,
+      kind: "buckler",
+    };
     const none = buildDefaultCalculatorState("trunk");
     none.shield = "none";
 
@@ -375,24 +456,52 @@ describe("Calculator desktop layout", () => {
       root.render(<Calculator state={equipped} setState={mockSetState} />);
     });
 
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-shield"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
     expect(
-      container.querySelector('[data-testid="shield-enchant-control"]')
+      document.body.querySelector('input[aria-label="Shield enchant"]')
     ).not.toBeNull();
     expect(container.textContent).not.toContain("shield enchant");
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
 
     await act(async () => {
       root.render(<Calculator state={none} setState={mockSetState} />);
     });
 
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-shield"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
     expect(
-      container.querySelector('[data-testid="shield-enchant-control"]')
+      document.body.querySelector('input[aria-label="Shield enchant"]')
     ).toBeNull();
     expect(container.textContent).not.toContain("shield enchant");
   });
 
-  test("places shield controls with enchant before the shield selector", async () => {
+  test("opens shield modal controls from the shield summary row", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.shield = "buckler";
+    equipped.shieldItem = {
+      ...equipped.shieldItem,
+      kind: "buckler",
+    };
 
     await act(async () => {
       root.render(<Calculator state={equipped} setState={mockSetState} />);
@@ -401,21 +510,21 @@ describe("Calculator desktop layout", () => {
     const equipmentSection = container.querySelector(
       '[data-testid="sidebar-section-equipment"]'
     ) as HTMLDivElement;
-    const shieldLabel = equipmentSection.querySelector(
-      '[data-testid="shield-label"]'
-    ) as HTMLElement;
-    const enchantControl = equipmentSection.querySelector(
-      '[data-testid="shield-enchant-control"]'
-    ) as HTMLElement;
-    const selectorControl = equipmentSection.querySelector(
-      '[data-testid="shield-selector-control"]'
-    ) as HTMLElement;
+    const shieldRow = equipmentSection.querySelector(
+      '[data-testid="equipment-row-shield"]'
+    ) as HTMLButtonElement;
 
-    expect(shieldLabel.compareDocumentPosition(enchantControl)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
-    );
-    expect(enchantControl.compareDocumentPosition(selectorControl)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING
-    );
+    expect(shieldRow.textContent).toContain("Shield:");
+    expect(shieldRow.querySelector('input[type="number"]')).toBeNull();
+
+    await act(async () => {
+      shieldRow.click();
+    });
+
+    expect(document.body.textContent).toContain("Equipment Details");
+    expect(document.body.querySelector('button[aria-label="Shield"]')).not.toBeNull();
+    expect(
+      document.body.querySelector('input[aria-label="Shield enchant"]')
+    ).not.toBeNull();
   });
 });

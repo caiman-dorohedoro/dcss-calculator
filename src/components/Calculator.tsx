@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -8,21 +9,13 @@ import {
 } from "@/components/ui/select";
 import { Accordion } from "@/components/ui/accordion";
 import AttrInput from "@/components/AttrInput";
-import EquipmentEnchantInput from "@/components/EquipmentEnchantInput";
+import EquipmentEditModal from "@/components/equipment/EquipmentEditModal";
+import EquipmentSummaryRow from "@/components/equipment/EquipmentSummaryRow";
 import EVChart from "@/components/chart/EVChart";
 import ACChart from "@/components/chart/ACChart";
 import SHChart from "@/components/chart/SHChart";
 import SFChart from "@/components/chart/SFChart";
 import { CalculatorState } from "@/hooks/useCalculatorState";
-import {
-  ArmourKey,
-  BodyArmourEgoKey,
-  armourOptions,
-  OrbKey,
-  orbOptions,
-  ShieldKey,
-  shieldOptions,
-} from "@/types/equipment.ts";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { GameVersion } from "@/types/game";
 import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
@@ -44,15 +37,37 @@ import {
 import { SortableAccordionItem } from "@/components/SortableAccordionItem";
 import githubIcon from "@/assets/pixelated-github-white.png";
 import { SpellSkillControls } from "@/components/SpellControls";
-import DynamicEquipmentControls, {
-  EquipmentModifierInputs,
-} from "@/components/DynamicEquipmentControls";
+import DynamicEquipmentControls from "@/components/DynamicEquipmentControls";
+import {
+  formatBodyArmourSummary,
+  formatOrbSummary,
+  formatShieldSummary,
+} from "@/utils/equipmentSummaryText";
 import { coerceEquipmentSlotCollections } from "@/versioning/dynamicSlotCounts";
 
 type CalculatorProps<V extends GameVersion> = {
   state: CalculatorState<V>;
   setState: React.Dispatch<React.SetStateAction<CalculatorState<V>>>;
 };
+
+type OpenPrimaryEquipment = "bodyArmour" | "shield" | "orb";
+
+const clearImportedItemMetadata = <T extends {
+  displayName?: string;
+  artifactKind?: "normal" | "randart" | "unrand";
+  source?: string;
+}>(
+  item: T,
+  changed: boolean
+): T =>
+  changed
+    ? {
+        ...item,
+        displayName: undefined,
+        artifactKind: undefined,
+        source: undefined,
+      }
+    : item;
 
 const SectionHeading = ({ children }: { children: string }) => (
   <div className="flex items-center gap-3">
@@ -63,20 +78,12 @@ const SectionHeading = ({ children }: { children: string }) => (
   </div>
 );
 
-const hasModifierValues = (
-  modifiers?: CalculatorState<GameVersion>["bodyArmour"]["modifiers"]
-) => modifiers !== undefined && Object.keys(modifiers).length > 0;
-
-const shouldShowModifierInputs = (
-  equipped: boolean,
-  modifiers?: CalculatorState<GameVersion>["bodyArmour"]["modifiers"],
-  displayName?: string
-) => equipped || hasModifierValues(modifiers) || displayName !== undefined;
-
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
+  const [openPrimaryEquipment, setOpenPrimaryEquipment] =
+    useState<OpenPrimaryEquipment | null>(null);
   const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
   const selectedBodyArmourEgo =
     state.bodyArmour.ego in bodyArmourEgos
@@ -164,6 +171,115 @@ const Calculator = <V extends GameVersion>({
       ...prev,
       accordionOrder: newItems.map((item) => item.id),
     }));
+  };
+
+  const primaryBodyArmour = {
+    ...state.bodyArmour,
+    kind: state.armour,
+    enchant:
+      state.bodyArmour.enchant !== 0
+        ? state.bodyArmour.enchant
+        : state.bodyArmourEnchant ?? 0,
+    ego: selectedBodyArmourEgo,
+  };
+  const primaryShieldItem = {
+    ...state.shieldItem,
+    kind: state.shield,
+    enchant:
+      state.shieldItem.enchant !== 0
+        ? state.shieldItem.enchant
+        : state.shieldEnchant ?? 0,
+  };
+  const primaryOrbItem = {
+    ...state.orbItem,
+    kind: state.orb,
+  };
+
+  const renderPrimaryEquipmentModal = () => {
+    switch (openPrimaryEquipment) {
+      case "bodyArmour":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "bodyArmour",
+              title: "Armour",
+              value: primaryBodyArmour,
+              bodyArmourEgos,
+              onSave: (next, changed) => {
+                const nextItem = clearImportedItemMetadata(next, changed);
+                setState((prev) => ({
+                  ...prev,
+                  armour: nextItem.kind,
+                  bodyArmourEnchant: nextItem.enchant,
+                  bodyArmourEgo: nextItem.ego,
+                  bodyArmour: nextItem,
+                }));
+                setOpenPrimaryEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenPrimaryEquipment(null)}
+          />
+        );
+      case "shield":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "shield",
+              title: "Shield",
+              value: primaryShieldItem,
+              onSave: (next, changed) => {
+                const nextItem = clearImportedItemMetadata(next, changed);
+                setState((prev) => ({
+                  ...prev,
+                  shield: nextItem.kind,
+                  shieldEnchant: nextItem.enchant,
+                  shieldItem: nextItem,
+                  orb: nextItem.kind === "none" ? prev.orb : "none",
+                  orbItem:
+                    nextItem.kind === "none"
+                      ? prev.orbItem
+                      : {
+                          ...prev.orbItem,
+                          kind: "none",
+                        },
+                }));
+                setOpenPrimaryEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenPrimaryEquipment(null)}
+          />
+        );
+      case "orb":
+        return (
+          <EquipmentEditModal
+            config={{
+              type: "orb",
+              title: "Orb",
+              value: primaryOrbItem,
+              onSave: (next, changed) => {
+                const nextItem = clearImportedItemMetadata(next, changed);
+                setState((prev) => ({
+                  ...prev,
+                  orb: nextItem.kind,
+                  orbItem: nextItem,
+                  shield: nextItem.kind === "none" ? prev.shield : "none",
+                  shieldItem:
+                    nextItem.kind === "none"
+                      ? prev.shieldItem
+                      : {
+                          ...prev.shieldItem,
+                          kind: "none",
+                        },
+                }));
+                setOpenPrimaryEquipment(null);
+              },
+            }}
+            onCancel={() => setOpenPrimaryEquipment(null)}
+          />
+        );
+      case null:
+        return null;
+    }
   };
 
   const controlsContent = (
@@ -272,294 +388,25 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-3"
       >
         <SectionHeading>Equipment</SectionHeading>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <div
-              data-testid="body-armour-controls"
-              className="flex min-w-0 max-w-full flex-row items-center gap-2 flex-nowrap"
-            >
-              <span data-testid="body-armour-label" className="shrink-0 text-sm">
-                Armour:
-              </span>
-              {state.armour !== "none" && (
-                <div
-                  data-testid="body-armour-enchant-control"
-                  className="shrink-0"
-                >
-                  <EquipmentEnchantInput
-                    ariaLabel="Body armour enchant"
-                    value={
-                      state.bodyArmour.enchant !== 0
-                        ? state.bodyArmour.enchant
-                        : state.bodyArmourEnchant ?? 0
-                    }
-                    onChange={(value) =>
-                      setState((prev) => ({
-                        ...prev,
-                        bodyArmourEnchant: value,
-                        bodyArmour: {
-                          ...prev.bodyArmour,
-                          enchant: value,
-                        },
-                      }))
-                    }
-                  />
-                </div>
-              )}
-              <div
-                data-testid="body-armour-selector-control"
-                className="min-w-0 flex-1"
-              >
-                <Select
-                  value={state.armour}
-                  onValueChange={(value) =>
-                    setState((prev) => {
-                      const nextArmour = value as ArmourKey;
-
-                      return {
-                        ...prev,
-                        armour: nextArmour,
-                        bodyArmourEgo:
-                          nextArmour === "none" ? "none" : prev.bodyArmourEgo,
-                        bodyArmour: {
-                          ...prev.bodyArmour,
-                          kind: nextArmour,
-                          ego:
-                            nextArmour === "none" ? "none" : prev.bodyArmour.ego,
-                        },
-                      };
-                    })
-                  }
-                >
-                  <SelectTrigger
-                    aria-label="Armour"
-                    className="h-6 min-w-0 max-w-full gap-2"
-                  >
-                    <SelectValue placeholder="Armour" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(armourOptions).map(([key, value]) => (
-                      <SelectItem key={key} value={key}>
-                        {value.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {state.armour !== "none" && (
-                <div data-testid="body-armour-ego-control" className="shrink-0">
-                  <Select
-                    value={selectedBodyArmourEgo}
-                    onValueChange={(value) =>
-                      setState((prev) => ({
-                        ...prev,
-                        bodyArmourEgo: value as BodyArmourEgoKey,
-                        bodyArmour: {
-                          ...prev.bodyArmour,
-                          ego: value as BodyArmourEgoKey,
-                        },
-                      }))
-                    }
-                  >
-                    <SelectTrigger
-                      aria-label="Body armour ego"
-                      className="min-w-[120px] h-6 w-auto gap-2"
-                    >
-                      <SelectValue placeholder="None" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(Object.keys(bodyArmourEgos) as BodyArmourEgoKey[]).map(
-                        (key) => (
-                          <SelectItem key={key} value={key}>
-                            {bodyArmourEgos[key]?.name ?? key}
-                          </SelectItem>
-                        ),
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-            {state.bodyArmour.displayName && (
-              <span className="text-xs text-muted-foreground">
-                {state.bodyArmour.displayName}
-              </span>
-            )}
-            {shouldShowModifierInputs(
-              state.armour !== "none",
-              state.bodyArmour.modifiers,
-              state.bodyArmour.displayName
-            ) && (
-              <EquipmentModifierInputs
-                modifiers={state.bodyArmour.modifiers}
-                onChange={(modifiers) =>
-                  setState((prev) => ({
-                    ...prev,
-                    bodyArmour: {
-                      ...prev.bodyArmour,
-                      modifiers,
-                    },
-                  }))
-                }
-              />
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="flex flex-row items-center gap-2 flex-nowrap">
-              <span data-testid="shield-label" className="shrink-0 text-sm">
-                Shield:
-              </span>
-              {state.shield !== "none" && (
-                <div data-testid="shield-enchant-control" className="shrink-0">
-                  <EquipmentEnchantInput
-                    ariaLabel="Shield enchant"
-                    value={
-                      state.shieldItem.enchant !== 0
-                        ? state.shieldItem.enchant
-                        : state.shieldEnchant ?? 0
-                    }
-                    onChange={(value) =>
-                      setState((prev) => ({
-                        ...prev,
-                        shieldEnchant: value,
-                        shieldItem: {
-                          ...prev.shieldItem,
-                          enchant: value,
-                        },
-                      }))
-                    }
-                  />
-                </div>
-              )}
-              <div data-testid="shield-selector-control">
-                <Select
-                  disabled={state.orb !== "none"}
-                  value={state.shield}
-                  onValueChange={(value) =>
-                    setState((prev) => {
-                      const nextShield = value as ShieldKey;
-
-                      return {
-                        ...prev,
-                        shield: nextShield,
-                        shieldItem: {
-                          ...prev.shieldItem,
-                          kind: nextShield,
-                        },
-                        orb: nextShield === "none" ? prev.orb : "none",
-                        orbItem:
-                          nextShield === "none"
-                            ? prev.orbItem
-                            : {
-                                ...prev.orbItem,
-                                kind: "none",
-                              },
-                      };
-                    })
-                  }
-                >
-                  <SelectTrigger aria-label="Shield" className="w-[160px] h-6">
-                    <SelectValue placeholder="Shield" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(shieldOptions).map(([key, value]) => (
-                      <SelectItem key={key} value={key}>
-                        {value.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-          </div>
-            {state.shieldItem.displayName && (
-              <span className="text-xs text-muted-foreground">
-                {state.shieldItem.displayName}
-              </span>
-            )}
-            {shouldShowModifierInputs(
-              state.shield !== "none",
-              state.shieldItem.modifiers,
-              state.shieldItem.displayName
-            ) && (
-              <EquipmentModifierInputs
-                modifiers={state.shieldItem.modifiers}
-                onChange={(modifiers) =>
-                  setState((prev) => ({
-                    ...prev,
-                    shieldItem: {
-                      ...prev.shieldItem,
-                      modifiers,
-                    },
-                  }))
-                }
-              />
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            <label className="flex flex-row items-center gap-2 text-sm">
-              Orb:
-              <Select
-                disabled={state.shield !== "none"}
-                value={state.orb}
-                onValueChange={(value) =>
-                  setState((prev) => {
-                    const nextOrb = value as OrbKey;
-
-                    return {
-                      ...prev,
-                      orb: nextOrb,
-                      orbItem: {
-                        ...prev.orbItem,
-                        kind: nextOrb,
-                      },
-                      shield: nextOrb === "none" ? prev.shield : "none",
-                      shieldItem:
-                        nextOrb === "none"
-                          ? prev.shieldItem
-                          : {
-                              ...prev.shieldItem,
-                              kind: "none",
-                            },
-                    };
-                  })
-                }
-              >
-                <SelectTrigger className="w-[160px] h-6">
-                  <SelectValue placeholder="Orb" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(orbOptions).map(([key, value]) => (
-                    <SelectItem key={key} value={key}>
-                      {value.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </label>
-            {state.orbItem.displayName && (
-              <span className="text-xs text-muted-foreground">
-                {state.orbItem.displayName}
-              </span>
-            )}
-            {shouldShowModifierInputs(
-              state.orb !== "none",
-              state.orbItem.modifiers,
-              state.orbItem.displayName
-            ) && (
-              <EquipmentModifierInputs
-                modifiers={state.orbItem.modifiers}
-                onChange={(modifiers) =>
-                  setState((prev) => ({
-                    ...prev,
-                    orbItem: {
-                      ...prev.orbItem,
-                      modifiers,
-                    },
-                  }))
-                }
-              />
-            )}
-          </div>
+        <div className="flex flex-col gap-3">
+          <EquipmentSummaryRow
+            testId="equipment-row-body-armour"
+            label="Armour"
+            summary={formatBodyArmourSummary(primaryBodyArmour)}
+            onOpen={() => setOpenPrimaryEquipment("bodyArmour")}
+          />
+          <EquipmentSummaryRow
+            testId="equipment-row-shield"
+            label="Shield"
+            summary={formatShieldSummary(primaryShieldItem)}
+            onOpen={() => setOpenPrimaryEquipment("shield")}
+          />
+          <EquipmentSummaryRow
+            testId="equipment-row-orb"
+            label="Orb"
+            summary={formatOrbSummary(primaryOrbItem)}
+            onOpen={() => setOpenPrimaryEquipment("orb")}
+          />
         </div>
         <DynamicEquipmentControls
           state={state}
@@ -567,6 +414,7 @@ const Calculator = <V extends GameVersion>({
           className="hidden lg:flex"
           testId="desktop-dynamic-equipment-controls"
         />
+        {renderPrimaryEquipmentModal()}
       </section>
     </CardHeader>
   );

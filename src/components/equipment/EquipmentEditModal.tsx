@@ -10,7 +10,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { FixedAuxItemState } from "@/types/equipmentItems";
+import {
+  armourOptions,
+  orbOptions,
+  shieldOptions,
+  type BodyArmourEgoKey,
+} from "@/types/equipment";
+import type {
+  BodyArmourItemState,
+  FixedAuxItemState,
+  OrbItemState,
+  ShieldItemState,
+} from "@/types/equipmentItems";
 import type {
   AmuletSlotState,
   AuxArmourSlotState,
@@ -18,6 +29,25 @@ import type {
 } from "@/types/equipmentSlots";
 
 type EquipmentModalConfig =
+  | {
+      type: "bodyArmour";
+      title: string;
+      value: BodyArmourItemState;
+      bodyArmourEgos: Partial<Record<BodyArmourEgoKey, { name: string }>>;
+      onSave: (next: BodyArmourItemState, changed: boolean) => void;
+    }
+  | {
+      type: "shield";
+      title: string;
+      value: ShieldItemState;
+      onSave: (next: ShieldItemState, changed: boolean) => void;
+    }
+  | {
+      type: "orb";
+      title: string;
+      value: OrbItemState;
+      onSave: (next: OrbItemState, changed: boolean) => void;
+    }
   | {
       type: "ring";
       title: string;
@@ -74,6 +104,14 @@ const ringKinds = ["none", "wizardry", "protection", "evasion"] as const;
 const amuletKinds = ["none", "reflection"] as const;
 const headgearKinds = ["none", "hat", "helmet"] as const;
 const gloveKinds = ["none", "gloves"] as const;
+
+const normalizeBodyArmourDraft = (
+  draft: BodyArmourItemState
+): BodyArmourItemState => ({
+  ...draft,
+  enchant: draft.kind === "none" ? 0 : draft.enchant,
+  ego: draft.kind === "none" ? "none" : draft.ego,
+});
 
 const isRingBonusKind = (kind: RingSlotState["kind"]) =>
   kind === "protection" || kind === "evasion";
@@ -138,6 +176,219 @@ const ModalFrame = ({ title, children, onCancel, onSave }: ModalFrameProps) =>
     </div>,
     document.body
   );
+
+const BodyArmourEditor = ({
+  config,
+  onCancel,
+}: {
+  config: Extract<EquipmentModalConfig, { type: "bodyArmour" }>;
+  onCancel: () => void;
+}) => {
+  const [draft, setDraft] = useState<BodyArmourItemState>(config.value);
+  const normalizedDraft = normalizeBodyArmourDraft(draft);
+
+  return (
+    <ModalFrame
+      title={config.title}
+      onCancel={onCancel}
+      onSave={() =>
+        config.onSave(
+          normalizedDraft,
+          !sameValue(normalizeBodyArmourDraft(config.value), normalizedDraft)
+        )
+      }
+    >
+      <label className="flex flex-col gap-1 text-sm">
+        Armour type
+        <Select
+          value={draft.kind}
+          onValueChange={(value) =>
+            setDraft((current) =>
+              normalizeBodyArmourDraft({
+                ...current,
+                kind: value as BodyArmourItemState["kind"],
+              })
+            )
+          }
+        >
+          <SelectTrigger aria-label="Armour" className="h-8">
+            <SelectValue placeholder="Armour" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(armourOptions).map(([key, value]) => (
+              <SelectItem key={key} value={key}>
+                {value.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </label>
+      {draft.kind !== "none" ? (
+        <>
+          <EquipmentEnchantInput
+            ariaLabel="Body armour enchant"
+            value={draft.enchant}
+            onChange={(enchant) =>
+              setDraft((current) => ({
+                ...current,
+                enchant,
+              }))
+            }
+          />
+          <label className="flex flex-col gap-1 text-sm">
+            Body armour ego
+            <Select
+              value={draft.ego}
+              onValueChange={(value) =>
+                setDraft((current) => ({
+                  ...current,
+                  ego: value as BodyArmourEgoKey,
+                }))
+              }
+            >
+              <SelectTrigger aria-label="Body armour ego" className="h-8">
+                <SelectValue placeholder="None" />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(config.bodyArmourEgos) as BodyArmourEgoKey[]).map(
+                  (key) => (
+                    <SelectItem key={key} value={key}>
+                      {config.bodyArmourEgos[key]?.name ?? key}
+                    </SelectItem>
+                  )
+                )}
+              </SelectContent>
+            </Select>
+          </label>
+        </>
+      ) : null}
+      <EquipmentModifierInputs
+        modifiers={draft.modifiers}
+        onChange={(modifiers) =>
+          setDraft((current) => ({
+            ...current,
+            modifiers,
+          }))
+        }
+      />
+    </ModalFrame>
+  );
+};
+
+const ShieldEditor = ({
+  config,
+  onCancel,
+}: {
+  config: Extract<EquipmentModalConfig, { type: "shield" }>;
+  onCancel: () => void;
+}) => {
+  const [draft, setDraft] = useState<ShieldItemState>(config.value);
+
+  return (
+    <ModalFrame
+      title={config.title}
+      onCancel={onCancel}
+      onSave={() => config.onSave(draft, !sameValue(config.value, draft))}
+    >
+      <label className="flex flex-col gap-1 text-sm">
+        Shield type
+        <Select
+          value={draft.kind}
+          onValueChange={(value) =>
+            setDraft((current) => ({
+              ...current,
+              kind: value as ShieldItemState["kind"],
+              enchant: value === "none" ? 0 : current.enchant,
+            }))
+          }
+        >
+          <SelectTrigger aria-label="Shield" className="h-8">
+            <SelectValue placeholder="Shield" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(shieldOptions).map(([key, value]) => (
+              <SelectItem key={key} value={key}>
+                {value.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </label>
+      {draft.kind !== "none" ? (
+        <EquipmentEnchantInput
+          ariaLabel="Shield enchant"
+          value={draft.enchant}
+          onChange={(enchant) =>
+            setDraft((current) => ({
+              ...current,
+              enchant,
+            }))
+          }
+        />
+      ) : null}
+      <EquipmentModifierInputs
+        modifiers={draft.modifiers}
+        onChange={(modifiers) =>
+          setDraft((current) => ({
+            ...current,
+            modifiers,
+          }))
+        }
+      />
+    </ModalFrame>
+  );
+};
+
+const OrbEditor = ({
+  config,
+  onCancel,
+}: {
+  config: Extract<EquipmentModalConfig, { type: "orb" }>;
+  onCancel: () => void;
+}) => {
+  const [draft, setDraft] = useState<OrbItemState>(config.value);
+
+  return (
+    <ModalFrame
+      title={config.title}
+      onCancel={onCancel}
+      onSave={() => config.onSave(draft, !sameValue(config.value, draft))}
+    >
+      <label className="flex flex-col gap-1 text-sm">
+        Orb type
+        <Select
+          value={draft.kind}
+          onValueChange={(value) =>
+            setDraft((current) => ({
+              ...current,
+              kind: value as OrbItemState["kind"],
+            }))
+          }
+        >
+          <SelectTrigger aria-label="Orb" className="h-8">
+            <SelectValue placeholder="Orb" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.entries(orbOptions).map(([key, value]) => (
+              <SelectItem key={key} value={key}>
+                {value.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </label>
+      <EquipmentModifierInputs
+        modifiers={draft.modifiers}
+        onChange={(modifiers) =>
+          setDraft((current) => ({
+            ...current,
+            modifiers,
+          }))
+        }
+      />
+    </ModalFrame>
+  );
+};
 
 const RingEditor = ({
   config,
@@ -475,6 +726,12 @@ const FixedAuxEditor = ({
 
 const EquipmentEditModal = ({ config, onCancel }: EquipmentEditModalProps) => {
   switch (config.type) {
+    case "bodyArmour":
+      return <BodyArmourEditor config={config} onCancel={onCancel} />;
+    case "shield":
+      return <ShieldEditor config={config} onCancel={onCancel} />;
+    case "orb":
+      return <OrbEditor config={config} onCancel={onCancel} />;
     case "ring":
       return <RingEditor config={config} onCancel={onCancel} />;
     case "amulet":
