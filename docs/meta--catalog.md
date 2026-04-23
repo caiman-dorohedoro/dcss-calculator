@@ -51,6 +51,7 @@
 | `2026-04-12-morgue-import-state-expansion.md` | morgue import state expansion 구현 계획 문서 | `/docs/superpowers/plans` |
 | `2026-04-15-itemized-equipment-modifiers.md` | gear-side modifier를 itemized equipment state와 aggregation helper로 옮기는 구현 계획 문서 | `/docs/superpowers/plans` |
 | `2026-04-23-equipment-summary-modal.md` | 장비 섹션을 인게임풍 텍스트 행과 상세 수정 모달로 바꾸는 구현 계획 | `/docs/superpowers/plans` |
+| `2026-04-23-equipment-status-list-refinement.md` | 장비 summary row를 인게임 상태창에 가까운 순서와 강화 표기로 다듬는 후속 구현 계획 | `/docs/superpowers/plans` |
 | `2026-04-11-spell-controls-sidebar.md` | spell controls sidebar 재배치와 데스크톱 폭 조정을 위한 구현 계획 | `/docs/superpowers/plans` |
 
 ## 핵심 유지보수 엔트리포인트
