@@ -96,14 +96,14 @@ describe("DynamicEquipmentControls", () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const ringSection = container.querySelector(
-      '[data-testid="dynamic-equipment-rings"]'
+    const dynamicEquipmentList = container.querySelector(
+      '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
 
-    expect(ringSection.textContent).toContain("Ring 1");
-    expect(ringSection.textContent).toContain("Ring 8");
+    expect(dynamicEquipmentList.textContent).toContain("Ring 1");
+    expect(dynamicEquipmentList.textContent).toContain("Ring 8");
     expect(
-      ringSection.querySelectorAll('[data-testid^="equipment-row-ring-"]')
+      dynamicEquipmentList.querySelectorAll('[data-testid^="equipment-row-ring-"]')
     ).toHaveLength(8);
   });
 
@@ -115,15 +115,56 @@ describe("DynamicEquipmentControls", () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const gloveSection = container.querySelector(
-      '[data-testid="dynamic-equipment-gloves"]'
+    const dynamicEquipmentList = container.querySelector(
+      '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
 
-    expect(gloveSection.textContent).toContain("Glove 1");
-    expect(gloveSection.textContent).toContain("Glove 2");
+    expect(dynamicEquipmentList.textContent).toContain("Glove 1");
+    expect(dynamicEquipmentList.textContent).toContain("Glove 2");
     expect(
-      gloveSection.querySelectorAll('[data-testid^="equipment-row-glove-"]')
+      dynamicEquipmentList.querySelectorAll('[data-testid^="equipment-row-glove-"]')
     ).toHaveLength(2);
+  });
+
+  test("renders dynamic equipment as one status-like list without nested equipment headings", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "formicid";
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const dynamicEquipmentList = container.querySelector(
+      '[data-testid="dynamic-equipment-list"]'
+    ) as HTMLDivElement;
+    const rowIds = Array.from(
+      dynamicEquipmentList.querySelectorAll('[data-testid^="equipment-row-"]')
+    ).map((row) => row.getAttribute("data-testid"));
+    const headings = Array.from(container.querySelectorAll("h2")).map(
+      (heading) => heading.textContent
+    );
+
+    expect(rowIds).toEqual([
+      "equipment-row-headgear-0",
+      "equipment-row-cloak",
+      "equipment-row-glove-0",
+      "equipment-row-glove-1",
+      "equipment-row-boots",
+      "equipment-row-barding",
+      "equipment-row-amulet-0",
+      "equipment-row-ring-0",
+      "equipment-row-ring-1",
+    ]);
+    expect(headings).not.toEqual(
+      expect.arrayContaining([
+        "Rings",
+        "Amulets",
+        "Headgear",
+        "Gloves",
+        "Fixed Equipment",
+      ])
+    );
+    expect(headings).toContain("Mutations");
   });
 
   test("clears imported metadata when manual slot edits change the slot state", () => {
@@ -295,24 +336,24 @@ describe("DynamicEquipmentControls", () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
     });
 
-    const fixedEquipmentSection = container.querySelector(
-      '[data-testid="fixed-equipment-controls"]'
+    const dynamicEquipmentList = container.querySelector(
+      '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
 
     expect(
-      fixedEquipmentSection.querySelector('[data-testid="equipment-row-cloak"]')
+      dynamicEquipmentList.querySelector('[data-testid="equipment-row-cloak"]')
         ?.textContent
     ).toContain("+2 cloak");
     expect(
-      fixedEquipmentSection.querySelector('[data-testid="equipment-row-boots"]')
+      dynamicEquipmentList.querySelector('[data-testid="equipment-row-boots"]')
         ?.textContent
     ).toContain("-1 pair of boots");
     expect(
-      fixedEquipmentSection.querySelector('[data-testid="equipment-row-barding"]')
+      dynamicEquipmentList.querySelector('[data-testid="equipment-row-barding"]')
         ?.textContent
     ).toContain("+5 barding");
-    expect(fixedEquipmentSection.querySelector('input[type="number"]')).toBeNull();
-    expect(fixedEquipmentSection.querySelector('input[type="checkbox"]')).toBeNull();
+    expect(dynamicEquipmentList.querySelector('input[type="number"]')).toBeNull();
+    expect(dynamicEquipmentList.querySelector('input[type="checkbox"]')).toBeNull();
     expect(
       container.querySelector('[data-testid="dynamic-equipment-modifiers"]')
     ).toBeNull();
@@ -390,10 +431,10 @@ describe("DynamicEquipmentControls", () => {
     expect(container.textContent).toContain("Ring 1");
     expect(container.textContent).toContain("ring of intelligence");
     expect(container.textContent).not.toContain("Modifiers");
-    const ringSection = container.querySelector(
-      '[data-testid="dynamic-equipment-rings"]'
+    const dynamicEquipmentList = container.querySelector(
+      '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
-    expect(ringSection.querySelector('button[role="combobox"]')).toBeNull();
+    expect(dynamicEquipmentList.querySelector('button[role="combobox"]')).toBeNull();
   });
 
   test("renders equipment rows as plain text and opens a portal modal", async () => {

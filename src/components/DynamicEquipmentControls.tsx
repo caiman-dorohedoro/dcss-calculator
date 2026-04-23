@@ -100,26 +100,29 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     slotCounts.gloveSlots,
     createDefaultAuxArmourSlot
   );
-  const fixedAuxEquipmentConfigs: FixedAuxEquipmentConfig[] = [
-    {
+  const fixedAuxEquipmentConfigs: Record<
+    FixedAuxEquipmentConfig["key"],
+    FixedAuxEquipmentConfig
+  > = {
+    cloak: {
       key: "cloak",
       itemKey: "cloakItem",
       label: "Cloak",
       enchantKey: "cloakEnchant",
     },
-    {
+    boots: {
       key: "boots",
       itemKey: "bootsItem",
       label: "Boots",
       enchantKey: "bootsEnchant",
     },
-    {
+    barding: {
       key: "barding",
       itemKey: "bardingItem",
       label: "Barding",
       enchantKey: "bardingEnchant",
     },
-  ];
+  };
 
   const updateRingSlot = (
     index: number,
@@ -204,6 +207,16 @@ const DynamicEquipmentControls = <V extends GameVersion>({
       [config.itemKey]: nextItem,
     }));
   };
+
+  const renderFixedAuxRow = (config: FixedAuxEquipmentConfig) => (
+    <EquipmentSummaryRow
+      key={config.key}
+      testId={`equipment-row-${config.key}`}
+      label={config.label}
+      summary={formatFixedAuxSummary(state[config.itemKey])}
+      onOpen={() => setOpenEquipment({ type: "fixedAux", config })}
+    />
+  );
 
   const renderOpenEquipmentModal = () => {
     if (!openEquipment) {
@@ -313,84 +326,51 @@ const DynamicEquipmentControls = <V extends GameVersion>({
 
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
-      <section data-testid="dynamic-equipment-rings" className="flex flex-col gap-3">
-        <SectionHeading>Rings</SectionHeading>
-        <div className="flex flex-col gap-3">
-          {ringSlots.map((slot, index) => (
-            <EquipmentSummaryRow
-              key={`ring-${index}`}
-              testId={`equipment-row-ring-${index}`}
-              label={`Ring ${index + 1}`}
-              summary={formatRingSummary(slot)}
-              onOpen={() => setOpenEquipment({ type: "ring", index })}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section data-testid="dynamic-equipment-amulets" className="flex flex-col gap-3">
-        <SectionHeading>Amulets</SectionHeading>
-        <div className="flex flex-col gap-3">
-          {amuletSlots.map((slot, index) => (
-            <EquipmentSummaryRow
-              key={`amulet-${index}`}
-              testId={`equipment-row-amulet-${index}`}
-              label={`Amulet ${index + 1}`}
-              summary={formatAmuletSummary(slot)}
-              onOpen={() => setOpenEquipment({ type: "amulet", index })}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section data-testid="dynamic-equipment-headgear" className="flex flex-col gap-3">
-        <SectionHeading>Headgear</SectionHeading>
-        <div className="flex flex-col gap-3">
-          {headgearSlots.map((slot, index) => (
-            <EquipmentSummaryRow
-              key={`headgear-${index}`}
-              testId={`equipment-row-headgear-${index}`}
-              label={
-                slotCounts.headgearSlots === 1
-                  ? "Headgear"
-                  : `Headgear ${index + 1}`
-              }
-              summary={formatHeadgearSummary(slot)}
-              onOpen={() => setOpenEquipment({ type: "headgear", index })}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section data-testid="dynamic-equipment-gloves" className="flex flex-col gap-3">
-        <SectionHeading>Gloves</SectionHeading>
-        <div className="flex flex-col gap-3">
-          {gloveSlots.map((slot, index) => (
-            <EquipmentSummaryRow
-              key={`glove-${index}`}
-              testId={`equipment-row-glove-${index}`}
-              label={`Glove ${index + 1}`}
-              summary={formatGlovesSummary(slot)}
-              onOpen={() => setOpenEquipment({ type: "gloves", index })}
-            />
-          ))}
-        </div>
-      </section>
-
-      <section data-testid="fixed-equipment-controls" className="flex flex-col gap-3">
-        <SectionHeading>Fixed Equipment</SectionHeading>
-        <div className="flex flex-col gap-3">
-          {fixedAuxEquipmentConfigs.map((config) => (
-            <EquipmentSummaryRow
-              key={config.key}
-              testId={`equipment-row-${config.key}`}
-              label={config.label}
-              summary={formatFixedAuxSummary(state[config.itemKey])}
-              onOpen={() => setOpenEquipment({ type: "fixedAux", config })}
-            />
-          ))}
-        </div>
-      </section>
+      <div data-testid="dynamic-equipment-list" className="flex flex-col gap-3">
+        {headgearSlots.map((slot, index) => (
+          <EquipmentSummaryRow
+            key={`headgear-${index}`}
+            testId={`equipment-row-headgear-${index}`}
+            label={
+              slotCounts.headgearSlots === 1
+                ? "Headgear"
+                : `Headgear ${index + 1}`
+            }
+            summary={formatHeadgearSummary(slot)}
+            onOpen={() => setOpenEquipment({ type: "headgear", index })}
+          />
+        ))}
+        {renderFixedAuxRow(fixedAuxEquipmentConfigs.cloak)}
+        {gloveSlots.map((slot, index) => (
+          <EquipmentSummaryRow
+            key={`glove-${index}`}
+            testId={`equipment-row-glove-${index}`}
+            label={`Glove ${index + 1}`}
+            summary={formatGlovesSummary(slot)}
+            onOpen={() => setOpenEquipment({ type: "gloves", index })}
+          />
+        ))}
+        {renderFixedAuxRow(fixedAuxEquipmentConfigs.boots)}
+        {renderFixedAuxRow(fixedAuxEquipmentConfigs.barding)}
+        {amuletSlots.map((slot, index) => (
+          <EquipmentSummaryRow
+            key={`amulet-${index}`}
+            testId={`equipment-row-amulet-${index}`}
+            label={`Amulet ${index + 1}`}
+            summary={formatAmuletSummary(slot)}
+            onOpen={() => setOpenEquipment({ type: "amulet", index })}
+          />
+        ))}
+        {ringSlots.map((slot, index) => (
+          <EquipmentSummaryRow
+            key={`ring-${index}`}
+            testId={`equipment-row-ring-${index}`}
+            label={`Ring ${index + 1}`}
+            summary={formatRingSummary(slot)}
+            onOpen={() => setOpenEquipment({ type: "ring", index })}
+          />
+        ))}
+      </div>
 
       {renderOpenEquipmentModal()}
 
