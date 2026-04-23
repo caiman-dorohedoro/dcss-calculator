@@ -1,7 +1,7 @@
 # 메타 카탈로그
 
 작성일: 2026-04-05  
-최종 업데이트: 2026-04-15
+최종 업데이트: 2026-04-23
 
 ## 목적
 
@@ -41,6 +41,7 @@
 | `2026-04-10-morgue-import-design.md` | morgue 붙여넣기 기반 calculator 자동 할당과 import summary 흐름을 정의한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-12-morgue-import-state-expansion-design.md` | morgue import 후 수동 편집 가능한 동적 슬롯과 parity-relevant modifier 확장을 정의한 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-15-itemized-equipment-modifiers-design.md` | dcss-morgue-parser detail object에 맞춰 gear-side modifier를 각 장비 item state로 옮기는 설계 문서 | `/docs/superpowers/specs` |
+| `2026-04-23-equipment-summary-modal-design.md` | 장비 섹션을 인게임풍 텍스트 행과 상세 수정 모달로 통일하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-11-desktop-layout-design.md` | PC에서 그래프는 좌측, 컨트롤은 우측 sticky 패널로 분리하는 데스크톱 레이아웃 설계 | `/docs/superpowers/specs` |
 | `2026-04-11-spell-controls-sidebar-design.md` | 주문 선택만 좌측에 남기고 spell 관련 입력을 우측 sidebar로 재배치하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-04-version-registry-refactor.md` | version registry 리팩터링 구현 계획 | `/docs/superpowers/plans` |
