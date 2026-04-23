@@ -23,7 +23,7 @@ describe("calculator saved-state migration", () => {
         kind: "ring_mail",
         enchant: 2,
         ego: "none",
-        modifiers: { int: 3 },
+        modifiers: { flags: ["Ponderous"], will: 1, mp: 10, int: 3 },
       },
       shieldItem: {
         kind: "buckler",
@@ -38,7 +38,12 @@ describe("calculator saved-state migration", () => {
 
     const parsed = parseSavedState(JSON.stringify(modern));
 
-    expect(parsed?.bodyArmour.modifiers).toEqual({ int: 3 });
+    expect(parsed?.bodyArmour.modifiers).toEqual({
+      flags: ["Ponderous"],
+      will: 1,
+      mp: 10,
+      int: 3,
+    });
     expect(parsed?.shieldItem.modifiers).toEqual({ sh: 2 });
     expect(parsed?.orbItem.modifiers).toEqual({ wizardry: 1 });
   });

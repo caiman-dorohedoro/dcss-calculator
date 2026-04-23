@@ -1491,3 +1491,29 @@ git commit -m "chore: verify equipment summary modal implementation"
 - TDD order: Every implementation task starts with a failing focused test, then implementation, then passing verification.
 - File boundaries: Summary formatting is pure utility code, row rendering is presentational, modal editing owns draft state, and existing container components only wire state to rows and saves.
 - Verification: Task 7 includes lint, full Jest suite, and production build before the final cleanup commit.
+
+## Follow-up: Parser Property Modifier Coverage
+
+**Goal:** Preserve and expose parser-visible item properties that are not
+currently formula inputs, so imported equipment rows can display examples like
+`{Ponderous, Will+ MP+10 Int+5}`, `{Reflect, Str+2}`, and
+`{rC+ rN++ Will- rCorr MP+7 Str+4}`.
+
+**Implementation steps:**
+
+- Add RED tests for summary formatting, morgue import mapping, saved-state
+  restoration, and modal editing of parser-style properties.
+- Extend `EquipmentModifierBag` with parser numeric fields and an editable
+  `flags` token list.
+- Map `dcss-morgue-parser` `properties.numeric`, `booleanProps`,
+  `namedEffects`, and `opaqueTokens` into item-level modifiers.
+- Append generated property summaries when imported `displayName` omits braces,
+  while preserving display names that already contain a raw `{...}` block.
+- Add modal inputs for numeric parser properties and a compact `Item flags`
+  token input for boolean or opaque properties.
+- Update saved-state validation so the new fields survive reload.
+
+**Verification:**
+
+- `npm test -- --runInBand src/utils/__tests__/equipmentSummaryText.test.ts src/morgueImport/__tests__/importMorgue.test.ts src/hooks/__tests__/calculatorStatePersistence.test.ts src/components/__tests__/DynamicEquipmentControls.test.tsx`
+- `npm run build`

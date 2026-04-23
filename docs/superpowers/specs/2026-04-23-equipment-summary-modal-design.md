@@ -267,3 +267,29 @@ Add tests before implementation for the new visible behavior:
 
 Existing calculation and import tests should remain valid because this design
 does not change formula inputs or parser semantics.
+
+## Follow-up: Parser Property Modifiers
+
+The summary rows should not depend on imported `displayName` containing the raw
+`{...}` property block. `dcss-morgue-parser` intentionally keeps display names
+and property bags separate, so the app must rebuild the visible property
+summary from item-level modifier state when a display name has no braces.
+
+`EquipmentModifierBag` should preserve the parser-visible item properties that
+users expect to see in Crawl-style equipment text, including:
+
+- numeric sequence properties such as `rF+`, `rC+`, `rN++`, `Will+`,
+  `RegenMP+`, `Regen+`, and `Stlth+`
+- signed numeric properties such as `Str+4`, `Int+5`, `Dex+2`, `Slay+4`,
+  `AC+3`, `EV+2`, `SH+4`, `HP+7`, and `MP+10`
+- boolean or named flags such as `Ponderous`, `Reflect`, `Spirit`, `SInv`,
+  `rCorr`, `+Inv`, `Bane`, `^Contam`, and parser `opaqueTokens`
+
+Only the existing calculation-relevant fields should affect formulas. The
+additional parser properties are display and editing state until the calculator
+models those mechanics directly.
+
+The details modal should keep numeric properties editable through compact
+number inputs and expose flags as editable item-property tokens. This keeps the
+UI from adding a selector for every Crawl artefact flag while still allowing
+users to correct imported properties such as `{Ponderous, Will+ MP+10 Int+5}`.

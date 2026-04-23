@@ -17,14 +17,102 @@ import type {
   RingSlotState,
 } from "@/types/equipmentSlots";
 
-const modifierDisplayOrder: Array<[keyof EquipmentModifierBag, string]> = [
-  ["str", "Str"],
-  ["dex", "Dex"],
-  ["int", "Int"],
-  ["ac", "AC"],
-  ["ev", "EV"],
-  ["sh", "SH"],
-  ["wizardry", "Wiz"],
+const sequenceSigned = (value: number) => {
+  const sign = value >= 0 ? "+" : "-";
+  return sign.repeat(Math.abs(value));
+};
+
+type NumericModifierKey = Exclude<keyof EquipmentModifierBag, "flags">;
+
+const modifierDisplayOrder: Array<
+  [NumericModifierKey, string, "signed" | "sequence"]
+> = [
+  ["rF", "rF", "sequence"],
+  ["rC", "rC", "sequence"],
+  ["rN", "rN", "sequence"],
+  ["will", "Will", "sequence"],
+  ["regenMP", "RegenMP", "sequence"],
+  ["regen", "Regen", "sequence"],
+  ["mp", "MP", "signed"],
+  ["str", "Str", "signed"],
+  ["dex", "Dex", "signed"],
+  ["int", "Int", "signed"],
+  ["slay", "Slay", "signed"],
+  ["ac", "AC", "signed"],
+  ["ev", "EV", "signed"],
+  ["sh", "SH", "signed"],
+  ["hp", "HP", "signed"],
+  ["stlth", "Stlth", "sequence"],
+  ["wizardry", "Wiz", "signed"],
+];
+
+const commaPrefixFlags = new Set(["Ponderous", "Reflect"]);
+
+const modifierTokenDisplayOrder: Array<NumericModifierKey | string> = [
+  "+Inv",
+  "Spirit",
+  "Bane",
+  "rF",
+  "rC",
+  "rN",
+  "rPois",
+  "rElec",
+  "will",
+  "rCorr",
+  "SInv",
+  "rMut",
+  "Fly",
+  "Clar",
+  "RMsl",
+  "Faith",
+  "Acrobat",
+  "Rampage",
+  "Harm",
+  "Shadows",
+  "Repulsion",
+  "Archmagi",
+  "Light",
+  "Mayhem",
+  "Guile",
+  "Energy",
+  "Air",
+  "Fire",
+  "Ice",
+  "Earth",
+  "Wildshape",
+  "Chemistry",
+  "Dissipate",
+  "Attunement",
+  "Mesmerism",
+  "Stardust",
+  "Hurl",
+  "Snipe",
+  "Bear",
+  "Archery",
+  "Command",
+  "Death",
+  "Resonance",
+  "Parrying",
+  "Glass",
+  "Pyromania",
+  "regenMP",
+  "regen",
+  "mp",
+  "str",
+  "dex",
+  "int",
+  "slay",
+  "ac",
+  "ev",
+  "sh",
+  "hp",
+  "stlth",
+  "wizardry",
+  "-Cast",
+  "*Rage",
+  "^Drain",
+  "*Corrode",
+  "^Contam",
 ];
 
 const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
@@ -39,6 +127,22 @@ const withDisplayNameEnchant = (displayName: string, enchant: number) =>
     ? displayName
     : withEnchant(enchant, displayName);
 
+const inlinePropertiesPattern = /\{[^}]*\}/;
+
+const withDisplayNameModifiers = (
+  displayName: string,
+  modifiers?: EquipmentModifierBag
+) =>
+  inlinePropertiesPattern.test(displayName)
+    ? displayName
+    : withModifiers(displayName, modifiers);
+
+const withEnchantableDisplayName = (
+  displayName: string,
+  enchant: number,
+  modifiers?: EquipmentModifierBag
+) => withDisplayNameModifiers(withDisplayNameEnchant(displayName, enchant), modifiers);
+
 const withModifiers = (
   itemName: string,
   modifiers?: EquipmentModifierBag
@@ -52,17 +156,47 @@ export const formatModifierSummary = (modifiers?: EquipmentModifierBag) => {
     return "";
   }
 
-  const parts = modifierDisplayOrder.flatMap(([key, label]) => {
+  const flags = modifiers.flags ?? [];
+  const commaFlags = flags.filter((flag) => commaPrefixFlags.has(flag));
+  const numericPartByKey = new Map<NumericModifierKey, string>();
+  for (const [key, label, style] of modifierDisplayOrder) {
     const value = modifiers[key];
-    return value === undefined || value === 0 ? [] : `${label}${signed(value)}`;
+    if (value === undefined || value === 0) {
+      continue;
+    }
+
+    const suffix = style === "sequence" ? sequenceSigned(value) : signed(value);
+    numericPartByKey.set(key, `${label}${suffix}`);
+  }
+
+  const orderedParts = modifierTokenDisplayOrder.flatMap((token) => {
+    if (numericPartByKey.has(token as NumericModifierKey)) {
+      return numericPartByKey.get(token as NumericModifierKey) ?? [];
+    }
+
+    return flags.includes(token) && !commaPrefixFlags.has(token) ? token : [];
   });
+  const knownOrderedTokens = new Set(modifierTokenDisplayOrder);
+  const residualParts = flags.filter(
+    (flag) => !commaPrefixFlags.has(flag) && !knownOrderedTokens.has(flag)
+  );
+  const parts = [...orderedParts, ...residualParts];
+  if (commaFlags.length > 0) {
+    return parts.length > 0
+      ? `{${commaFlags.join(", ")}, ${parts.join(" ")}}`
+      : `{${commaFlags.join(", ")}}`;
+  }
 
   return parts.length > 0 ? `{${parts.join(" ")}}` : "";
 };
 
 export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
   if (item.displayName) {
-    return withDisplayNameEnchant(item.displayName, item.enchant);
+    return withEnchantableDisplayName(
+      item.displayName,
+      item.enchant,
+      item.modifiers
+    );
   }
   if (item.kind === "none") {
     return "none";
@@ -80,7 +214,11 @@ export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
 
 export const formatShieldSummary = (item: ShieldItemState) => {
   if (item.displayName) {
-    return withDisplayNameEnchant(item.displayName, item.enchant);
+    return withEnchantableDisplayName(
+      item.displayName,
+      item.enchant,
+      item.modifiers
+    );
   }
   if (item.kind === "none") {
     return "none";
@@ -94,7 +232,7 @@ export const formatShieldSummary = (item: ShieldItemState) => {
 
 export const formatOrbSummary = (item: OrbItemState) => {
   if (item.displayName) {
-    return item.displayName;
+    return withDisplayNameModifiers(item.displayName, item.modifiers);
   }
   if (item.kind === "none") {
     return "none";
@@ -105,7 +243,7 @@ export const formatOrbSummary = (item: OrbItemState) => {
 
 export const formatRingSummary = (slot: RingSlotState) => {
   if (slot.displayName) {
-    return slot.displayName;
+    return withDisplayNameModifiers(slot.displayName, slot.modifiers);
   }
   if (slot.kind === "none") {
     return "none";
@@ -123,7 +261,7 @@ export const formatRingSummary = (slot: RingSlotState) => {
 
 export const formatAmuletSummary = (slot: AmuletSlotState) => {
   if (slot.displayName) {
-    return slot.displayName;
+    return withDisplayNameModifiers(slot.displayName, slot.modifiers);
   }
   if (slot.kind === "none") {
     return "none";
@@ -134,7 +272,11 @@ export const formatAmuletSummary = (slot: AmuletSlotState) => {
 
 export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
   if (slot.displayName) {
-    return withDisplayNameEnchant(slot.displayName, slot.enchant);
+    return withEnchantableDisplayName(
+      slot.displayName,
+      slot.enchant,
+      slot.modifiers
+    );
   }
   if (!slot.present) {
     return "none";
@@ -148,7 +290,11 @@ export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
 
 export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
   if (slot.displayName) {
-    return withDisplayNameEnchant(slot.displayName, slot.enchant);
+    return withEnchantableDisplayName(
+      slot.displayName,
+      slot.enchant,
+      slot.modifiers
+    );
   }
   if (!slot.present) {
     return "none";
@@ -162,7 +308,11 @@ export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
 
 export const formatFixedAuxSummary = (item: FixedAuxItemState) => {
   if (item.displayName) {
-    return withDisplayNameEnchant(item.displayName, item.enchant);
+    return withEnchantableDisplayName(
+      item.displayName,
+      item.enchant,
+      item.modifiers
+    );
   }
   if (!item.present) {
     return "none";

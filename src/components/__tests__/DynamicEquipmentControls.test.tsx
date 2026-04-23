@@ -43,6 +43,20 @@ const setNumberInputValue = (input: HTMLInputElement, value: string) => {
   input.dispatchEvent(new Event("input", { bubbles: true }));
 };
 
+const setTextInputValue = (input: HTMLInputElement, value: string) => {
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    "value"
+  )?.set;
+
+  if (!valueSetter) {
+    throw new Error("Could not find input value setter");
+  }
+
+  valueSetter.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+};
+
 const {
   default: DynamicEquipmentControls,
 } = await import("../DynamicEquipmentControls");
@@ -436,6 +450,84 @@ describe("DynamicEquipmentControls", () => {
       '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
     expect(dynamicEquipmentList.querySelector('button[role="combobox"]')).toBeNull();
+  });
+
+  test("edits parser-style numeric properties and flags from the modal", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.headgearSlots = [
+      {
+        present: true,
+        enchant: 3,
+        kind: "hat",
+        displayName: "hat of Pondering",
+        modifiers: { flags: ["Ponderous"], will: 1, mp: 10, int: 5 },
+        source: "imported",
+      },
+    ];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const headgearRow = container.querySelector(
+      '[data-testid="equipment-row-headgear-0"]'
+    ) as HTMLButtonElement;
+
+    expect(headgearRow.textContent).toContain(
+      "+3 hat of Pondering {Ponderous, Will+ MP+10 Int+5}"
+    );
+
+    await act(async () => {
+      headgearRow.click();
+    });
+
+    await act(async () => {
+      setNumberInputValue(
+        document.body.querySelector(
+          'input[aria-label="Will modifier"]'
+        ) as HTMLInputElement,
+        "2"
+      );
+      setNumberInputValue(
+        document.body.querySelector(
+          'input[aria-label="MP modifier"]'
+        ) as HTMLInputElement,
+        "7"
+      );
+      setNumberInputValue(
+        document.body.querySelector(
+          'input[aria-label="Int modifier"]'
+        ) as HTMLInputElement,
+        "4"
+      );
+      setTextInputValue(
+        document.body.querySelector(
+          'input[aria-label="Item flags"]'
+        ) as HTMLInputElement,
+        "Reflect Ponderous"
+      );
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="save-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(setState).toHaveBeenCalledTimes(1);
+    const updater = setState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+    const nextState = updater(state);
+
+    expect(nextState.headgearSlots[0].modifiers).toMatchObject({
+      flags: ["Reflect", "Ponderous"],
+      will: 2,
+      mp: 7,
+      int: 4,
+    });
   });
 
   test("renders equipment rows as plain text and opens a portal modal", async () => {

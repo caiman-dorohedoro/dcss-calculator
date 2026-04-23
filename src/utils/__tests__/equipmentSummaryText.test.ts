@@ -36,6 +36,46 @@ describe("equipment summary text", () => {
     ).toBe("the +5 pair of gloves of Vipholopp {Str+7 Dex+3 SInv}");
   });
 
+  test("appends parser item properties when imported display names omit braces", () => {
+    expect(
+      formatHeadgearSummary({
+        present: true,
+        kind: "hat",
+        enchant: 3,
+        displayName: "hat of Pondering",
+        modifiers: { flags: ["Ponderous"], will: 1, mp: 10, int: 5 },
+        source: "imported",
+      })
+    ).toBe("+3 hat of Pondering {Ponderous, Will+ MP+10 Int+5}");
+
+    expect(
+      formatShieldSummary({
+        kind: "tower_shield",
+        enchant: 10,
+        displayName: 'tower shield "Ygacoyf"',
+        modifiers: { flags: ["Reflect"], str: 2 },
+        source: "imported",
+      })
+    ).toBe('+10 tower shield "Ygacoyf" {Reflect, Str+2}');
+
+    expect(
+      formatRingSummary({
+        kind: "none",
+        plus: 0,
+        displayName: "ring of Ewkivat",
+        modifiers: {
+          rC: 1,
+          rN: 2,
+          will: -1,
+          flags: ["rCorr"],
+          mp: 7,
+          str: 4,
+        },
+        source: "imported",
+      })
+    ).toBe("ring of Ewkivat {rC+ rN++ Will- rCorr MP+7 Str+4}");
+  });
+
   test("adds state enchantment to imported enchantable names when missing", () => {
     expect(
       formatFixedAuxSummary({

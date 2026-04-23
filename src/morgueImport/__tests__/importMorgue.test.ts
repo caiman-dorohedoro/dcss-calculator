@@ -143,10 +143,10 @@ describe("morgue import mapper", () => {
       ])
     );
     expect(result.summary.skipped).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ label: "Rings" }),
-        expect.objectContaining({ label: "Mutations" }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ label: "Mutations" })])
+    );
+    expect(result.summary.skipped).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ label: "Rings" })])
     );
   });
 
@@ -525,6 +525,119 @@ describe("morgue import mapper", () => {
     expect(result.importedState.unattributedGear).toBeUndefined();
   });
 
+  test("keeps parser item properties that are display-only for calculations", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Naga",
+      speciesVariant: null,
+      background: "Conjurer",
+      god: null,
+      xl: 12,
+      ac: 17,
+      ev: 20,
+      sh: 11,
+      strength: 8,
+      intelligence: 23,
+      dexterity: 14,
+      bodyArmour: "robe",
+      shield: "tower shield",
+      helmets: ['+3 hat of Pondering'],
+      gloves: [],
+      footwear: [],
+      cloaks: ["+2 cloak"],
+      orb: "none",
+      amulets: ['amulet of Impatience'],
+      rings: ['ring of Ewkivat'],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: { ...makeItem("robe", "robe"), objectClass: "armour" },
+      shieldDetails: {
+        ...makeItem('+10 tower shield "Ygacoyf"', "tower shield", {
+          booleanProps: { Reflect: true },
+          numeric: { Str: 2 },
+        }),
+        objectClass: "armour",
+        enchant: 10,
+      },
+      helmetDetails: [
+        {
+          ...makeItem("+3 hat of Pondering", "hat", {
+            booleanProps: { Ponderous: true },
+            numeric: { Will: 1, MP: 10, Int: 5 },
+          }),
+          objectClass: "armour",
+          enchant: 3,
+        },
+      ],
+      footwearDetails: [],
+      cloakDetails: [
+        {
+          ...makeItem("+2 cloak", "cloak", {
+            numeric: { Will: 1 },
+          }),
+          objectClass: "armour",
+          enchant: 2,
+        },
+      ],
+      orbDetails: undefined,
+      amuletDetails: [
+        makeItem("amulet of Impatience", "amulet", {
+          booleanProps: { Inv: true },
+          numeric: { RegenMP: 1, Str: 3 },
+        }),
+      ],
+      ringDetails: [
+        makeItem("ring of Ewkivat", "ring", {
+          booleanProps: { rCorr: true },
+          numeric: { rC: 1, rN: 2, Will: -1, MP: 7, Str: 4 },
+        }),
+      ],
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Magic Dart",
+          failurePercent: 2,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.shieldItem.modifiers).toEqual({
+      flags: ["Reflect"],
+      str: 2,
+    });
+    expect(result.importedState.headgearSlots[0].modifiers).toEqual({
+      flags: ["Ponderous"],
+      will: 1,
+      mp: 10,
+      int: 5,
+    });
+    expect(result.importedState.cloakItem.modifiers).toEqual({ will: 1 });
+    expect(result.importedState.amuletSlots[0].modifiers).toEqual({
+      flags: ["+Inv"],
+      regenMP: 1,
+      str: 3,
+    });
+    expect(result.importedState.ringSlots[0].modifiers).toEqual({
+      flags: ["rCorr"],
+      rC: 1,
+      rN: 2,
+      will: -1,
+      mp: 7,
+      str: 4,
+    });
+  });
+
   test("returns a parser failure record for invalid text", () => {
     expect(parseImportedMorgue("not a morgue")).toMatchObject({
       ok: false,
@@ -548,15 +661,16 @@ describe("morgue import mapper", () => {
     expect(imported.importedState.version).toBe("trunk");
     expect(imported.importedState.species).toBe("oni");
     expect(imported.importedState.ringSlots).toEqual(
-      expect.arrayContaining([expect.objectContaining({ kind: "none" })])
-    );
-    expect(imported.summary.skipped).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          label: "Rings",
-          detail: expect.stringContaining("ring of protection from fire"),
+          kind: "none",
+          displayName: "ring of protection from fire",
+          modifiers: { rF: 1 },
         }),
       ])
+    );
+    expect(imported.summary.skipped).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ label: "Rings" })])
     );
   });
 });

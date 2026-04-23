@@ -18,6 +18,7 @@ type AttrInputProps = {
   type: "stat" | "skill" | "number";
   min?: number;
   max?: number;
+  ariaLabel?: string;
   onChange: (value: number) => void;
 };
 
@@ -27,6 +28,7 @@ const AttrInput = ({
   type = "stat",
   min,
   max,
+  ariaLabel,
   onChange,
 }: AttrInputProps) => {
   const minValue =
@@ -45,6 +47,7 @@ const AttrInput = ({
     <div className="flex flex-row gap-2 items-center justify-center">
       <label className="break-keep text-sm">{label}:</label>
       <Input
+        aria-label={ariaLabel}
         type="number"
         className={cn(defaultWidth, type === "skill" ? skillWidth : "", "h-6")}
         min={minValue}

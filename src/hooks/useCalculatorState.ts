@@ -298,17 +298,32 @@ const coerceLegacySlots = <T>(
 const isOptionalNumber = (value: unknown) =>
   value === undefined || typeof value === "number";
 
+const isOptionalStringArray = (value: unknown) =>
+  value === undefined ||
+  (Array.isArray(value) && value.every((item) => typeof item === "string"));
+
 const isModifierBag = (value: unknown): value is EquipmentModifierBag => {
   if (!isObject(value)) return false;
 
   return (
+    isOptionalNumber(value.rF) &&
+    isOptionalNumber(value.rC) &&
+    isOptionalNumber(value.rN) &&
+    isOptionalNumber(value.will) &&
     isOptionalNumber(value.str) &&
     isOptionalNumber(value.dex) &&
     isOptionalNumber(value.int) &&
+    isOptionalNumber(value.slay) &&
     isOptionalNumber(value.ac) &&
     isOptionalNumber(value.ev) &&
     isOptionalNumber(value.sh) &&
-    isOptionalNumber(value.wizardry)
+    isOptionalNumber(value.hp) &&
+    isOptionalNumber(value.mp) &&
+    isOptionalNumber(value.regen) &&
+    isOptionalNumber(value.regenMP) &&
+    isOptionalNumber(value.stlth) &&
+    isOptionalNumber(value.wizardry) &&
+    isOptionalStringArray(value.flags)
   );
 };
 

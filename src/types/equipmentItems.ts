@@ -9,13 +9,24 @@ type ArtifactKind = "normal" | "randart" | "unrand";
 type EquipmentSource = "manual" | "imported" | "legacy";
 
 export type EquipmentModifierBag = {
+  rF?: number;
+  rC?: number;
+  rN?: number;
+  will?: number;
   str?: number;
   dex?: number;
   int?: number;
+  slay?: number;
   ac?: number;
   ev?: number;
   sh?: number;
+  hp?: number;
+  mp?: number;
+  regen?: number;
+  regenMP?: number;
+  stlth?: number;
   wizardry?: number;
+  flags?: string[];
 };
 
 type EquipmentItemMeta = {

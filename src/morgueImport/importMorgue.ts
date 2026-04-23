@@ -1,6 +1,8 @@
 import {
   parseMorgueText,
+  type EquipmentBooleanPropertyKey,
   type EquipmentItemSnapshot,
+  type EquipmentNumericPropertyKey,
   type ParsedMorgueTextRecord,
 } from "dcss-morgue-parser";
 import type { CalculatorState } from "@/hooks/useCalculatorState.ts";
@@ -98,7 +100,7 @@ const hasBaseType = (
 
 const hasBooleanProperty = (
   item: EquipmentItemSnapshot,
-  property: "Reflect" | "Wiz"
+  property: EquipmentBooleanPropertyKey
 ) => {
   return (
     item.properties.booleanProps[property] === true ||
@@ -133,18 +135,90 @@ const mapOrb = (baseType: string | null | undefined): OrbKey | null => {
 };
 
 const numericItemModifierMap = {
+  rF: "rF",
+  rC: "rC",
+  rN: "rN",
+  Will: "will",
   Str: "str",
   Dex: "dex",
   Int: "int",
+  Slay: "slay",
   AC: "ac",
   EV: "ev",
   SH: "sh",
+  HP: "hp",
+  MP: "mp",
+  Regen: "regen",
+  RegenMP: "regenMP",
+  Stlth: "stlth",
 } as const;
+
+const booleanItemModifierLabels: Record<EquipmentBooleanPropertyKey, string> = {
+  rPois: "rPois",
+  rElec: "rElec",
+  rCorr: "rCorr",
+  rMut: "rMut",
+  SInv: "SInv",
+  Fly: "Fly",
+  Reflect: "Reflect",
+  Clar: "Clar",
+  RMsl: "RMsl",
+  Faith: "Faith",
+  Spirit: "Spirit",
+  Wiz: "Wiz",
+  Acrobat: "Acrobat",
+  Rampage: "Rampage",
+  Harm: "Harm",
+  Shadows: "Shadows",
+  Repulsion: "Repulsion",
+  Archmagi: "Archmagi",
+  Light: "Light",
+  Mayhem: "Mayhem",
+  Guile: "Guile",
+  Energy: "Energy",
+  Air: "Air",
+  Fire: "Fire",
+  Ice: "Ice",
+  Earth: "Earth",
+  Wildshape: "Wildshape",
+  Chemistry: "Chemistry",
+  Dissipate: "Dissipate",
+  Attunement: "Attunement",
+  Mesmerism: "Mesmerism",
+  Stardust: "Stardust",
+  Hurl: "Hurl",
+  Snipe: "Snipe",
+  Bear: "Bear",
+  Archery: "Archery",
+  Command: "Command",
+  Death: "Death",
+  Resonance: "Resonance",
+  Parrying: "Parrying",
+  Glass: "Glass",
+  Pyromania: "Pyromania",
+  Ponderous: "Ponderous",
+  Inv: "+Inv",
+  "-Cast": "-Cast",
+  Bane: "Bane",
+  "*Rage": "*Rage",
+  "^Drain": "^Drain",
+  "*Corrode": "*Corrode",
+  "^Contam": "^Contam",
+};
+
+const addFlagModifier = (modifiers: EquipmentModifierBag, flag: string) => {
+  if (modifiers.flags?.includes(flag)) {
+    return;
+  }
+
+  modifiers.flags = [...(modifiers.flags ?? []), flag];
+};
 
 const buildModifierBagFromItem = (
   item: EquipmentItemSnapshot,
   options?: {
     ignoreNumeric?: Array<keyof typeof numericItemModifierMap>;
+    ignoreFlags?: EquipmentBooleanPropertyKey[];
     ignoreWiz?: boolean;
   }
 ): EquipmentModifierBag | undefined => {
@@ -152,13 +226,14 @@ const buildModifierBagFromItem = (
 
   for (const [property, key] of Object.entries(numericItemModifierMap) as [
     keyof typeof numericItemModifierMap,
-    keyof EquipmentModifierBag,
+    Exclude<keyof EquipmentModifierBag, "flags">,
   ][]) {
     if (options?.ignoreNumeric?.includes(property)) {
       continue;
     }
 
-    const value = item.properties.numeric[property];
+    const value =
+      item.properties.numeric[property as EquipmentNumericPropertyKey];
     if (typeof value === "number" && value !== 0) {
       modifiers[key] = value;
     }
@@ -166,6 +241,25 @@ const buildModifierBagFromItem = (
 
   if (!options?.ignoreWiz && item.properties.booleanProps.Wiz === true) {
     modifiers.wizardry = 1;
+  }
+
+  for (const [property, label] of Object.entries(
+    booleanItemModifierLabels
+  ) as [EquipmentBooleanPropertyKey, string][]) {
+    if (property === "Wiz" || options?.ignoreFlags?.includes(property)) {
+      continue;
+    }
+
+    if (item.properties.booleanProps[property] === true) {
+      addFlagModifier(modifiers, label);
+    }
+  }
+
+  for (const token of [
+    ...(item.namedEffects ?? []),
+    ...item.properties.opaqueTokens,
+  ]) {
+    addFlagModifier(modifiers, token);
   }
 
   return Object.keys(modifiers).length > 0 ? modifiers : undefined;
@@ -275,8 +369,11 @@ const fillAmuletSlots = (
   const unsupported: string[] = [];
 
   for (const detail of details ?? []) {
-    const modifiers = buildModifierBagFromItem(detail);
-    const nextSlot: AmuletSlotState | null = hasBooleanProperty(detail, "Reflect")
+    const isReflection = hasBooleanProperty(detail, "Reflect");
+    const modifiers = buildModifierBagFromItem(detail, {
+      ignoreFlags: isReflection ? ["Reflect"] : undefined,
+    });
+    const nextSlot: AmuletSlotState | null = isReflection
       ? {
           kind: "reflection",
           modifiers,
@@ -630,7 +727,9 @@ export const buildImportedCalculatorState = (
     importedState.orbItem = {
       kind: orb,
       modifiers: record.orbDetails
-        ? buildModifierBagFromItem(record.orbDetails)
+        ? buildModifierBagFromItem(record.orbDetails, {
+            ignoreFlags: orb === "energy" ? ["Energy"] : undefined,
+          })
         : undefined,
       displayName: record.orbDetails?.displayName,
       artifactKind: record.orbDetails?.artifactKind,
