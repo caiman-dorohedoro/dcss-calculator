@@ -2,6 +2,7 @@ import { useState } from "react";
 import AttrInput from "@/components/AttrInput";
 import { Checkbox } from "@/components/ui/checkbox";
 import EquipmentEditModal from "@/components/equipment/EquipmentEditModal";
+import EquipmentModifierInputs from "@/components/equipment/EquipmentModifierInputs";
 import EquipmentSummaryRow from "@/components/equipment/EquipmentSummaryRow";
 import EquipmentEnchantInput from "@/components/EquipmentEnchantInput";
 import {
@@ -50,15 +51,6 @@ const ringKinds = ["none", "wizardry", "protection", "evasion"] as const;
 const amuletKinds = ["none", "reflection"] as const;
 const headgearKinds = ["none", "hat", "helmet"] as const;
 const gloveKinds = ["none", "gloves"] as const;
-const modifierFields = [
-  ["Str", "str"],
-  ["Dex", "dex"],
-  ["Int", "int"],
-  ["AC", "ac"],
-  ["EV", "ev"],
-  ["SH", "sh"],
-  ["Wiz", "wizardry"],
-] as const;
 
 const isRingBonusKind = (kind: RingSlotState["kind"]) =>
   kind === "protection" || kind === "evasion";
@@ -72,43 +64,24 @@ const shouldShowModifierInputs = (
   displayName?: string
 ) => occupied || hasModifierValues(modifiers) || displayName !== undefined;
 
-const updateModifierBag = (
-  current: EquipmentModifierBag | undefined,
-  key: keyof EquipmentModifierBag,
-  value: number
-) => {
-  const next = { ...(current ?? {}) };
+const clearImportedItemMetadata = <T extends {
+  displayName?: string;
+  artifactKind?: "normal" | "randart" | "unrand";
+  source?: string;
+}>(
+  item: T,
+  changed: boolean
+): T =>
+  changed
+    ? {
+        ...item,
+        displayName: undefined,
+        artifactKind: undefined,
+        source: undefined,
+      }
+    : item;
 
-  if (value === 0) {
-    delete next[key];
-  } else {
-    next[key] = value;
-  }
-
-  return Object.keys(next).length > 0 ? next : undefined;
-};
-
-export const EquipmentModifierInputs = ({
-  modifiers,
-  onChange,
-  className,
-}: {
-  modifiers?: EquipmentModifierBag;
-  onChange: (next: EquipmentModifierBag | undefined) => void;
-  className?: string;
-}) => (
-  <div className={cn("flex flex-wrap gap-4", className)}>
-    {modifierFields.map(([label, key]) => (
-      <AttrInput
-        key={key}
-        label={label}
-        value={modifiers?.[key] ?? 0}
-        type="number"
-        onChange={(value) => onChange(updateModifierBag(modifiers, key, value))}
-      />
-    ))}
-  </div>
-);
+export { default as EquipmentModifierInputs } from "@/components/equipment/EquipmentModifierInputs";
 
 const DynamicEquipmentControls = <V extends GameVersion>({
   state,
@@ -117,7 +90,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
   testId,
 }: DynamicEquipmentControlsProps<V>) => {
   const slotCounts = getDynamicSlotCounts(state.version, state.species);
-  const [openDraftTitle, setOpenDraftTitle] = useState<string | null>(null);
+  const [openRingIndex, setOpenRingIndex] = useState<number | null>(null);
 
   const ringSlots = coerceSlotArrayLength(
     state.ringSlots,
@@ -220,20 +193,25 @@ const DynamicEquipmentControls = <V extends GameVersion>({
               testId={`equipment-row-ring-${index}`}
               label={`Ring ${index + 1}`}
               summary={formatRingSummary(slot)}
-              onOpen={() => setOpenDraftTitle(`Ring ${index + 1}`)}
+              onOpen={() => setOpenRingIndex(index)}
             />
           ))}
         </div>
-        {openDraftTitle ? (
+        {openRingIndex !== null ? (
           <EquipmentEditModal
-            title={openDraftTitle}
-            onCancel={() => setOpenDraftTitle(null)}
-            onSave={() => setOpenDraftTitle(null)}
-          >
-            <div className="text-sm text-muted-foreground">
-              Ring editor shell
-            </div>
-          </EquipmentEditModal>
+            config={{
+              type: "ring",
+              title: `Ring ${openRingIndex + 1}`,
+              value: ringSlots[openRingIndex] ?? createDefaultRingSlot(),
+              onSave: (next, changed) => {
+                updateRingSlot(openRingIndex, () =>
+                  clearImportedItemMetadata(next, changed)
+                );
+                setOpenRingIndex(null);
+              },
+            }}
+            onCancel={() => setOpenRingIndex(null)}
+          />
         ) : null}
       </section>
 

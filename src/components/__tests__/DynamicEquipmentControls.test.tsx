@@ -370,6 +370,100 @@ describe("DynamicEquipmentControls", () => {
     expect(document.body.textContent).toContain("Ring 1");
   });
 
+  test("cancels ring modal edits without updating state", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.ringSlots = [{ kind: "protection", plus: 4 }];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-ring-0"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    const plusInput = document.body.querySelector(
+      'input[aria-label="Ring plus"]'
+    ) as HTMLInputElement;
+
+    await act(async () => {
+      setNumberInputValue(plusInput, "6");
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(setState).not.toHaveBeenCalled();
+    expect(
+      document.body.querySelector('[data-testid="equipment-edit-modal"]')
+    ).toBeNull();
+  });
+
+  test("saves ring modal edits and clears stale imported metadata when changed", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.ringSlots = [
+      {
+        kind: "protection",
+        plus: 4,
+        displayName: "the ring of Robustness {AC+8}",
+        artifactKind: "randart",
+        source: "imported",
+      },
+    ];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-ring-0"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      setNumberInputValue(
+        document.body.querySelector(
+          'input[aria-label="Ring plus"]'
+        ) as HTMLInputElement,
+        "6"
+      );
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="save-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(setState).toHaveBeenCalledTimes(1);
+    const updater = setState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+    const nextState = updater(state);
+
+    expect(nextState.ringSlots[0]).toEqual({
+      kind: "protection",
+      plus: 6,
+      displayName: undefined,
+      artifactKind: undefined,
+      source: undefined,
+    });
+  });
+
   test("ring slot updates do not overwrite legacy wizardry", () => {
     const state = buildDefaultCalculatorState("trunk");
     state.wizardry = 1;
