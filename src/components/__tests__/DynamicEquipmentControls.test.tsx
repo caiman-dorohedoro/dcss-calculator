@@ -155,6 +155,7 @@ describe("DynamicEquipmentControls", () => {
       "equipment-row-ring-0",
       "equipment-row-ring-1",
     ]);
+    expect(dynamicEquipmentList.className).toContain("gap-1");
     expect(headings).not.toEqual(
       expect.arrayContaining([
         "Rings",

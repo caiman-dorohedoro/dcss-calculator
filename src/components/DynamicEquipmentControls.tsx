@@ -326,7 +326,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
 
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
-      <div data-testid="dynamic-equipment-list" className="flex flex-col gap-3">
+      <div data-testid="dynamic-equipment-list" className="flex flex-col gap-1">
         {headgearSlots.map((slot, index) => (
           <EquipmentSummaryRow
             key={`headgear-${index}`}

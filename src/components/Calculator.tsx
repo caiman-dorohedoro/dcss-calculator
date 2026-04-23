@@ -400,7 +400,7 @@ const Calculator = <V extends GameVersion>({
         className="flex flex-col gap-3"
       >
         <SectionHeading>Equipment</SectionHeading>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
           <EquipmentSummaryRow
             testId="equipment-row-offhand"
             label="Offhand"

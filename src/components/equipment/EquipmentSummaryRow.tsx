@@ -19,7 +19,7 @@ const EquipmentSummaryRow = ({
     type="button"
     data-testid={testId}
     className={cn(
-      "flex w-full min-w-0 items-start gap-3 rounded-sm border border-transparent px-2 py-1 text-left text-sm hover:border-border hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white",
+      "flex w-full min-w-0 items-start gap-3 rounded-sm border border-transparent px-1.5 py-0.5 text-left text-sm hover:border-border hover:bg-accent/30 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white",
       className
     )}
     onClick={onOpen}

@@ -477,6 +477,7 @@ describe("Calculator desktop layout", () => {
 
     expect(bodyArmourRow).not.toBeNull();
     expect(bodyArmourRow.textContent).toContain("Armour:");
+    expect(bodyArmourRow.className).toContain("py-0.5");
     expect(bodyArmourRow.querySelector('input[type="number"]')).toBeNull();
     expect(bodyArmourRow.querySelector('button[role="combobox"]')).toBeNull();
   });
