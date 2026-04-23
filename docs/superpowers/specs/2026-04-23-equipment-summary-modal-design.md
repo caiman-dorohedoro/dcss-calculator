@@ -48,6 +48,10 @@ The problem is especially visible for imported artifacts:
 - Prefer imported in-game item names exactly as provided by `displayName`.
 - Generate fallback text that uses in-game-style item names such as `pair of
   gloves`, `leather armour`, and `orb of energy`.
+- Keep enchantment values visible for enchantable equipped gear, including
+  explicit `+0` values such as `+0 cloak`.
+- Present the equipment rows as one compact list in an order that feels close
+  to Crawl's status equipment view.
 - Move all equipment selectors, enchant controls, and item modifier controls
   into a details modal.
 - Keep every dynamic slot visible, including octopode ring slots and formicid
@@ -90,16 +94,39 @@ Rows should cover all currently supported equipment:
 - boots
 - barding
 
+The equipment section should not introduce additional visual subsections such
+as `Rings`, `Amulets`, `Headgear`, or `Fixed Equipment`. The calculator already
+has larger sections for stats, skills, equipment, and mutations; inside the
+equipment section, rows should read as one continuous equipment list.
+
+The list should be ordered to resemble Crawl's in-game equipment status view,
+without trying to reproduce unsupported inventory concepts:
+
+1. offhand equipment: shield, then orb
+2. body armour
+3. headgear
+4. cloak
+5. gloves
+6. boots
+7. barding
+8. amulets
+9. rings
+
+Weapon or staff rows are out of scope because the current calculator state does
+not model a weapon slot.
+
 All dynamic slots stay visible even when empty. For example, octopodes still see
 all ring rows, and formicids still see both glove rows. Empty slots should use a
 clear fallback such as `none`.
 
 The row label identifies the app slot, while the summary text should read like
-an in-game item name. For example:
+an in-game item name. Rows should keep the existing `Label: item text` shape;
+the UI should not switch to `label - item text`. For example:
 
 - `Armour: the +4 leather armour of the Plethaurus {Will+ Str+2 Dex+5}`
 - `Ring 1: a ring of protection +4`
-- `Glove 1: a +5 pair of gloves {Str+2}`
+- `Glove 1: +5 pair of gloves {Str+2}`
+- `Cloak: +0 cloak`
 - `Orb: an orb of energy`
 - `Boots: none`
 
@@ -129,11 +156,15 @@ Fallback examples:
 - orb: `orb of energy {Wiz+1}`
 - ring: `ring of protection +4`
 - amulet: `amulet of reflection`
-- headgear: `+2 helmet`
+- headgear: `+0 helmet`
 - gloves: `+5 pair of gloves {Str+2}`
 - cloak: `+1 cloak`
-- boots: `pair of boots`
+- boots: `+0 pair of boots`
 - barding: `+5 barding`
+
+Fallback text should include `+0` for enchantable equipment when the item is
+present. Rings keep their existing plus behavior: only ring kinds that actually
+have a ring plus, such as protection or evasion, append that plus value.
 
 Modifier summaries should include only item-level effects that already exist in
 `EquipmentModifierBag`: `Str`, `Dex`, `Int`, `AC`, `EV`, `SH`, and `Wiz`.
@@ -207,6 +238,11 @@ Add tests before implementation for the new visible behavior:
 - imported `displayName` renders unchanged in an equipment row
 - fallback text uses in-game-style names such as `pair of gloves`, `leather
   armour`, and `orb of energy`
+- fallback text includes `+0` for equipped enchantable gear
+- the equipment section orders rows like the supported subset of Crawl's status
+  equipment view
+- the equipment section does not render nested headings such as `Rings`,
+  `Amulets`, or `Fixed Equipment`
 - the main equipment section no longer renders equipment selectors, checkboxes,
   or modifier inputs directly
 - clicking a row opens the details modal
