@@ -194,6 +194,18 @@ const Calculator = <V extends GameVersion>({
     ...state.orbItem,
     kind: state.orb,
   };
+  const offhandSummary =
+    primaryShieldItem.kind !== "none"
+      ? formatShieldSummary(primaryShieldItem)
+      : formatOrbSummary(primaryOrbItem);
+  const openOffhandModal = () =>
+    setOpenPrimaryEquipment(
+      primaryShieldItem.kind !== "none"
+        ? "shield"
+        : primaryOrbItem.kind !== "none"
+        ? "orb"
+        : "shield"
+    );
 
   const renderPrimaryEquipmentModal = () => {
     switch (openPrimaryEquipment) {
@@ -390,16 +402,10 @@ const Calculator = <V extends GameVersion>({
         <SectionHeading>Equipment</SectionHeading>
         <div className="flex flex-col gap-3">
           <EquipmentSummaryRow
-            testId="equipment-row-shield"
-            label="Shield"
-            summary={formatShieldSummary(primaryShieldItem)}
-            onOpen={() => setOpenPrimaryEquipment("shield")}
-          />
-          <EquipmentSummaryRow
-            testId="equipment-row-orb"
-            label="Orb"
-            summary={formatOrbSummary(primaryOrbItem)}
-            onOpen={() => setOpenPrimaryEquipment("orb")}
+            testId="equipment-row-offhand"
+            label="Offhand"
+            summary={offhandSummary}
+            onOpen={openOffhandModal}
           />
           <EquipmentSummaryRow
             testId="equipment-row-body-armour"

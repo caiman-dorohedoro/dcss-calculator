@@ -220,9 +220,10 @@ describe("Calculator desktop layout", () => {
     expect(desktopSpellSkillControls.textContent).not.toContain("conjuration");
     expect(desktopSpellSkillControls.textContent).not.toContain("fire");
 
+    expect(equipmentSection.textContent).toContain("Offhand:");
     expect(equipmentSection.textContent).toContain("Armour:");
-    expect(equipmentSection.textContent).toContain("Shield:");
-    expect(equipmentSection.textContent).toContain("Orb:");
+    expect(equipmentSection.textContent).not.toContain("Shield:");
+    expect(equipmentSection.textContent).not.toContain("Orb:");
     expect(desktopDynamicEquipmentControls.className).toContain("hidden");
     expect(desktopDynamicEquipmentControls.className).toContain("lg:flex");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Ring 1");
@@ -287,9 +288,8 @@ describe("Calculator desktop layout", () => {
       equipmentSection.querySelectorAll('[data-testid^="equipment-row-"]')
     ).map((row) => row.getAttribute("data-testid"));
 
-    expect(rowIds.slice(0, 11)).toEqual([
-      "equipment-row-shield",
-      "equipment-row-orb",
+    expect(rowIds.slice(0, 10)).toEqual([
+      "equipment-row-offhand",
       "equipment-row-body-armour",
       "equipment-row-headgear-0",
       "equipment-row-cloak",
@@ -302,7 +302,59 @@ describe("Calculator desktop layout", () => {
     ]);
   });
 
-  test("renders body armour, shield, and orb as summary rows", async () => {
+  test("uses one offhand row for mutually exclusive shield and orb equipment", async () => {
+    const shieldState = buildDefaultCalculatorState("trunk");
+    shieldState.shield = "kite_shield";
+    shieldState.shieldItem = {
+      ...shieldState.shieldItem,
+      kind: "kite_shield",
+      enchant: 2,
+    };
+    shieldState.orb = "none";
+
+    await act(async () => {
+      root.render(<Calculator state={shieldState} setState={mockSetState} />);
+    });
+
+    let equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+    let offhandRow = equipmentSection.querySelector(
+      '[data-testid="equipment-row-offhand"]'
+    ) as HTMLButtonElement;
+
+    expect(offhandRow.textContent).toContain("Offhand:");
+    expect(offhandRow.textContent).toContain("+2 kite shield");
+    expect(equipmentSection.textContent).not.toContain("Shield:");
+    expect(equipmentSection.textContent).not.toContain("Orb:");
+
+    const orbState = buildDefaultCalculatorState("trunk");
+    orbState.shield = "none";
+    orbState.orb = "energy";
+    orbState.orbItem = {
+      ...orbState.orbItem,
+      kind: "energy",
+      modifiers: { wizardry: 1 },
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={orbState} setState={mockSetState} />);
+    });
+
+    equipmentSection = container.querySelector(
+      '[data-testid="sidebar-section-equipment"]'
+    ) as HTMLDivElement;
+    offhandRow = equipmentSection.querySelector(
+      '[data-testid="equipment-row-offhand"]'
+    ) as HTMLButtonElement;
+
+    expect(offhandRow.textContent).toContain("Offhand:");
+    expect(offhandRow.textContent).toContain("orb of energy {Wiz+1}");
+    expect(equipmentSection.textContent).not.toContain("Shield:");
+    expect(equipmentSection.textContent).not.toContain("Orb:");
+  });
+
+  test("renders body armour and offhand equipment as summary rows", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.armour = "leather_armour";
     state.bodyArmour = {
@@ -333,13 +385,10 @@ describe("Calculator desktop layout", () => {
         ?.textContent
     ).toContain("+4 leather armour (Resonance) {Int+3}");
     expect(
-      equipmentSection.querySelector('[data-testid="equipment-row-shield"]')
+      equipmentSection.querySelector('[data-testid="equipment-row-offhand"]')
         ?.textContent
     ).toContain("+2 kite shield");
-    expect(
-      equipmentSection.querySelector('[data-testid="equipment-row-orb"]')
-        ?.textContent
-    ).toContain("none");
+    expect(equipmentSection.textContent).not.toContain("Orb:");
     expect(
       equipmentSection.querySelector(
         '[data-testid="body-armour-selector-control"]'
@@ -452,7 +501,7 @@ describe("Calculator desktop layout", () => {
     expect(bodyArmourRow.textContent).toContain("quicksilver dragon scales");
   });
 
-  test("renders body armour, shield, and orb modifiers in summary rows", async () => {
+  test("renders body armour and equipped offhand modifiers in summary rows", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.bodyArmour = {
       ...equipped.bodyArmour,
@@ -464,12 +513,6 @@ describe("Calculator desktop layout", () => {
       kind: "kite_shield",
       modifiers: { sh: 2 },
     };
-    equipped.orb = "energy";
-    equipped.orbItem = {
-      ...equipped.orbItem,
-      kind: "energy",
-      modifiers: { wizardry: 1 },
-    };
 
     await act(async () => {
       root.render(<Calculator state={equipped} setState={mockSetState} />);
@@ -480,11 +523,9 @@ describe("Calculator desktop layout", () => {
     ) as HTMLDivElement;
 
     expect(equipmentSection.textContent).toContain("Armour");
-    expect(equipmentSection.textContent).toContain("Shield");
-    expect(equipmentSection.textContent).toContain("Orb");
+    expect(equipmentSection.textContent).toContain("Offhand");
     expect(equipmentSection.textContent).toContain("Int+3");
     expect(equipmentSection.textContent).toContain("SH+2");
-    expect(equipmentSection.textContent).toContain("Wiz");
     expect(equipmentSection.textContent).not.toContain("Modifiers");
     expect(
       equipmentSection
@@ -493,12 +534,7 @@ describe("Calculator desktop layout", () => {
     ).toBeNull();
     expect(
       equipmentSection
-        .querySelector('[data-testid="equipment-row-shield"]')
-        ?.querySelector('input[type="number"]')
-    ).toBeNull();
-    expect(
-      equipmentSection
-        .querySelector('[data-testid="equipment-row-orb"]')
+        .querySelector('[data-testid="equipment-row-offhand"]')
         ?.querySelector('input[type="number"]')
     ).toBeNull();
   });
@@ -520,7 +556,7 @@ describe("Calculator desktop layout", () => {
     await act(async () => {
       (
         container.querySelector(
-          '[data-testid="equipment-row-shield"]'
+          '[data-testid="equipment-row-offhand"]'
         ) as HTMLButtonElement
       ).click();
     });
@@ -545,7 +581,7 @@ describe("Calculator desktop layout", () => {
     await act(async () => {
       (
         container.querySelector(
-          '[data-testid="equipment-row-shield"]'
+          '[data-testid="equipment-row-offhand"]'
         ) as HTMLButtonElement
       ).click();
     });
@@ -556,7 +592,7 @@ describe("Calculator desktop layout", () => {
     expect(container.textContent).not.toContain("shield enchant");
   });
 
-  test("opens shield modal controls from the shield summary row", async () => {
+  test("opens shield modal controls from the offhand summary row", async () => {
     const equipped = buildDefaultCalculatorState("trunk");
     equipped.shield = "buckler";
     equipped.shieldItem = {
@@ -572,10 +608,10 @@ describe("Calculator desktop layout", () => {
       '[data-testid="sidebar-section-equipment"]'
     ) as HTMLDivElement;
     const shieldRow = equipmentSection.querySelector(
-      '[data-testid="equipment-row-shield"]'
+      '[data-testid="equipment-row-offhand"]'
     ) as HTMLButtonElement;
 
-    expect(shieldRow.textContent).toContain("Shield:");
+    expect(shieldRow.textContent).toContain("Offhand:");
     expect(shieldRow.querySelector('input[type="number"]')).toBeNull();
 
     await act(async () => {
