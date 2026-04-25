@@ -180,6 +180,9 @@ describe("DynamicEquipmentControls", () => {
       ])
     );
     expect(headings).toContain("Mutations");
+    expect(dynamicEquipmentList.textContent).toContain("Amulet:");
+    expect(dynamicEquipmentList.textContent).not.toContain("Amulet 1");
+    expect(dynamicEquipmentList.textContent).toContain("Glove 1");
   });
 
   test("clears imported metadata when manual slot edits change the slot state", () => {
@@ -306,8 +309,12 @@ describe("DynamicEquipmentControls", () => {
       '[data-testid="equipment-row-glove-0"]'
     ) as HTMLButtonElement;
 
-    expect(gloveRow.textContent).toContain("Glove 1");
+    expect(gloveRow.textContent).toContain("Glove:");
+    expect(gloveRow.textContent).not.toContain("Glove 1");
     expect(gloveRow.textContent).toContain("+1 pair of gloves");
+    expect(gloveRow.querySelectorAll("span")[1].className).toContain(
+      "text-[#eaeaea]"
+    );
     expect(gloveRow.textContent).not.toContain("Enchant:");
     expect(gloveRow.querySelector('input[type="checkbox"]')).toBeNull();
     expect(gloveRow.querySelector('input[type="number"]')).toBeNull();
@@ -609,7 +616,7 @@ describe("DynamicEquipmentControls", () => {
         ) as HTMLInputElement
     );
     for (const input of activeModifierInputs) {
-      expect(input.className).toContain("border-lime-400");
+      expect(input.className).toContain("border-[#a7a7a7]");
     }
 
     expect(
@@ -618,7 +625,7 @@ describe("DynamicEquipmentControls", () => {
           'input[aria-label="AC modifier"]'
         ) as HTMLInputElement
       ).className
-    ).not.toContain("border-lime-400");
+    ).not.toContain("border-[#a7a7a7]");
   });
 
   test("cancels ring modal edits without updating state", async () => {

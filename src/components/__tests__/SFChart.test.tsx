@@ -90,7 +90,8 @@ describe("SFChart mobile spell controls", () => {
     expect(mobileSpellSkillControls.textContent).not.toContain("conjuration");
     expect(mobileSpellSkillControls.textContent).not.toContain("fire");
     expect(mobileDynamicEquipmentControls.textContent).toContain("Ring 1");
-    expect(mobileDynamicEquipmentControls.textContent).toContain("Amulet 1");
+    expect(mobileDynamicEquipmentControls.textContent).toContain("Amulet:");
+    expect(mobileDynamicEquipmentControls.textContent).not.toContain("Amulet 1");
     const mobileDynamicEquipmentList = mobileDynamicEquipmentControls.querySelector(
       '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
@@ -99,7 +100,8 @@ describe("SFChart mobile spell controls", () => {
     ) as HTMLButtonElement;
     expect(mobileHeadgearRow.textContent).toContain("Headgear:");
     expect(mobileHeadgearRow.textContent).not.toContain("present");
-    expect(mobileDynamicEquipmentControls.textContent).toContain("Glove 1");
+    expect(mobileDynamicEquipmentControls.textContent).toContain("Glove:");
+    expect(mobileDynamicEquipmentControls.textContent).not.toContain("Glove 1");
     expect(mobileDynamicEquipmentControls.textContent).not.toContain(
       "body armour ego"
     );

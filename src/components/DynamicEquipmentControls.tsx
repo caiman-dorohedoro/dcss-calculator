@@ -54,6 +54,9 @@ const SectionHeading = ({ children }: { children: string }) => (
   </div>
 );
 
+const indexedSlotLabel = (label: string, count: number, index: number) =>
+  count === 1 ? label : `${label} ${index + 1}`;
+
 const clearImportedItemMetadata = <T extends {
   displayName?: string;
   propertiesText?: string;
@@ -231,7 +234,11 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentEditModal
             config={{
               type: "ring",
-              title: `Ring ${openEquipment.index + 1}`,
+              title: indexedSlotLabel(
+                "Ring",
+                slotCounts.ringSlots,
+                openEquipment.index
+              ),
               value: ringSlots[openEquipment.index] ?? createDefaultRingSlot(),
               onSave: (next, changed) => {
                 updateRingSlot(openEquipment.index, () =>
@@ -248,7 +255,11 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentEditModal
             config={{
               type: "amulet",
-              title: `Amulet ${openEquipment.index + 1}`,
+              title: indexedSlotLabel(
+                "Amulet",
+                slotCounts.amuletSlots,
+                openEquipment.index
+              ),
               value:
                 amuletSlots[openEquipment.index] ?? createDefaultAmuletSlot(),
               onSave: (next, changed) => {
@@ -266,10 +277,11 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentEditModal
             config={{
               type: "headgear",
-              title:
-                slotCounts.headgearSlots === 1
-                  ? "Headgear"
-                  : `Headgear ${openEquipment.index + 1}`,
+              title: indexedSlotLabel(
+                "Headgear",
+                slotCounts.headgearSlots,
+                openEquipment.index
+              ),
               value:
                 headgearSlots[openEquipment.index] ??
                 createDefaultAuxArmourSlot(),
@@ -291,7 +303,11 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentEditModal
             config={{
               type: "gloves",
-              title: `Glove ${openEquipment.index + 1}`,
+              title: indexedSlotLabel(
+                "Glove",
+                slotCounts.gloveSlots,
+                openEquipment.index
+              ),
               value:
                 gloveSlots[openEquipment.index] ??
                 createDefaultAuxArmourSlot(),
@@ -334,9 +350,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
             key={`headgear-${index}`}
             testId={`equipment-row-headgear-${index}`}
             label={
-              slotCounts.headgearSlots === 1
-                ? "Headgear"
-                : `Headgear ${index + 1}`
+              indexedSlotLabel("Headgear", slotCounts.headgearSlots, index)
             }
             summary={formatHeadgearSummary(slot)}
             onOpen={() => setOpenEquipment({ type: "headgear", index })}
@@ -347,7 +361,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentSummaryRow
             key={`glove-${index}`}
             testId={`equipment-row-glove-${index}`}
-            label={`Glove ${index + 1}`}
+            label={indexedSlotLabel("Glove", slotCounts.gloveSlots, index)}
             summary={formatGlovesSummary(slot)}
             onOpen={() => setOpenEquipment({ type: "gloves", index })}
           />
@@ -358,7 +372,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentSummaryRow
             key={`amulet-${index}`}
             testId={`equipment-row-amulet-${index}`}
-            label={`Amulet ${index + 1}`}
+            label={indexedSlotLabel("Amulet", slotCounts.amuletSlots, index)}
             summary={formatAmuletSummary(slot)}
             onOpen={() => setOpenEquipment({ type: "amulet", index })}
           />
@@ -367,7 +381,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
           <EquipmentSummaryRow
             key={`ring-${index}`}
             testId={`equipment-row-ring-${index}`}
-            label={`Ring ${index + 1}`}
+            label={indexedSlotLabel("Ring", slotCounts.ringSlots, index)}
             summary={formatRingSummary(slot)}
             onOpen={() => setOpenEquipment({ type: "ring", index })}
           />

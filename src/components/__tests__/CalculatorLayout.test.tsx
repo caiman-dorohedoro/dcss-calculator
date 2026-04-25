@@ -227,7 +227,8 @@ describe("Calculator desktop layout", () => {
     expect(desktopDynamicEquipmentControls.className).toContain("hidden");
     expect(desktopDynamicEquipmentControls.className).toContain("lg:flex");
     expect(desktopDynamicEquipmentControls.textContent).toContain("Ring 1");
-    expect(desktopDynamicEquipmentControls.textContent).toContain("Amulet 1");
+    expect(desktopDynamicEquipmentControls.textContent).toContain("Amulet:");
+    expect(desktopDynamicEquipmentControls.textContent).not.toContain("Amulet 1");
     const desktopDynamicEquipmentList = desktopDynamicEquipmentControls.querySelector(
       '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
@@ -236,7 +237,8 @@ describe("Calculator desktop layout", () => {
     ) as HTMLButtonElement;
     expect(desktopHeadgearRow.textContent).toContain("Headgear:");
     expect(desktopHeadgearRow.textContent).not.toContain("present");
-    expect(desktopDynamicEquipmentControls.textContent).toContain("Glove 1");
+    expect(desktopDynamicEquipmentControls.textContent).toContain("Glove:");
+    expect(desktopDynamicEquipmentControls.textContent).not.toContain("Glove 1");
     expect(desktopDynamicEquipmentControls.textContent).not.toContain(
       "body armour ego"
     );
@@ -248,9 +250,9 @@ describe("Calculator desktop layout", () => {
     );
 
     expect(equipmentSection.textContent).toContain("Ring 1");
-    expect(equipmentSection.textContent).toContain("Amulet 1");
+    expect(equipmentSection.textContent).toContain("Amulet:");
     expect(equipmentSection.textContent).toContain("Headgear:");
-    expect(equipmentSection.textContent).toContain("Glove 1");
+    expect(equipmentSection.textContent).toContain("Glove:");
     expect(equipmentSection.textContent).toContain("Cloak");
     expect(equipmentSection.textContent).toContain("Boots");
     expect(equipmentSection.textContent).toContain("Barding");

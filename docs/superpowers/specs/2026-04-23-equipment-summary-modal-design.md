@@ -125,6 +125,11 @@ All dynamic slots stay visible even when empty. For example, octopodes still see
 all ring rows, and formicids still see both glove rows. Empty slots should use a
 clear fallback such as `none`.
 
+When a slot type can repeat but the current species/version only exposes one
+slot, omit the numeric suffix. For example, show `Glove:` and `Amulet:` for
+one-slot characters, while keeping `Glove 1:` / `Glove 2:` or `Ring 1:` /
+`Ring 2:` when multiple slots are actually present.
+
 The row label identifies the app slot, while the summary text should read like
 an in-game item name. Rows should keep the existing `Label: item text` shape;
 the UI should not switch to `label - item text`. For example:
@@ -143,6 +148,8 @@ The app does not need to reproduce Crawl inventory letters such as `a -` or
 Equipment rows should be visually compact. Keep enough hover/focus affordance
 to make rows clickable, but use tighter vertical padding and smaller gaps than
 form controls so the list scans more like an in-game equipment readout.
+Summary text should use a light terminal-like foreground near `rgb(234 234 234)`
+instead of the earlier bright green.
 
 ## Summary Text Rules
 
@@ -295,7 +302,9 @@ UI from adding a selector for every Crawl artefact flag while still allowing
 users to correct imported properties such as `{Ponderous, Will+ MP+10 Int+5}`.
 Inputs with non-zero imported or edited values should be visually emphasized
 without dimming the surrounding zero-value inputs, so users can quickly spot
-which parser-derived modifiers are active.
+which parser-derived modifiers are active. The active input emphasis should use
+a subtle neutral gray near `rgb(167 167 167)` rather than the equipment row
+foreground.
 
 For normal imported rings such as `ring of willpower`, the summary row should
 not invent a Crawl property block like `{Will+}` when the parser did not provide

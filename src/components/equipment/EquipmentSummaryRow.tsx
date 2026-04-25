@@ -25,7 +25,7 @@ const EquipmentSummaryRow = ({
     onClick={onOpen}
   >
     <span className="shrink-0 text-muted-foreground">{label}:</span>
-    <span className="min-w-0 flex-1 break-words font-mono text-lime-300">
+    <span className="min-w-0 flex-1 break-words font-mono text-[#eaeaea]">
       {summary}
     </span>
   </button>

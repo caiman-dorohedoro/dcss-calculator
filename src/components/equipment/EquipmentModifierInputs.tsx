@@ -26,7 +26,7 @@ const numericModifierFields: Array<[string, NumericModifierKey]> = [
 ];
 
 const activeModifierInputClassName =
-  "border-lime-400 bg-lime-400/10 shadow-[0_0_0_1px_rgba(163,230,53,0.35)]";
+  "border-[#a7a7a7] bg-[#a7a7a7]/10 shadow-[0_0_0_1px_rgba(167,167,167,0.35)]";
 
 const normalizeFlags = (value: string) => {
   const flags = value
