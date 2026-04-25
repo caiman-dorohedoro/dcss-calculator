@@ -399,23 +399,23 @@ const Calculator = <V extends GameVersion>({
       </section>
       <section
         data-testid="sidebar-section-equipment"
-        className="flex flex-col gap-3"
+        className="flex flex-col"
       >
-        <SectionHeading>Equipment</SectionHeading>
-        <div className="flex flex-col gap-1">
-          <EquipmentSummaryRow
-            testId="equipment-row-offhand"
-            label="Offhand"
-            summary={offhandSummary}
-            onOpen={openOffhandModal}
-          />
-          <EquipmentSummaryRow
-            testId="equipment-row-body-armour"
-            label="Armour"
-            summary={formatBodyArmourSummary(primaryBodyArmour)}
-            onOpen={() => setOpenPrimaryEquipment("bodyArmour")}
-          />
+        <div className="pb-3">
+          <SectionHeading>Equipment</SectionHeading>
         </div>
+        <EquipmentSummaryRow
+          testId="equipment-row-offhand"
+          label="Offhand"
+          summary={offhandSummary}
+          onOpen={openOffhandModal}
+        />
+        <EquipmentSummaryRow
+          testId="equipment-row-body-armour"
+          label="Armour"
+          summary={formatBodyArmourSummary(primaryBodyArmour)}
+          onOpen={() => setOpenPrimaryEquipment("bodyArmour")}
+        />
         <DynamicEquipmentControls
           state={state}
           setState={setState}
