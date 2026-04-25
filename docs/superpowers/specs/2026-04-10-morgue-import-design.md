@@ -109,6 +109,12 @@ The parser produces a broader record than the app can store. It includes:
 
 That mismatch means the implementation needs a dedicated translation layer.
 
+As of `dcss-morgue-parser@0.6.2`, live dumps whose title line is compacted to
+an abbreviation such as `(GCAE)` can still parse when the `Notes` section starts
+with the full descriptor, for example `Gale Centaur Air Elementalist`. The app
+continues to rely on parser output at this boundary instead of duplicating
+species/background parsing locally.
+
 ## Proposed Design
 
 ### 1. Add A Dedicated Morgue Import Mapping Layer

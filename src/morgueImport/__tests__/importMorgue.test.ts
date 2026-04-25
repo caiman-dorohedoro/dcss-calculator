@@ -86,6 +86,15 @@ const baseSkills = {
   shapeshifting: 0,
 };
 
+const defaultGodState = {
+  godPietyDisplay: null,
+  godPietyRank: null,
+  godOstracismPips: 0,
+  godStatus: null,
+  godUnderPenance: false,
+  godHistory: [],
+};
+
 describe("morgue import mapper", () => {
   test("normalizes raw morgue versions into supported app versions", () => {
     expect(normalizeMorgueVersion("0.32.1-5-gba85492")).toBe("0.32");
@@ -158,6 +167,7 @@ describe("morgue import mapper", () => {
       speciesVariant: null,
       background: "Fighter",
       god: null,
+      ...defaultGodState,
       xl: 10,
       ac: 20,
       ev: 11,
@@ -282,6 +292,7 @@ describe("morgue import mapper", () => {
       speciesVariant: null,
       background: "Conjurer",
       god: null,
+      ...defaultGodState,
       xl: 12,
       ac: 17,
       ev: 20,
@@ -421,6 +432,7 @@ describe("morgue import mapper", () => {
       speciesVariant: null,
       background: "Conjurer",
       god: null,
+      ...defaultGodState,
       xl: 12,
       ac: 17,
       ev: 20,
@@ -533,6 +545,7 @@ describe("morgue import mapper", () => {
       speciesVariant: null,
       background: "Conjurer",
       god: null,
+      ...defaultGodState,
       xl: 12,
       ac: 17,
       ev: 20,
@@ -646,6 +659,7 @@ describe("morgue import mapper", () => {
       speciesVariant: null,
       background: "Conjurer",
       god: null,
+      ...defaultGodState,
       xl: 12,
       ac: 17,
       ev: 20,
@@ -753,5 +767,26 @@ describe("morgue import mapper", () => {
     expect(imported.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Rings" })])
     );
+  });
+
+  test("parses compact title-line dumps using the notes descriptor fallback", () => {
+    const abbreviatedMorgue = oniMonkTrunkStatueFormMorgue.replace(
+      "(Oni Monk)",
+      "(GCAE)"
+    ).concat(`
+Notes
+Turn   | Place    | Note
+-------+----------+----------------------------------------
+     0 | D:1      | caiman the Gale Centaur Air Elementalist began the quest for the Orb.
+`);
+
+    const parsed = parseMorgueText(abbreviatedMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    expect(parsed.record.species).toBe("Gale Centaur");
+    expect(parsed.record.background).toBe("Air Elementalist");
   });
 });
