@@ -20,12 +20,6 @@ export type ArmourKey =
   | "shadow_dragon"
   | "golden_dragon";
 
-export type BodyArmourEgoKey =
-  | "none"
-  | "command"
-  | "death"
-  | "resonance";
-
 export const armourOptions = {
   none: { name: "none", baseAC: 0, encumbrance: 0 },
   robe: { name: "robe", baseAC: 2, encumbrance: 0 },
@@ -84,8 +78,64 @@ export const miscellaneousOptions = {
 } as const;
 
 export const bodyArmourEgoOptions = {
-  none: { name: "None" },
-  command: { name: "Command" },
-  death: { name: "Death" },
-  resonance: { name: "Resonance" },
-} as const satisfies Record<BodyArmourEgoKey, { name: string }>;
+  none: { name: "None", itemName: null },
+  "fire resistance": { name: "Fire resistance", itemName: "fire resistance" },
+  "cold resistance": { name: "Cold resistance", itemName: "cold resistance" },
+  "poison resistance": {
+    name: "Poison resistance",
+    itemName: "poison resistance",
+  },
+  "corrosion resistance": {
+    name: "Corrosion resistance",
+    itemName: "corrosion resistance",
+  },
+  "see invisible": { name: "See invisible", itemName: "see invisible" },
+  invisibility: { name: "Invisibility", itemName: "invisibility" },
+  strength: { name: "Strength", itemName: "strength" },
+  dexterity: { name: "Dexterity", itemName: "dexterity" },
+  intelligence: { name: "Intelligence", itemName: "intelligence" },
+  ponderousness: { name: "Ponderousness", itemName: "ponderousness" },
+  flying: { name: "Flying", itemName: "flying" },
+  willpower: { name: "Willpower", itemName: "willpower" },
+  protection: { name: "Protection", itemName: "protection" },
+  stealth: { name: "Stealth", itemName: "stealth" },
+  resistance: { name: "Resistance", itemName: "resistance" },
+  "positive energy": { name: "Positive energy", itemName: "positive energy" },
+  "the Archmagi": { name: "The Archmagi", itemName: "the Archmagi" },
+  reflection: { name: "Reflection", itemName: "reflection" },
+  "spirit shield": { name: "Spirit shield", itemName: "spirit shield" },
+  hurling: { name: "Hurling", itemName: "hurling" },
+  repulsion: { name: "Repulsion", itemName: "repulsion" },
+  harm: { name: "Harm", itemName: "harm" },
+  shadows: { name: "Shadows", itemName: "shadows" },
+  rampaging: { name: "Rampaging", itemName: "rampaging" },
+  infusion: { name: "Infusion", itemName: "infusion" },
+  light: { name: "Light", itemName: "light" },
+  wrath: { name: "Wrath", itemName: "wrath" },
+  mayhem: { name: "Mayhem", itemName: "mayhem" },
+  guile: { name: "Guile", itemName: "guile" },
+  energy: { name: "Energy", itemName: "energy" },
+  sniping: { name: "Sniping", itemName: "sniping" },
+  ice: { name: "Ice", itemName: "ice" },
+  fire: { name: "Fire", itemName: "fire" },
+  air: { name: "Air", itemName: "air" },
+  earth: { name: "Earth", itemName: "earth" },
+  archery: { name: "Archery", itemName: "archery" },
+  command: { name: "Command", itemName: "command" },
+  death: { name: "Death", itemName: "death" },
+  resonance: { name: "Resonance", itemName: "resonance" },
+  parrying: { name: "Parrying", itemName: "parrying" },
+  glass: { name: "Glass", itemName: "glass" },
+  pyromania: { name: "Pyromania", itemName: "pyromania" },
+  stardust: { name: "Stardust", itemName: "stardust" },
+  mesmerism: { name: "Mesmerism", itemName: "mesmerism" },
+  attunement: { name: "Attunement", itemName: "attunement" },
+} as const;
+
+export type KnownBodyArmourEgoKey = keyof typeof bodyArmourEgoOptions;
+export type BodyArmourEgoKey = KnownBodyArmourEgoKey | (string & {});
+export type SpellBoostBodyArmourEgoKey =
+  | "none"
+  | "command"
+  | "death"
+  | "resonance";

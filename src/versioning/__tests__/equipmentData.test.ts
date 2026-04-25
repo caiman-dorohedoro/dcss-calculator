@@ -2,6 +2,7 @@ import { describe, expect, test } from "@jest/globals";
 import {
   getArmourEncumbrance,
   getBodyArmourEgoOptions,
+  getSpellBoostBodyArmourEgoOptions,
 } from "../equipmentData";
 
 describe("equipmentData", () => {
@@ -21,19 +22,37 @@ describe("equipmentData", () => {
     expect(getArmourEncumbrance("trunk", "acid_dragon")).toBe(5);
   });
 
-  test("only exposes no special body-armour spell ego before 0.34", () => {
-    expect(Object.keys(getBodyArmourEgoOptions("0.32"))).toEqual(["none"]);
-    expect(Object.keys(getBodyArmourEgoOptions("0.33"))).toEqual(["none"]);
+  test("exposes common Crawl body-armour egos on all supported versions", () => {
+    for (const version of ["0.32", "0.33", "0.34", "trunk"] as const) {
+      expect(Object.keys(getBodyArmourEgoOptions(version))).toEqual(
+        expect.arrayContaining([
+          "none",
+          "willpower",
+          "strength",
+          "dexterity",
+          "intelligence",
+          "protection",
+          "resistance",
+          "ponderousness",
+        ])
+      );
+    }
   });
 
-  test("exposes command, death, and resonance egos on 0.34 and trunk", () => {
-    expect(Object.keys(getBodyArmourEgoOptions("0.34"))).toEqual([
+  test("exposes command, death, and resonance as spell-boost egos only on 0.34 and trunk", () => {
+    expect(Object.keys(getSpellBoostBodyArmourEgoOptions("0.32"))).toEqual([
+      "none",
+    ]);
+    expect(Object.keys(getSpellBoostBodyArmourEgoOptions("0.33"))).toEqual([
+      "none",
+    ]);
+    expect(Object.keys(getSpellBoostBodyArmourEgoOptions("0.34"))).toEqual([
       "none",
       "command",
       "death",
       "resonance",
     ]);
-    expect(Object.keys(getBodyArmourEgoOptions("trunk"))).toEqual([
+    expect(Object.keys(getSpellBoostBodyArmourEgoOptions("trunk"))).toEqual([
       "none",
       "command",
       "death",

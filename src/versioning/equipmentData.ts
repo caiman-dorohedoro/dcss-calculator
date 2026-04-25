@@ -1,7 +1,8 @@
 import {
   ArmourKey,
   armourOptions,
-  BodyArmourEgoKey,
+  type KnownBodyArmourEgoKey,
+  type SpellBoostBodyArmourEgoKey,
   bodyArmourEgoOptions,
 } from "@/types/equipment.ts";
 import { GameVersion } from "@/types/game";
@@ -13,9 +14,65 @@ const fireDragonEncumbranceByVersion: Record<GameVersion, number> = {
   trunk: 9,
 };
 
+const commonBodyArmourEgoKeys = [
+  "none",
+  "fire resistance",
+  "cold resistance",
+  "poison resistance",
+  "corrosion resistance",
+  "see invisible",
+  "invisibility",
+  "strength",
+  "dexterity",
+  "intelligence",
+  "ponderousness",
+  "flying",
+  "willpower",
+  "protection",
+  "stealth",
+  "resistance",
+  "positive energy",
+  "the Archmagi",
+  "reflection",
+  "spirit shield",
+  "hurling",
+  "repulsion",
+  "harm",
+  "shadows",
+  "rampaging",
+  "infusion",
+  "light",
+  "wrath",
+  "mayhem",
+  "guile",
+  "energy",
+  "sniping",
+  "ice",
+  "fire",
+  "air",
+  "earth",
+  "archery",
+] as const satisfies readonly KnownBodyArmourEgoKey[];
+
+const spellBoostBodyArmourEgoKeys = [
+  "command",
+  "death",
+  "resonance",
+] as const satisfies readonly KnownBodyArmourEgoKey[];
+
 const bodyArmourEgoKeysByVersion: Record<
   GameVersion,
-  readonly BodyArmourEgoKey[]
+  readonly KnownBodyArmourEgoKey[]
+> = {
+  "0.32": commonBodyArmourEgoKeys,
+  "0.33": commonBodyArmourEgoKeys,
+  "0.34": [...commonBodyArmourEgoKeys, ...spellBoostBodyArmourEgoKeys],
+  trunk: [...commonBodyArmourEgoKeys, ...spellBoostBodyArmourEgoKeys],
+};
+
+const spellBoostBodyArmourEgoKeysByVersion: Record<
+  GameVersion,
+  readonly SpellBoostBodyArmourEgoKey[]
 > = {
   "0.32": ["none"],
   "0.33": ["none"],
@@ -40,5 +97,23 @@ export const getBodyArmourEgoOptions = <V extends GameVersion>(version: V) => {
       key,
       bodyArmourEgoOptions[key],
     ])
-  ) as Partial<Record<BodyArmourEgoKey, { name: string }>>;
+  ) as Partial<
+    Record<KnownBodyArmourEgoKey, { name: string; itemName: string | null }>
+  >;
+};
+
+export const getSpellBoostBodyArmourEgoOptions = <V extends GameVersion>(
+  version: V
+) => {
+  return Object.fromEntries(
+    spellBoostBodyArmourEgoKeysByVersion[version].map((key) => [
+      key,
+      bodyArmourEgoOptions[key],
+    ])
+  ) as Partial<
+    Record<
+      SpellBoostBodyArmourEgoKey,
+      { name: string; itemName: string | null }
+    >
+  >;
 };
