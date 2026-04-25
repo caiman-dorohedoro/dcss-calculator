@@ -481,6 +481,14 @@ describe("DynamicEquipmentControls", () => {
       headgearRow.click();
     });
 
+    expect(
+      (
+        document.body.querySelector(
+          'input[aria-label="Item flags"]'
+        ) as HTMLInputElement
+      ).placeholder
+    ).toBe("Example: Ponderous Reflect Spirit +Inv rCorr SInv");
+
     await act(async () => {
       setNumberInputValue(
         document.body.querySelector(

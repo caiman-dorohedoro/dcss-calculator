@@ -97,7 +97,7 @@ const EquipmentModifierInputs = ({
       <Input
         aria-label="Item flags"
         className="h-8"
-        placeholder="Ponderous Reflect Spirit +Inv rCorr SInv"
+        placeholder="Example: Ponderous Reflect Spirit +Inv rCorr SInv"
         value={modifiers?.flags?.join(" ") ?? ""}
         onChange={(event) => onChange(updateFlags(modifiers, event.target.value))}
       />
