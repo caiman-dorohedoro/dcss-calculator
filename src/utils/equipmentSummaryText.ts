@@ -267,9 +267,14 @@ export const formatOrbSummary = (item: OrbItemState) => {
 
 export const formatRingSummary = (slot: RingSlotState) => {
   if (slot.displayName) {
+    const hideDerivedProperties =
+      slot.source === "imported" &&
+      slot.artifactKind === "normal" &&
+      !slot.propertiesText;
+
     return withImportedDisplaySummary(slot.displayName, {
       propertiesText: slot.propertiesText,
-      modifiers: slot.modifiers,
+      modifiers: hideDerivedProperties ? undefined : slot.modifiers,
     });
   }
   if (slot.kind === "none") {

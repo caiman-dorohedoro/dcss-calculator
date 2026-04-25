@@ -25,6 +25,9 @@ const numericModifierFields: Array<[string, NumericModifierKey]> = [
   ["Wiz", "wizardry"],
 ];
 
+const activeModifierInputClassName =
+  "border-lime-400 bg-lime-400/10 shadow-[0_0_0_1px_rgba(163,230,53,0.35)]";
+
 const normalizeFlags = (value: string) => {
   const flags = value
     .split(/[,\s]+/)
@@ -86,6 +89,9 @@ const EquipmentModifierInputs = ({
           ariaLabel={`${label} modifier`}
           value={modifiers?.[key] ?? 0}
           type="number"
+          inputClassName={
+            modifiers?.[key] ? activeModifierInputClassName : undefined
+          }
           onChange={(value) =>
             onChange(updateNumericModifierBag(modifiers, key, value))
           }

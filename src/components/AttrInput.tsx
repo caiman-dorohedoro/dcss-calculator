@@ -19,6 +19,7 @@ type AttrInputProps = {
   min?: number;
   max?: number;
   ariaLabel?: string;
+  inputClassName?: string;
   onChange: (value: number) => void;
 };
 
@@ -29,6 +30,7 @@ const AttrInput = ({
   min,
   max,
   ariaLabel,
+  inputClassName,
   onChange,
 }: AttrInputProps) => {
   const minValue =
@@ -49,7 +51,12 @@ const AttrInput = ({
       <Input
         aria-label={ariaLabel}
         type="number"
-        className={cn(defaultWidth, type === "skill" ? skillWidth : "", "h-6")}
+        className={cn(
+          defaultWidth,
+          type === "skill" ? skillWidth : "",
+          "h-6",
+          inputClassName
+        )}
         min={minValue}
         max={maxValue}
         step={type === "skill" ? "0.1" : undefined}

@@ -293,6 +293,18 @@ The details modal should keep numeric properties editable through compact
 number inputs and expose flags as editable item-property tokens. This keeps the
 UI from adding a selector for every Crawl artefact flag while still allowing
 users to correct imported properties such as `{Ponderous, Will+ MP+10 Int+5}`.
+Inputs with non-zero imported or edited values should be visually emphasized
+without dimming the surrounding zero-value inputs, so users can quickly spot
+which parser-derived modifiers are active.
+
+For normal imported rings such as `ring of willpower`, the summary row should
+not invent a Crawl property block like `{Will+}` when the parser did not provide
+raw `propertiesText`. The modifier remains editable in the details modal for
+calculation parity, but the row text should stay close to Crawl's visible item
+name. Imported arbitrary or artefact rings should still show parser
+`propertiesText` when available, for example `ring "Dori" {rC+ MP+9 Stlth+}`.
+When such an imported arbitrary ring opens in the details modal, hide the
+manual `Ring type` selector and keep the modal focused on modifier correction.
 
 For imported body armour, the summary row should prefer the parser's original
 item name and raw `propertiesText` over any regenerated modifier text. This is

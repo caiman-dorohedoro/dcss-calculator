@@ -574,6 +574,53 @@ describe("DynamicEquipmentControls", () => {
     expect(document.body.textContent).toContain("Ring 1");
   });
 
+  test("hides imported arbitrary ring type and highlights active modifiers", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.ringSlots = [
+      {
+        kind: "none",
+        plus: 0,
+        displayName: 'ring "Dori"',
+        propertiesText: "rC+ MP+9 Stlth+",
+        artifactKind: "randart",
+        modifiers: { rC: 1, mp: 9, stlth: 1 },
+        source: "imported",
+      },
+    ];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-ring-0"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(document.body.querySelector('button[aria-label="Ring type"]')).toBeNull();
+
+    const activeModifierInputs = ["rC", "MP", "Stlth"].map(
+      (label) =>
+        document.body.querySelector(
+          `input[aria-label="${label} modifier"]`
+        ) as HTMLInputElement
+    );
+    for (const input of activeModifierInputs) {
+      expect(input.className).toContain("border-lime-400");
+    }
+
+    expect(
+      (
+        document.body.querySelector(
+          'input[aria-label="AC modifier"]'
+        ) as HTMLInputElement
+      ).className
+    ).not.toContain("border-lime-400");
+  });
+
   test("cancels ring modal edits without updating state", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.ringSlots = [{ kind: "protection", plus: 4 }];

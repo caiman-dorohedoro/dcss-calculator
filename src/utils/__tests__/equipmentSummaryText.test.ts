@@ -88,6 +88,19 @@ describe("equipment summary text", () => {
     ).toBe("ring of Ewkivat {rC+ rN++ Will- rCorr MP+7 Str+4}");
   });
 
+  test("does not invent property braces for normal imported rings", () => {
+    expect(
+      formatRingSummary({
+        kind: "none",
+        plus: 0,
+        displayName: "ring of willpower",
+        modifiers: { will: 1 },
+        artifactKind: "normal",
+        source: "imported",
+      })
+    ).toBe("ring of willpower");
+  });
+
   test("adds state enchantment to imported enchantable names when missing", () => {
     expect(
       formatFixedAuxSummary({

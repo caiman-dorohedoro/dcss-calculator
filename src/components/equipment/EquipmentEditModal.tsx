@@ -424,6 +424,7 @@ const RingEditor = ({
 }) => {
   const [draft, setDraft] = useState<RingSlotState>(config.value);
   const normalizedDraft = normalizeRingDraft(draft);
+  const showRingType = draft.source !== "imported" || draft.kind !== "none";
 
   return (
     <ModalFrame
@@ -436,31 +437,33 @@ const RingEditor = ({
         )
       }
     >
-      <label className="flex flex-col gap-1 text-sm">
-        Ring type
-        <Select
-          value={draft.kind}
-          onValueChange={(value) =>
-            setDraft((current) =>
-              normalizeRingDraft({
-                ...current,
-                kind: value as RingSlotState["kind"],
-              })
-            )
-          }
-        >
-          <SelectTrigger aria-label="Ring type" className="h-8">
-            <SelectValue placeholder="none" />
-          </SelectTrigger>
-          <SelectContent>
-            {ringKinds.map((kind) => (
-              <SelectItem key={kind} value={kind}>
-                {kind}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </label>
+      {showRingType ? (
+        <label className="flex flex-col gap-1 text-sm">
+          Ring type
+          <Select
+            value={draft.kind}
+            onValueChange={(value) =>
+              setDraft((current) =>
+                normalizeRingDraft({
+                  ...current,
+                  kind: value as RingSlotState["kind"],
+                })
+              )
+            }
+          >
+            <SelectTrigger aria-label="Ring type" className="h-8">
+              <SelectValue placeholder="none" />
+            </SelectTrigger>
+            <SelectContent>
+              {ringKinds.map((kind) => (
+                <SelectItem key={kind} value={kind}>
+                  {kind}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+      ) : null}
       {isRingBonusKind(draft.kind) ? (
         <EquipmentEnchantInput
           ariaLabel="Ring plus"
