@@ -1,9 +1,9 @@
 import {
   ArmourKey,
   armourOptions,
-  type KnownBodyArmourEgoKey,
+  type KnownEquipmentEgoKey,
   type SpellBoostBodyArmourEgoKey,
-  bodyArmourEgoOptions,
+  equipmentEgoOptions,
 } from "@/types/equipment.ts";
 import { GameVersion } from "@/types/game";
 
@@ -52,17 +52,17 @@ const commonBodyArmourEgoKeys = [
   "air",
   "earth",
   "archery",
-] as const satisfies readonly KnownBodyArmourEgoKey[];
+] as const satisfies readonly KnownEquipmentEgoKey[];
 
 const spellBoostBodyArmourEgoKeys = [
   "command",
   "death",
   "resonance",
-] as const satisfies readonly KnownBodyArmourEgoKey[];
+] as const satisfies readonly KnownEquipmentEgoKey[];
 
 const bodyArmourEgoKeysByVersion: Record<
   GameVersion,
-  readonly KnownBodyArmourEgoKey[]
+  readonly KnownEquipmentEgoKey[]
 > = {
   "0.32": commonBodyArmourEgoKeys,
   "0.33": commonBodyArmourEgoKeys,
@@ -95,10 +95,10 @@ export const getBodyArmourEgoOptions = <V extends GameVersion>(version: V) => {
   return Object.fromEntries(
     bodyArmourEgoKeysByVersion[version].map((key) => [
       key,
-      bodyArmourEgoOptions[key],
+      equipmentEgoOptions[key],
     ])
   ) as Partial<
-    Record<KnownBodyArmourEgoKey, { name: string; itemName: string | null }>
+    Record<KnownEquipmentEgoKey, { name: string; itemName: string | null }>
   >;
 };
 
@@ -108,7 +108,7 @@ export const getSpellBoostBodyArmourEgoOptions = <V extends GameVersion>(
   return Object.fromEntries(
     spellBoostBodyArmourEgoKeysByVersion[version].map((key) => [
       key,
-      bodyArmourEgoOptions[key],
+      equipmentEgoOptions[key],
     ])
   ) as Partial<
     Record<

@@ -77,7 +77,7 @@ export const miscellaneousOptions = {
   barding: {name: "barding", baseAC: 4, encumbrance: -6},
 } as const;
 
-export const bodyArmourEgoOptions = {
+export const equipmentEgoOptions = {
   none: { name: "None", itemName: null },
   "fire resistance": { name: "Fire resistance", itemName: "fire resistance" },
   "cold resistance": { name: "Cold resistance", itemName: "cold resistance" },
@@ -132,8 +132,12 @@ export const bodyArmourEgoOptions = {
   attunement: { name: "Attunement", itemName: "attunement" },
 } as const;
 
-export type KnownBodyArmourEgoKey = keyof typeof bodyArmourEgoOptions;
-export type BodyArmourEgoKey = KnownBodyArmourEgoKey | (string & {});
+export const bodyArmourEgoOptions = equipmentEgoOptions;
+
+export type KnownEquipmentEgoKey = keyof typeof equipmentEgoOptions;
+export type EquipmentEgoKey = KnownEquipmentEgoKey | (string & {});
+export type KnownBodyArmourEgoKey = KnownEquipmentEgoKey;
+export type BodyArmourEgoKey = EquipmentEgoKey;
 export type SpellBoostBodyArmourEgoKey =
   | "none"
   | "command"
