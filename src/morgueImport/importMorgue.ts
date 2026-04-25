@@ -21,6 +21,7 @@ import {
   shieldOptions,
   type ArmourKey,
   type BodyArmourEgoKey,
+  type EquipmentEgoKey,
   type OrbKey,
   type ShieldKey,
 } from "@/types/equipment.ts";
@@ -132,6 +133,17 @@ const mapOrb = (baseType: string | null | undefined): OrbKey | null => {
   }
 
   return orbNameMap[baseType] ?? null;
+};
+
+const mapOrbDetail = (
+  detail: EquipmentItemSnapshot | undefined,
+  summary: string | undefined
+): OrbKey | null => {
+  if (detail?.baseType === "orb" && detail.ego === "energy") {
+    return "energy";
+  }
+
+  return mapOrb(detail?.baseType ?? summary);
 };
 
 const numericItemModifierMap = {
@@ -430,6 +442,7 @@ const fillAuxArmourSlots = (
     slots[nextIndex] = {
       present: true,
       enchant: detail.enchant ?? 0,
+      ego: deriveArmourClassEgo(detail),
       modifiers: buildModifierBagFromItem(detail),
       displayName: detail.displayName,
       propertiesText: detail.propertiesText ?? undefined,
@@ -459,6 +472,7 @@ const fillHeadgearSlots = (
       present: true,
       enchant: detail.enchant ?? 0,
       kind: detail.baseType === "hat" ? "hat" : "helmet",
+      ego: deriveArmourClassEgo(detail),
       modifiers: buildModifierBagFromItem(detail),
       displayName: detail.displayName,
       propertiesText: detail.propertiesText ?? undefined,
@@ -566,6 +580,15 @@ const deriveBodyArmourEgo = (
 
   return "none";
 };
+
+const deriveArmourClassEgo = (
+  detail: EquipmentItemSnapshot | null | undefined
+): EquipmentEgoKey =>
+  detail?.objectClass === "armour" &&
+  detail.artifactKind === "normal" &&
+  detail.ego
+    ? (detail.ego as EquipmentEgoKey)
+    : "none";
 
 const deriveWildMagic = (record: ParsedMorgueTextRecord) => {
   const activeWildMagic = record.mutations.find(
@@ -720,6 +743,7 @@ export const buildImportedCalculatorState = (
     importedState.shieldItem = {
       kind: shield,
       enchant: record.shieldDetails?.enchant ?? 0,
+      ego: deriveArmourClassEgo(record.shieldDetails),
       modifiers: record.shieldDetails
         ? buildModifierBagFromItem(record.shieldDetails)
         : undefined,
@@ -730,11 +754,12 @@ export const buildImportedCalculatorState = (
     };
   }
 
-  const orb = mapOrb(record.orbDetails?.baseType ?? record.orb);
+  const orb = mapOrbDetail(record.orbDetails, record.orb);
   if (orb) {
     importedState.orb = orb;
     importedState.orbItem = {
       kind: orb,
+      ego: deriveArmourClassEgo(record.orbDetails),
       modifiers: record.orbDetails
         ? buildModifierBagFromItem(record.orbDetails, {
             ignoreFlags: orb === "energy" ? ["Energy"] : undefined,
@@ -752,6 +777,12 @@ export const buildImportedCalculatorState = (
     importedState.orbItem = {
       ...importedState.orbItem,
       kind: "none",
+      ego: "none",
+      modifiers: undefined,
+      displayName: undefined,
+      propertiesText: undefined,
+      artifactKind: undefined,
+      source: undefined,
     };
   }
   if (importedState.orb !== "none") {
@@ -760,8 +791,10 @@ export const buildImportedCalculatorState = (
       ...importedState.shieldItem,
       kind: "none",
       enchant: 0,
+      ego: "none",
       modifiers: undefined,
       displayName: undefined,
+      propertiesText: undefined,
       artifactKind: undefined,
       source: undefined,
     };
@@ -779,7 +812,9 @@ export const buildImportedCalculatorState = (
     record.gloves.length > 1;
   importedState.boots = hasBaseType(record.footwearDetails, "boots");
   importedState.barding = hasBaseType(record.footwearDetails, "barding");
-  importedState.cloak = hasBaseType(record.cloakDetails, "cloak");
+  importedState.cloak =
+    hasBaseType(record.cloakDetails, "cloak") ||
+    hasBaseType(record.cloakDetails, "scarf");
   importedState.bodyArmourEnchant = record.bodyArmourDetails?.enchant ?? 0;
   importedState.shieldEnchant = record.shieldDetails?.enchant ?? 0;
   importedState.bootsEnchant =
@@ -796,32 +831,35 @@ export const buildImportedCalculatorState = (
     kind: "boots",
     present: importedState.boots,
     enchant: bootsDetail?.enchant ?? 0,
-      modifiers: bootsDetail ? buildModifierBagFromItem(bootsDetail) : undefined,
-      displayName: bootsDetail?.displayName,
-      propertiesText: bootsDetail?.propertiesText ?? undefined,
-      artifactKind: bootsDetail?.artifactKind,
-      source: bootsDetail ? "imported" : undefined,
-    };
+    ego: deriveArmourClassEgo(bootsDetail),
+    modifiers: bootsDetail ? buildModifierBagFromItem(bootsDetail) : undefined,
+    displayName: bootsDetail?.displayName,
+    propertiesText: bootsDetail?.propertiesText ?? undefined,
+    artifactKind: bootsDetail?.artifactKind,
+    source: bootsDetail ? "imported" : undefined,
+  };
   importedState.bardingItem = {
     kind: "barding",
     present: importedState.barding,
     enchant: bardingDetail?.enchant ?? 0,
-      modifiers: bardingDetail ? buildModifierBagFromItem(bardingDetail) : undefined,
-      displayName: bardingDetail?.displayName,
-      propertiesText: bardingDetail?.propertiesText ?? undefined,
-      artifactKind: bardingDetail?.artifactKind,
-      source: bardingDetail ? "imported" : undefined,
-    };
+    ego: deriveArmourClassEgo(bardingDetail),
+    modifiers: bardingDetail ? buildModifierBagFromItem(bardingDetail) : undefined,
+    displayName: bardingDetail?.displayName,
+    propertiesText: bardingDetail?.propertiesText ?? undefined,
+    artifactKind: bardingDetail?.artifactKind,
+    source: bardingDetail ? "imported" : undefined,
+  };
   importedState.cloakItem = {
-    kind: "cloak",
+    kind: cloakDetail?.baseType === "scarf" ? "scarf" : "cloak",
     present: importedState.cloak,
     enchant: cloakDetail?.enchant ?? 0,
-      modifiers: cloakDetail ? buildModifierBagFromItem(cloakDetail) : undefined,
-      displayName: cloakDetail?.displayName,
-      propertiesText: cloakDetail?.propertiesText ?? undefined,
-      artifactKind: cloakDetail?.artifactKind,
-      source: cloakDetail ? "imported" : undefined,
-    };
+    ego: deriveArmourClassEgo(cloakDetail),
+    modifiers: cloakDetail ? buildModifierBagFromItem(cloakDetail) : undefined,
+    displayName: cloakDetail?.displayName,
+    propertiesText: cloakDetail?.propertiesText ?? undefined,
+    artifactKind: cloakDetail?.artifactKind,
+    source: cloakDetail ? "imported" : undefined,
+  };
   fillHeadgearSlots(
     importedState.headgearSlots,
     record.helmetDetails?.filter(
@@ -831,13 +869,6 @@ export const buildImportedCalculatorState = (
   fillAuxArmourSlots(importedState.gloveSlots, record.glovesDetails);
 
   summary.applied.push({ label: "Auxiliary armour" });
-
-  if (record.cloaks.some((name) => name.includes("scarf"))) {
-    summary.skipped.push({
-      label: "Cloaks",
-      detail: "Scarf is not modeled separately from cloak.",
-    });
-  }
 
   for (const [parserKey, stateKey] of Object.entries(schoolSkillKeyMap)) {
     if (!importedState.schoolSkills || !(stateKey in importedState.schoolSkills)) {

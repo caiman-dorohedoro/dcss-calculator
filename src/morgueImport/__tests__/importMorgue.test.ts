@@ -365,6 +365,230 @@ describe("morgue import mapper", () => {
     );
   });
 
+  test("imports parser-reported armour egos for shield, orb, scarf, headgear, gloves, and footwear", () => {
+    const orbOfEnergy = {
+      ...makeItem("orb of energy", "orb", {
+        booleanProps: { Energy: true },
+      }),
+      objectClass: "armour",
+      enchant: null,
+      ego: "energy",
+    } as EquipmentItemSnapshot;
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Human",
+      speciesVariant: null,
+      background: "Wizard",
+      god: null,
+      ...defaultGodState,
+      xl: 10,
+      ac: 5,
+      ev: 10,
+      sh: 0,
+      strength: 10,
+      intelligence: 20,
+      dexterity: 10,
+      bodyArmour: "robe",
+      shield: "+2 buckler of reflection",
+      helmets: ["+0 hat of intelligence"],
+      gloves: ["+0 pair of gloves of strength"],
+      footwear: ["+1 pair of boots of flying"],
+      cloaks: ["scarf of resistance"],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("robe", "robe"),
+      shieldDetails: {
+        ...makeItem("+2 buckler of reflection", "buckler", {
+          booleanProps: { Reflect: true },
+        }),
+        objectClass: "armour",
+        enchant: 2,
+        ego: "reflection",
+        egoProperties: {
+          numeric: {},
+          booleanProps: { Reflect: true },
+          opaqueTokens: [],
+        },
+      } as EquipmentItemSnapshot,
+      helmetDetails: [
+        {
+          ...makeItem("+0 hat of intelligence", "hat", {
+            numeric: { Int: 3 },
+          }),
+          objectClass: "armour",
+          enchant: 0,
+          ego: "intelligence",
+        } as EquipmentItemSnapshot,
+      ],
+      glovesDetails: [
+        {
+          ...makeItem("+0 pair of gloves of strength", "gloves", {
+            numeric: { Str: 3 },
+          }),
+          objectClass: "armour",
+          enchant: 0,
+          ego: "strength",
+        } as EquipmentItemSnapshot,
+      ],
+      footwearDetails: [
+        {
+          ...makeItem("+1 pair of boots of flying", "boots", {
+            booleanProps: { Fly: true },
+          }),
+          objectClass: "armour",
+          enchant: 1,
+          ego: "flying",
+        } as EquipmentItemSnapshot,
+      ],
+      cloakDetails: [
+        {
+          ...makeItem("scarf of resistance", "scarf", {
+            numeric: { rF: 1, rC: 1 },
+          }),
+          objectClass: "armour",
+          enchant: null,
+          ego: "resistance",
+        } as EquipmentItemSnapshot,
+      ],
+      orbDetails: undefined,
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Magic Dart",
+          failurePercent: 2,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.shieldItem).toEqual(
+      expect.objectContaining({
+        kind: "buckler",
+        enchant: 2,
+        ego: "reflection",
+      })
+    );
+    expect(result.importedState.cloakItem).toEqual(
+      expect.objectContaining({
+        kind: "scarf",
+        present: true,
+        ego: "resistance",
+      })
+    );
+    expect(result.importedState.headgearSlots[0]).toEqual(
+      expect.objectContaining({
+        present: true,
+        kind: "hat",
+        ego: "intelligence",
+      })
+    );
+    expect(result.importedState.gloveSlots[0]).toEqual(
+      expect.objectContaining({ present: true, ego: "strength" })
+    );
+    expect(result.importedState.bootsItem).toEqual(
+      expect.objectContaining({
+        kind: "boots",
+        present: true,
+        ego: "flying",
+      })
+    );
+
+    const orbResult = buildImportedCalculatorState({
+      ...record,
+      shield: "none",
+      shieldDetails: undefined,
+      orb: "orb of energy",
+      orbDetails: orbOfEnergy,
+    } as ParsedMorgueTextRecord);
+    expect(orbResult.ok).toBe(true);
+    if (!orbResult.ok) {
+      throw new Error("expected successful import");
+    }
+    expect(orbResult.importedState.orb).toBe("energy");
+    expect(orbResult.importedState.orbItem).toEqual(
+      expect.objectContaining({ kind: "energy", ego: "energy" })
+    );
+  });
+
+  test("does not turn jewellery subtype effects into equipment ego", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Human",
+      speciesVariant: null,
+      background: "Wizard",
+      god: null,
+      ...defaultGodState,
+      xl: 10,
+      ac: 5,
+      ev: 10,
+      sh: 0,
+      strength: 10,
+      intelligence: 20,
+      dexterity: 10,
+      bodyArmour: "robe",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: ["ring of willpower"],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("robe", "robe"),
+      ringDetails: [
+        {
+          ...makeItem("ring of willpower", "ring", {
+            numeric: { Will: 1 },
+          }),
+          objectClass: "jewellery",
+          ego: null,
+          subtypeEffect: "willpower",
+        } as EquipmentItemSnapshot,
+      ],
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Magic Dart",
+          failurePercent: 2,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.ringSlots[0]).toEqual(
+      expect.objectContaining({
+        kind: "none",
+        modifiers: { will: 1 },
+      })
+    );
+    expect("ego" in result.importedState.ringSlots[0]).toBe(false);
+  });
+
   test("maps slot-supported jewellery, signed enchants, residual numeric props, and mutation modifiers", () => {
     const record = {
       playerName: "tester",
