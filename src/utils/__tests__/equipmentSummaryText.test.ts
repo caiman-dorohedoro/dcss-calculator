@@ -193,6 +193,63 @@ describe("equipment summary text", () => {
     ).toBe("+0 pair of boots");
   });
 
+  test("builds fallback summaries from generic equipment egos", () => {
+    expect(
+      formatShieldSummary({
+        kind: "buckler",
+        enchant: 2,
+        ego: "reflection",
+        modifiers: { flags: ["Reflect"] },
+      })
+    ).toBe("+2 buckler of reflection {Reflect}");
+
+    expect(
+      formatOrbSummary({
+        kind: "energy",
+        ego: "energy",
+      })
+    ).toBe("orb of energy");
+
+    expect(
+      formatHeadgearSummary({
+        present: true,
+        kind: "hat",
+        enchant: 0,
+        ego: "intelligence",
+        modifiers: { int: 3 },
+      })
+    ).toBe("+0 hat of intelligence {Int+3}");
+
+    expect(
+      formatGlovesSummary({
+        present: true,
+        enchant: 0,
+        ego: "strength",
+        modifiers: { str: 3 },
+      })
+    ).toBe("+0 pair of gloves of strength {Str+3}");
+
+    expect(
+      formatFixedAuxSummary({
+        kind: "scarf",
+        present: true,
+        enchant: 0,
+        ego: "resistance",
+        modifiers: { rF: 1, rC: 1 },
+      })
+    ).toBe("+0 scarf of resistance {rF+ rC+}");
+
+    expect(
+      formatFixedAuxSummary({
+        kind: "boots",
+        present: true,
+        enchant: 1,
+        ego: "flying",
+        modifiers: { flags: ["Fly"] },
+      })
+    ).toBe("+1 pair of boots of flying {Fly}");
+  });
+
   test("uses none for empty equipment slots", () => {
     expect(formatBodyArmourSummary({ kind: "none", enchant: 0, ego: "none" })).toBe(
       "none"

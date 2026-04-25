@@ -2,6 +2,7 @@ import {
   armourOptions,
   orbOptions,
   shieldOptions,
+  type EquipmentEgoKey,
 } from "@/types/equipment";
 import type {
   BodyArmourItemState,
@@ -15,7 +16,7 @@ import type {
   AuxArmourSlotState,
   RingSlotState,
 } from "@/types/equipmentSlots";
-import { getBodyArmourEgoItemName } from "@/utils/bodyArmourEgos";
+import { getEquipmentEgoItemName } from "@/utils/equipmentEgos";
 
 const sequenceSigned = (value: number) => {
   const sign = value >= 0 ? "+" : "-";
@@ -120,11 +121,11 @@ const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
 const withEnchant = (enchant: number, itemName: string) =>
   `${signed(enchant)} ${itemName}`;
 
-const withBodyArmourEgo = (
+const withEquipmentEgo = (
   baseName: string,
-  ego: BodyArmourItemState["ego"]
+  ego: EquipmentEgoKey | undefined
 ) => {
-  const egoItemName = getBodyArmourEgoItemName(ego);
+  const egoItemName = getEquipmentEgoItemName(ego ?? "none");
   return egoItemName ? `${baseName} of ${egoItemName}` : baseName;
 };
 
@@ -246,7 +247,7 @@ export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
   }
 
   const baseName = armourOptions[item.kind].name;
-  const itemName = withBodyArmourEgo(baseName, item.ego);
+  const itemName = withEquipmentEgo(baseName, item.ego);
 
   return withModifiers(withEnchant(item.enchant, itemName), item.modifiers);
 };
@@ -264,8 +265,9 @@ export const formatShieldSummary = (item: ShieldItemState) => {
     return "none";
   }
 
+  const itemName = withEquipmentEgo(shieldOptions[item.kind].name, item.ego);
   return withModifiers(
-    withEnchant(item.enchant, shieldOptions[item.kind].name),
+    withEnchant(item.enchant, itemName),
     item.modifiers
   );
 };
@@ -282,7 +284,10 @@ export const formatOrbSummary = (item: OrbItemState) => {
     return "none";
   }
 
-  return withModifiers(orbOptions[item.kind].name, item.modifiers);
+  const baseName =
+    item.ego && item.ego !== "none" ? "orb" : orbOptions[item.kind].name;
+  const itemName = withEquipmentEgo(baseName, item.ego);
+  return withModifiers(itemName, item.modifiers);
 };
 
 export const formatRingSummary = (slot: RingSlotState) => {
@@ -335,8 +340,9 @@ export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
     return "none";
   }
 
+  const itemName = withEquipmentEgo(slot.kind ?? "helmet", slot.ego);
   return withModifiers(
-    withEnchant(slot.enchant, slot.kind ?? "helmet"),
+    withEnchant(slot.enchant, itemName),
     slot.modifiers
   );
 };
@@ -354,8 +360,9 @@ export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
     return "none";
   }
 
+  const itemName = withEquipmentEgo("pair of gloves", slot.ego);
   return withModifiers(
-    withEnchant(slot.enchant, "pair of gloves"),
+    withEnchant(slot.enchant, itemName),
     slot.modifiers
   );
 };
@@ -374,5 +381,8 @@ export const formatFixedAuxSummary = (item: FixedAuxItemState) => {
   }
 
   const itemName = item.kind === "boots" ? "pair of boots" : item.kind;
-  return withModifiers(withEnchant(item.enchant, itemName), item.modifiers);
+  return withModifiers(
+    withEnchant(item.enchant, withEquipmentEgo(itemName, item.ego)),
+    item.modifiers
+  );
 };
