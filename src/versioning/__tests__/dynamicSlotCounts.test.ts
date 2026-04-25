@@ -72,7 +72,9 @@ describe("dynamic slot counts", () => {
         { kind: "protection", plus: 3 },
       ],
       amuletSlots: [{ kind: "none" }],
-      headgearSlots: [{ present: false, enchant: 0 }],
+      headgearSlots: [
+        { present: false, enchant: 0, kind: undefined, ego: "none" },
+      ],
       gloveSlots: [{ present: true, enchant: 2 }],
     });
   });

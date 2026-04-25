@@ -58,24 +58,29 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.shieldItem).toEqual({
       kind: "none",
       enchant: 0,
+      ego: "none",
     });
     expect(state.orbItem).toEqual({
       kind: "none",
+      ego: "none",
     });
     expect(state.cloakItem).toEqual({
       kind: "cloak",
       present: false,
       enchant: 0,
+      ego: "none",
     });
     expect(state.bootsItem).toEqual({
       kind: "boots",
       present: false,
       enchant: 0,
+      ego: "none",
     });
     expect(state.bardingItem).toEqual({
       kind: "barding",
       present: false,
       enchant: 0,
+      ego: "none",
     });
     expect(state.unattributedGear).toBeUndefined();
     expect("equipmentStr" in state).toBe(false);
