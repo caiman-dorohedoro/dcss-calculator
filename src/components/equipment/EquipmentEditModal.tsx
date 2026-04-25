@@ -38,9 +38,7 @@ type EquipmentModalConfig =
       type: "bodyArmour";
       title: string;
       value: BodyArmourItemState;
-      bodyArmourEgos: Partial<
-        Record<BodyArmourEgoKey, { name: string; itemName: string | null }>
-      >;
+      bodyArmourEgos: Partial<Record<BodyArmourEgoKey, BodyArmourEgoOptionValue>>;
       onSave: (next: BodyArmourItemState, changed: boolean) => void;
     }
   | {
@@ -111,6 +109,8 @@ const ringKinds = ["none", "wizardry", "protection", "evasion"] as const;
 const amuletKinds = ["none", "reflection"] as const;
 const headgearKinds = ["none", "hat", "helmet"] as const;
 const gloveKinds = ["none", "gloves"] as const;
+type BodyArmourEgoOptionValue = { name: string; itemName: string | null };
+type BodyArmourEgoOptionEntry = [string, BodyArmourEgoOptionValue];
 
 const normalizeBodyArmourDraft = (
   draft: BodyArmourItemState
@@ -211,15 +211,19 @@ const BodyArmourEditor = ({
   const importedItemSummary = config.value.displayName
     ? formatBodyArmourSummary(config.value)
     : null;
-  const bodyArmourEgoEntries = Object.entries(config.bodyArmourEgos);
-  const bodyArmourEgoOptions = bodyArmourEgoEntries.some(
-    ([key]) => key === draft.ego
-  )
-    ? bodyArmourEgoEntries
-    : [
-        [draft.ego, { name: getBodyArmourEgoLabel(draft.ego), itemName: null }],
-        ...bodyArmourEgoEntries,
-      ];
+  const bodyArmourEgoEntries = Object.entries(config.bodyArmourEgos).filter(
+    (entry): entry is BodyArmourEgoOptionEntry => entry[1] !== undefined
+  );
+  const bodyArmourEgoOptions: BodyArmourEgoOptionEntry[] =
+    bodyArmourEgoEntries.some(([key]) => key === draft.ego)
+      ? bodyArmourEgoEntries
+      : [
+          [
+            draft.ego,
+            { name: getBodyArmourEgoLabel(draft.ego), itemName: null },
+          ],
+          ...bodyArmourEgoEntries,
+        ];
 
   return (
     <ModalFrame
