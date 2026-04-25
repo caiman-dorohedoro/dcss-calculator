@@ -54,6 +54,58 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.orbItem.modifiers).toEqual({ wizardry: 1 });
   });
 
+  test("restores parser-aligned body armour ego strings", () => {
+    const modern = {
+      ...buildDefaultCalculatorState("trunk"),
+      bodyArmour: {
+        kind: "robe",
+        enchant: 2,
+        ego: "willpower",
+        modifiers: { will: 1 },
+      },
+    };
+
+    const parsed = parseSavedState(JSON.stringify(modern));
+
+    expect(parsed?.bodyArmour.ego).toBe("willpower");
+    expect(parsed?.bodyArmour.modifiers).toEqual({ will: 1 });
+  });
+
+  test("keeps unknown imported body armour ego strings loadable", () => {
+    const modern = {
+      ...buildDefaultCalculatorState("trunk"),
+      bodyArmour: {
+        kind: "robe",
+        enchant: 1,
+        ego: "future mystery",
+        displayName: "+1 robe of future mystery",
+        artifactKind: "normal",
+        source: "imported",
+      },
+    };
+
+    const parsed = parseSavedState(JSON.stringify(modern));
+
+    expect(parsed?.bodyArmour.ego).toBe("future mystery");
+  });
+
+  test("folds legacy top-level bodyArmourEgo into itemized body armour when needed", () => {
+    const legacy = {
+      ...buildDefaultCalculatorState("trunk"),
+      bodyArmourEgo: "resonance",
+      bodyArmour: {
+        kind: "plate",
+        enchant: 0,
+        ego: "none",
+      },
+    };
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed?.bodyArmour.ego).toBe("resonance");
+    expect(parsed?.bodyArmourEgo).toBe("resonance");
+  });
+
   test("migrates legacy flat gear totals into rings and explicit fallback gear", () => {
     const legacy = {
       version: "trunk",

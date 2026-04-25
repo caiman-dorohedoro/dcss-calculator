@@ -26,7 +26,6 @@ import {
   coerceEquipmentSlotCollections,
 } from "@/versioning/dynamicSlotCounts";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 import type {
   BodyArmourItemState,
@@ -458,8 +457,7 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
 
   if (
     state.bodyArmourEgo !== undefined &&
-    (typeof state.bodyArmourEgo !== "string" ||
-      !(state.bodyArmourEgo in getBodyArmourEgoOptions(version)))
+    typeof state.bodyArmourEgo !== "string"
   ) {
     return false;
   }
@@ -611,6 +609,22 @@ export const parseSavedState = (
     const version = parsed.version;
     const config = getVersionConfig(version);
     const defaultState = buildDefaultCalculatorState(version);
+    const parsedBodyArmour = isBodyArmourItem(parsed.bodyArmour)
+      ? parsed.bodyArmour
+      : defaultState.bodyArmour;
+    const legacyBodyArmourEgo =
+      typeof parsed.bodyArmourEgo === "string"
+        ? (parsed.bodyArmourEgo as BodyArmourEgoKey)
+        : undefined;
+    const bodyArmour =
+      legacyBodyArmourEgo &&
+      legacyBodyArmourEgo !== "none" &&
+      parsedBodyArmour.ego === "none"
+        ? {
+            ...parsedBodyArmour,
+            ego: legacyBodyArmourEgo,
+          }
+        : parsedBodyArmour;
 
     if (
       typeof parsed.species !== "string" ||
@@ -683,6 +697,7 @@ export const parseSavedState = (
       orb: parsed.orb ?? (parsed.channel === true ? "energy" : "none"),
       wizardry,
       species,
+      bodyArmour,
       ...coerceEquipmentSlotCollections(version, species, {
         ringSlots,
         amuletSlots: useModernAmuletSlots

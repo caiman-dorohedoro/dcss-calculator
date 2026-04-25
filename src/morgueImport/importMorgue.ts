@@ -28,7 +28,7 @@ import type { GameVersion } from "@/types/game";
 import { speciesOptions } from "@/types/species.ts";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
+import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
 export type MorgueImportSummaryEntry = {
@@ -544,29 +544,27 @@ const applyMutationModifiers = (
 };
 
 const deriveBodyArmourEgo = (
-  record: ParsedMorgueTextRecord,
-  version: GameVersion
-): BodyArmourEgoKey | null => {
-  const detail = record.bodyArmourDetails;
+  detail: EquipmentItemSnapshot | null | undefined
+): BodyArmourEgoKey => {
   if (!detail) {
-    return null;
+    return "none";
   }
 
-  const supportedEgos = new Set(Object.keys(getBodyArmourEgoOptions(version)));
-  if (detail.properties.booleanProps.Command && supportedEgos.has("command")) {
+  if (detail.ego) {
+    return detail.ego as BodyArmourEgoKey;
+  }
+
+  if (detail.properties.booleanProps.Command) {
     return "command";
   }
-  if (detail.properties.booleanProps.Death && supportedEgos.has("death")) {
+  if (detail.properties.booleanProps.Death) {
     return "death";
   }
-  if (
-    detail.properties.booleanProps.Resonance &&
-    supportedEgos.has("resonance")
-  ) {
+  if (detail.properties.booleanProps.Resonance) {
     return "resonance";
   }
 
-  return null;
+  return "none";
 };
 
 const deriveWildMagic = (record: ParsedMorgueTextRecord) => {
@@ -697,13 +695,14 @@ export const buildImportedCalculatorState = (
     }
   );
 
+  const importedBodyArmourEgo = deriveBodyArmourEgo(record.bodyArmourDetails);
   const armour = mapArmour(record.bodyArmourDetails?.baseType ?? record.bodyArmour);
   if (armour) {
     importedState.armour = armour;
     importedState.bodyArmour = {
       kind: armour,
       enchant: record.bodyArmourDetails?.enchant ?? 0,
-      ego: "none",
+      ego: importedBodyArmourEgo,
       modifiers: record.bodyArmourDetails
         ? buildModifierBagFromItem(record.bodyArmourDetails)
         : undefined,
@@ -897,13 +896,13 @@ export const buildImportedCalculatorState = (
     });
   }
 
-  const bodyArmourEgo = deriveBodyArmourEgo(record, detectedVersion);
-  if (bodyArmourEgo) {
-    importedState.bodyArmourEgo = bodyArmourEgo;
-    importedState.bodyArmour.ego = bodyArmourEgo;
+  if (importedBodyArmourEgo !== "none") {
+    importedState.bodyArmourEgo =
+      getSpellBoostBodyArmourEgo(importedBodyArmourEgo);
+    importedState.bodyArmour.ego = importedBodyArmourEgo;
     summary.applied.push({
       label: "Body armour ego",
-      detail: bodyArmourEgo,
+      detail: importedBodyArmourEgo,
     });
   }
   if (record.gizmo) {

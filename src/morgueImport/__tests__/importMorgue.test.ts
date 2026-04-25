@@ -284,6 +284,87 @@ describe("morgue import mapper", () => {
     expect(result.importedState.wildMagic).toBe(2);
   });
 
+  test("imports parser-reported normal body armour ego without translating it to none", () => {
+    const robeOfWillpower = {
+      ...makeItem("+2 robe of willpower", "robe", {
+        numeric: { Will: 1 },
+      }),
+      objectClass: "armour",
+      enchant: 2,
+      ego: "willpower",
+      egoProperties: {
+        numeric: { Will: 1 },
+        booleanProps: {},
+        opaqueTokens: [],
+      },
+    } as EquipmentItemSnapshot;
+
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Human",
+      speciesVariant: null,
+      background: "Wizard",
+      god: null,
+      ...defaultGodState,
+      xl: 10,
+      ac: 5,
+      ev: 10,
+      sh: 0,
+      strength: 10,
+      intelligence: 20,
+      dexterity: 10,
+      bodyArmour: "+2 robe of willpower",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: robeOfWillpower,
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Magic Dart",
+          failurePercent: 2,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.bodyArmour).toMatchObject({
+      kind: "robe",
+      enchant: 2,
+      ego: "willpower",
+      displayName: "+2 robe of willpower",
+      artifactKind: "normal",
+      source: "imported",
+      modifiers: { will: 1 },
+    });
+    expect(result.importedState.bodyArmourEgo).toBe("none");
+    expect(result.summary.applied).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Body armour ego",
+          detail: "willpower",
+        }),
+      ])
+    );
+  });
+
   test("maps slot-supported jewellery, signed enchants, residual numeric props, and mutation modifiers", () => {
     const record = {
       playerName: "tester",
