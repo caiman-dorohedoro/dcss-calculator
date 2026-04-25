@@ -3,6 +3,7 @@ import {
   ArmourKey,
   armourOptions,
   BodyArmourEgoKey,
+  EquipmentEgoKey,
   OrbKey,
   ShieldKey,
   orbOptions,
@@ -184,6 +185,7 @@ const isAuxArmourSlot = (value: unknown): value is AuxArmourSlotState => {
     (value.kind === undefined ||
       value.kind === "helmet" ||
       value.kind === "hat") &&
+    (value.ego === undefined || typeof value.ego === "string") &&
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
     (value.source === undefined || isSlotSource(value.source))
@@ -197,6 +199,7 @@ const isDefaultAuxArmourSlot = (value: unknown): boolean => {
     value.present === false &&
     value.enchant === 0 &&
     value.kind === undefined &&
+    (value.ego === undefined || value.ego === "none") &&
     value.displayName === undefined &&
     value.artifactKind === undefined &&
     value.source === undefined
@@ -210,7 +213,7 @@ const createLegacyHeadgearSlots = (present: boolean, slotCount: number) => {
 
   if (slotCount > 0) {
     slots[0] = present
-      ? { present: true, enchant: 0, kind: "helmet" }
+      ? { present: true, enchant: 0, kind: "helmet", ego: "none" }
       : createDefaultAuxArmourSlot();
   }
 
@@ -232,10 +235,12 @@ const coerceLegacyHeadgearSlots = (
       ? {
           ...slot,
           kind: slot.kind ?? "helmet",
+          ego: coerceEquipmentEgo(slot.ego),
         }
       : {
           ...slot,
           kind: undefined,
+          ego: "none",
         }
   );
 };
@@ -274,12 +279,14 @@ const createLegacyAuxArmourSlots = (
   );
 
   if (slotCount > 0) {
-    slots[0] = present ? { present: true, enchant: 0 } : createDefaultAuxArmourSlot();
+    slots[0] = present
+      ? { present: true, enchant: 0, ego: "none" }
+      : createDefaultAuxArmourSlot();
   }
 
   if (slotCount > 1) {
     slots[1] = secondSlotPresent
-      ? { present: true, enchant: 0 }
+      ? { present: true, enchant: 0, ego: "none" }
       : createDefaultAuxArmourSlot();
   }
 
@@ -331,6 +338,9 @@ const isEquipmentItemSource = (
 ): value is "manual" | "imported" | "legacy" =>
   value === "manual" || value === "imported" || value === "legacy";
 
+const coerceEquipmentEgo = (value: unknown): EquipmentEgoKey =>
+  typeof value === "string" ? (value as EquipmentEgoKey) : "none";
+
 const isEquipmentMeta = (
   value: Record<string, unknown>
 ) =>
@@ -359,6 +369,7 @@ const isShieldItem = (value: unknown): value is ShieldItemState => {
     typeof value.kind === "string" &&
     value.kind in shieldOptions &&
     typeof value.enchant === "number" &&
+    (value.ego === undefined || typeof value.ego === "string") &&
     isEquipmentMeta(value)
   );
 };
@@ -369,6 +380,7 @@ const isOrbItem = (value: unknown): value is OrbItemState => {
   return (
     typeof value.kind === "string" &&
     value.kind in orbOptions &&
+    (value.ego === undefined || typeof value.ego === "string") &&
     isEquipmentMeta(value)
   );
 };
@@ -377,9 +389,13 @@ const isFixedAuxItem = (value: unknown): value is FixedAuxItemState => {
   if (!isObject(value)) return false;
 
   return (
-    (value.kind === "cloak" || value.kind === "boots" || value.kind === "barding") &&
+    (value.kind === "cloak" ||
+      value.kind === "scarf" ||
+      value.kind === "boots" ||
+      value.kind === "barding") &&
     typeof value.present === "boolean" &&
     typeof value.enchant === "number" &&
+    (value.ego === undefined || typeof value.ego === "string") &&
     isEquipmentMeta(value)
   );
 };
@@ -393,6 +409,46 @@ const isUnattributedGear = (value: unknown): value is UnattributedGearState => {
     isModifierBag(value.modifiers)
   );
 };
+
+const normalizeShieldItem = (
+  value: unknown,
+  fallback: ShieldItemState
+): ShieldItemState => {
+  const item = isShieldItem(value) ? value : fallback;
+  return {
+    ...item,
+    ego: coerceEquipmentEgo(item.ego),
+  };
+};
+
+const normalizeOrbItem = (
+  value: unknown,
+  fallback: OrbItemState
+): OrbItemState => {
+  const item = isOrbItem(value) ? value : fallback;
+  return {
+    ...item,
+    ego: coerceEquipmentEgo(item.ego),
+  };
+};
+
+const normalizeFixedAuxItem = (
+  value: unknown,
+  fallback: FixedAuxItemState
+): FixedAuxItemState => {
+  const item = isFixedAuxItem(value) ? value : fallback;
+  return {
+    ...item,
+    ego: coerceEquipmentEgo(item.ego),
+  };
+};
+
+const normalizeAuxArmourSlot = (
+  value: AuxArmourSlotState
+): AuxArmourSlotState => ({
+  ...value,
+  ego: coerceEquipmentEgo(value.ego),
+});
 
 const buildLegacyModifierBag = (parsed: Record<string, unknown>) => {
   const modifiers: EquipmentModifierBag = {};
@@ -669,7 +725,7 @@ export const parseSavedState = (
         ? parsed.wizardry ?? 0
         : 0;
 
-    const gloveSlots = useModernGloveSlots
+    const gloveSlots = (useModernGloveSlots
       ? coerceLegacySlots(
           parsed.gloveSlots,
           slotCounts.gloveSlots,
@@ -679,9 +735,10 @@ export const parseSavedState = (
           parsed.gloves === true,
           slotCounts.gloveSlots,
           parsed.secondGloves === true
-        );
+        )
+    ).map(normalizeAuxArmourSlot);
 
-    const headgearSlots = useModernHeadgearSlots
+    const headgearSlots = (useModernHeadgearSlots
       ? coerceLegacyHeadgearSlots(
           parsed.headgearSlots,
           slotCounts.headgearSlots
@@ -689,7 +746,26 @@ export const parseSavedState = (
       : createLegacyHeadgearSlots(
           parsed.helmet === true,
           slotCounts.headgearSlots
-        );
+        )
+    ).map(normalizeAuxArmourSlot);
+
+    const shieldItem = normalizeShieldItem(
+      parsed.shieldItem,
+      defaultState.shieldItem
+    );
+    const orbItem = normalizeOrbItem(parsed.orbItem, defaultState.orbItem);
+    const cloakItem = normalizeFixedAuxItem(
+      parsed.cloakItem,
+      defaultState.cloakItem
+    );
+    const bootsItem = normalizeFixedAuxItem(
+      parsed.bootsItem,
+      defaultState.bootsItem
+    );
+    const bardingItem = normalizeFixedAuxItem(
+      parsed.bardingItem,
+      defaultState.bardingItem
+    );
 
     const normalized = {
       ...defaultState,
@@ -698,6 +774,11 @@ export const parseSavedState = (
       wizardry,
       species,
       bodyArmour,
+      shieldItem,
+      orbItem,
+      cloakItem,
+      bootsItem,
+      bardingItem,
       ...coerceEquipmentSlotCollections(version, species, {
         ringSlots,
         amuletSlots: useModernAmuletSlots

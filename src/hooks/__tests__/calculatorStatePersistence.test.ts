@@ -89,6 +89,86 @@ describe("calculator saved-state migration", () => {
     expect(parsed?.bodyArmour.ego).toBe("future mystery");
   });
 
+  test("restores parser-aligned ego strings for non-body armour items", () => {
+    const modern = {
+      ...buildDefaultCalculatorState("trunk"),
+      shieldItem: {
+        kind: "buckler",
+        enchant: 2,
+        ego: "reflection",
+        modifiers: { flags: ["Reflect"] },
+      },
+      orbItem: {
+        kind: "energy",
+        ego: "energy",
+        modifiers: { flags: ["Energy"] },
+      },
+      cloakItem: {
+        kind: "scarf",
+        present: true,
+        enchant: 0,
+        ego: "resistance",
+        modifiers: { rF: 1, rC: 1 },
+      },
+      bootsItem: {
+        kind: "boots",
+        present: true,
+        enchant: 1,
+        ego: "flying",
+        modifiers: { flags: ["Fly"] },
+      },
+      headgearSlots: [
+        {
+          present: true,
+          enchant: 0,
+          kind: "hat",
+          ego: "future mystery",
+        },
+      ],
+      gloveSlots: [
+        {
+          present: true,
+          enchant: 0,
+          ego: "strength",
+          modifiers: { str: 3 },
+        },
+      ],
+    };
+
+    const parsed = parseSavedState(JSON.stringify(modern));
+
+    expect(parsed?.shieldItem.ego).toBe("reflection");
+    expect(parsed?.orbItem.ego).toBe("energy");
+    expect(parsed?.cloakItem.kind).toBe("scarf");
+    expect(parsed?.cloakItem.ego).toBe("resistance");
+    expect(parsed?.bootsItem.ego).toBe("flying");
+    expect(parsed?.headgearSlots[0].ego).toBe("future mystery");
+    expect(parsed?.gloveSlots[0].ego).toBe("strength");
+  });
+
+  test("migrates older itemized equipment saves without ego fields to none", () => {
+    const legacy = {
+      ...buildDefaultCalculatorState("trunk"),
+      shieldItem: { kind: "buckler", enchant: 2 },
+      orbItem: { kind: "energy" },
+      cloakItem: { kind: "cloak", present: true, enchant: 1 },
+      bootsItem: { kind: "boots", present: true, enchant: 1 },
+      bardingItem: { kind: "barding", present: false, enchant: 0 },
+      headgearSlots: [{ present: true, enchant: 0, kind: "helmet" }],
+      gloveSlots: [{ present: true, enchant: 0 }],
+    };
+
+    const parsed = parseSavedState(JSON.stringify(legacy));
+
+    expect(parsed?.shieldItem.ego).toBe("none");
+    expect(parsed?.orbItem.ego).toBe("none");
+    expect(parsed?.cloakItem.ego).toBe("none");
+    expect(parsed?.bootsItem.ego).toBe("none");
+    expect(parsed?.bardingItem.ego).toBe("none");
+    expect(parsed?.headgearSlots[0].ego).toBe("none");
+    expect(parsed?.gloveSlots[0].ego).toBe("none");
+  });
+
   test("folds legacy top-level bodyArmourEgo into itemized body armour when needed", () => {
     const legacy = {
       ...buildDefaultCalculatorState("trunk"),
@@ -179,11 +259,11 @@ describe("calculator saved-state migration", () => {
       { kind: "wizardry", plus: 0 },
     ]);
     expect(parsed?.gloveSlots).toEqual([
-      { present: true, enchant: 0 },
-      { present: true, enchant: 0 },
+      { present: true, enchant: 0, ego: "none" },
+      { present: true, enchant: 0, ego: "none" },
     ]);
     expect(parsed?.headgearSlots).toEqual([
-      { present: true, enchant: 0, kind: "helmet" },
+      { present: true, enchant: 0, kind: "helmet", ego: "none" },
     ]);
     expect(parsed?.wizardry).toBe(0);
   });
@@ -205,11 +285,11 @@ describe("calculator saved-state migration", () => {
       { kind: "wizardry", plus: 0 },
     ]);
     expect(parsed?.gloveSlots).toEqual([
-      { present: true, enchant: 0 },
-      { present: true, enchant: 0 },
+      { present: true, enchant: 0, ego: "none" },
+      { present: true, enchant: 0, ego: "none" },
     ]);
     expect(parsed?.headgearSlots).toEqual([
-      { present: true, enchant: 0, kind: "helmet" },
+      { present: true, enchant: 0, kind: "helmet", ego: "none" },
     ]);
     expect(parsed?.wizardry).toBe(0);
   });
@@ -242,11 +322,11 @@ describe("calculator saved-state migration", () => {
     ]);
     expect(parsed?.amuletSlots).toEqual([{ kind: "none" }]);
     expect(parsed?.headgearSlots).toEqual([
-      { present: true, enchant: 0, kind: "helmet" },
+      { present: true, enchant: 0, kind: "helmet", ego: "none" },
     ]);
     expect(parsed?.gloveSlots).toEqual([
-      { present: true, enchant: 0 },
-      { present: true, enchant: 0 },
+      { present: true, enchant: 0, ego: "none" },
+      { present: true, enchant: 0, ego: "none" },
     ]);
     expect(parsed?.wizardry).toBe(1);
   });
@@ -381,11 +461,11 @@ describe("calculator saved-state migration", () => {
       { kind: "evasion", plus: 1 },
     ]);
     expect(parsed?.gloveSlots).toEqual([
-      { present: true, enchant: 2 },
-      { present: true, enchant: -1 },
+      { present: true, enchant: 2, ego: "none" },
+      { present: true, enchant: -1, ego: "none" },
     ]);
     expect(parsed?.headgearSlots).toEqual([
-      { present: true, enchant: 3, kind: "helmet" },
+      { present: true, enchant: 3, kind: "helmet", ego: "none" },
     ]);
     expect(parsed?.wizardry).toBe(2);
   });
@@ -412,10 +492,12 @@ describe("calculator saved-state migration", () => {
       { kind: "none", plus: 0 },
     ]);
     expect(parsed?.gloveSlots).toEqual([
-      { present: false, enchant: 0 },
-      { present: false, enchant: 0 },
+      { present: false, enchant: 0, kind: undefined, ego: "none" },
+      { present: false, enchant: 0, kind: undefined, ego: "none" },
     ]);
-    expect(parsed?.headgearSlots).toEqual([{ present: false, enchant: 0 }]);
+    expect(parsed?.headgearSlots).toEqual([
+      { present: false, enchant: 0, kind: undefined, ego: "none" },
+    ]);
   });
 
   test("coerces slot arrays when the legacy source keys are absent", () => {

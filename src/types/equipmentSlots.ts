@@ -1,4 +1,5 @@
 import type { EquipmentModifierBag } from "@/types/equipmentItems";
+import type { EquipmentEgoKey } from "@/types/equipment";
 
 export type RingSlotKind = "none" | "wizardry" | "protection" | "evasion";
 
@@ -29,6 +30,7 @@ export type AuxArmourSlotState = {
   present: boolean;
   enchant: number;
   kind?: HeadgearKind;
+  ego: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
   displayName?: string;
   propertiesText?: string;
@@ -64,6 +66,7 @@ export const createDefaultAuxArmourSlot = (): AuxArmourSlotState => ({
   present: false,
   enchant: 0,
   kind: undefined,
+  ego: "none",
 });
 
 export const clearRingSlotMetadata = (slot: RingSlotState): RingSlotState =>
@@ -81,6 +84,7 @@ export const clearAuxArmourSlotMetadata = (
   present,
   enchant: present ? slot.enchant : 0,
   kind: present ? slot.kind : undefined,
+  ego: present ? slot.ego : "none",
 });
 
 export const applyRingSlotUpdate = <T extends { ringSlots: RingSlotState[] }>(

@@ -1,6 +1,7 @@
 import type {
   ArmourKey,
   BodyArmourEgoKey,
+  EquipmentEgoKey,
   OrbKey,
   ShieldKey,
 } from "@/types/equipment";
@@ -46,18 +47,21 @@ export type BodyArmourItemState = EquipmentItemMeta & {
 export type ShieldItemState = EquipmentItemMeta & {
   kind: ShieldKey;
   enchant: number;
+  ego: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
 };
 
 export type OrbItemState = EquipmentItemMeta & {
   kind: OrbKey;
+  ego: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
 };
 
 export type FixedAuxItemState = EquipmentItemMeta & {
-  kind: "cloak" | "boots" | "barding";
+  kind: "cloak" | "scarf" | "boots" | "barding";
   present: boolean;
   enchant: number;
+  ego: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
 };
 
@@ -76,10 +80,12 @@ export const createDefaultBodyArmourItem = (): BodyArmourItemState => ({
 export const createDefaultShieldItem = (): ShieldItemState => ({
   kind: "none",
   enchant: 0,
+  ego: "none",
 });
 
 export const createDefaultOrbItem = (): OrbItemState => ({
   kind: "none",
+  ego: "none",
 });
 
 export const createDefaultFixedAuxItem = (
@@ -88,4 +94,5 @@ export const createDefaultFixedAuxItem = (
   kind,
   present: false,
   enchant: 0,
+  ego: "none",
 });
