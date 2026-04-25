@@ -628,20 +628,29 @@ describe("Calculator desktop layout", () => {
 
   test("clears imported body armour display metadata only after a saved edit", async () => {
     const state = buildDefaultCalculatorState("trunk");
-    state.armour = "leather_armour";
+    state.armour = "robe";
     state.bodyArmour = {
-      kind: "leather_armour",
-      enchant: 4,
+      kind: "robe",
+      enchant: 5,
       ego: "none",
-      displayName: "the +4 leather armour of the Plethaurus {Will+ Str+2 Dex+5}",
-      artifactKind: "randart",
+      displayName: "justicar's regalia",
+      propertiesText: "Inspire Amulet+ Str+4",
+      artifactKind: "unrand",
       source: "imported",
-      modifiers: { str: 2, dex: 5 },
+      modifiers: { flags: ["Inspire", "Amulet+"], str: 4 },
     };
 
     await act(async () => {
       root.render(<Calculator state={state} setState={mockSetState} />);
     });
+
+    expect(
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-body-armour"]'
+        ) as HTMLButtonElement
+      ).textContent
+    ).toContain("+5 justicar's regalia {Inspire Amulet+ Str+4}");
 
     await act(async () => {
       (
@@ -651,12 +660,17 @@ describe("Calculator desktop layout", () => {
       ).click();
     });
 
+    expect(document.body.textContent).toContain("Imported item");
+    expect(document.body.textContent).toContain("justicar's regalia");
+    expect(document.body.textContent).toContain("Base armour");
+    expect(document.body.textContent).toContain("robe");
+
     await act(async () => {
       setNumberInputValue(
         document.body.querySelector(
           'input[aria-label="Body armour enchant"]'
         ) as HTMLInputElement,
-        "5"
+        "6"
       );
     });
 
@@ -675,10 +689,11 @@ describe("Calculator desktop layout", () => {
     const nextState = updater(state);
 
     expect(nextState.bodyArmour).toMatchObject({
-      kind: "leather_armour",
-      enchant: 5,
+      kind: "robe",
+      enchant: 6,
       ego: "none",
       displayName: undefined,
+      propertiesText: undefined,
       artifactKind: undefined,
       source: undefined,
     });

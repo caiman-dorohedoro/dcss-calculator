@@ -7,6 +7,7 @@ export type RingSlotState = {
   plus: number;
   modifiers?: EquipmentModifierBag;
   displayName?: string;
+  propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
 };
@@ -17,6 +18,7 @@ export type AmuletSlotState = {
   kind: AmuletSlotKind;
   modifiers?: EquipmentModifierBag;
   displayName?: string;
+  propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
 };
@@ -29,12 +31,14 @@ export type AuxArmourSlotState = {
   kind?: HeadgearKind;
   modifiers?: EquipmentModifierBag;
   displayName?: string;
+  propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
 };
 
 const clearSlotMetadata = <T extends {
   displayName?: string;
+  propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
 }>(
@@ -42,6 +46,7 @@ const clearSlotMetadata = <T extends {
 ): T => ({
   ...slot,
   displayName: undefined,
+  propertiesText: undefined,
   artifactKind: undefined,
   source: undefined,
 });

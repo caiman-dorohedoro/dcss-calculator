@@ -23,6 +23,10 @@ describe("calculator saved-state migration", () => {
         kind: "ring_mail",
         enchant: 2,
         ego: "none",
+        displayName: "robe of Augmentation",
+        propertiesText: "Str+4 Int+4 Dex+4",
+        artifactKind: "unrand",
+        source: "imported",
         modifiers: { flags: ["Ponderous"], will: 1, mp: 10, int: 3 },
       },
       shieldItem: {
@@ -44,6 +48,8 @@ describe("calculator saved-state migration", () => {
       mp: 10,
       int: 3,
     });
+    expect(parsed?.bodyArmour.displayName).toBe("robe of Augmentation");
+    expect(parsed?.bodyArmour.propertiesText).toBe("Str+4 Int+4 Dex+4");
     expect(parsed?.shieldItem.modifiers).toEqual({ sh: 2 });
     expect(parsed?.orbItem.modifiers).toEqual({ wizardry: 1 });
   });

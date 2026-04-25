@@ -303,6 +303,7 @@ const fillRingSlots = (
           ignoreNumeric: ["AC"],
         }),
         displayName: detail.displayName,
+        propertiesText: detail.propertiesText ?? undefined,
         artifactKind: detail.artifactKind,
         source: "imported",
       };
@@ -314,6 +315,7 @@ const fillRingSlots = (
           ignoreNumeric: ["EV"],
         }),
         displayName: detail.displayName,
+        propertiesText: detail.propertiesText ?? undefined,
         artifactKind: detail.artifactKind,
         source: "imported",
       };
@@ -325,6 +327,7 @@ const fillRingSlots = (
           ignoreWiz: true,
         }),
         displayName: detail.displayName,
+        propertiesText: detail.propertiesText ?? undefined,
         artifactKind: detail.artifactKind,
         source: "imported",
       };
@@ -336,6 +339,7 @@ const fillRingSlots = (
           plus: 0,
           modifiers,
           displayName: detail.displayName,
+          propertiesText: detail.propertiesText ?? undefined,
           artifactKind: detail.artifactKind,
           source: "imported",
         };
@@ -378,6 +382,7 @@ const fillAmuletSlots = (
           kind: "reflection",
           modifiers,
           displayName: detail.displayName,
+          propertiesText: detail.propertiesText ?? undefined,
           artifactKind: detail.artifactKind,
           source: "imported",
         }
@@ -386,6 +391,7 @@ const fillAmuletSlots = (
             kind: "none",
             modifiers,
             displayName: detail.displayName,
+            propertiesText: detail.propertiesText ?? undefined,
             artifactKind: detail.artifactKind,
             source: "imported",
           }
@@ -426,6 +432,7 @@ const fillAuxArmourSlots = (
       enchant: detail.enchant ?? 0,
       modifiers: buildModifierBagFromItem(detail),
       displayName: detail.displayName,
+      propertiesText: detail.propertiesText ?? undefined,
       artifactKind: detail.artifactKind,
       source: "imported",
     };
@@ -454,6 +461,7 @@ const fillHeadgearSlots = (
       kind: detail.baseType === "hat" ? "hat" : "helmet",
       modifiers: buildModifierBagFromItem(detail),
       displayName: detail.displayName,
+      propertiesText: detail.propertiesText ?? undefined,
       artifactKind: detail.artifactKind,
       source: "imported",
     };
@@ -700,6 +708,7 @@ export const buildImportedCalculatorState = (
         ? buildModifierBagFromItem(record.bodyArmourDetails)
         : undefined,
       displayName: record.bodyArmourDetails?.displayName,
+      propertiesText: record.bodyArmourDetails?.propertiesText ?? undefined,
       artifactKind: record.bodyArmourDetails?.artifactKind,
       source: record.bodyArmourDetails ? "imported" : undefined,
     };
@@ -716,6 +725,7 @@ export const buildImportedCalculatorState = (
         ? buildModifierBagFromItem(record.shieldDetails)
         : undefined,
       displayName: record.shieldDetails?.displayName,
+      propertiesText: record.shieldDetails?.propertiesText ?? undefined,
       artifactKind: record.shieldDetails?.artifactKind,
       source: record.shieldDetails ? "imported" : undefined,
     };
@@ -732,6 +742,7 @@ export const buildImportedCalculatorState = (
           })
         : undefined,
       displayName: record.orbDetails?.displayName,
+      propertiesText: record.orbDetails?.propertiesText ?? undefined,
       artifactKind: record.orbDetails?.artifactKind,
       source: record.orbDetails ? "imported" : undefined,
     };
@@ -786,29 +797,32 @@ export const buildImportedCalculatorState = (
     kind: "boots",
     present: importedState.boots,
     enchant: bootsDetail?.enchant ?? 0,
-    modifiers: bootsDetail ? buildModifierBagFromItem(bootsDetail) : undefined,
-    displayName: bootsDetail?.displayName,
-    artifactKind: bootsDetail?.artifactKind,
-    source: bootsDetail ? "imported" : undefined,
-  };
+      modifiers: bootsDetail ? buildModifierBagFromItem(bootsDetail) : undefined,
+      displayName: bootsDetail?.displayName,
+      propertiesText: bootsDetail?.propertiesText ?? undefined,
+      artifactKind: bootsDetail?.artifactKind,
+      source: bootsDetail ? "imported" : undefined,
+    };
   importedState.bardingItem = {
     kind: "barding",
     present: importedState.barding,
     enchant: bardingDetail?.enchant ?? 0,
-    modifiers: bardingDetail ? buildModifierBagFromItem(bardingDetail) : undefined,
-    displayName: bardingDetail?.displayName,
-    artifactKind: bardingDetail?.artifactKind,
-    source: bardingDetail ? "imported" : undefined,
-  };
+      modifiers: bardingDetail ? buildModifierBagFromItem(bardingDetail) : undefined,
+      displayName: bardingDetail?.displayName,
+      propertiesText: bardingDetail?.propertiesText ?? undefined,
+      artifactKind: bardingDetail?.artifactKind,
+      source: bardingDetail ? "imported" : undefined,
+    };
   importedState.cloakItem = {
     kind: "cloak",
     present: importedState.cloak,
     enchant: cloakDetail?.enchant ?? 0,
-    modifiers: cloakDetail ? buildModifierBagFromItem(cloakDetail) : undefined,
-    displayName: cloakDetail?.displayName,
-    artifactKind: cloakDetail?.artifactKind,
-    source: cloakDetail ? "imported" : undefined,
-  };
+      modifiers: cloakDetail ? buildModifierBagFromItem(cloakDetail) : undefined,
+      displayName: cloakDetail?.displayName,
+      propertiesText: cloakDetail?.propertiesText ?? undefined,
+      artifactKind: cloakDetail?.artifactKind,
+      source: cloakDetail ? "imported" : undefined,
+    };
   fillHeadgearSlots(
     importedState.headgearSlots,
     record.helmetDetails?.filter(

@@ -56,6 +56,7 @@ const SectionHeading = ({ children }: { children: string }) => (
 
 const clearImportedItemMetadata = <T extends {
   displayName?: string;
+  propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: string;
 }>(
@@ -66,6 +67,7 @@ const clearImportedItemMetadata = <T extends {
     ? {
         ...item,
         displayName: undefined,
+        propertiesText: undefined,
         artifactKind: undefined,
         source: undefined,
       }

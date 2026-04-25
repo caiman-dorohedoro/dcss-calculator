@@ -38,6 +38,18 @@ describe("equipment summary text", () => {
 
   test("appends parser item properties when imported display names omit braces", () => {
     expect(
+      formatBodyArmourSummary({
+        kind: "robe",
+        enchant: 5,
+        ego: "none",
+        displayName: "justicar's regalia",
+        propertiesText: "Inspire Amulet+ Str+4",
+        modifiers: { flags: ["Inspire", "Amulet+"], str: 4 },
+        source: "imported",
+      })
+    ).toBe("+5 justicar's regalia {Inspire Amulet+ Str+4}");
+
+    expect(
       formatHeadgearSummary({
         present: true,
         kind: "hat",

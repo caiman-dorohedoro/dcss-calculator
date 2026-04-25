@@ -638,6 +638,87 @@ describe("morgue import mapper", () => {
     });
   });
 
+  test("preserves imported body armour name and raw property text separately from base armour", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Naga",
+      speciesVariant: null,
+      background: "Conjurer",
+      god: null,
+      xl: 12,
+      ac: 17,
+      ev: 20,
+      sh: 11,
+      strength: 8,
+      intelligence: 23,
+      dexterity: 14,
+      bodyArmour: "robe",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: {
+        ...makeItem("justicar's regalia", "robe", {
+          numeric: { Str: 4 },
+        }),
+        objectClass: "armour",
+        enchant: 5,
+        artifactKind: "unrand",
+        propertiesText: "Inspire Amulet+ Str+4",
+        properties: {
+          numeric: { Str: 4 },
+          booleanProps: {},
+          opaqueTokens: ["Inspire", "Amulet+"],
+        },
+      },
+      shieldDetails: undefined,
+      helmetDetails: [],
+      glovesDetails: [],
+      footwearDetails: [],
+      cloakDetails: [],
+      orbDetails: undefined,
+      amuletDetails: [],
+      ringDetails: [],
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Magic Dart",
+          failurePercent: 2,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.armour).toBe("robe");
+    expect(result.importedState.bodyArmour).toEqual(
+      expect.objectContaining({
+        kind: "robe",
+        enchant: 5,
+        displayName: "justicar's regalia",
+        propertiesText: "Inspire Amulet+ Str+4",
+        artifactKind: "unrand",
+        source: "imported",
+        modifiers: { flags: ["Inspire", "Amulet+"], str: 4 },
+      })
+    );
+  });
+
   test("returns a parser failure record for invalid text", () => {
     expect(parseImportedMorgue("not a morgue")).toMatchObject({
       ok: false,

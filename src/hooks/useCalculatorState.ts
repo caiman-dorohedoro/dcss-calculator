@@ -336,6 +336,7 @@ const isEquipmentMeta = (
   value: Record<string, unknown>
 ) =>
   (value.displayName === undefined || typeof value.displayName === "string") &&
+  (value.propertiesText === undefined || typeof value.propertiesText === "string") &&
   (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
   (value.source === undefined || isEquipmentItemSource(value.source)) &&
   (value.modifiers === undefined || isModifierBag(value.modifiers));

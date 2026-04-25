@@ -27,6 +27,7 @@ import type {
   AuxArmourSlotState,
   RingSlotState,
 } from "@/types/equipmentSlots";
+import { formatBodyArmourSummary } from "@/utils/equipmentSummaryText";
 
 type EquipmentModalConfig =
   | {
@@ -177,6 +178,19 @@ const ModalFrame = ({ title, children, onCancel, onSave }: ModalFrameProps) =>
     document.body
   );
 
+const ImportedMetadata = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) => (
+  <div className="flex flex-col gap-1 text-sm">
+    <span className="text-muted-foreground">{label}</span>
+    <span>{value}</span>
+  </div>
+);
+
 const BodyArmourEditor = ({
   config,
   onCancel,
@@ -186,6 +200,11 @@ const BodyArmourEditor = ({
 }) => {
   const [draft, setDraft] = useState<BodyArmourItemState>(config.value);
   const normalizedDraft = normalizeBodyArmourDraft(draft);
+  const importedBaseArmour =
+    config.value.kind !== "none" ? armourOptions[config.value.kind].name : null;
+  const importedItemSummary = config.value.displayName
+    ? formatBodyArmourSummary(config.value)
+    : null;
 
   return (
     <ModalFrame
@@ -198,6 +217,12 @@ const BodyArmourEditor = ({
         )
       }
     >
+      {config.value.source === "imported" && importedItemSummary ? (
+        <ImportedMetadata label="Imported item" value={importedItemSummary} />
+      ) : null}
+      {config.value.source === "imported" && importedBaseArmour ? (
+        <ImportedMetadata label="Base armour" value={importedBaseArmour} />
+      ) : null}
       <label className="flex flex-col gap-1 text-sm">
         Armour type
         <Select

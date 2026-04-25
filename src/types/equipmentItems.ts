@@ -31,6 +31,7 @@ export type EquipmentModifierBag = {
 
 type EquipmentItemMeta = {
   displayName?: string;
+  propertiesText?: string;
   artifactKind?: ArtifactKind;
   source?: EquipmentSource;
 };

@@ -293,3 +293,16 @@ The details modal should keep numeric properties editable through compact
 number inputs and expose flags as editable item-property tokens. This keeps the
 UI from adding a selector for every Crawl artefact flag while still allowing
 users to correct imported properties such as `{Ponderous, Will+ MP+10 Int+5}`.
+
+For imported body armour, the summary row should prefer the parser's original
+item name and raw `propertiesText` over any regenerated modifier text. This is
+especially important for unrand names such as `justicar's regalia`, where the
+calculator may normalize the base armour to `robe` for calculations while the
+UI should continue showing `+5 justicar's regalia {Inspire Amulet+ Str+4}`.
+
+The body armour details modal should expose that split explicitly:
+
+- `Imported item`: read-only Crawl-style imported name and raw property text
+- `Base armour`: read-only normalized armour base used by the calculator
+- editable controls below remain based on normalized state such as `Armour type`
+  and enchant

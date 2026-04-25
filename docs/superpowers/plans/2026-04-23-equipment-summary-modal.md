@@ -1517,3 +1517,29 @@ currently formula inputs, so imported equipment rows can display examples like
 
 - `npm test -- --runInBand src/utils/__tests__/equipmentSummaryText.test.ts src/morgueImport/__tests__/importMorgue.test.ts src/hooks/__tests__/calculatorStatePersistence.test.ts src/components/__tests__/DynamicEquipmentControls.test.tsx`
 - `npm run build`
+
+## Follow-up: Imported Body Armour Name vs Base Armour
+
+**Goal:** Keep imported body armour rows showing the original parser item name
+and raw property text, while still exposing the normalized base armour in the
+details modal for calculation transparency.
+
+**Implementation steps:**
+
+- Add RED tests for imported body armour summary text using parser
+  `propertiesText`, for import-state persistence of that raw text, and for
+  modal display of both `Imported item` and `Base armour`.
+- Preserve `propertiesText` alongside imported `displayName` in equipment item
+  and slot metadata, and clear it together with other imported metadata after a
+  real manual edit is saved.
+- Update imported summary formatting to prefer raw `propertiesText` when the
+  parser did not inline braces into `displayName`.
+- Show read-only imported body armour text and normalized base armour at the
+  top of the body armour details modal.
+
+**Verification:**
+
+- `npm test -- --runInBand src/utils/__tests__/equipmentSummaryText.test.ts src/morgueImport/__tests__/importMorgue.test.ts src/hooks/__tests__/calculatorStatePersistence.test.ts src/components/__tests__/CalculatorLayout.test.tsx`
+- `npm test -- --runInBand src/utils/__tests__/equipmentSummaryText.test.ts src/morgueImport/__tests__/importMorgue.test.ts src/hooks/__tests__/calculatorStatePersistence.test.ts src/components/__tests__/CalculatorLayout.test.tsx src/components/__tests__/DynamicEquipmentControls.test.tsx src/components/__tests__/SFChart.test.tsx`
+- `npm run lint`
+- `npm run build`

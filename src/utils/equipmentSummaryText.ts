@@ -137,11 +137,32 @@ const withDisplayNameModifiers = (
     ? displayName
     : withModifiers(displayName, modifiers);
 
-const withEnchantableDisplayName = (
+const withPropertiesText = (itemName: string, propertiesText?: string | null) =>
+  propertiesText ? `${itemName} {${propertiesText}}` : itemName;
+
+const withImportedDisplaySummary = (
   displayName: string,
-  enchant: number,
-  modifiers?: EquipmentModifierBag
-) => withDisplayNameModifiers(withDisplayNameEnchant(displayName, enchant), modifiers);
+  options?: {
+    enchant?: number;
+    propertiesText?: string;
+    modifiers?: EquipmentModifierBag;
+  }
+) => {
+  const itemName =
+    options?.enchant === undefined
+      ? displayName
+      : withDisplayNameEnchant(displayName, options.enchant);
+
+  if (inlinePropertiesPattern.test(displayName)) {
+    return itemName;
+  }
+
+  if (options?.propertiesText) {
+    return withPropertiesText(itemName, options.propertiesText);
+  }
+
+  return withDisplayNameModifiers(itemName, options?.modifiers);
+};
 
 const withModifiers = (
   itemName: string,
@@ -192,11 +213,11 @@ export const formatModifierSummary = (modifiers?: EquipmentModifierBag) => {
 
 export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
   if (item.displayName) {
-    return withEnchantableDisplayName(
-      item.displayName,
-      item.enchant,
-      item.modifiers
-    );
+    return withImportedDisplaySummary(item.displayName, {
+      enchant: item.enchant,
+      propertiesText: item.propertiesText,
+      modifiers: item.modifiers,
+    });
   }
   if (item.kind === "none") {
     return "none";
@@ -214,11 +235,11 @@ export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
 
 export const formatShieldSummary = (item: ShieldItemState) => {
   if (item.displayName) {
-    return withEnchantableDisplayName(
-      item.displayName,
-      item.enchant,
-      item.modifiers
-    );
+    return withImportedDisplaySummary(item.displayName, {
+      enchant: item.enchant,
+      propertiesText: item.propertiesText,
+      modifiers: item.modifiers,
+    });
   }
   if (item.kind === "none") {
     return "none";
@@ -232,7 +253,10 @@ export const formatShieldSummary = (item: ShieldItemState) => {
 
 export const formatOrbSummary = (item: OrbItemState) => {
   if (item.displayName) {
-    return withDisplayNameModifiers(item.displayName, item.modifiers);
+    return withImportedDisplaySummary(item.displayName, {
+      propertiesText: item.propertiesText,
+      modifiers: item.modifiers,
+    });
   }
   if (item.kind === "none") {
     return "none";
@@ -243,7 +267,10 @@ export const formatOrbSummary = (item: OrbItemState) => {
 
 export const formatRingSummary = (slot: RingSlotState) => {
   if (slot.displayName) {
-    return withDisplayNameModifiers(slot.displayName, slot.modifiers);
+    return withImportedDisplaySummary(slot.displayName, {
+      propertiesText: slot.propertiesText,
+      modifiers: slot.modifiers,
+    });
   }
   if (slot.kind === "none") {
     return "none";
@@ -261,7 +288,10 @@ export const formatRingSummary = (slot: RingSlotState) => {
 
 export const formatAmuletSummary = (slot: AmuletSlotState) => {
   if (slot.displayName) {
-    return withDisplayNameModifiers(slot.displayName, slot.modifiers);
+    return withImportedDisplaySummary(slot.displayName, {
+      propertiesText: slot.propertiesText,
+      modifiers: slot.modifiers,
+    });
   }
   if (slot.kind === "none") {
     return "none";
@@ -272,11 +302,11 @@ export const formatAmuletSummary = (slot: AmuletSlotState) => {
 
 export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
   if (slot.displayName) {
-    return withEnchantableDisplayName(
-      slot.displayName,
-      slot.enchant,
-      slot.modifiers
-    );
+    return withImportedDisplaySummary(slot.displayName, {
+      enchant: slot.enchant,
+      propertiesText: slot.propertiesText,
+      modifiers: slot.modifiers,
+    });
   }
   if (!slot.present) {
     return "none";
@@ -290,11 +320,11 @@ export const formatHeadgearSummary = (slot: AuxArmourSlotState) => {
 
 export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
   if (slot.displayName) {
-    return withEnchantableDisplayName(
-      slot.displayName,
-      slot.enchant,
-      slot.modifiers
-    );
+    return withImportedDisplaySummary(slot.displayName, {
+      enchant: slot.enchant,
+      propertiesText: slot.propertiesText,
+      modifiers: slot.modifiers,
+    });
   }
   if (!slot.present) {
     return "none";
@@ -308,11 +338,11 @@ export const formatGlovesSummary = (slot: AuxArmourSlotState) => {
 
 export const formatFixedAuxSummary = (item: FixedAuxItemState) => {
   if (item.displayName) {
-    return withEnchantableDisplayName(
-      item.displayName,
-      item.enchant,
-      item.modifiers
-    );
+    return withImportedDisplaySummary(item.displayName, {
+      enchant: item.enchant,
+      propertiesText: item.propertiesText,
+      modifiers: item.modifiers,
+    });
   }
   if (!item.present) {
     return "none";
