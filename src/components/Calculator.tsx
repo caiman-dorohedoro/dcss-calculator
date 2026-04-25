@@ -18,7 +18,6 @@ import SFChart from "@/components/chart/SFChart";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { GameVersion } from "@/types/game";
-import { getBodyArmourEgoOptions } from "@/versioning/equipmentData";
 import {
   DndContext,
   closestCenter,
@@ -87,7 +86,6 @@ const Calculator = <V extends GameVersion>({
 }: CalculatorProps<V>) => {
   const [openPrimaryEquipment, setOpenPrimaryEquipment] =
     useState<OpenPrimaryEquipment | null>(null);
-  const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
   const selectedBodyArmourEgo =
     state.bodyArmour.ego ??
     (state.bodyArmourEgo !== undefined ? state.bodyArmourEgo : "none");
@@ -216,7 +214,6 @@ const Calculator = <V extends GameVersion>({
               type: "bodyArmour",
               title: "Armour",
               value: primaryBodyArmour,
-              bodyArmourEgos,
               onSave: (next, changed) => {
                 const nextItem = clearImportedItemMetadata(next, changed);
                 setState((prev) => ({
@@ -253,6 +250,12 @@ const Calculator = <V extends GameVersion>({
                       : {
                           ...prev.orbItem,
                           kind: "none",
+                          ego: "none",
+                          modifiers: undefined,
+                          displayName: undefined,
+                          propertiesText: undefined,
+                          artifactKind: undefined,
+                          source: undefined,
                         },
                 }));
                 setOpenPrimaryEquipment(null);
@@ -281,6 +284,13 @@ const Calculator = <V extends GameVersion>({
                       : {
                           ...prev.shieldItem,
                           kind: "none",
+                          enchant: 0,
+                          ego: "none",
+                          modifiers: undefined,
+                          displayName: undefined,
+                          propertiesText: undefined,
+                          artifactKind: undefined,
+                          source: undefined,
                         },
                 }));
                 setOpenPrimaryEquipment(null);

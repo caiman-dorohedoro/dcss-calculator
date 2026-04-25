@@ -239,6 +239,11 @@ const equipmentEgoAvailabilityByBaseName = {
   readonly (readonly [KnownEquipmentEgoKey | "normal", number])[]
 >;
 
+const equipmentEgoAvailabilityMap: Record<
+  string,
+  readonly (readonly [KnownEquipmentEgoKey | "normal", number])[]
+> = equipmentEgoAvailabilityByBaseName;
+
 const cloneModifierBag = (
   modifiers: EquipmentModifierBag
 ): EquipmentModifierBag => ({
@@ -283,7 +288,7 @@ export const getEquipmentEgoOptionsForBaseName = (
   currentEgo?: EquipmentEgoKey
 ): EquipmentEgoOptionEntry[] => {
   const legal = baseName
-    ? [...(equipmentEgoAvailabilityByBaseName[baseName] ?? [])]
+    ? [...(equipmentEgoAvailabilityMap[baseName] ?? [])]
         .filter(isVisibleAvailabilityEntry)
         .sort((left, right) => right[1] - left[1])
     : [];
@@ -298,6 +303,7 @@ export const getEquipmentEgoOptionsForBaseName = (
   if (
     currentEgo &&
     currentEgo !== "none" &&
+    !isKnownEquipmentEgo(currentEgo) &&
     !entries.some(([key]) => key === currentEgo)
   ) {
     return [

@@ -14,10 +14,11 @@ import {
   armourOptions,
   orbOptions,
   shieldOptions,
-  type BodyArmourEgoKey,
+  type EquipmentEgoKey,
 } from "@/types/equipment";
 import type {
   BodyArmourItemState,
+  EquipmentModifierBag,
   FixedAuxItemState,
   OrbItemState,
   ShieldItemState,
@@ -28,9 +29,10 @@ import type {
   RingSlotState,
 } from "@/types/equipmentSlots";
 import {
-  getBodyArmourEgoLabel,
-  syncBodyArmourEgoModifiers,
-} from "@/utils/bodyArmourEgos";
+  getEquipmentEgoOptionsForBaseName,
+  syncEquipmentEgoModifiers,
+  type EquipmentEgoOptionEntry,
+} from "@/utils/equipmentEgos";
 import { formatBodyArmourSummary } from "@/utils/equipmentSummaryText";
 
 type EquipmentModalConfig =
@@ -38,7 +40,6 @@ type EquipmentModalConfig =
       type: "bodyArmour";
       title: string;
       value: BodyArmourItemState;
-      bodyArmourEgos: Partial<Record<BodyArmourEgoKey, BodyArmourEgoOptionValue>>;
       onSave: (next: BodyArmourItemState, changed: boolean) => void;
     }
   | {
@@ -109,8 +110,55 @@ const ringKinds = ["none", "wizardry", "protection", "evasion"] as const;
 const amuletKinds = ["none", "reflection"] as const;
 const headgearKinds = ["none", "hat", "helmet"] as const;
 const gloveKinds = ["none", "gloves"] as const;
-type BodyArmourEgoOptionValue = { name: string; itemName: string | null };
-type BodyArmourEgoOptionEntry = [string, BodyArmourEgoOptionValue];
+
+const coerceEquipmentEgoForBaseName = (
+  ego: EquipmentEgoKey | undefined,
+  baseName: string | null | undefined
+): EquipmentEgoKey => {
+  const currentEgo = ego ?? "none";
+  return getEquipmentEgoOptionsForBaseName(baseName, currentEgo).some(
+    ([key]) => key === currentEgo
+  )
+    ? currentEgo
+    : "none";
+};
+
+const syncDraftEgoForBaseName = <T extends {
+  ego?: EquipmentEgoKey;
+  modifiers?: EquipmentModifierBag;
+}>(
+  draft: T,
+  baseName: string | null | undefined
+): T & { ego: EquipmentEgoKey } => {
+  const previousEgo = draft.ego ?? "none";
+  const nextEgo = coerceEquipmentEgoForBaseName(previousEgo, baseName);
+  return {
+    ...draft,
+    ego: nextEgo,
+    modifiers:
+      nextEgo === previousEgo
+        ? draft.modifiers
+        : syncEquipmentEgoModifiers(draft.modifiers, previousEgo, nextEgo),
+  };
+};
+
+const getBodyArmourBaseName = (kind: BodyArmourItemState["kind"]) =>
+  kind === "none" ? null : armourOptions[kind].name;
+
+const getShieldBaseName = (kind: ShieldItemState["kind"]) =>
+  kind === "none" ? null : shieldOptions[kind].name;
+
+const getOrbBaseName = (kind: OrbItemState["kind"]) =>
+  kind === "energy" ? "orb" : null;
+
+const getHeadgearBaseName = (draft: AuxArmourSlotState) =>
+  draft.present ? draft.kind ?? "helmet" : null;
+
+const getGlovesBaseName = (draft: AuxArmourSlotState) =>
+  draft.present ? "gloves" : null;
+
+const getFixedAuxBaseName = (draft: FixedAuxItemState) =>
+  draft.present ? draft.kind : null;
 
 const normalizeBodyArmourDraft = (
   draft: BodyArmourItemState
@@ -118,6 +166,17 @@ const normalizeBodyArmourDraft = (
   ...draft,
   enchant: draft.kind === "none" ? 0 : draft.enchant,
   ego: draft.kind === "none" ? "none" : draft.ego,
+});
+
+const normalizeShieldDraft = (draft: ShieldItemState): ShieldItemState => ({
+  ...draft,
+  enchant: draft.kind === "none" ? 0 : draft.enchant,
+  ego: draft.kind === "none" ? "none" : draft.ego ?? "none",
+});
+
+const normalizeOrbDraft = (draft: OrbItemState): OrbItemState => ({
+  ...draft,
+  ego: draft.kind === "none" ? "none" : draft.ego ?? "none",
 });
 
 const isRingBonusKind = (kind: RingSlotState["kind"]) =>
@@ -134,6 +193,7 @@ const normalizeHeadgearDraft = (
   ...draft,
   enchant: draft.present ? draft.enchant : 0,
   kind: draft.present ? draft.kind ?? "helmet" : undefined,
+  ego: draft.present ? draft.ego ?? "none" : "none",
 });
 
 const normalizeGlovesDraft = (
@@ -143,6 +203,7 @@ const normalizeGlovesDraft = (
   present: draft.present,
   enchant: draft.present ? draft.enchant : 0,
   kind: undefined,
+  ego: draft.present ? draft.ego ?? "none" : "none",
 });
 
 const normalizeFixedAuxDraft = (
@@ -150,6 +211,7 @@ const normalizeFixedAuxDraft = (
 ): FixedAuxItemState => ({
   ...draft,
   enchant: draft.present ? draft.enchant : 0,
+  ego: draft.present ? draft.ego ?? "none" : "none",
 });
 
 const sameValue = <T,>(a: T, b: T) =>
@@ -197,6 +259,43 @@ const ImportedMetadata = ({
   </div>
 );
 
+const EquipmentEgoSelect = ({
+  label,
+  ariaLabel,
+  baseName,
+  value,
+  onChange,
+}: {
+  label: string;
+  ariaLabel: string;
+  baseName: string | null | undefined;
+  value: EquipmentEgoKey | undefined;
+  onChange: (ego: EquipmentEgoKey) => void;
+}) => {
+  const options = getEquipmentEgoOptionsForBaseName(baseName, value);
+
+  return (
+    <label className="flex flex-col gap-1 text-sm">
+      {label}
+      <Select
+        value={value ?? "none"}
+        onValueChange={(next) => onChange(next as EquipmentEgoKey)}
+      >
+        <SelectTrigger aria-label={ariaLabel} className="h-8">
+          <SelectValue placeholder="None" />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map(([key, option]: EquipmentEgoOptionEntry) => (
+            <SelectItem key={key} value={key}>
+              {option.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
+};
+
 const BodyArmourEditor = ({
   config,
   onCancel,
@@ -204,26 +303,21 @@ const BodyArmourEditor = ({
   config: Extract<EquipmentModalConfig, { type: "bodyArmour" }>;
   onCancel: () => void;
 }) => {
-  const [draft, setDraft] = useState<BodyArmourItemState>(config.value);
+  const [draft, setDraft] = useState<BodyArmourItemState>(() =>
+    normalizeBodyArmourDraft(
+      syncDraftEgoForBaseName(
+        config.value,
+        getBodyArmourBaseName(config.value.kind)
+      )
+    )
+  );
   const normalizedDraft = normalizeBodyArmourDraft(draft);
   const importedBaseArmour =
     config.value.kind !== "none" ? armourOptions[config.value.kind].name : null;
   const importedItemSummary = config.value.displayName
     ? formatBodyArmourSummary(config.value)
     : null;
-  const bodyArmourEgoEntries = Object.entries(config.bodyArmourEgos).filter(
-    (entry): entry is BodyArmourEgoOptionEntry => entry[1] !== undefined
-  );
-  const bodyArmourEgoOptions: BodyArmourEgoOptionEntry[] =
-    bodyArmourEgoEntries.some(([key]) => key === draft.ego)
-      ? bodyArmourEgoEntries
-      : [
-          [
-            draft.ego,
-            { name: getBodyArmourEgoLabel(draft.ego), itemName: null },
-          ],
-          ...bodyArmourEgoEntries,
-        ];
+  const bodyArmourBaseName = getBodyArmourBaseName(draft.kind);
 
   return (
     <ModalFrame
@@ -247,12 +341,18 @@ const BodyArmourEditor = ({
         <Select
           value={draft.kind}
           onValueChange={(value) =>
-            setDraft((current) =>
-              normalizeBodyArmourDraft({
-                ...current,
-                kind: value as BodyArmourItemState["kind"],
-              })
-            )
+            setDraft((current) => {
+              const kind = value as BodyArmourItemState["kind"];
+              return normalizeBodyArmourDraft(
+                syncDraftEgoForBaseName(
+                  {
+                    ...current,
+                    kind,
+                  },
+                  getBodyArmourBaseName(kind)
+                )
+              );
+            })
           }
         >
           <SelectTrigger aria-label="Armour" className="h-8">
@@ -279,34 +379,23 @@ const BodyArmourEditor = ({
               }))
             }
           />
-          <label className="flex flex-col gap-1 text-sm">
-            Body armour ego
-            <Select
-              value={draft.ego}
-              onValueChange={(value) =>
-                setDraft((current) => ({
-                  ...current,
-                  ego: value as BodyArmourEgoKey,
-                  modifiers: syncBodyArmourEgoModifiers(
-                    current.modifiers,
-                    current.ego,
-                    value as BodyArmourEgoKey
-                  ),
-                }))
-              }
-            >
-              <SelectTrigger aria-label="Body armour ego" className="h-8">
-                <SelectValue placeholder="None" />
-              </SelectTrigger>
-              <SelectContent>
-                {bodyArmourEgoOptions.map(([key, value]) => (
-                  <SelectItem key={key} value={key}>
-                    {value.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </label>
+          <EquipmentEgoSelect
+            label="Body armour ego"
+            ariaLabel="Body armour ego"
+            baseName={bodyArmourBaseName}
+            value={draft.ego}
+            onChange={(ego) =>
+              setDraft((current) => ({
+                ...current,
+                ego,
+                modifiers: syncEquipmentEgoModifiers(
+                  current.modifiers,
+                  current.ego ?? "none",
+                  ego
+                ),
+              }))
+            }
+          />
         </>
       ) : null}
       <EquipmentModifierInputs
@@ -329,24 +418,42 @@ const ShieldEditor = ({
   config: Extract<EquipmentModalConfig, { type: "shield" }>;
   onCancel: () => void;
 }) => {
-  const [draft, setDraft] = useState<ShieldItemState>(config.value);
+  const [draft, setDraft] = useState<ShieldItemState>(() =>
+    normalizeShieldDraft(
+      syncDraftEgoForBaseName(config.value, getShieldBaseName(config.value.kind))
+    )
+  );
+  const normalizedDraft = normalizeShieldDraft(draft);
 
   return (
     <ModalFrame
       title={config.title}
       onCancel={onCancel}
-      onSave={() => config.onSave(draft, !sameValue(config.value, draft))}
+      onSave={() =>
+        config.onSave(
+          normalizedDraft,
+          !sameValue(normalizeShieldDraft(config.value), normalizedDraft)
+        )
+      }
     >
       <label className="flex flex-col gap-1 text-sm">
         Shield type
         <Select
           value={draft.kind}
           onValueChange={(value) =>
-            setDraft((current) => ({
-              ...current,
-              kind: value as ShieldItemState["kind"],
-              enchant: value === "none" ? 0 : current.enchant,
-            }))
+            setDraft((current) => {
+              const kind = value as ShieldItemState["kind"];
+              return normalizeShieldDraft(
+                syncDraftEgoForBaseName(
+                  {
+                    ...current,
+                    kind,
+                    enchant: kind === "none" ? 0 : current.enchant,
+                  },
+                  getShieldBaseName(kind)
+                )
+              );
+            })
           }
         >
           <SelectTrigger aria-label="Shield" className="h-8">
@@ -373,6 +480,25 @@ const ShieldEditor = ({
           }
         />
       ) : null}
+      {draft.kind !== "none" ? (
+        <EquipmentEgoSelect
+          label="Shield ego"
+          ariaLabel="Shield ego"
+          baseName={getShieldBaseName(draft.kind)}
+          value={draft.ego}
+          onChange={(ego) =>
+            setDraft((current) => ({
+              ...current,
+              ego,
+              modifiers: syncEquipmentEgoModifiers(
+                current.modifiers,
+                current.ego ?? "none",
+                ego
+              ),
+            }))
+          }
+        />
+      ) : null}
       <EquipmentModifierInputs
         modifiers={draft.modifiers}
         onChange={(modifiers) =>
@@ -393,23 +519,42 @@ const OrbEditor = ({
   config: Extract<EquipmentModalConfig, { type: "orb" }>;
   onCancel: () => void;
 }) => {
-  const [draft, setDraft] = useState<OrbItemState>(config.value);
+  const [draft, setDraft] = useState<OrbItemState>(() =>
+    normalizeOrbDraft(
+      syncDraftEgoForBaseName(config.value, getOrbBaseName(config.value.kind))
+    )
+  );
+  const normalizedDraft = normalizeOrbDraft(draft);
+  const orbBaseName = getOrbBaseName(draft.kind);
 
   return (
     <ModalFrame
       title={config.title}
       onCancel={onCancel}
-      onSave={() => config.onSave(draft, !sameValue(config.value, draft))}
+      onSave={() =>
+        config.onSave(
+          normalizedDraft,
+          !sameValue(normalizeOrbDraft(config.value), normalizedDraft)
+        )
+      }
     >
       <label className="flex flex-col gap-1 text-sm">
         Orb type
         <Select
           value={draft.kind}
           onValueChange={(value) =>
-            setDraft((current) => ({
-              ...current,
-              kind: value as OrbItemState["kind"],
-            }))
+            setDraft((current) => {
+              const kind = value as OrbItemState["kind"];
+              return normalizeOrbDraft(
+                syncDraftEgoForBaseName(
+                  {
+                    ...current,
+                    kind,
+                  },
+                  getOrbBaseName(kind)
+                )
+              );
+            })
           }
         >
           <SelectTrigger aria-label="Orb" className="h-8">
@@ -424,6 +569,25 @@ const OrbEditor = ({
           </SelectContent>
         </Select>
       </label>
+      {orbBaseName ? (
+        <EquipmentEgoSelect
+          label="Orb ego"
+          ariaLabel="Orb ego"
+          baseName={orbBaseName}
+          value={draft.ego}
+          onChange={(ego) =>
+            setDraft((current) => ({
+              ...current,
+              ego,
+              modifiers: syncEquipmentEgoModifiers(
+                current.modifiers,
+                current.ego ?? "none",
+                ego
+              ),
+            }))
+          }
+        />
+      ) : null}
       <EquipmentModifierInputs
         modifiers={draft.modifiers}
         onChange={(modifiers) =>
@@ -569,7 +733,11 @@ const HeadgearEditor = ({
   config: Extract<EquipmentModalConfig, { type: "headgear" }>;
   onCancel: () => void;
 }) => {
-  const [draft, setDraft] = useState<AuxArmourSlotState>(config.value);
+  const [draft, setDraft] = useState<AuxArmourSlotState>(() =>
+    normalizeHeadgearDraft(
+      syncDraftEgoForBaseName(config.value, getHeadgearBaseName(config.value))
+    )
+  );
   const normalizedDraft = normalizeHeadgearDraft(draft);
 
   return (
@@ -590,11 +758,15 @@ const HeadgearEditor = ({
           onValueChange={(value) =>
             setDraft((current) => {
               const nextKind = value as (typeof headgearKinds)[number];
-              return normalizeHeadgearDraft({
+              const nextDraft = normalizeHeadgearDraft({
                 ...current,
                 present: nextKind !== "none",
                 kind: nextKind === "none" ? undefined : nextKind,
               });
+              return syncDraftEgoForBaseName(
+                nextDraft,
+                getHeadgearBaseName(nextDraft)
+              );
             })
           }
         >
@@ -622,6 +794,25 @@ const HeadgearEditor = ({
           }
         />
       ) : null}
+      {draft.present ? (
+        <EquipmentEgoSelect
+          label="Headgear ego"
+          ariaLabel="Headgear ego"
+          baseName={getHeadgearBaseName(draft)}
+          value={draft.ego}
+          onChange={(ego) =>
+            setDraft((current) => ({
+              ...current,
+              ego,
+              modifiers: syncEquipmentEgoModifiers(
+                current.modifiers,
+                current.ego ?? "none",
+                ego
+              ),
+            }))
+          }
+        />
+      ) : null}
       <EquipmentModifierInputs
         modifiers={draft.modifiers}
         onChange={(modifiers) =>
@@ -642,7 +833,11 @@ const GlovesEditor = ({
   config: Extract<EquipmentModalConfig, { type: "gloves" }>;
   onCancel: () => void;
 }) => {
-  const [draft, setDraft] = useState<AuxArmourSlotState>(config.value);
+  const [draft, setDraft] = useState<AuxArmourSlotState>(() =>
+    normalizeGlovesDraft(
+      syncDraftEgoForBaseName(config.value, getGlovesBaseName(config.value))
+    )
+  );
   const normalizedDraft = normalizeGlovesDraft(draft);
 
   return (
@@ -661,12 +856,16 @@ const GlovesEditor = ({
         <Select
           value={draft.present ? "gloves" : "none"}
           onValueChange={(value) =>
-            setDraft((current) =>
-              normalizeGlovesDraft({
+            setDraft((current) => {
+              const nextDraft = normalizeGlovesDraft({
                 ...current,
                 present: (value as (typeof gloveKinds)[number]) === "gloves",
-              })
-            )
+              });
+              return syncDraftEgoForBaseName(
+                nextDraft,
+                getGlovesBaseName(nextDraft)
+              );
+            })
           }
         >
           <SelectTrigger aria-label="Gloves type" className="h-8">
@@ -693,6 +892,25 @@ const GlovesEditor = ({
           }
         />
       ) : null}
+      {draft.present ? (
+        <EquipmentEgoSelect
+          label="Gloves ego"
+          ariaLabel="Gloves ego"
+          baseName={getGlovesBaseName(draft)}
+          value={draft.ego}
+          onChange={(ego) =>
+            setDraft((current) => ({
+              ...current,
+              ego,
+              modifiers: syncEquipmentEgoModifiers(
+                current.modifiers,
+                current.ego ?? "none",
+                ego
+              ),
+            }))
+          }
+        />
+      ) : null}
       <EquipmentModifierInputs
         modifiers={draft.modifiers}
         onChange={(modifiers) =>
@@ -713,8 +931,21 @@ const FixedAuxEditor = ({
   config: Extract<EquipmentModalConfig, { type: "fixedAux" }>;
   onCancel: () => void;
 }) => {
-  const [draft, setDraft] = useState<FixedAuxItemState>(config.value);
+  const [draft, setDraft] = useState<FixedAuxItemState>(() =>
+    normalizeFixedAuxDraft(
+      syncDraftEgoForBaseName(config.value, getFixedAuxBaseName(config.value))
+    )
+  );
   const normalizedDraft = normalizeFixedAuxDraft(draft);
+  const isCloakSlot =
+    config.value.kind === "cloak" || config.value.kind === "scarf";
+  const equippedValue = isCloakSlot
+    ? draft.present
+      ? draft.kind
+      : "none"
+    : draft.present
+      ? "equipped"
+      : "none";
 
   return (
     <ModalFrame
@@ -730,22 +961,52 @@ const FixedAuxEditor = ({
       <label className="flex flex-col gap-1 text-sm">
         {config.title}
         <Select
-          value={draft.present ? "equipped" : "none"}
+          value={equippedValue}
           onValueChange={(value) =>
-            setDraft((current) =>
-              normalizeFixedAuxDraft({
-                ...current,
-                present: value === "equipped",
-              })
-            )
+            setDraft((current) => {
+              const nextDraft = normalizeFixedAuxDraft(
+                isCloakSlot
+                  ? {
+                      ...current,
+                      kind:
+                        value === "none"
+                          ? current.kind
+                          : value === "scarf"
+                            ? "scarf"
+                            : "cloak",
+                      present: value !== "none",
+                    }
+                  : {
+                      ...current,
+                      present: value === "equipped",
+                    }
+              );
+              return syncDraftEgoForBaseName(
+                nextDraft,
+                getFixedAuxBaseName(nextDraft)
+              );
+            })
           }
         >
-          <SelectTrigger aria-label={`${config.title} equipped`} className="h-8">
+          <SelectTrigger
+            aria-label={isCloakSlot ? "Cloak type" : `${config.title} equipped`}
+            className="h-8"
+          >
             <SelectValue placeholder="none" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">none</SelectItem>
-            <SelectItem value="equipped">equipped</SelectItem>
+            {isCloakSlot ? (
+              <>
+                <SelectItem value="none">none</SelectItem>
+                <SelectItem value="cloak">cloak</SelectItem>
+                <SelectItem value="scarf">scarf</SelectItem>
+              </>
+            ) : (
+              <>
+                <SelectItem value="none">none</SelectItem>
+                <SelectItem value="equipped">equipped</SelectItem>
+              </>
+            )}
           </SelectContent>
         </Select>
       </label>
@@ -757,6 +1018,25 @@ const FixedAuxEditor = ({
             setDraft((current) => ({
               ...current,
               enchant,
+            }))
+          }
+        />
+      ) : null}
+      {draft.present ? (
+        <EquipmentEgoSelect
+          label={`${config.title} ego`}
+          ariaLabel={`${config.title} ego`}
+          baseName={getFixedAuxBaseName(draft)}
+          value={draft.ego}
+          onChange={(ego) =>
+            setDraft((current) => ({
+              ...current,
+              ego,
+              modifiers: syncEquipmentEgoModifiers(
+                current.modifiers,
+                current.ego ?? "none",
+                ego
+              ),
             }))
           }
         />

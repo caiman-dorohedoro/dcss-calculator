@@ -30,7 +30,7 @@ export type AuxArmourSlotState = {
   present: boolean;
   enchant: number;
   kind?: HeadgearKind;
-  ego: EquipmentEgoKey;
+  ego?: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
   displayName?: string;
   propertiesText?: string;

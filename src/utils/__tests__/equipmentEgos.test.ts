@@ -97,4 +97,10 @@ describe("equipment ego availability", () => {
       "resistance",
     ]);
   });
+
+  test("does not preserve known egos that are illegal for the selected base item", () => {
+    expect(
+      getEquipmentEgoOptionsForBaseName("robe", "resonance").map(([key]) => key)
+    ).not.toContain("resonance");
+  });
 });

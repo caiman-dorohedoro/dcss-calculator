@@ -230,7 +230,9 @@ describe("DynamicEquipmentControls", () => {
       present: false,
       enchant: 0,
       kind: undefined,
+      ego: "none",
       displayName: undefined,
+      propertiesText: undefined,
       artifactKind: undefined,
       source: undefined,
     });
@@ -607,6 +609,117 @@ describe("DynamicEquipmentControls", () => {
       mp: 7,
       int: 4,
     });
+  });
+
+  test("shows auxiliary armour ego selectors in equipment modals", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.headgearSlots = [
+      {
+        present: true,
+        kind: "hat",
+        enchant: 0,
+        ego: "intelligence",
+        modifiers: { int: 3 },
+      },
+    ];
+    state.gloveSlots = [
+      {
+        present: true,
+        enchant: 0,
+        ego: "strength",
+        modifiers: { str: 3 },
+      },
+    ];
+    state.cloak = true;
+    state.cloakItem = {
+      ...state.cloakItem,
+      kind: "scarf",
+      present: true,
+      ego: "resistance",
+      modifiers: { rF: 1, rC: 1 },
+    };
+    state.boots = true;
+    state.bootsItem = {
+      ...state.bootsItem,
+      present: true,
+      enchant: 1,
+      ego: "flying",
+      modifiers: { flags: ["Fly"] },
+    };
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-headgear-0"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(
+      document.body.querySelector('button[aria-label="Headgear ego"]')
+        ?.textContent
+    ).toContain("Intelligence");
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-glove-0"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(
+      document.body.querySelector('button[aria-label="Gloves ego"]')?.textContent
+    ).toContain("Strength");
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-cloak"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(
+      document.body.querySelector('button[aria-label="Cloak type"]')?.textContent
+    ).toContain("scarf");
+    expect(
+      document.body.querySelector('button[aria-label="Cloak ego"]')?.textContent
+    ).toContain("Resistance");
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-footwear"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(
+      document.body.querySelector('button[aria-label="Footwear ego"]')
+        ?.textContent
+    ).toContain("Flying");
   });
 
   test("renders equipment rows as plain text and opens a portal modal", async () => {

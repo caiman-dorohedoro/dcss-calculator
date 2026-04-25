@@ -657,6 +657,67 @@ describe("Calculator desktop layout", () => {
     ).not.toBeNull();
   });
 
+  test("shows shield and orb equipment ego selectors in offhand modals", async () => {
+    const shieldState = buildDefaultCalculatorState("trunk");
+    shieldState.shield = "buckler";
+    shieldState.shieldItem = {
+      ...shieldState.shieldItem,
+      kind: "buckler",
+      enchant: 2,
+      ego: "reflection",
+      modifiers: { flags: ["Reflect"] },
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={shieldState} setState={mockSetState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-offhand"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(
+      document.body.querySelector('button[aria-label="Shield ego"]')?.textContent
+    ).toContain("Reflection");
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="cancel-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    const orbState = buildDefaultCalculatorState("trunk");
+    orbState.shield = "none";
+    orbState.orb = "energy";
+    orbState.orbItem = {
+      ...orbState.orbItem,
+      kind: "energy",
+      ego: "energy",
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={orbState} setState={mockSetState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-offhand"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(
+      document.body.querySelector('button[aria-label="Orb ego"]')?.textContent
+    ).toContain("Energy");
+  });
+
   test("clears imported body armour display metadata only after a saved edit", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.armour = "robe";

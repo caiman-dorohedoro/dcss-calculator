@@ -47,13 +47,13 @@ export type BodyArmourItemState = EquipmentItemMeta & {
 export type ShieldItemState = EquipmentItemMeta & {
   kind: ShieldKey;
   enchant: number;
-  ego: EquipmentEgoKey;
+  ego?: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
 };
 
 export type OrbItemState = EquipmentItemMeta & {
   kind: OrbKey;
-  ego: EquipmentEgoKey;
+  ego?: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
 };
 
@@ -61,7 +61,7 @@ export type FixedAuxItemState = EquipmentItemMeta & {
   kind: "cloak" | "scarf" | "boots" | "barding";
   present: boolean;
   enchant: number;
-  ego: EquipmentEgoKey;
+  ego?: EquipmentEgoKey;
   modifiers?: EquipmentModifierBag;
 };
 
