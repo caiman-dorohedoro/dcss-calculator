@@ -88,7 +88,7 @@ describe("equipment summary text", () => {
     ).toBe("ring of Ewkivat {rC+ rN++ Will- rCorr MP+7 Str+4}");
   });
 
-  test("does not invent property braces for normal imported rings", () => {
+  test("does not invent property braces for normal imported items", () => {
     expect(
       formatRingSummary({
         kind: "none",
@@ -99,6 +99,18 @@ describe("equipment summary text", () => {
         source: "imported",
       })
     ).toBe("ring of willpower");
+
+    expect(
+      formatBodyArmourSummary({
+        kind: "robe",
+        enchant: 2,
+        ego: "none",
+        displayName: "+2 robe of willpower",
+        modifiers: { will: 1 },
+        artifactKind: "normal",
+        source: "imported",
+      })
+    ).toBe("+2 robe of willpower");
   });
 
   test("adds state enchantment to imported enchantable names when missing", () => {

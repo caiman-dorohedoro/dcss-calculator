@@ -174,6 +174,12 @@ displaying it. This preserves imported artifact names like `the +4 leather
 armour of the Plethaurus ...` while still showing `+0 pair of boots` when the
 parser provides `pair of boots`.
 
+For imported normal items, do not synthesize `{...}` property braces from the
+calculator modifier bag. Those modifiers still feed calculations, but the
+summary should keep the normal in-game item text such as `+2 robe of willpower`
+or `ring of willpower` unless the parser provided raw `propertiesText` from the
+morgue line.
+
 Fallback text should stay intentionally narrow. It should use known equipment
 names from the app's option tables and item state, then append calculation
 modifiers when present.
