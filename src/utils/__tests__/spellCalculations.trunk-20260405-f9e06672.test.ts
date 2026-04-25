@@ -456,6 +456,35 @@ describe("trunk snapshot 20260405 (crawl f9e06672)", () => {
       expect(failureRate).toBe(8);
     });
 
+    test("non-spell body armour egos do not change spell failure", () => {
+      const baseParams = {
+        version: "trunk" as const,
+        species: "galeCentaur" as const,
+        strength: 20,
+        intelligence: 12,
+        spellcasting: 0,
+        armour: "plate" as const,
+        shield: "none" as const,
+        armourSkill: 27,
+        shieldSkill: 0,
+        targetSpell: "Summon Small Mammal" as const,
+        schoolSkills: zeroSkillLevels("summoning"),
+        spellDifficulty: 1 as const,
+      };
+
+      expect(
+        calculateSpellFailureRate({
+          ...baseParams,
+          bodyArmourEgo: "willpower",
+        })
+      ).toBe(
+        calculateSpellFailureRate({
+          ...baseParams,
+          bodyArmourEgo: "none",
+        })
+      );
+    });
+
     test("resonance ego lowers Forgecraft spell failure on body armour", () => {
       const failureRate = calculateSpellFailureRate({
         version: "trunk",

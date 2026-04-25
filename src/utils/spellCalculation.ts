@@ -6,6 +6,7 @@ import {
   shieldOptions,
 } from "@/types/equipment.ts";
 import { GameVersion } from "@/types/game";
+import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import {
   VersionedSchoolSkillLevels,
   VersionedSpellDatum,
@@ -16,7 +17,7 @@ import {
 import { SpeciesKey } from "@/types/species";
 import {
   getArmourEncumbrance,
-  getBodyArmourEgoOptions,
+  getSpellBoostBodyArmourEgoOptions,
 } from "@/versioning/equipmentData";
 import { getFormulaProfile } from "@/versioning/formulaProfiles";
 import { getVersionConfig } from "@/versioning/versionRegistry";
@@ -282,7 +283,8 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
   wizardry,
 }: ApplySpellSuccessBoostsParams<V>) => {
   const spellSchools = getSpellSchools(version, targetSpell);
-  const supportedBodyArmourEgos = getBodyArmourEgoOptions(version);
+  const supportedBodyArmourEgos = getSpellBoostBodyArmourEgoOptions(version);
+  const spellBoostBodyArmourEgo = getSpellBoostBodyArmourEgo(bodyArmourEgo);
   let boostedChance = chance;
   let failReduce = 100;
 
@@ -292,8 +294,8 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
 
   if (
     armour !== "none" &&
-    bodyArmourEgo in supportedBodyArmourEgos &&
-    bodyArmourEgo === "death" &&
+    spellBoostBodyArmourEgo in supportedBodyArmourEgos &&
+    spellBoostBodyArmourEgo === "death" &&
     spellSchools.some((school) => school === "necromancy")
   ) {
     failReduce = Math.floor(failReduce / 2);
@@ -301,8 +303,8 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
 
   if (
     armour !== "none" &&
-    bodyArmourEgo in supportedBodyArmourEgos &&
-    bodyArmourEgo === "command" &&
+    spellBoostBodyArmourEgo in supportedBodyArmourEgos &&
+    spellBoostBodyArmourEgo === "command" &&
     spellSchools.some((school) => school === "summoning")
   ) {
     failReduce = Math.floor((failReduce * 180) / (180 + armourSkill * 10));
@@ -310,8 +312,8 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
 
   if (
     armour !== "none" &&
-    bodyArmourEgo in supportedBodyArmourEgos &&
-    bodyArmourEgo === "resonance" &&
+    spellBoostBodyArmourEgo in supportedBodyArmourEgos &&
+    spellBoostBodyArmourEgo === "resonance" &&
     spellSchools.some((school) => school === "forgecraft")
   ) {
     failReduce = Math.floor((failReduce * 2) / 3);
