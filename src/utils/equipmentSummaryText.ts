@@ -1,6 +1,5 @@
 import {
   armourOptions,
-  bodyArmourEgoOptions,
   orbOptions,
   shieldOptions,
 } from "@/types/equipment";
@@ -16,6 +15,7 @@ import type {
   AuxArmourSlotState,
   RingSlotState,
 } from "@/types/equipmentSlots";
+import { getBodyArmourEgoItemName } from "@/utils/bodyArmourEgos";
 
 const sequenceSigned = (value: number) => {
   const sign = value >= 0 ? "+" : "-";
@@ -119,6 +119,14 @@ const signed = (value: number) => (value >= 0 ? `+${value}` : `${value}`);
 
 const withEnchant = (enchant: number, itemName: string) =>
   `${signed(enchant)} ${itemName}`;
+
+const withBodyArmourEgo = (
+  baseName: string,
+  ego: BodyArmourItemState["ego"]
+) => {
+  const egoItemName = getBodyArmourEgoItemName(ego);
+  return egoItemName ? `${baseName} of ${egoItemName}` : baseName;
+};
 
 const leadingEnchantPattern = /^(?:(?:the|a|an)\s+)?[+-]\d+\b/;
 
@@ -238,13 +246,9 @@ export const formatBodyArmourSummary = (item: BodyArmourItemState) => {
   }
 
   const baseName = armourOptions[item.kind].name;
-  const egoName =
-    item.ego === "none" ? "" : ` (${bodyArmourEgoOptions[item.ego].name})`;
+  const itemName = withBodyArmourEgo(baseName, item.ego);
 
-  return withModifiers(
-    `${withEnchant(item.enchant, baseName)}${egoName}`,
-    item.modifiers
-  );
+  return withModifiers(withEnchant(item.enchant, itemName), item.modifiers);
 };
 
 export const formatShieldSummary = (item: ShieldItemState) => {

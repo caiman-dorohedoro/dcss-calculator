@@ -143,7 +143,16 @@ describe("equipment summary text", () => {
         ego: "resonance",
         modifiers: { int: 3 },
       })
-    ).toBe("+4 leather armour (Resonance) {Int+3}");
+    ).toBe("+4 leather armour of resonance {Int+3}");
+
+    expect(
+      formatBodyArmourSummary({
+        kind: "robe",
+        enchant: 2,
+        ego: "willpower",
+        modifiers: { will: 1 },
+      })
+    ).toBe("+2 robe of willpower {Will+}");
 
     expect(
       formatBodyArmourSummary({
@@ -215,5 +224,15 @@ describe("equipment summary text", () => {
         wizardry: 1,
       })
     ).toBe("{Str+2 Dex+5 Int-1 AC+3 EV-2 SH+4 Wiz+1}");
+  });
+
+  test("formats unknown body armour ego strings without crashing", () => {
+    expect(
+      formatBodyArmourSummary({
+        kind: "robe",
+        enchant: 1,
+        ego: "future mystery",
+      })
+    ).toBe("+1 robe of future mystery");
   });
 });

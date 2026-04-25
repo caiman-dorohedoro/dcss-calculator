@@ -385,7 +385,7 @@ describe("Calculator desktop layout", () => {
     expect(
       equipmentSection.querySelector('[data-testid="equipment-row-body-armour"]')
         ?.textContent
-    ).toContain("+4 leather armour (Resonance) {Int+3}");
+    ).toContain("+4 leather armour of resonance {Int+3}");
     expect(
       equipmentSection.querySelector('[data-testid="equipment-row-offhand"]')
         ?.textContent
@@ -461,6 +461,35 @@ describe("Calculator desktop layout", () => {
     ).toBeNull();
     expect(container.textContent).not.toContain("body armour enchant");
     expect(container.textContent).not.toContain("body armour ego");
+  });
+
+  test("shows parser-aligned body armour ego in the modal", async () => {
+    const equipped = buildDefaultCalculatorState("trunk");
+    equipped.armour = "robe";
+    equipped.bodyArmour = {
+      ...equipped.bodyArmour,
+      kind: "robe",
+      enchant: 2,
+      ego: "willpower",
+      modifiers: { will: 1 },
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={equipped} setState={mockSetState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[data-testid="equipment-row-body-armour"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(
+      document.body.querySelector('button[aria-label="Body armour ego"]')
+        ?.textContent
+    ).toContain("Willpower");
   });
 
   test("places body armour in a single summary row", async () => {

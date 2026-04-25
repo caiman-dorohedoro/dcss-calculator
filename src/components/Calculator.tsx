@@ -43,6 +43,7 @@ import {
   formatOrbSummary,
   formatShieldSummary,
 } from "@/utils/equipmentSummaryText";
+import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import { coerceEquipmentSlotCollections } from "@/versioning/dynamicSlotCounts";
 
 type CalculatorProps<V extends GameVersion> = {
@@ -88,11 +89,8 @@ const Calculator = <V extends GameVersion>({
     useState<OpenPrimaryEquipment | null>(null);
   const bodyArmourEgos = getBodyArmourEgoOptions(state.version);
   const selectedBodyArmourEgo =
-    state.bodyArmour.ego in bodyArmourEgos
-      ? state.bodyArmour.ego
-      : state.bodyArmourEgo !== undefined && state.bodyArmourEgo in bodyArmourEgos
-      ? state.bodyArmourEgo
-      : "none";
+    state.bodyArmour.ego ??
+    (state.bodyArmourEgo !== undefined ? state.bodyArmourEgo : "none");
 
   const skillAttrKeys: Array<{
     label: string;
@@ -225,7 +223,7 @@ const Calculator = <V extends GameVersion>({
                   ...prev,
                   armour: nextItem.kind,
                   bodyArmourEnchant: nextItem.enchant,
-                  bodyArmourEgo: nextItem.ego,
+                  bodyArmourEgo: getSpellBoostBodyArmourEgo(nextItem.ego),
                   bodyArmour: nextItem,
                 }));
                 setOpenPrimaryEquipment(null);

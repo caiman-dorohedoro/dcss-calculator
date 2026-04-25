@@ -27,6 +27,10 @@ import type {
   AuxArmourSlotState,
   RingSlotState,
 } from "@/types/equipmentSlots";
+import {
+  getBodyArmourEgoLabel,
+  syncBodyArmourEgoModifiers,
+} from "@/utils/bodyArmourEgos";
 import { formatBodyArmourSummary } from "@/utils/equipmentSummaryText";
 
 type EquipmentModalConfig =
@@ -34,7 +38,9 @@ type EquipmentModalConfig =
       type: "bodyArmour";
       title: string;
       value: BodyArmourItemState;
-      bodyArmourEgos: Partial<Record<BodyArmourEgoKey, { name: string }>>;
+      bodyArmourEgos: Partial<
+        Record<BodyArmourEgoKey, { name: string; itemName: string | null }>
+      >;
       onSave: (next: BodyArmourItemState, changed: boolean) => void;
     }
   | {
@@ -205,6 +211,15 @@ const BodyArmourEditor = ({
   const importedItemSummary = config.value.displayName
     ? formatBodyArmourSummary(config.value)
     : null;
+  const bodyArmourEgoEntries = Object.entries(config.bodyArmourEgos);
+  const bodyArmourEgoOptions = bodyArmourEgoEntries.some(
+    ([key]) => key === draft.ego
+  )
+    ? bodyArmourEgoEntries
+    : [
+        [draft.ego, { name: getBodyArmourEgoLabel(draft.ego), itemName: null }],
+        ...bodyArmourEgoEntries,
+      ];
 
   return (
     <ModalFrame
@@ -268,6 +283,11 @@ const BodyArmourEditor = ({
                 setDraft((current) => ({
                   ...current,
                   ego: value as BodyArmourEgoKey,
+                  modifiers: syncBodyArmourEgoModifiers(
+                    current.modifiers,
+                    current.ego,
+                    value as BodyArmourEgoKey
+                  ),
                 }))
               }
             >
@@ -275,13 +295,11 @@ const BodyArmourEditor = ({
                 <SelectValue placeholder="None" />
               </SelectTrigger>
               <SelectContent>
-                {(Object.keys(config.bodyArmourEgos) as BodyArmourEgoKey[]).map(
-                  (key) => (
-                    <SelectItem key={key} value={key}>
-                      {config.bodyArmourEgos[key]?.name ?? key}
-                    </SelectItem>
-                  )
-                )}
+                {bodyArmourEgoOptions.map(([key, value]) => (
+                  <SelectItem key={key} value={key}>
+                    {value.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </label>
