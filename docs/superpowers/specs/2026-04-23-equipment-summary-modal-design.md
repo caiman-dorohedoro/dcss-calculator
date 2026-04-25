@@ -130,6 +130,13 @@ slot, omit the numeric suffix. For example, show `Glove:` and `Amulet:` for
 one-slot characters, while keeping `Glove 1:` / `Glove 2:` or `Ring 1:` /
 `Ring 2:` when multiple slots are actually present.
 
+Boots and barding should be presented as one footwear position. The calculator
+keeps the internal `bootsItem` and `bardingItem` state separate for existing AC,
+EV, import, and modifier calculations, but the equipment readout should show a
+single `Footwear:` row. If barding is equipped, that row displays the barding
+summary; otherwise it displays boots or `none`. This keeps the list closer to
+the in-game status equipment layout without losing parser-provided item names.
+
 The row label identifies the app slot, while the summary text should read like
 an in-game item name. Rows should keep the existing `Label: item text` shape;
 the UI should not switch to `label - item text`. For example:
@@ -140,7 +147,8 @@ the UI should not switch to `label - item text`. For example:
 - `Ring 1: a ring of protection +4`
 - `Glove 1: +5 pair of gloves {Str+2}`
 - `Cloak: +0 cloak`
-- `Boots: none`
+- `Footwear: +0 pair of boots`
+- `Footwear: +4 barding`
 
 The app does not need to reproduce Crawl inventory letters such as `a -` or
 `p -`. Slot labels are enough context for this calculator.

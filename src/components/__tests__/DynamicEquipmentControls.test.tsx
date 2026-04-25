@@ -163,8 +163,7 @@ describe("DynamicEquipmentControls", () => {
       "equipment-row-cloak",
       "equipment-row-glove-0",
       "equipment-row-glove-1",
-      "equipment-row-boots",
-      "equipment-row-barding",
+      "equipment-row-footwear",
       "equipment-row-amulet-0",
       "equipment-row-ring-0",
       "equipment-row-ring-1",
@@ -330,7 +329,7 @@ describe("DynamicEquipmentControls", () => {
     expect(enchantInput.className).toContain("w-14");
   });
 
-  test("renders fixed equipment summary rows and removes old modifier labels", async () => {
+  test("renders fixed equipment summary rows and groups footwear", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.cloak = true;
     state.cloakEnchant = 2;
@@ -346,13 +345,7 @@ describe("DynamicEquipmentControls", () => {
       present: true,
       enchant: -1,
     };
-    state.barding = true;
-    state.bardingEnchant = 5;
-    state.bardingItem = {
-      ...state.bardingItem,
-      present: true,
-      enchant: 5,
-    };
+    state.barding = false;
 
     await act(async () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
@@ -367,18 +360,40 @@ describe("DynamicEquipmentControls", () => {
         ?.textContent
     ).toContain("+2 cloak");
     expect(
-      dynamicEquipmentList.querySelector('[data-testid="equipment-row-boots"]')
+      dynamicEquipmentList.querySelector('[data-testid="equipment-row-footwear"]')
         ?.textContent
     ).toContain("-1 pair of boots");
     expect(
+      dynamicEquipmentList.querySelector('[data-testid="equipment-row-boots"]')
+    ).toBeNull();
+    expect(
       dynamicEquipmentList.querySelector('[data-testid="equipment-row-barding"]')
-        ?.textContent
-    ).toContain("+5 barding");
+    ).toBeNull();
     expect(dynamicEquipmentList.querySelector('input[type="number"]')).toBeNull();
     expect(dynamicEquipmentList.querySelector('input[type="checkbox"]')).toBeNull();
     expect(
       container.querySelector('[data-testid="dynamic-equipment-modifiers"]')
     ).toBeNull();
+
+    const bardingState = buildDefaultCalculatorState("trunk");
+    bardingState.barding = true;
+    bardingState.bardingEnchant = 5;
+    bardingState.bardingItem = {
+      ...bardingState.bardingItem,
+      present: true,
+      enchant: 5,
+    };
+
+    await act(async () => {
+      root.render(
+        <DynamicEquipmentControls state={bardingState} setState={setState} />
+      );
+    });
+
+    expect(
+      container.querySelector('[data-testid="equipment-row-footwear"]')
+        ?.textContent
+    ).toContain("+5 barding");
   });
 
   test("renders dynamic equipment and fixed auxiliary equipment as summary rows", async () => {
@@ -424,13 +439,62 @@ describe("DynamicEquipmentControls", () => {
       container.querySelector('[data-testid="equipment-row-cloak"]')?.textContent
     ).toContain("+1 cloak");
     expect(
-      container.querySelector('[data-testid="equipment-row-boots"]')?.textContent
+      container.querySelector('[data-testid="equipment-row-footwear"]')?.textContent
     ).toContain("pair of boots");
     expect(
-      container.querySelector('[data-testid="equipment-row-barding"]')?.textContent
-    ).toContain("none");
+      container.querySelector('[data-testid="equipment-row-barding"]')
+    ).toBeNull();
     expect(container.querySelector('button[role="combobox"]')).toBeNull();
     expect(container.querySelector('input[type="checkbox"]')).toBeNull();
+  });
+
+  test("opens footwear row with a single modal backed by the active footwear item", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.boots = true;
+    state.bootsItem = { ...state.bootsItem, present: true, enchant: 0 };
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const footwearRow = container.querySelector(
+      '[data-testid="equipment-row-footwear"]'
+    ) as HTMLButtonElement;
+
+    expect(footwearRow.textContent).toContain("Footwear:");
+    expect(footwearRow.textContent).toContain("+0 pair of boots");
+
+    await act(async () => {
+      footwearRow.click();
+    });
+
+    expect(document.body.textContent).toContain("Footwear");
+
+    await act(async () => {
+      setNumberInputValue(
+        document.body.querySelector(
+          'input[aria-label="Footwear enchant"]'
+        ) as HTMLInputElement,
+        "2"
+      );
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector(
+          '[data-testid="save-equipment-edit"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(setState).toHaveBeenCalledTimes(1);
+    const updater = setState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+    const nextState = updater(state);
+
+    expect(nextState.boots).toBe(true);
+    expect(nextState.bootsItem.enchant).toBe(2);
   });
 
   test("renders imported ring text as a summary row and removes the old Modifiers section", async () => {

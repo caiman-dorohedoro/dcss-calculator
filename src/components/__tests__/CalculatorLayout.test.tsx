@@ -254,8 +254,9 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).toContain("Headgear:");
     expect(equipmentSection.textContent).toContain("Glove:");
     expect(equipmentSection.textContent).toContain("Cloak");
-    expect(equipmentSection.textContent).toContain("Boots");
-    expect(equipmentSection.textContent).toContain("Barding");
+    expect(equipmentSection.textContent).toContain("Footwear");
+    expect(equipmentSection.textContent).not.toContain("Boots");
+    expect(equipmentSection.textContent).not.toContain("Barding");
     const equipmentHeadings = Array.from(
       equipmentSection.querySelectorAll("h2")
     ).map((heading) => heading.textContent);
@@ -296,8 +297,7 @@ describe("Calculator desktop layout", () => {
       "equipment-row-headgear-0",
       "equipment-row-cloak",
       "equipment-row-glove-0",
-      "equipment-row-boots",
-      "equipment-row-barding",
+      "equipment-row-footwear",
       "equipment-row-amulet-0",
       "equipment-row-ring-0",
       "equipment-row-ring-1",

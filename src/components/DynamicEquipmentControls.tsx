@@ -35,7 +35,7 @@ type FixedAuxEquipmentConfig = {
   key: "cloak" | "boots" | "barding";
   itemKey: "cloakItem" | "bootsItem" | "bardingItem";
   enchantKey: "cloakEnchant" | "bootsEnchant" | "bardingEnchant";
-  label: "Cloak" | "Boots" | "Barding";
+  label: "Cloak" | "Boots" | "Barding" | "Footwear";
 };
 
 type OpenEquipment =
@@ -56,6 +56,8 @@ const SectionHeading = ({ children }: { children: string }) => (
 
 const indexedSlotLabel = (label: string, count: number, index: number) =>
   count === 1 ? label : `${label} ${index + 1}`;
+
+const bardingWearerSpecies = new Set(["armataur", "naga", "galeCentaur"]);
 
 const clearImportedItemMetadata = <T extends {
   displayName?: string;
@@ -127,6 +129,18 @@ const DynamicEquipmentControls = <V extends GameVersion>({
       label: "Barding",
       enchantKey: "bardingEnchant",
     },
+  };
+  const footwearBaseConfig =
+    state.bardingItem.present || state.barding
+      ? fixedAuxEquipmentConfigs.barding
+      : state.bootsItem.present || state.boots
+        ? fixedAuxEquipmentConfigs.boots
+        : bardingWearerSpecies.has(String(state.species))
+          ? fixedAuxEquipmentConfigs.barding
+          : fixedAuxEquipmentConfigs.boots;
+  const footwearConfig: FixedAuxEquipmentConfig = {
+    ...footwearBaseConfig,
+    label: "Footwear",
   };
 
   const updateRingSlot = (
@@ -213,10 +227,13 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     }));
   };
 
-  const renderFixedAuxRow = (config: FixedAuxEquipmentConfig) => (
+  const renderFixedAuxRow = (
+    config: FixedAuxEquipmentConfig,
+    options?: { key: string; testId: string }
+  ) => (
     <EquipmentSummaryRow
-      key={config.key}
-      testId={`equipment-row-${config.key}`}
+      key={options?.key ?? config.key}
+      testId={options?.testId ?? `equipment-row-${config.key}`}
       label={config.label}
       summary={formatFixedAuxSummary(state[config.itemKey])}
       onOpen={() => setOpenEquipment({ type: "fixedAux", config })}
@@ -366,8 +383,10 @@ const DynamicEquipmentControls = <V extends GameVersion>({
             onOpen={() => setOpenEquipment({ type: "gloves", index })}
           />
         ))}
-        {renderFixedAuxRow(fixedAuxEquipmentConfigs.boots)}
-        {renderFixedAuxRow(fixedAuxEquipmentConfigs.barding)}
+        {renderFixedAuxRow(footwearConfig, {
+          key: "footwear",
+          testId: "equipment-row-footwear",
+        })}
         {amuletSlots.map((slot, index) => (
           <EquipmentSummaryRow
             key={`amulet-${index}`}
