@@ -27,9 +27,9 @@ const equipmentEgoModifierMap: Partial<
 > = {
   "fire resistance": { rF: 1 },
   "cold resistance": { rC: 1 },
-  "poison resistance": { flags: ["rPois"] },
-  "corrosion resistance": { flags: ["rCorr"] },
-  "see invisible": { flags: ["SInv"] },
+  "poison resistance": { rPois: 1 },
+  "corrosion resistance": { rCorr: 1 },
+  "see invisible": { sInv: 1 },
   invisibility: { flags: ["+Inv"] },
   strength: { str: 3 },
   dexterity: { dex: 3 },

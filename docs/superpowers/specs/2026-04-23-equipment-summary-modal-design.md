@@ -235,6 +235,24 @@ The modal can reuse the existing `Select`, `EquipmentEnchantInput`, and
 `EquipmentModifierInputs` controls. The key change is location: these controls
 belong inside the modal, not in the main equipment list.
 
+### 2026-04-26 Modal Refinement
+
+The modal should keep imported item identity visible without exposing duplicate
+parser metadata. When an imported item has a display summary, show that summary
+on the title row beside the slot label. Do not show a separate `Imported item`
+or `Base armour` metadata row; editable selectors such as `Armour type` already
+show the base item that drives calculations.
+
+For enchantable equipment, place the enchant input before the item type selector
+on the same row. The enchant input should share the selector height and be wide
+enough for signed two-digit values.
+
+Item modifiers should be arranged as aligned columns. Numeric resist and stat
+properties remain number inputs, but boolean `SInv` should be edited with a
+checkbox below the resist column. `Slay`, `Stlth`, and `Wiz` belong in the final
+miscellaneous combat/magic column. Residual parser tokens should be labeled
+`Other properties` rather than `Item flags`.
+
 ## Imported Name Invalidation
 
 Imported `displayName` should remain visible until the user changes that item in

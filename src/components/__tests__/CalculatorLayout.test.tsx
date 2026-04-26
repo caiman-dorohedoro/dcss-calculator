@@ -655,6 +655,29 @@ describe("Calculator desktop layout", () => {
     expect(
       document.body.querySelector('input[aria-label="Shield enchant"]')
     ).not.toBeNull();
+    expect(
+      (
+        document.body.querySelector(
+          'input[aria-label="Shield enchant"]'
+        ) as HTMLInputElement
+      ).className
+    ).toContain("h-8");
+    expect(
+      (
+        document.body.querySelector(
+          'input[aria-label="Shield enchant"]'
+        ) as HTMLInputElement
+      ).className
+    ).toContain("w-16");
+    expect(
+      Array.from(
+        (
+          document.body.querySelector(
+            '[data-testid="shield-enchant-type-row"]'
+          ) as HTMLDivElement
+        ).querySelectorAll("input,button")
+      ).map((control) => control.getAttribute("aria-label"))
+    ).toEqual(["Shield enchant", "Shield"]);
   });
 
   test("shows shield and orb equipment ego selectors in offhand modals", async () => {
@@ -752,10 +775,32 @@ describe("Calculator desktop layout", () => {
       ).click();
     });
 
-    expect(document.body.textContent).toContain("Imported item");
+    expect(document.body.textContent).not.toContain("Imported item");
     expect(document.body.textContent).toContain("justicar's regalia");
-    expect(document.body.textContent).toContain("Base armour");
     expect(document.body.textContent).toContain("robe");
+    const titleRow = document.body.querySelector(
+      '[data-testid="equipment-modal-title-row"]'
+    ) as HTMLDivElement;
+    expect(titleRow.className).toContain("gap-5");
+    expect(titleRow.textContent).toContain("Armour");
+    expect(titleRow.textContent).toContain(
+      "+5 justicar's regalia {Inspire Amulet+ Str+4}"
+    );
+    expect(document.body.textContent).not.toContain("Base armour");
+    expect(
+      document.body.querySelector(
+        '[data-testid="equipment-modal-imported-summary"]'
+      )?.textContent
+    ).toBe("+5 justicar's regalia {Inspire Amulet+ Str+4}");
+    expect(
+      Array.from(
+        (
+          document.body.querySelector(
+            '[data-testid="body-armour-enchant-type-row"]'
+          ) as HTMLDivElement
+        ).querySelectorAll("input,button")
+      ).map((control) => control.getAttribute("aria-label"))
+    ).toEqual(["Body armour enchant", "Armour"]);
 
     await act(async () => {
       setNumberInputValue(

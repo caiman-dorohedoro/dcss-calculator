@@ -315,6 +315,10 @@ const isModifierBag = (value: unknown): value is EquipmentModifierBag => {
     isOptionalNumber(value.rF) &&
     isOptionalNumber(value.rC) &&
     isOptionalNumber(value.rN) &&
+    isOptionalNumber(value.rPois) &&
+    isOptionalNumber(value.rElec) &&
+    isOptionalNumber(value.rCorr) &&
+    isOptionalNumber(value.sInv) &&
     isOptionalNumber(value.will) &&
     isOptionalNumber(value.str) &&
     isOptionalNumber(value.dex) &&

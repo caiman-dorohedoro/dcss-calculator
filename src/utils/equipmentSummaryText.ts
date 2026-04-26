@@ -26,11 +26,15 @@ const sequenceSigned = (value: number) => {
 type NumericModifierKey = Exclude<keyof EquipmentModifierBag, "flags">;
 
 const modifierDisplayOrder: Array<
-  [NumericModifierKey, string, "signed" | "sequence"]
+  [NumericModifierKey, string, "flag" | "signed" | "sequence"]
 > = [
   ["rF", "rF", "sequence"],
   ["rC", "rC", "sequence"],
   ["rN", "rN", "sequence"],
+  ["rPois", "rPois", "flag"],
+  ["rElec", "rElec", "flag"],
+  ["rCorr", "rCorr", "flag"],
+  ["sInv", "SInv", "flag"],
   ["will", "Will", "sequence"],
   ["regenMP", "RegenMP", "sequence"],
   ["regen", "Regen", "sequence"],
@@ -60,7 +64,7 @@ const modifierTokenDisplayOrder: Array<NumericModifierKey | string> = [
   "rElec",
   "will",
   "rCorr",
-  "SInv",
+  "sInv",
   "rMut",
   "Fly",
   "Clar",
@@ -205,6 +209,11 @@ export const formatModifierSummary = (modifiers?: EquipmentModifierBag) => {
   for (const [key, label, style] of modifierDisplayOrder) {
     const value = modifiers[key];
     if (value === undefined || value === 0) {
+      continue;
+    }
+
+    if (style === "flag") {
+      numericPartByKey.set(key, label);
       continue;
     }
 

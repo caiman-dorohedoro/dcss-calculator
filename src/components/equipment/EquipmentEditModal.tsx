@@ -33,7 +33,16 @@ import {
   syncEquipmentEgoModifiers,
   type EquipmentEgoOptionEntry,
 } from "@/utils/equipmentEgos";
-import { formatBodyArmourSummary } from "@/utils/equipmentSummaryText";
+import {
+  formatAmuletSummary,
+  formatBodyArmourSummary,
+  formatFixedAuxSummary,
+  formatGlovesSummary,
+  formatHeadgearSummary,
+  formatOrbSummary,
+  formatRingSummary,
+  formatShieldSummary,
+} from "@/utils/equipmentSummaryText";
 
 type EquipmentModalConfig =
   | {
@@ -92,6 +101,7 @@ type EquipmentEditModalProps = {
 
 type ModalFrameProps = {
   title: string;
+  titleDetail?: ReactNode;
   children: ReactNode;
   onCancel: () => void;
   onSave: () => void;
@@ -217,7 +227,13 @@ const normalizeFixedAuxDraft = (
 const sameValue = <T,>(a: T, b: T) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const ModalFrame = ({ title, children, onCancel, onSave }: ModalFrameProps) =>
+const ModalFrame = ({
+  title,
+  titleDetail,
+  children,
+  onCancel,
+  onSave,
+}: ModalFrameProps) =>
   createPortal(
     <div
       data-testid="equipment-edit-modal"
@@ -227,7 +243,20 @@ const ModalFrame = ({ title, children, onCancel, onSave }: ModalFrameProps) =>
     >
       <div className={panelClassName} style={panelStyle}>
         <h2 className="text-lg font-semibold">Equipment Details</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{title}</p>
+        <div
+          data-testid="equipment-modal-title-row"
+          className="mt-1 flex items-baseline gap-5"
+        >
+          <p className="text-sm text-muted-foreground">{title}</p>
+          {titleDetail ? (
+            <span
+              data-testid="equipment-modal-imported-summary"
+              className="text-sm"
+            >
+              {titleDetail}
+            </span>
+          ) : null}
+        </div>
         <div className="mt-4 flex flex-col gap-4">{children}</div>
         <div className="mt-5 flex items-center justify-end gap-2">
           <Button
@@ -246,18 +275,9 @@ const ModalFrame = ({ title, children, onCancel, onSave }: ModalFrameProps) =>
     document.body
   );
 
-const ImportedMetadata = ({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) => (
-  <div className="flex flex-col gap-1 text-sm">
-    <span className="text-muted-foreground">{label}</span>
-    <span>{value}</span>
-  </div>
-);
+const enchantTypeRowClassName =
+  "grid grid-cols-[auto_minmax(0,1fr)] items-end gap-3";
+const enchantFieldClassName = "flex flex-col gap-1 text-sm";
 
 const EquipmentEgoSelect = ({
   label,
@@ -312,16 +332,50 @@ const BodyArmourEditor = ({
     )
   );
   const normalizedDraft = normalizeBodyArmourDraft(draft);
-  const importedBaseArmour =
-    config.value.kind !== "none" ? armourOptions[config.value.kind].name : null;
   const importedItemSummary = config.value.displayName
     ? formatBodyArmourSummary(config.value)
     : null;
   const bodyArmourBaseName = getBodyArmourBaseName(draft.kind);
+  const armourTypeControl = (
+    <label className="flex flex-col gap-1 text-sm">
+      Armour type
+      <Select
+        value={draft.kind}
+        onValueChange={(value) =>
+          setDraft((current) => {
+            const kind = value as BodyArmourItemState["kind"];
+            return normalizeBodyArmourDraft(
+              syncDraftEgoForBaseName(
+                {
+                  ...current,
+                  kind,
+                },
+                getBodyArmourBaseName(kind)
+              )
+            );
+          })
+        }
+      >
+        <SelectTrigger aria-label="Armour" className="h-8">
+          <SelectValue placeholder="Armour" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(armourOptions).map(([key, value]) => (
+            <SelectItem key={key} value={key}>
+              {value.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -330,55 +384,27 @@ const BodyArmourEditor = ({
         )
       }
     >
-      {config.value.source === "imported" && importedItemSummary ? (
-        <ImportedMetadata label="Imported item" value={importedItemSummary} />
-      ) : null}
-      {config.value.source === "imported" && importedBaseArmour ? (
-        <ImportedMetadata label="Base armour" value={importedBaseArmour} />
-      ) : null}
-      <label className="flex flex-col gap-1 text-sm">
-        Armour type
-        <Select
-          value={draft.kind}
-          onValueChange={(value) =>
-            setDraft((current) => {
-              const kind = value as BodyArmourItemState["kind"];
-              return normalizeBodyArmourDraft(
-                syncDraftEgoForBaseName(
-                  {
-                    ...current,
-                    kind,
-                  },
-                  getBodyArmourBaseName(kind)
-                )
-              );
-            })
-          }
-        >
-          <SelectTrigger aria-label="Armour" className="h-8">
-            <SelectValue placeholder="Armour" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(armourOptions).map(([key, value]) => (
-              <SelectItem key={key} value={key}>
-                {value.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </label>
       {draft.kind !== "none" ? (
         <>
-          <EquipmentEnchantInput
-            ariaLabel="Body armour enchant"
-            value={draft.enchant}
-            onChange={(enchant) =>
-              setDraft((current) => ({
-                ...current,
-                enchant,
-              }))
-            }
-          />
+          <div
+            data-testid="body-armour-enchant-type-row"
+            className={enchantTypeRowClassName}
+          >
+            <label className={enchantFieldClassName}>
+              Enchant
+              <EquipmentEnchantInput
+                ariaLabel="Body armour enchant"
+                value={draft.enchant}
+                onChange={(enchant) =>
+                  setDraft((current) => ({
+                    ...current,
+                    enchant,
+                  }))
+                }
+              />
+            </label>
+            {armourTypeControl}
+          </div>
           <EquipmentEgoSelect
             label="Body armour ego"
             ariaLabel="Body armour ego"
@@ -397,7 +423,9 @@ const BodyArmourEditor = ({
             }
           />
         </>
-      ) : null}
+      ) : (
+        armourTypeControl
+      )}
       <EquipmentModifierInputs
         modifiers={draft.modifiers}
         onChange={(modifiers) =>
@@ -424,10 +452,50 @@ const ShieldEditor = ({
     )
   );
   const normalizedDraft = normalizeShieldDraft(draft);
+  const importedItemSummary = config.value.displayName
+    ? formatShieldSummary(config.value)
+    : null;
+  const shieldTypeControl = (
+    <label className="flex flex-col gap-1 text-sm">
+      Shield type
+      <Select
+        value={draft.kind}
+        onValueChange={(value) =>
+          setDraft((current) => {
+            const kind = value as ShieldItemState["kind"];
+            return normalizeShieldDraft(
+              syncDraftEgoForBaseName(
+                {
+                  ...current,
+                  kind,
+                  enchant: kind === "none" ? 0 : current.enchant,
+                },
+                getShieldBaseName(kind)
+              )
+            );
+          })
+        }
+      >
+        <SelectTrigger aria-label="Shield" className="h-8">
+          <SelectValue placeholder="Shield" />
+        </SelectTrigger>
+        <SelectContent>
+          {Object.entries(shieldOptions).map(([key, value]) => (
+            <SelectItem key={key} value={key}>
+              {value.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -436,50 +504,29 @@ const ShieldEditor = ({
         )
       }
     >
-      <label className="flex flex-col gap-1 text-sm">
-        Shield type
-        <Select
-          value={draft.kind}
-          onValueChange={(value) =>
-            setDraft((current) => {
-              const kind = value as ShieldItemState["kind"];
-              return normalizeShieldDraft(
-                syncDraftEgoForBaseName(
-                  {
-                    ...current,
-                    kind,
-                    enchant: kind === "none" ? 0 : current.enchant,
-                  },
-                  getShieldBaseName(kind)
-                )
-              );
-            })
-          }
-        >
-          <SelectTrigger aria-label="Shield" className="h-8">
-            <SelectValue placeholder="Shield" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(shieldOptions).map(([key, value]) => (
-              <SelectItem key={key} value={key}>
-                {value.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </label>
       {draft.kind !== "none" ? (
-        <EquipmentEnchantInput
-          ariaLabel="Shield enchant"
-          value={draft.enchant}
-          onChange={(enchant) =>
-            setDraft((current) => ({
-              ...current,
-              enchant,
-            }))
-          }
-        />
-      ) : null}
+        <div
+          data-testid="shield-enchant-type-row"
+          className={enchantTypeRowClassName}
+        >
+          <label className={enchantFieldClassName}>
+            Enchant
+            <EquipmentEnchantInput
+              ariaLabel="Shield enchant"
+              value={draft.enchant}
+              onChange={(enchant) =>
+                setDraft((current) => ({
+                  ...current,
+                  enchant,
+                }))
+              }
+            />
+          </label>
+          {shieldTypeControl}
+        </div>
+      ) : (
+        shieldTypeControl
+      )}
       {draft.kind !== "none" ? (
         <EquipmentEgoSelect
           label="Shield ego"
@@ -526,10 +573,16 @@ const OrbEditor = ({
   );
   const normalizedDraft = normalizeOrbDraft(draft);
   const orbBaseName = getOrbBaseName(draft.kind);
+  const importedItemSummary = config.value.displayName
+    ? formatOrbSummary(config.value)
+    : null;
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -611,10 +664,16 @@ const RingEditor = ({
   const [draft, setDraft] = useState<RingSlotState>(config.value);
   const normalizedDraft = normalizeRingDraft(draft);
   const showRingType = draft.source !== "imported" || draft.kind !== "none";
+  const importedItemSummary = config.value.displayName
+    ? formatRingSummary(config.value)
+    : null;
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -683,10 +742,16 @@ const AmuletEditor = ({
   onCancel: () => void;
 }) => {
   const [draft, setDraft] = useState<AmuletSlotState>(config.value);
+  const importedItemSummary = config.value.displayName
+    ? formatAmuletSummary(config.value)
+    : null;
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() => config.onSave(draft, !sameValue(config.value, draft))}
     >
@@ -739,10 +804,49 @@ const HeadgearEditor = ({
     )
   );
   const normalizedDraft = normalizeHeadgearDraft(draft);
+  const importedItemSummary = config.value.displayName
+    ? formatHeadgearSummary(config.value)
+    : null;
+  const headgearTypeControl = (
+    <label className="flex flex-col gap-1 text-sm">
+      Headgear type
+      <Select
+        value={draft.present ? draft.kind ?? "helmet" : "none"}
+        onValueChange={(value) =>
+          setDraft((current) => {
+            const nextKind = value as (typeof headgearKinds)[number];
+            const nextDraft = normalizeHeadgearDraft({
+              ...current,
+              present: nextKind !== "none",
+              kind: nextKind === "none" ? undefined : nextKind,
+            });
+            return syncDraftEgoForBaseName(
+              nextDraft,
+              getHeadgearBaseName(nextDraft)
+            );
+          })
+        }
+      >
+        <SelectTrigger aria-label="Headgear type" className="h-8">
+          <SelectValue placeholder="none" />
+        </SelectTrigger>
+        <SelectContent>
+          {headgearKinds.map((kind) => (
+            <SelectItem key={kind} value={kind}>
+              {kind}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -751,49 +855,29 @@ const HeadgearEditor = ({
         )
       }
     >
-      <label className="flex flex-col gap-1 text-sm">
-        Headgear type
-        <Select
-          value={draft.present ? draft.kind ?? "helmet" : "none"}
-          onValueChange={(value) =>
-            setDraft((current) => {
-              const nextKind = value as (typeof headgearKinds)[number];
-              const nextDraft = normalizeHeadgearDraft({
-                ...current,
-                present: nextKind !== "none",
-                kind: nextKind === "none" ? undefined : nextKind,
-              });
-              return syncDraftEgoForBaseName(
-                nextDraft,
-                getHeadgearBaseName(nextDraft)
-              );
-            })
-          }
-        >
-          <SelectTrigger aria-label="Headgear type" className="h-8">
-            <SelectValue placeholder="none" />
-          </SelectTrigger>
-          <SelectContent>
-            {headgearKinds.map((kind) => (
-              <SelectItem key={kind} value={kind}>
-                {kind}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </label>
       {draft.present ? (
-        <EquipmentEnchantInput
-          ariaLabel="Headgear enchant"
-          value={draft.enchant}
-          onChange={(enchant) =>
-            setDraft((current) => ({
-              ...current,
-              enchant,
-            }))
-          }
-        />
-      ) : null}
+        <div
+          data-testid="headgear-enchant-type-row"
+          className={enchantTypeRowClassName}
+        >
+          <label className={enchantFieldClassName}>
+            Enchant
+            <EquipmentEnchantInput
+              ariaLabel="Headgear enchant"
+              value={draft.enchant}
+              onChange={(enchant) =>
+                setDraft((current) => ({
+                  ...current,
+                  enchant,
+                }))
+              }
+            />
+          </label>
+          {headgearTypeControl}
+        </div>
+      ) : (
+        headgearTypeControl
+      )}
       {draft.present ? (
         <EquipmentEgoSelect
           label="Headgear ego"
@@ -839,10 +923,47 @@ const GlovesEditor = ({
     )
   );
   const normalizedDraft = normalizeGlovesDraft(draft);
+  const importedItemSummary = config.value.displayName
+    ? formatGlovesSummary(config.value)
+    : null;
+  const glovesTypeControl = (
+    <label className="flex flex-col gap-1 text-sm">
+      Gloves
+      <Select
+        value={draft.present ? "gloves" : "none"}
+        onValueChange={(value) =>
+          setDraft((current) => {
+            const nextDraft = normalizeGlovesDraft({
+              ...current,
+              present: (value as (typeof gloveKinds)[number]) === "gloves",
+            });
+            return syncDraftEgoForBaseName(
+              nextDraft,
+              getGlovesBaseName(nextDraft)
+            );
+          })
+        }
+      >
+        <SelectTrigger aria-label="Gloves type" className="h-8">
+          <SelectValue placeholder="none" />
+        </SelectTrigger>
+        <SelectContent>
+          {gloveKinds.map((kind) => (
+            <SelectItem key={kind} value={kind}>
+              {kind}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  );
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -851,47 +972,29 @@ const GlovesEditor = ({
         )
       }
     >
-      <label className="flex flex-col gap-1 text-sm">
-        Gloves
-        <Select
-          value={draft.present ? "gloves" : "none"}
-          onValueChange={(value) =>
-            setDraft((current) => {
-              const nextDraft = normalizeGlovesDraft({
-                ...current,
-                present: (value as (typeof gloveKinds)[number]) === "gloves",
-              });
-              return syncDraftEgoForBaseName(
-                nextDraft,
-                getGlovesBaseName(nextDraft)
-              );
-            })
-          }
-        >
-          <SelectTrigger aria-label="Gloves type" className="h-8">
-            <SelectValue placeholder="none" />
-          </SelectTrigger>
-          <SelectContent>
-            {gloveKinds.map((kind) => (
-              <SelectItem key={kind} value={kind}>
-                {kind}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </label>
       {draft.present ? (
-        <EquipmentEnchantInput
-          ariaLabel="Gloves enchant"
-          value={draft.enchant}
-          onChange={(enchant) =>
-            setDraft((current) => ({
-              ...current,
-              enchant,
-            }))
-          }
-        />
-      ) : null}
+        <div
+          data-testid="gloves-enchant-type-row"
+          className={enchantTypeRowClassName}
+        >
+          <label className={enchantFieldClassName}>
+            Enchant
+            <EquipmentEnchantInput
+              ariaLabel="Gloves enchant"
+              value={draft.enchant}
+              onChange={(enchant) =>
+                setDraft((current) => ({
+                  ...current,
+                  enchant,
+                }))
+              }
+            />
+          </label>
+          {glovesTypeControl}
+        </div>
+      ) : (
+        glovesTypeControl
+      )}
       {draft.present ? (
         <EquipmentEgoSelect
           label="Gloves ego"
@@ -939,6 +1042,9 @@ const FixedAuxEditor = ({
   const normalizedDraft = normalizeFixedAuxDraft(draft);
   const isCloakSlot =
     config.value.kind === "cloak" || config.value.kind === "scarf";
+  const importedItemSummary = config.value.displayName
+    ? formatFixedAuxSummary(config.value)
+    : null;
   const equippedValue = isCloakSlot
     ? draft.present
       ? draft.kind
@@ -946,10 +1052,67 @@ const FixedAuxEditor = ({
     : draft.present
       ? "equipped"
       : "none";
+  const fixedAuxTypeControl = (
+    <label className="flex flex-col gap-1 text-sm">
+      {config.title}
+      <Select
+        value={equippedValue}
+        onValueChange={(value) =>
+          setDraft((current) => {
+            const nextDraft = normalizeFixedAuxDraft(
+              isCloakSlot
+                ? {
+                    ...current,
+                    kind:
+                      value === "none"
+                        ? current.kind
+                        : value === "scarf"
+                          ? "scarf"
+                          : "cloak",
+                    present: value !== "none",
+                  }
+                : {
+                    ...current,
+                    present: value === "equipped",
+                  }
+            );
+            return syncDraftEgoForBaseName(
+              nextDraft,
+              getFixedAuxBaseName(nextDraft)
+            );
+          })
+        }
+      >
+        <SelectTrigger
+          aria-label={isCloakSlot ? "Cloak type" : `${config.title} equipped`}
+          className="h-8"
+        >
+          <SelectValue placeholder="none" />
+        </SelectTrigger>
+        <SelectContent>
+          {isCloakSlot ? (
+            <>
+              <SelectItem value="none">none</SelectItem>
+              <SelectItem value="cloak">cloak</SelectItem>
+              <SelectItem value="scarf">scarf</SelectItem>
+            </>
+          ) : (
+            <>
+              <SelectItem value="none">none</SelectItem>
+              <SelectItem value="equipped">equipped</SelectItem>
+            </>
+          )}
+        </SelectContent>
+      </Select>
+    </label>
+  );
 
   return (
     <ModalFrame
       title={config.title}
+      titleDetail={
+        config.value.source === "imported" ? importedItemSummary : undefined
+      }
       onCancel={onCancel}
       onSave={() =>
         config.onSave(
@@ -958,70 +1121,29 @@ const FixedAuxEditor = ({
         )
       }
     >
-      <label className="flex flex-col gap-1 text-sm">
-        {config.title}
-        <Select
-          value={equippedValue}
-          onValueChange={(value) =>
-            setDraft((current) => {
-              const nextDraft = normalizeFixedAuxDraft(
-                isCloakSlot
-                  ? {
-                      ...current,
-                      kind:
-                        value === "none"
-                          ? current.kind
-                          : value === "scarf"
-                            ? "scarf"
-                            : "cloak",
-                      present: value !== "none",
-                    }
-                  : {
-                      ...current,
-                      present: value === "equipped",
-                    }
-              );
-              return syncDraftEgoForBaseName(
-                nextDraft,
-                getFixedAuxBaseName(nextDraft)
-              );
-            })
-          }
-        >
-          <SelectTrigger
-            aria-label={isCloakSlot ? "Cloak type" : `${config.title} equipped`}
-            className="h-8"
-          >
-            <SelectValue placeholder="none" />
-          </SelectTrigger>
-          <SelectContent>
-            {isCloakSlot ? (
-              <>
-                <SelectItem value="none">none</SelectItem>
-                <SelectItem value="cloak">cloak</SelectItem>
-                <SelectItem value="scarf">scarf</SelectItem>
-              </>
-            ) : (
-              <>
-                <SelectItem value="none">none</SelectItem>
-                <SelectItem value="equipped">equipped</SelectItem>
-              </>
-            )}
-          </SelectContent>
-        </Select>
-      </label>
       {draft.present ? (
-        <EquipmentEnchantInput
-          ariaLabel={`${config.title} enchant`}
-          value={draft.enchant}
-          onChange={(enchant) =>
-            setDraft((current) => ({
-              ...current,
-              enchant,
-            }))
-          }
-        />
-      ) : null}
+        <div
+          data-testid={`${config.type}-enchant-type-row`}
+          className={enchantTypeRowClassName}
+        >
+          <label className={enchantFieldClassName}>
+            Enchant
+            <EquipmentEnchantInput
+              ariaLabel={`${config.title} enchant`}
+              value={draft.enchant}
+              onChange={(enchant) =>
+                setDraft((current) => ({
+                  ...current,
+                  enchant,
+                }))
+              }
+            />
+          </label>
+          {fixedAuxTypeControl}
+        </div>
+      ) : (
+        fixedAuxTypeControl
+      )}
       {draft.present ? (
         <EquipmentEgoSelect
           label={`${config.title} ego`}

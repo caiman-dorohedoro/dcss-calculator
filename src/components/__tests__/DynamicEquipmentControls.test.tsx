@@ -275,7 +275,7 @@ describe("DynamicEquipmentControls", () => {
     const enchantInput = document.body.querySelector(
       'input[aria-label="Headgear enchant"]'
     ) as HTMLInputElement;
-    expect(enchantInput.className).toContain("w-14");
+    expect(enchantInput.className).toContain("w-16");
 
     await act(async () => {
       setNumberInputValue(enchantInput, "-2");
@@ -328,7 +328,7 @@ describe("DynamicEquipmentControls", () => {
       'input[aria-label="Gloves enchant"]'
     ) as HTMLInputElement;
 
-    expect(enchantInput.className).toContain("w-14");
+    expect(enchantInput.className).toContain("w-16");
   });
 
   test("renders fixed equipment summary rows and groups footwear", async () => {
@@ -557,10 +557,78 @@ describe("DynamicEquipmentControls", () => {
     expect(
       (
         document.body.querySelector(
-          'input[aria-label="Item flags"]'
+          'input[aria-label="Other properties"]'
         ) as HTMLInputElement
       ).placeholder
-    ).toBe("Example: Ponderous Reflect Spirit +Inv rCorr SInv");
+    ).toBe("Example: Ponderous Reflect Spirit +Inv Fly shock");
+
+    expect(
+      Array.from(
+        document.body.querySelectorAll('input[aria-label$=" modifier"]')
+      ).map((input) => input.getAttribute("aria-label"))
+    ).toEqual([
+      "rF modifier",
+      "rC modifier",
+      "rN modifier",
+      "rPois modifier",
+      "rElec modifier",
+      "rCorr modifier",
+      "Will modifier",
+      "AC modifier",
+      "EV modifier",
+      "SH modifier",
+      "Str modifier",
+      "Int modifier",
+      "Dex modifier",
+      "RegenHP modifier",
+      "RegenMP modifier",
+      "HP modifier",
+      "MP modifier",
+      "Slay modifier",
+      "Stlth modifier",
+      "Wiz modifier",
+    ]);
+    expect(
+      Array.from(
+        (
+          document.body.querySelector(
+            '[data-testid="equipment-modifier-column-resists"]'
+          ) as HTMLDivElement
+        ).querySelectorAll('input[aria-label$=" modifier"]')
+      ).map((input) => input.getAttribute("aria-label"))
+    ).toEqual([
+      "rF modifier",
+      "rC modifier",
+      "rN modifier",
+      "rPois modifier",
+      "rElec modifier",
+      "rCorr modifier",
+      "Will modifier",
+    ]);
+    const sInvCheckbox = document.body.querySelector(
+      'button[aria-label="SInv property"]'
+    ) as HTMLButtonElement;
+    expect(sInvCheckbox).not.toBeNull();
+    expect(
+      (
+        document.body.querySelector(
+          '[data-testid="equipment-modifier-column-resists"]'
+        ) as HTMLDivElement
+      ).textContent
+    ).toContain("SInv");
+    expect(
+      Array.from(
+        (
+          document.body.querySelector(
+            '[data-testid="equipment-modifier-column-magic"]'
+          ) as HTMLDivElement
+        ).querySelectorAll('input[aria-label$=" modifier"]')
+      ).map((input) => input.getAttribute("aria-label"))
+    ).toEqual([
+      "Slay modifier",
+      "Stlth modifier",
+      "Wiz modifier",
+    ]);
 
     await act(async () => {
       setNumberInputValue(
@@ -583,10 +651,17 @@ describe("DynamicEquipmentControls", () => {
       );
       setTextInputValue(
         document.body.querySelector(
-          'input[aria-label="Item flags"]'
+          'input[aria-label="Other properties"]'
         ) as HTMLInputElement,
         "Reflect Ponderous"
       );
+    });
+    await act(async () => {
+      (
+        document.body.querySelector(
+          'button[aria-label="SInv property"]'
+        ) as HTMLButtonElement
+      ).click();
     });
 
     await act(async () => {
@@ -608,6 +683,7 @@ describe("DynamicEquipmentControls", () => {
       will: 2,
       mp: 7,
       int: 4,
+      sInv: 1,
     });
   });
 
@@ -765,9 +841,9 @@ describe("DynamicEquipmentControls", () => {
         kind: "none",
         plus: 0,
         displayName: 'ring "Dori"',
-        propertiesText: "rC+ MP+9 Stlth+",
+        propertiesText: "rC+ rCorr SInv MP+9 Stlth+",
         artifactKind: "randart",
-        modifiers: { rC: 1, mp: 9, stlth: 1 },
+        modifiers: { rC: 1, rCorr: 1, sInv: 1, mp: 9, stlth: 1 },
         source: "imported",
       },
     ];
@@ -786,7 +862,7 @@ describe("DynamicEquipmentControls", () => {
 
     expect(document.body.querySelector('button[aria-label="Ring type"]')).toBeNull();
 
-    const activeModifierInputs = ["rC", "MP", "Stlth"].map(
+    const activeModifierInputs = ["rC", "rCorr", "MP", "Stlth"].map(
       (label) =>
         document.body.querySelector(
           `input[aria-label="${label} modifier"]`
@@ -795,6 +871,11 @@ describe("DynamicEquipmentControls", () => {
     for (const input of activeModifierInputs) {
       expect(input.className).toContain("border-[#a7a7a7]");
     }
+    expect(
+      document.body
+        .querySelector('button[aria-label="SInv property"]')
+        ?.getAttribute("data-state")
+    ).toBe("checked");
 
     expect(
       (

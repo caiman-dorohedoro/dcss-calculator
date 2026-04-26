@@ -15,7 +15,7 @@ const EquipmentEnchantInput = ({
     <Input
       aria-label={ariaLabel}
       type="number"
-      className="h-6 w-14"
+      className="h-8 w-16"
       value={value}
       onChange={(event) => onChange(Number(event.target.value))}
     />

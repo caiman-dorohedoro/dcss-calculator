@@ -13,6 +13,10 @@ export type EquipmentModifierBag = {
   rF?: number;
   rC?: number;
   rN?: number;
+  rPois?: number;
+  rElec?: number;
+  rCorr?: number;
+  sInv?: number;
   will?: number;
   str?: number;
   dex?: number;

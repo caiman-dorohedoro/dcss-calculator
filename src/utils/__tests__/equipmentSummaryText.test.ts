@@ -79,7 +79,7 @@ describe("equipment summary text", () => {
           rC: 1,
           rN: 2,
           will: -1,
-          flags: ["rCorr"],
+          rCorr: 1,
           mp: 7,
           str: 4,
         },

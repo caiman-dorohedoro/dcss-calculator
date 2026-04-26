@@ -165,12 +165,19 @@ const numericItemModifierMap = {
   Stlth: "stlth",
 } as const;
 
-const booleanItemModifierLabels: Record<EquipmentBooleanPropertyKey, string> = {
+type NumericModifierBagKey = Exclude<keyof EquipmentModifierBag, "flags">;
+
+const booleanItemNumericModifierMap: Partial<
+  Record<EquipmentBooleanPropertyKey, NumericModifierBagKey>
+> = {
   rPois: "rPois",
   rElec: "rElec",
   rCorr: "rCorr",
+  SInv: "sInv",
+};
+
+const booleanItemModifierLabels: Partial<Record<EquipmentBooleanPropertyKey, string>> = {
   rMut: "rMut",
-  SInv: "SInv",
   Fly: "Fly",
   Reflect: "Reflect",
   Clar: "Clar",
@@ -226,6 +233,36 @@ const addFlagModifier = (modifiers: EquipmentModifierBag, flag: string) => {
   modifiers.flags = [...(modifiers.flags ?? []), flag];
 };
 
+const getPropertyTextTokens = (propertiesText: string | null | undefined) =>
+  (propertiesText ?? "")
+    .split(/[,\s]+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+const orderFlagsByPropertyText = (
+  flags: string[] | undefined,
+  propertiesText: string | null | undefined
+) => {
+  if (!flags || !propertiesText) {
+    return flags;
+  }
+
+  const remaining = [...flags];
+  const ordered: string[] = [];
+
+  for (const token of getPropertyTextTokens(propertiesText)) {
+    const index = remaining.indexOf(token);
+    if (index === -1) {
+      continue;
+    }
+
+    ordered.push(remaining[index]);
+    remaining.splice(index, 1);
+  }
+
+  return [...ordered, ...remaining];
+};
+
 const buildModifierBagFromItem = (
   item: EquipmentItemSnapshot,
   options?: {
@@ -238,7 +275,7 @@ const buildModifierBagFromItem = (
 
   for (const [property, key] of Object.entries(numericItemModifierMap) as [
     keyof typeof numericItemModifierMap,
-    Exclude<keyof EquipmentModifierBag, "flags">,
+    NumericModifierBagKey,
   ][]) {
     if (options?.ignoreNumeric?.includes(property)) {
       continue;
@@ -253,6 +290,18 @@ const buildModifierBagFromItem = (
 
   if (!options?.ignoreWiz && item.properties.booleanProps.Wiz === true) {
     modifiers.wizardry = 1;
+  }
+
+  for (const [property, key] of Object.entries(
+    booleanItemNumericModifierMap
+  ) as [EquipmentBooleanPropertyKey, NumericModifierBagKey][]) {
+    if (options?.ignoreFlags?.includes(property)) {
+      continue;
+    }
+
+    if (item.properties.booleanProps[property] === true) {
+      modifiers[key] = 1;
+    }
   }
 
   for (const [property, label] of Object.entries(
@@ -273,6 +322,11 @@ const buildModifierBagFromItem = (
   ]) {
     addFlagModifier(modifiers, token);
   }
+
+  modifiers.flags = orderFlagsByPropertyText(
+    modifiers.flags,
+    item.propertiesText
+  );
 
   return Object.keys(modifiers).length > 0 ? modifiers : undefined;
 };

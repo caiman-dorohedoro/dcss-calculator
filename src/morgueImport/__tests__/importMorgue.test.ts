@@ -872,11 +872,17 @@ describe("morgue import mapper", () => {
       bodyArmourDetails: { ...makeItem("robe", "robe"), objectClass: "armour" },
       shieldDetails: {
         ...makeItem('+10 tower shield "Ygacoyf"', "tower shield", {
-          booleanProps: { Reflect: true },
+          booleanProps: { Reflect: true, Fly: true, rElec: true },
           numeric: { Str: 2 },
         }),
         objectClass: "armour",
         enchant: 10,
+        propertiesText: "shock, Fly rElec Reflect Str+2",
+        properties: {
+          numeric: { Str: 2 },
+          booleanProps: { Reflect: true, Fly: true, rElec: true },
+          opaqueTokens: ["shock"],
+        },
       },
       helmetDetails: [
         {
@@ -931,7 +937,8 @@ describe("morgue import mapper", () => {
     }
 
     expect(result.importedState.shieldItem.modifiers).toEqual({
-      flags: ["Reflect"],
+      flags: ["shock", "Fly", "Reflect"],
+      rElec: 1,
       str: 2,
     });
     expect(result.importedState.headgearSlots[0].modifiers).toEqual({
@@ -947,7 +954,7 @@ describe("morgue import mapper", () => {
       str: 3,
     });
     expect(result.importedState.ringSlots[0].modifiers).toEqual({
-      flags: ["rCorr"],
+      rCorr: 1,
       rC: 1,
       rN: 2,
       will: -1,
