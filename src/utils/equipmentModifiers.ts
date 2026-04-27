@@ -21,7 +21,9 @@ export const getRingWizardryCount = (ringSlots: RingSlotState[] = []) =>
   ringSlots.filter((slot) => slot.kind === "wizardry").length;
 
 export const getAmuletReflectionCount = (amuletSlots: AmuletSlotState[] = []) =>
-  amuletSlots.filter((slot) => slot.kind === "reflection").length;
+  amuletSlots.filter(
+    (slot) => slot.kind === "reflection" && slot.modifiers?.sh === undefined
+  ).length;
 
 export const getAuxArmourEnchantTotal = (slots: AuxArmourSlotState[] = []) =>
   slots

@@ -99,6 +99,18 @@ Relevant parser facts:
 This design therefore treats parser detail objects as the authoritative source
 for item-side numeric and boolean modifiers.
 
+Morgue status-line stats are already effective in-game stats, including
+equipped item bonuses. During import, the calculator stores base stat controls
+as the status stat minus equipped item-level `Str`, `Dex`, and `Int` modifiers,
+then lets the normal equipment aggregation add those item modifiers back for
+formulas. This prevents EV, SH, and spell-failure calculations from counting
+imported stat bonuses twice.
+
+Reflection amulets follow the same single-source rule for SH. A manually chosen
+`amulet of reflection` still contributes the calculator's implicit reflection
+SH bonus, but an imported reflection amulet that already carries parser-provided
+`SH` in its modifier bag should not also receive that implicit bonus.
+
 ## Proposed State Model
 
 ### 1. Shared Equipment Modifier Bag

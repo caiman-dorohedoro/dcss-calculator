@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import type { EquipmentItemSnapshot, ParsedMorgueTextRecord } from "dcss-morgue-parser";
 import { parseMorgueText } from "dcss-morgue-parser";
+import { calculateEvData, calculateSHData } from "@/utils/calculatorUtils";
 import { deepElfConjurer033Morgue } from "../__fixtures__/deepElfConjurer033";
 import { oniMonkTrunkStatueFormMorgue } from "../__fixtures__/oniMonkTrunkStatueForm";
 import {
@@ -1043,6 +1044,147 @@ describe("morgue import mapper", () => {
         modifiers: { flags: ["Inspire", "Amulet+"], str: 4 },
       })
     );
+  });
+
+  test("keeps imported current EV and SH from double-counting item stat modifiers", () => {
+    const record = {
+      playerName: "caiman",
+      version: "0.35-a0-295-g2878072334",
+      species: "Vine Stalker",
+      speciesVariant: null,
+      background: "Warper",
+      god: "Okawaru",
+      ...defaultGodState,
+      xl: 25,
+      ac: 25,
+      ev: 29,
+      sh: 24,
+      strength: 18,
+      intelligence: 13,
+      dexterity: 40,
+      bodyArmour: '+0 ring mail "Guekh"',
+      shield: "+2 kite shield",
+      helmets: ["+2 helmet"],
+      gloves: ["+2 pair of gloves of dexterity"],
+      footwear: ['+2 pair of boots of Refuge'],
+      cloaks: ["+2 cloak"],
+      orb: "none",
+      amulets: ['amulet of Utzomir'],
+      rings: ['ring "Meysoxye"', 'ring "Ahem"'],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: {
+        ...makeItem('+0 ring mail "Guekh"', "ring mail", {
+          booleanProps: { rElec: true, rPois: true },
+          numeric: { Regen: 1, Str: 4 },
+        }),
+        objectClass: "armour",
+        enchant: 0,
+      },
+      shieldDetails: {
+        ...makeItem("+2 kite shield", "kite shield", {
+          numeric: { AC: 3 },
+        }),
+        objectClass: "armour",
+        enchant: 2,
+      },
+      helmetDetails: [
+        {
+          ...makeItem("+2 helmet", "helmet"),
+          objectClass: "armour",
+          enchant: 2,
+        },
+      ],
+      glovesDetails: [
+        {
+          ...makeItem("+2 pair of gloves of dexterity", "gloves", {
+            numeric: { Dex: 3 },
+          }),
+          objectClass: "armour",
+          enchant: 2,
+        },
+      ],
+      footwearDetails: [
+        {
+          ...makeItem("+2 pair of boots of Refuge", "boots", {
+            booleanProps: { Rampage: true, rElec: true },
+            numeric: { rF: 2, Will: 3 },
+          }),
+          objectClass: "armour",
+          enchant: 2,
+        },
+      ],
+      cloakDetails: [
+        {
+          ...makeItem("+2 cloak", "cloak", {
+            booleanProps: { rCorr: true },
+          }),
+          objectClass: "armour",
+          enchant: 2,
+        },
+      ],
+      orbDetails: undefined,
+      amuletDetails: [
+        makeItem("amulet of Utzomir", "amulet", {
+          booleanProps: { Reflect: true, rElec: true },
+          numeric: { Dex: 3, SH: 5 },
+        }),
+      ],
+      ringDetails: [
+        makeItem('ring "Meysoxye"', "ring", {
+          numeric: { MP: 5, Dex: 8 },
+        }),
+        makeItem('ring "Ahem"', "ring", {
+          booleanProps: { SInv: true },
+          numeric: { rC: 2 },
+        }),
+      ],
+      skills: {
+        ...baseSkills,
+        armour: 13,
+        dodging: 15,
+        shields: 10.6,
+        spellcasting: 7,
+      },
+      effectiveSkills: {
+        ...baseSkills,
+        armour: 13,
+        dodging: 15,
+        shields: 10.6,
+        spellcasting: 7,
+      },
+      spells: [
+        {
+          name: "Blink",
+          failurePercent: 1,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      strength: 14,
+      dexterity: 26,
+      intelligence: 13,
+    });
+
+    const currentEV = calculateEvData(result.importedState).find(
+      (point) => point.dodgingSkill === 15
+    )?.finalEV;
+    const currentSH = calculateSHData(result.importedState).find(
+      (point) => point.shield === 10.6
+    )?.sh;
+
+    expect(currentEV).toBe(29);
+    expect(currentSH).toBe(24);
   });
 
   test("returns a parser failure record for invalid text", () => {

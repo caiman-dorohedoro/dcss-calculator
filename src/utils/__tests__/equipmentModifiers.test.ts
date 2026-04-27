@@ -1,6 +1,9 @@
 import { describe, expect, test } from "@jest/globals";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
-import { getAggregatedEquipmentEffects } from "../equipmentModifiers";
+import {
+  getAggregatedEquipmentEffects,
+  getAmuletReflectionCount,
+} from "../equipmentModifiers";
 
 describe("getAggregatedEquipmentEffects", () => {
   test("sums fixed items, slots, and legacy fallback gear", () => {
@@ -46,5 +49,12 @@ describe("getAggregatedEquipmentEffects", () => {
       sh: 3,
       wizardry: 3,
     });
+  });
+
+  test("does not add implicit reflection SH when parser supplied SH on the amulet", () => {
+    expect(getAmuletReflectionCount([{ kind: "reflection" }])).toBe(1);
+    expect(
+      getAmuletReflectionCount([{ kind: "reflection", modifiers: { sh: 5 } }])
+    ).toBe(0);
   });
 });

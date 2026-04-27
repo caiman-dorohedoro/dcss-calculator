@@ -30,6 +30,7 @@ import { speciesOptions } from "@/types/species.ts";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
+import { getAggregatedEquipmentEffects } from "@/utils/equipmentModifiers";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
 export type MorgueImportSummaryEntry = {
@@ -656,6 +657,17 @@ const deriveWildMagic = (record: ParsedMorgueTextRecord) => {
   return activeWildMagic?.level ?? null;
 };
 
+const normalizeImportedBaseStats = (
+  state: CalculatorState<GameVersion>,
+  record: ParsedMorgueTextRecord
+) => {
+  const itemModifiers = getAggregatedEquipmentEffects(state);
+
+  state.strength = record.strength - itemModifiers.str;
+  state.dexterity = record.dexterity - itemModifiers.dex;
+  state.intelligence = record.intelligence - itemModifiers.int;
+};
+
 const chooseTargetSpell = (
   version: GameVersion,
   record: ParsedMorgueTextRecord
@@ -968,6 +980,8 @@ export const buildImportedCalculatorState = (
       detail: `Unsupported amulet effects skipped: ${amuletMapping.unsupported.join(", ")}`,
     });
   }
+
+  normalizeImportedBaseStats(importedState, record);
 
   const wildMagic = deriveWildMagic(record);
   if (wildMagic !== null) {
