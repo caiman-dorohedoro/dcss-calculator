@@ -153,7 +153,12 @@ describe("morgue import mapper", () => {
       ])
     );
     expect(result.summary.skipped).toEqual(
-      expect.arrayContaining([expect.objectContaining({ label: "Mutations" })])
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Mutations & Traits",
+          detail: expect.stringContaining("Unsupported A: traits skipped"),
+        }),
+      ])
     );
     expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Rings" })])

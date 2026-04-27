@@ -1025,14 +1025,14 @@ export const buildImportedCalculatorState = (
   const mutationMapping = applyMutationModifiers(record, importedState);
   if (mutationMapping.applied.length > 0) {
     summary.applied.push({
-      label: "Mutations",
+      label: "Mutations & Traits",
       detail: mutationMapping.applied.join(", "),
     });
   }
   if (mutationMapping.unsupported.length > 0) {
     summary.skipped.push({
-      label: "Mutations",
-      detail: `Unsupported mutations skipped: ${mutationMapping.unsupported.join(", ")}`,
+      label: "Mutations & Traits",
+      detail: `Unsupported A: traits skipped: ${mutationMapping.unsupported.join(", ")}`,
     });
   }
 

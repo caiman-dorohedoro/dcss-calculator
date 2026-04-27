@@ -178,7 +178,7 @@ describe("DynamicEquipmentControls", () => {
         "Fixed Equipment",
       ])
     );
-    expect(headings).toContain("Mutations");
+    expect(headings).toContain("Mutations & Traits");
     expect(dynamicEquipmentList.textContent).toContain("Amulet:");
     expect(dynamicEquipmentList.textContent).not.toContain("Amulet 1");
     expect(dynamicEquipmentList.textContent).toContain("Glove 1");

@@ -410,7 +410,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
       {renderOpenEquipmentModal()}
 
       <section data-testid="dynamic-equipment-mutations" className="flex flex-col gap-3">
-        <SectionHeading>Mutations</SectionHeading>
+        <SectionHeading>Mutations & Traits</SectionHeading>
         <div className="flex flex-wrap gap-4">
           <AttrInput
             label="wild magic"
