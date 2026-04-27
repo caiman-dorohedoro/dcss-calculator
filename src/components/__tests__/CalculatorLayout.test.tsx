@@ -149,7 +149,21 @@ describe("Calculator desktop layout", () => {
     expect(speciesSelectTrigger.className).not.toContain("w-[180px]");
     expect(speciesSelectTrigger.className).toContain("w-full");
     expect(baseStatsRow).not.toBeNull();
-    expect(baseStatsRow.className).toContain("lg:flex-nowrap");
+    expect(baseStatsRow.className).toContain("grid");
+    expect(baseStatsRow.className).toContain("grid-cols-3");
+    expect(baseStatsRow.className).toContain("gap-2");
+    expect(baseStatsRow.className).not.toContain("flex-wrap");
+    const baseStatInputs = Array.from(
+      baseStatsRow.querySelectorAll('input[type="number"]')
+    ) as HTMLInputElement[];
+    expect(baseStatInputs).toHaveLength(3);
+    expect(baseStatInputs.map((input) => input.className)).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining("w-14"),
+        expect.stringContaining("w-14"),
+        expect.stringContaining("w-14"),
+      ])
+    );
     expect(baseStatsRow.textContent).toContain("Str");
     expect(baseStatsRow.textContent).toContain("Dex");
     expect(baseStatsRow.textContent).toContain("Int");

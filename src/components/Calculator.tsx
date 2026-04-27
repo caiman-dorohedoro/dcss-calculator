@@ -348,12 +348,13 @@ const Calculator = <V extends GameVersion>({
           </label>
           <div
             data-testid="base-stats-row"
-            className="flex flex-row gap-4 items-center flex-wrap lg:flex-nowrap"
+            className="grid w-full grid-cols-3 items-center gap-2"
           >
             <AttrInput
               label="Str"
               value={state.strength}
               type="stat"
+              inputClassName="w-14 sm:w-16"
               onChange={(value) =>
                 setState((prev) => ({ ...prev, strength: value }))
               }
@@ -362,6 +363,7 @@ const Calculator = <V extends GameVersion>({
               label="Dex"
               value={state.dexterity}
               type="stat"
+              inputClassName="w-14 sm:w-16"
               onChange={(value) =>
                 setState((prev) => ({ ...prev, dexterity: value }))
               }
@@ -370,6 +372,7 @@ const Calculator = <V extends GameVersion>({
               label="Int"
               value={state.intelligence}
               type="stat"
+              inputClassName="w-14 sm:w-16"
               onChange={(value) =>
                 setState((prev) => ({ ...prev, intelligence: value }))
               }
