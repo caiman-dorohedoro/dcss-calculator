@@ -108,9 +108,9 @@ type ModalFrameProps = {
 };
 
 const overlayClassName =
-  "fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-6";
+  "fixed inset-0 z-[100] flex items-stretch justify-center bg-black/70 p-0 sm:items-center sm:p-6";
 const panelClassName =
-  "w-full max-w-2xl border border-white bg-card p-6 text-card-foreground shadow-2xl";
+  "h-dvh w-full max-w-none overflow-y-auto border border-white bg-card p-3 text-card-foreground shadow-2xl sm:h-auto sm:max-h-[calc(100dvh-3rem)] sm:max-w-2xl sm:p-6";
 const panelStyle = {
   outline: "1px solid white",
   outlineOffset: "-4px",
@@ -245,7 +245,7 @@ const ModalFrame = ({
         <h2 className="text-lg font-semibold">Equipment Details</h2>
         <div
           data-testid="equipment-modal-title-row"
-          className="mt-1 flex items-baseline gap-5"
+          className="mt-1 flex flex-wrap items-baseline gap-3 sm:gap-5"
         >
           <p className="text-sm text-muted-foreground">{title}</p>
           {titleDetail ? (
@@ -257,8 +257,8 @@ const ModalFrame = ({
             </span>
           ) : null}
         </div>
-        <div className="mt-4 flex flex-col gap-4">{children}</div>
-        <div className="mt-5 flex items-center justify-end gap-2">
+        <div className="mt-3 flex flex-col gap-3 sm:mt-4 sm:gap-4">{children}</div>
+        <div className="mt-3 flex items-center justify-end gap-2 sm:mt-5">
           <Button
             data-testid="cancel-equipment-edit"
             variant="ghost"
@@ -276,7 +276,7 @@ const ModalFrame = ({
   );
 
 const enchantTypeRowClassName =
-  "grid grid-cols-[auto_minmax(0,1fr)] items-end gap-3";
+  "grid grid-cols-[auto_minmax(0,1fr)] items-end gap-2 sm:gap-3";
 const enchantFieldClassName = "flex flex-col gap-1 text-sm";
 
 const EquipmentEgoSelect = ({

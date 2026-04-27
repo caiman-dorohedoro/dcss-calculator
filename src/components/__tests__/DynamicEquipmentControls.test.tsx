@@ -554,6 +554,13 @@ describe("DynamicEquipmentControls", () => {
       headgearRow.click();
     });
 
+    const modifierGrid = document.body.querySelector(
+      '[data-testid="equipment-modifier-grid"]'
+    ) as HTMLDivElement;
+    expect(modifierGrid).not.toBeNull();
+    expect(modifierGrid.className).toContain("grid-cols-2");
+    expect(modifierGrid.className).toContain("lg:grid-cols-4");
+
     expect(
       (
         document.body.querySelector(
@@ -830,6 +837,22 @@ describe("DynamicEquipmentControls", () => {
     expect(
       document.body.querySelector('[data-testid="equipment-edit-modal"]')
     ).not.toBeNull();
+    const modal = document.body.querySelector(
+      '[data-testid="equipment-edit-modal"]'
+    ) as HTMLDivElement;
+    const panel = modal.firstElementChild as HTMLDivElement;
+    expect(modal.className).toContain("p-0");
+    expect(modal.className).toContain("sm:p-6");
+    expect(modal.className).toContain("items-stretch");
+    expect(modal.className).toContain("sm:items-center");
+    expect(panel.className).toContain("h-dvh");
+    expect(panel.className).toContain("w-full");
+    expect(panel.className).toContain("max-w-none");
+    expect(panel.className).toContain("overflow-y-auto");
+    expect(panel.className).toContain("p-3");
+    expect(panel.className).toContain("sm:h-auto");
+    expect(panel.className).toContain("sm:max-w-2xl");
+    expect(panel.className).toContain("sm:p-6");
     expect(document.body.textContent).toContain("Equipment Details");
     expect(document.body.textContent).toContain("Ring 1");
   });

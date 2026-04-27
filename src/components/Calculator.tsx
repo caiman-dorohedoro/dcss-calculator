@@ -332,7 +332,7 @@ const Calculator = <V extends GameVersion>({
                 })
               }
             >
-              <SelectTrigger className="w-[180px] h-6">
+              <SelectTrigger className="h-6">
                 <SelectValue placeholder="Species" />
               </SelectTrigger>
               <SelectContent>
@@ -401,8 +401,7 @@ const Calculator = <V extends GameVersion>({
         <SpellSkillControls
           state={state}
           setState={setState}
-          className="hidden lg:flex"
-          testId="desktop-spell-skill-controls"
+          testId="sidebar-spell-skill-controls"
         />
       </section>
       <section
@@ -427,8 +426,7 @@ const Calculator = <V extends GameVersion>({
         <DynamicEquipmentControls
           state={state}
           setState={setState}
-          className="hidden lg:flex"
-          testId="desktop-dynamic-equipment-controls"
+          testId="sidebar-dynamic-equipment-controls"
         />
         {renderPrimaryEquipmentModal()}
       </section>

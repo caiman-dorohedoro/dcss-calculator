@@ -17,8 +17,6 @@ import { calculateAvgSFData, calculateSFTicks } from "@/utils/calculatorUtils";
 import { getSpellSchools } from "@/utils/spellCalculation";
 import { GameVersion } from "@/types/game";
 import SpellModeHeader from "../SpellModeHeader";
-import { SpellSkillControls } from "../SpellControls";
-import DynamicEquipmentControls from "../DynamicEquipmentControls";
 import { CartesianViewBox } from "recharts/types/util/types";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
 
@@ -47,21 +45,6 @@ const SFChart = <V extends GameVersion>({
   return (
     <>
       <SpellModeHeader state={state} setState={setState} />
-      <div
-        data-testid="mobile-spell-controls"
-        className="flex flex-col gap-4 lg:hidden"
-      >
-        <SpellSkillControls
-          state={state}
-          setState={setState}
-          testId="mobile-spell-skill-controls"
-        />
-        <DynamicEquipmentControls
-          state={state}
-          setState={setState}
-          testId="mobile-dynamic-equipment-controls"
-        />
-      </div>
       <ResponsiveContainer width="100%" height={350}>
         <LineChart
           data={sfData}

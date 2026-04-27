@@ -142,6 +142,12 @@ describe("Calculator desktop layout", () => {
     ).find((label) => label.textContent?.includes("Species"));
     expect(speciesLabel).toBeDefined();
     expect(speciesLabel?.className).toContain("lg:basis-full");
+    const speciesSelectTrigger = speciesLabel?.querySelector(
+      'button[role="combobox"]'
+    ) as HTMLButtonElement;
+    expect(speciesSelectTrigger).not.toBeNull();
+    expect(speciesSelectTrigger.className).not.toContain("w-[180px]");
+    expect(speciesSelectTrigger.className).toContain("w-full");
     expect(baseStatsRow).not.toBeNull();
     expect(baseStatsRow.className).toContain("lg:flex-nowrap");
     expect(baseStatsRow.textContent).toContain("Str");
@@ -182,18 +188,18 @@ describe("Calculator desktop layout", () => {
     const equipmentSection = container.querySelector(
       '[data-testid="sidebar-section-equipment"]'
     ) as HTMLDivElement;
-    const desktopSpellSkillControls = skillSection.querySelector(
-      '[data-testid="desktop-spell-skill-controls"]'
+    const sidebarSpellSkillControls = skillSection.querySelector(
+      '[data-testid="sidebar-spell-skill-controls"]'
     ) as HTMLDivElement;
-    const desktopDynamicEquipmentControls = equipmentSection.querySelector(
-      '[data-testid="desktop-dynamic-equipment-controls"]'
+    const sidebarDynamicEquipmentControls = equipmentSection.querySelector(
+      '[data-testid="sidebar-dynamic-equipment-controls"]'
     ) as HTMLDivElement;
 
     expect(baseStatsSection).not.toBeNull();
     expect(skillSection).not.toBeNull();
     expect(equipmentSection).not.toBeNull();
-    expect(desktopSpellSkillControls).not.toBeNull();
-    expect(desktopDynamicEquipmentControls).not.toBeNull();
+    expect(sidebarSpellSkillControls).not.toBeNull();
+    expect(sidebarDynamicEquipmentControls).not.toBeNull();
 
     expect(baseStatsSection.textContent).toContain("Species");
     expect(baseStatsSection.textContent).toContain("Str");
@@ -213,39 +219,39 @@ describe("Calculator desktop layout", () => {
     expect(skillSection.textContent).not.toContain("Dodging Skill");
     expect(skillSection.textContent).not.toContain("Spellcasting Skill");
     expect(skillStatsRow.className).toContain("lg:flex-nowrap");
-    expect(desktopSpellSkillControls.className).toContain("hidden");
-    expect(desktopSpellSkillControls.className).toContain("lg:flex");
-    expect(desktopSpellSkillControls.textContent).toContain("Show spell skills");
-    expect(desktopSpellSkillControls.textContent).not.toContain("Spellcasting");
-    expect(desktopSpellSkillControls.textContent).not.toContain("conjuration");
-    expect(desktopSpellSkillControls.textContent).not.toContain("fire");
+    expect(sidebarSpellSkillControls.className).not.toContain("hidden");
+    expect(sidebarSpellSkillControls.className).not.toContain("lg:flex");
+    expect(sidebarSpellSkillControls.textContent).toContain("Show spell skills");
+    expect(sidebarSpellSkillControls.textContent).not.toContain("Spellcasting");
+    expect(sidebarSpellSkillControls.textContent).not.toContain("conjuration");
+    expect(sidebarSpellSkillControls.textContent).not.toContain("fire");
 
     expect(equipmentSection.textContent).toContain("Offhand:");
     expect(equipmentSection.textContent).toContain("Armour:");
     expect(equipmentSection.textContent).not.toContain("Shield:");
     expect(equipmentSection.textContent).not.toContain("Orb:");
-    expect(desktopDynamicEquipmentControls.className).toContain("hidden");
-    expect(desktopDynamicEquipmentControls.className).toContain("lg:flex");
-    expect(desktopDynamicEquipmentControls.textContent).toContain("Ring 1");
-    expect(desktopDynamicEquipmentControls.textContent).toContain("Amulet:");
-    expect(desktopDynamicEquipmentControls.textContent).not.toContain("Amulet 1");
-    const desktopDynamicEquipmentList = desktopDynamicEquipmentControls.querySelector(
+    expect(sidebarDynamicEquipmentControls.className).not.toContain("hidden");
+    expect(sidebarDynamicEquipmentControls.className).not.toContain("lg:flex");
+    expect(sidebarDynamicEquipmentControls.textContent).toContain("Ring 1");
+    expect(sidebarDynamicEquipmentControls.textContent).toContain("Amulet:");
+    expect(sidebarDynamicEquipmentControls.textContent).not.toContain("Amulet 1");
+    const sidebarDynamicEquipmentList = sidebarDynamicEquipmentControls.querySelector(
       '[data-testid="dynamic-equipment-list"]'
     ) as HTMLDivElement;
-    const desktopHeadgearRow = desktopDynamicEquipmentList.querySelector(
+    const sidebarHeadgearRow = sidebarDynamicEquipmentList.querySelector(
       '[data-testid="equipment-row-headgear-0"]'
     ) as HTMLButtonElement;
-    expect(desktopHeadgearRow.textContent).toContain("Headgear:");
-    expect(desktopHeadgearRow.textContent).not.toContain("present");
-    expect(desktopDynamicEquipmentControls.textContent).toContain("Glove:");
-    expect(desktopDynamicEquipmentControls.textContent).not.toContain("Glove 1");
-    expect(desktopDynamicEquipmentControls.textContent).not.toContain(
+    expect(sidebarHeadgearRow.textContent).toContain("Headgear:");
+    expect(sidebarHeadgearRow.textContent).not.toContain("present");
+    expect(sidebarDynamicEquipmentControls.textContent).toContain("Glove:");
+    expect(sidebarDynamicEquipmentControls.textContent).not.toContain("Glove 1");
+    expect(sidebarDynamicEquipmentControls.textContent).not.toContain(
       "body armour ego"
     );
-    expect(desktopDynamicEquipmentControls.textContent).not.toContain(
+    expect(sidebarDynamicEquipmentControls.textContent).not.toContain(
       "body armour enchant"
     );
-    expect(desktopDynamicEquipmentControls.textContent).not.toContain(
+    expect(sidebarDynamicEquipmentControls.textContent).not.toContain(
       "shield enchant"
     );
 

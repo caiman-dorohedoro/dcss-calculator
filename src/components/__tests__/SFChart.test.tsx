@@ -41,7 +41,7 @@ await jest.unstable_mockModule("@/components/chart/CustomSpellTick", () => ({
 
 const { default: SFChart } = await import("../chart/SFChart");
 
-describe("SFChart mobile spell controls", () => {
+describe("SFChart layout", () => {
   let container: HTMLDivElement;
   let root: Root;
   const setState = jest.fn();
@@ -62,7 +62,7 @@ describe("SFChart mobile spell controls", () => {
     Reflect.set(globalThis, "IS_REACT_ACT_ENVIRONMENT", false);
   });
 
-  test("renders mobile spell controls with the spell failure panel", async () => {
+  test("does not render mobile-only controls inside the spell failure panel", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.targetSpell = "Fireball";
 
@@ -70,40 +70,24 @@ describe("SFChart mobile spell controls", () => {
       root.render(<SFChart state={state} setState={setState} />);
     });
 
-    const mobileSpellControls = container.querySelector(
-      '[data-testid="mobile-spell-controls"]'
-    ) as HTMLDivElement;
-    const mobileSpellSkillControls = mobileSpellControls.querySelector(
-      '[data-testid="mobile-spell-skill-controls"]'
-    ) as HTMLDivElement;
-    const mobileDynamicEquipmentControls = mobileSpellControls.querySelector(
-      '[data-testid="mobile-dynamic-equipment-controls"]'
-    ) as HTMLDivElement;
-
-    expect(mobileSpellControls).not.toBeNull();
-    expect(mobileSpellControls.className).toContain("lg:hidden");
-    expect(mobileSpellSkillControls).not.toBeNull();
-    expect(mobileDynamicEquipmentControls).not.toBeNull();
+    expect(
+      container.querySelector(
+        '[data-testid="mobile-spell-controls"]'
+      )
+    ).toBeNull();
+    expect(
+      container.querySelector(
+        '[data-testid="mobile-spell-skill-controls"]'
+      )
+    ).toBeNull();
+    expect(
+      container.querySelector(
+        '[data-testid="mobile-dynamic-equipment-controls"]'
+      )
+    ).toBeNull();
     expect(container.textContent).toContain("Spell:");
-    expect(mobileSpellSkillControls.textContent).toContain("Show spell skills");
-    expect(mobileSpellSkillControls.textContent).not.toContain("Spellcasting");
-    expect(mobileSpellSkillControls.textContent).not.toContain("conjuration");
-    expect(mobileSpellSkillControls.textContent).not.toContain("fire");
-    expect(mobileDynamicEquipmentControls.textContent).toContain("Ring 1");
-    expect(mobileDynamicEquipmentControls.textContent).toContain("Amulet:");
-    expect(mobileDynamicEquipmentControls.textContent).not.toContain("Amulet 1");
-    const mobileDynamicEquipmentList = mobileDynamicEquipmentControls.querySelector(
-      '[data-testid="dynamic-equipment-list"]'
-    ) as HTMLDivElement;
-    const mobileHeadgearRow = mobileDynamicEquipmentList.querySelector(
-      '[data-testid="equipment-row-headgear-0"]'
-    ) as HTMLButtonElement;
-    expect(mobileHeadgearRow.textContent).toContain("Headgear:");
-    expect(mobileHeadgearRow.textContent).not.toContain("present");
-    expect(mobileDynamicEquipmentControls.textContent).toContain("Glove:");
-    expect(mobileDynamicEquipmentControls.textContent).not.toContain("Glove 1");
-    expect(mobileDynamicEquipmentControls.textContent).not.toContain(
-      "body armour ego"
-    );
+    expect(
+      container.querySelector('[data-testid="responsive-container"]')
+    ).not.toBeNull();
   });
 });

@@ -134,13 +134,13 @@ const ModifierNumberInput = ({
   value: number;
   onChange: (value: number) => void;
 }) => (
-  <label className="grid grid-cols-[4.5rem_4rem] items-center gap-2 text-sm">
+  <label className="grid grid-cols-[4.25rem_3.5rem] items-center gap-1.5 text-sm sm:grid-cols-[4.5rem_4rem] sm:gap-2">
     <span className="text-right text-muted-foreground">{field.label}:</span>
     <Input
       aria-label={`${field.label} modifier`}
       type="number"
       className={cn(
-        "h-6 w-16 px-2",
+        "h-6 w-14 px-2 sm:w-16",
         value ? activeModifierInputClassName : undefined
       )}
       value={value}
@@ -158,7 +158,7 @@ const ModifierCheckboxInput = ({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) => (
-  <label className="mt-2 grid grid-cols-[4.5rem_4rem] items-center gap-2 border-t border-border/60 pt-2 text-sm">
+  <label className="mt-1.5 grid grid-cols-[4.25rem_3.5rem] items-center gap-1.5 border-t border-border/60 pt-1.5 text-sm sm:mt-2 sm:grid-cols-[4.5rem_4rem] sm:gap-2 sm:pt-2">
     <span className="text-right text-muted-foreground">{label}:</span>
     <Checkbox
       aria-label={`${label} property`}
@@ -179,13 +179,16 @@ const EquipmentModifierInputs = ({
   onChange,
   className,
 }: EquipmentModifierInputsProps) => (
-  <div className={cn("space-y-3", className)}>
-    <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div className={cn("space-y-2 sm:space-y-3", className)}>
+    <div
+      data-testid="equipment-modifier-grid"
+      className="grid grid-cols-2 gap-x-3 gap-y-2 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-3"
+    >
       {numericModifierColumns.map((column) => (
         <div
           key={column.id}
           data-testid={`equipment-modifier-column-${column.id}`}
-          className="flex flex-col gap-2"
+          className="flex flex-col gap-1.5 sm:gap-2"
         >
           {column.fields.map((field) => (
             <ModifierNumberInput
