@@ -60,12 +60,23 @@ function App() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="mx-auto flex items-center gap-x-2">
-              <TabsTrigger value="ev">DCSS Calculator</TabsTrigger>
-              <MorgueImportControls
-                currentVersion={state.version}
-                onApplyImport={(importedState) => setState(importedState)}
-              />
+            <div className="pointer-events-none absolute inset-x-0 top-1/2 grid -translate-y-1/2 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
+              <TabsTrigger
+                value="ev"
+                data-testid="calculator-title-tab"
+                className="pointer-events-auto col-start-2 justify-self-center"
+              >
+                DCSS Calculator
+              </TabsTrigger>
+              <div
+                data-testid="morgue-import-header-action"
+                className="pointer-events-auto col-start-3 justify-self-start pl-2"
+              >
+                <MorgueImportControls
+                  currentVersion={state.version}
+                  onApplyImport={(importedState) => setState(importedState)}
+                />
+              </div>
             </div>
             <button
               onClick={resetState}

@@ -70,9 +70,15 @@ describe("App desktop shell", () => {
       '[data-testid="app-tabs"]'
     ) as HTMLDivElement;
     const tabList = container.querySelector('[role="tablist"]') as HTMLDivElement;
-    const [versionCluster, centerCluster, resetButton] = Array.from(
+    const [versionCluster, centeredTitleRow, resetButton] = Array.from(
       tabList.children
     ) as HTMLDivElement[];
+    const titleTab = container.querySelector(
+      '[data-testid="calculator-title-tab"]'
+    ) as HTMLButtonElement;
+    const importAction = container.querySelector(
+      '[data-testid="morgue-import-header-action"]'
+    ) as HTMLDivElement;
 
     expect(shell.className).toContain("min-h-screen");
     expect(tabs.className).toContain("max-w-7xl");
@@ -87,10 +93,25 @@ describe("App desktop shell", () => {
     expect(versionCluster.className).toContain("-translate-y-1/2");
     expect(versionCluster.className).toContain("flex items-center gap-x-2");
     expect(versionCluster.textContent).toContain("trunk");
-    expect(centerCluster.className).toContain("mx-auto");
-    expect(centerCluster.className).toContain("flex items-center gap-x-2");
-    expect(centerCluster.textContent).toContain("DCSS Calculator");
-    expect(centerCluster.textContent).toContain("import");
+    expect(centeredTitleRow.className).toContain("pointer-events-none");
+    expect(centeredTitleRow.className).toContain("absolute");
+    expect(centeredTitleRow.className).toContain("inset-x-0");
+    expect(centeredTitleRow.className).toContain("top-1/2");
+    expect(centeredTitleRow.className).toContain("-translate-y-1/2");
+    expect(centeredTitleRow.className).toContain("grid");
+    expect(centeredTitleRow.className).toContain(
+      "grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]"
+    );
+    expect(centeredTitleRow.className).not.toContain("mx-auto");
+    expect(titleTab.className).toContain("pointer-events-auto");
+    expect(titleTab.className).toContain("col-start-2");
+    expect(titleTab.className).toContain("justify-self-center");
+    expect(titleTab.textContent).toContain("DCSS Calculator");
+    expect(importAction.className).toContain("pointer-events-auto");
+    expect(importAction.className).toContain("col-start-3");
+    expect(importAction.className).toContain("justify-self-start");
+    expect(importAction.className).toContain("pl-2");
+    expect(importAction.textContent).toContain("import");
     expect(resetButton.className).toContain("absolute");
     expect(resetButton.className).toContain("right-8");
     expect(container.textContent).toContain("DCSS Calculator");
