@@ -53,6 +53,10 @@ const baseDefaultState = {
   largeBonePlates: 0,
   spellcasting: 0,
   wildMagic: 0,
+  god: null,
+  godPietyDisplay: null,
+  godPietyRank: null,
+  godUnderPenance: false,
 };
 
 const buildSchoolDefaults = <V extends GameVersion>(version: V) => {

@@ -95,6 +95,10 @@ export interface CalculatorState<V extends GameVersion> {
   targetSpell?: VersionedSpellName<V>;
   spellcasting?: number;
   wildMagic?: number;
+  god?: string | null;
+  godPietyDisplay?: string | null;
+  godPietyRank?: number | null;
+  godUnderPenance?: boolean;
 }
 
 export const isSchoolSkillKey = <V extends GameVersion>(
@@ -303,6 +307,12 @@ const coerceLegacySlots = <T>(
 
 const isOptionalNumber = (value: unknown) =>
   value === undefined || typeof value === "number";
+
+const isOptionalNullableString = (value: unknown) =>
+  value === undefined || value === null || typeof value === "string";
+
+const isOptionalNullableNumber = (value: unknown) =>
+  value === undefined || value === null || typeof value === "number";
 
 const isOptionalStringArray = (value: unknown) =>
   value === undefined ||
@@ -594,7 +604,12 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.tenguFlight) ||
     !isOptionalNumber(state.largeBonePlates) ||
     !isOptionalNumber(state.spellcasting) ||
-    !isOptionalNumber(state.wildMagic)
+    !isOptionalNumber(state.wildMagic) ||
+    !isOptionalNullableString(state.god) ||
+    !isOptionalNullableString(state.godPietyDisplay) ||
+    !isOptionalNullableNumber(state.godPietyRank) ||
+    (state.godUnderPenance !== undefined &&
+      typeof state.godUnderPenance !== "boolean")
   ) {
     return false;
   }

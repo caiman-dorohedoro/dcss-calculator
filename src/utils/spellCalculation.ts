@@ -47,6 +47,9 @@ export type SpellCalculationParams<V extends GameVersion> = {
   runicMagic?: number;
   wildMagic?: number;
   enkindle?: boolean;
+  god?: string | null;
+  godPietyRank?: number | null;
+  godUnderPenance?: boolean;
 };
 
 const spellDifficulties = {
@@ -261,6 +264,19 @@ export const getSpellFlags = <V extends GameVersion>(
   return spell.flags;
 };
 
+const vehumetSupportsSpell = <V extends GameVersion>(
+  version: V,
+  targetSpell: VersionedSpellName<V>
+) => {
+  const spellSchools = getSpellSchools(version, targetSpell);
+  const spellFlags = getSpellFlags(version, targetSpell);
+
+  return (
+    spellSchools.some((school) => school === "conjuration") ||
+    spellFlags.some((flag) => flag === "destructive")
+  );
+};
+
 type ApplySpellSuccessBoostsParams<V extends GameVersion> = {
   version: V;
   targetSpell: VersionedSpellName<V>;
@@ -270,6 +286,9 @@ type ApplySpellSuccessBoostsParams<V extends GameVersion> = {
   armourSkill: number;
   chance: number;
   wizardry: number;
+  god?: string | null;
+  godPietyRank?: number | null;
+  godUnderPenance?: boolean;
 };
 
 const applySpellSuccessBoosts = <V extends GameVersion>({
@@ -281,6 +300,9 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
   armourSkill,
   chance,
   wizardry,
+  god,
+  godPietyRank,
+  godUnderPenance = false,
 }: ApplySpellSuccessBoostsParams<V>) => {
   const spellSchools = getSpellSchools(version, targetSpell);
   const supportedBodyArmourEgos = getSpellBoostBodyArmourEgoOptions(version);
@@ -290,6 +312,15 @@ const applySpellSuccessBoosts = <V extends GameVersion>({
 
   if (orb === "energy" || orb === "wucad_mu") {
     boostedChance += 10;
+  }
+
+  if (
+    god === "Vehumet" &&
+    (godPietyRank ?? 0) >= 3 &&
+    !godUnderPenance &&
+    vehumetSupportsSpell(version, targetSpell)
+  ) {
+    failReduce = Math.floor((failReduce * 2) / 3);
   }
 
   if (
@@ -351,6 +382,9 @@ function rawSpellFail<V extends GameVersion>({
   runicMagic = 0,
   wildMagic = 0,
   enkindle = false,
+  god,
+  godPietyRank,
+  godUnderPenance = false,
 }: SpellCalculationParams<V>) {
   const config = getVersionConfig(version);
   const formula = getFormulaProfile(config.formulaProfile);
@@ -415,6 +449,9 @@ function rawSpellFail<V extends GameVersion>({
     armourSkill,
     chance: chance2,
     wizardry: totalWizardry,
+    god,
+    godPietyRank,
+    godUnderPenance,
   });
 
   if (enkindle) {

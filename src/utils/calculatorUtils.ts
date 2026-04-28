@@ -249,6 +249,9 @@ export const calculateAvgSFData = <V extends GameVersion>(
         antiWizardry: state.antiWizardry,
         runicMagic: state.runicMagic,
         wildMagic: state.wildMagic,
+        god: state.god,
+        godPietyRank: state.godPietyRank,
+        godUnderPenance: state.godUnderPenance,
       });
 
       if (
@@ -280,6 +283,9 @@ export const calculateAvgSFData = <V extends GameVersion>(
           runicMagic: state.runicMagic,
           wildMagic: state.wildMagic,
           enkindle: true,
+          god: state.god,
+          godPietyRank: state.godPietyRank,
+          godUnderPenance: state.godUnderPenance,
         });
 
         return {

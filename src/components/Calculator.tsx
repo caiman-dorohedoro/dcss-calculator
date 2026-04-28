@@ -80,12 +80,32 @@ const SectionHeading = ({ children }: { children: string }) => (
   </div>
 );
 
+const formatGodDisplay = <V extends GameVersion>(
+  state: CalculatorState<V>
+) => {
+  if (!state.god) {
+    return null;
+  }
+
+  return state.godPietyDisplay
+    ? `${state.god} [${state.godPietyDisplay}]`
+    : state.god;
+};
+
+const hasVehumetSpellSuccess = <V extends GameVersion>(
+  state: CalculatorState<V>
+) =>
+  state.god === "Vehumet" &&
+  (state.godPietyRank ?? 0) >= 3 &&
+  state.godUnderPenance !== true;
+
 const Calculator = <V extends GameVersion>({
   state,
   setState,
 }: CalculatorProps<V>) => {
   const [openPrimaryEquipment, setOpenPrimaryEquipment] =
     useState<OpenPrimaryEquipment | null>(null);
+  const godDisplay = formatGodDisplay(state);
   const selectedBodyArmourEgo =
     state.bodyArmour.ego ??
     (state.bodyArmourEgo !== undefined ? state.bodyArmourEgo : "none");
@@ -310,6 +330,22 @@ const Calculator = <V extends GameVersion>({
         data-testid="sidebar-section-base-stats"
         className="flex flex-col gap-3"
       >
+        {godDisplay ? (
+          <div
+            data-testid="god-status"
+            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm"
+          >
+            <span className="shrink-0 text-muted-foreground">God:</span>
+            <span className="min-w-0 break-words font-mono text-[#eaeaea]">
+              {godDisplay}
+            </span>
+            {hasVehumetSpellSuccess(state) ? (
+              <span className="rounded-sm border border-emerald-400/40 bg-emerald-400/10 px-1.5 py-0.5 text-xs font-medium text-emerald-200">
+                Success bonus active
+              </span>
+            ) : null}
+          </div>
+        ) : null}
         <div className="flex flex-row flex-wrap items-center gap-4 text-sm">
           <label className="flex flex-row items-center gap-2 text-sm lg:basis-full">
             Species:

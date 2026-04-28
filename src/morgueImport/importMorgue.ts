@@ -657,6 +657,16 @@ const deriveWildMagic = (record: ParsedMorgueTextRecord) => {
   return activeWildMagic?.level ?? null;
 };
 
+const formatGodSummary = (record: ParsedMorgueTextRecord) => {
+  if (!record.god) {
+    return null;
+  }
+
+  return record.godPietyDisplay
+    ? `${record.god} [${record.godPietyDisplay}]`
+    : record.god;
+};
+
 const normalizeImportedBaseStats = (
   state: CalculatorState<GameVersion>,
   record: ParsedMorgueTextRecord
@@ -766,6 +776,10 @@ export const buildImportedCalculatorState = (
   importedState.strength = record.strength;
   importedState.dexterity = record.dexterity;
   importedState.intelligence = record.intelligence;
+  importedState.god = record.god;
+  importedState.godPietyDisplay = record.godPietyDisplay;
+  importedState.godPietyRank = record.godPietyRank;
+  importedState.godUnderPenance = record.godUnderPenance;
   importedState.armourSkill = record.effectiveSkills.armour;
   importedState.shieldSkill = record.effectiveSkills.shields;
   importedState.dodgingSkill = record.effectiveSkills.dodging;
@@ -783,6 +797,14 @@ export const buildImportedCalculatorState = (
       detail: `Armour ${record.effectiveSkills.armour}, Shields ${record.effectiveSkills.shields}, Dodging ${record.effectiveSkills.dodging}, Spellcasting ${record.effectiveSkills.spellcasting}`,
     }
   );
+
+  const godSummary = formatGodSummary(record);
+  if (godSummary) {
+    summary.applied.push({
+      label: "God",
+      detail: godSummary,
+    });
+  }
 
   const importedBodyArmourEgo = deriveBodyArmourEgo(record.bodyArmourDetails);
   const armour = mapArmour(record.bodyArmourDetails?.baseType ?? record.bodyArmour);

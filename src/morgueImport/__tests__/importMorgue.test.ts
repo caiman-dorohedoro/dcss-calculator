@@ -371,6 +371,78 @@ describe("morgue import mapper", () => {
     );
   });
 
+  test("imports current god and piety bucket for spell-success passives", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.34.1-3-ga2c7840dd7",
+      species: "Human",
+      speciesVariant: null,
+      background: "Conjurer",
+      god: "Vehumet",
+      godPietyDisplay: "***...",
+      godPietyRank: 3,
+      godOstracismPips: 0,
+      godStatus: "Vehumet is pleased with you.",
+      godUnderPenance: false,
+      godHistory: [],
+      xl: 12,
+      ac: 5,
+      ev: 10,
+      sh: 0,
+      strength: 10,
+      intelligence: 20,
+      dexterity: 10,
+      bodyArmour: "robe",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("robe", "robe"),
+      skills: baseSkills,
+      effectiveSkills: {
+        ...baseSkills,
+        spellcasting: 8,
+        conjurations: 8,
+      },
+      spells: [
+        {
+          name: "Fireball",
+          failurePercent: 16,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      god: "Vehumet",
+      godPietyDisplay: "***...",
+      godPietyRank: 3,
+      godUnderPenance: false,
+    });
+    expect(result.summary.applied).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "God",
+          detail: "Vehumet [***...]",
+        }),
+      ])
+    );
+  });
+
   test("uses parser-reported acid dragon base for faerie dragon scales", () => {
     const record = {
       playerName: "tester",

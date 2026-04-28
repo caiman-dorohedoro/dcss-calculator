@@ -294,6 +294,44 @@ describe("Calculator desktop layout", () => {
     expect(equipmentSection.textContent).not.toContain("shield enchant");
   });
 
+  test("shows imported god and active success bonus above species as read-only sidebar text", async () => {
+    const state = {
+      ...buildDefaultCalculatorState("trunk"),
+      god: "Vehumet",
+      godPietyDisplay: "***...",
+      godPietyRank: 3,
+      godUnderPenance: false,
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={state} setState={mockSetState} />);
+    });
+
+    const godStatus = container.querySelector(
+      '[data-testid="god-status"]'
+    ) as HTMLDivElement;
+
+    const baseStatsSection = container.querySelector(
+      '[data-testid="sidebar-section-base-stats"]'
+    ) as HTMLDivElement;
+    const baseStatsText = baseStatsSection.textContent ?? "";
+
+    expect(godStatus).not.toBeNull();
+    expect(baseStatsText.indexOf("God:")).toBeLessThan(
+      baseStatsText.indexOf("Species")
+    );
+    expect(godStatus.textContent).toContain("God:");
+    expect(godStatus.textContent).toContain("Vehumet [***...]");
+    expect(godStatus.textContent).toContain("Success bonus active");
+    const activeBadge = Array.from(godStatus.querySelectorAll("span")).find(
+      (span) => span.textContent === "Success bonus active"
+    ) as HTMLSpanElement;
+    expect(activeBadge.className).toContain("text-emerald");
+    expect(activeBadge.className).not.toContain("text-muted-foreground");
+    expect(godStatus.querySelector("input")).toBeNull();
+    expect(godStatus.querySelector('button[role="combobox"]')).toBeNull();
+  });
+
   test("orders equipment rows like the supported subset of Crawl status equipment", async () => {
     await act(async () => {
       root.render(

@@ -75,6 +75,9 @@ mapping layer that:
 - `wizardry` and `wildMagic` should be populated when they can be inferred
   reliably and otherwise reported as skipped without blocking the rest of the
   import.
+- Parser-provided god and piety state should be imported when available. This is
+  required for god passives that affect existing calculator formulas, such as
+  Vehumet's spell success passive.
 
 ## Current Repo State
 
@@ -94,6 +97,8 @@ Today the calculator state includes:
 - auxiliary armour booleans such as helmet, gloves, boots, cloak, barding, and
   second gloves
 - spell-related modifiers `wizardry`, `wildMagic`, and `bodyArmourEgo`
+- imported god metadata: `god`, `godPietyDisplay`, `godPietyRank`, and
+  `godUnderPenance`
 
 The parser produces a broader record than the app can store. It includes:
 
@@ -219,6 +224,8 @@ Supported fields to apply:
   target version exposes that ego
 - `wizardry` when parsed equipment properties expose a reliable `Wiz` count
 - `wildMagic` when parsed mutations expose an active, reliable wild-magic level
+- `god`, `godPietyDisplay`, `godPietyRank`, and `godUnderPenance` when the
+  parser reports them
 
 Fields to skip in this pass:
 
@@ -359,6 +366,27 @@ For `wildMagic`:
 
 These should not trigger an extra confirmation modal. They are best-effort
 fields.
+
+### God And Piety State
+
+The parser exposes the current god and the visible piety bucket. The app should
+store this as read-only import metadata rather than editable manual controls.
+
+This metadata is formula-relevant for Vehumet:
+
+- if `god` is `Vehumet`
+- and `godPietyRank` is at least `3`
+- and the character is not under penance
+- and the target spell is a Vehumet-supported spell
+
+then the spell failure calculation should apply Crawl's spell success passive
+as a raw failure multiplier of `2 / 3`. Higher Vehumet piety ranks do not add
+stronger success stages; rank `4` and above unlock separate passives outside
+this calculator's spell failure formula.
+
+The sidebar should display the imported god above species as a compact
+read-only status row. When the Vehumet success passive is active, it should show
+an active status badge rather than a muted informational label.
 
 ### Body Armour Ego
 

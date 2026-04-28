@@ -647,6 +647,91 @@ describe("Spell Calculations", () => {
     expect(modified).toBeLessThan(base);
   });
 
+  test("Vehumet rank 3 applies a raw success multiplier to supported destructive spells", () => {
+    const baseParams = {
+      version: "trunk" as const,
+      species: "human" as const,
+      strength: 12,
+      spellcasting: 10,
+      intelligence: 20,
+      targetSpell: "Hellfire Mortar" as const,
+      schoolSkills: { earth: 10, fire: 10, forgecraft: 10 } as never,
+      spellDifficulty: 7 as const,
+      armour: "none" as const,
+      shield: "none" as const,
+      armourSkill: 0,
+      shieldSkill: 0,
+    };
+    const vehumetParams = {
+      ...baseParams,
+      god: "Vehumet",
+      godPietyRank: 3,
+      godUnderPenance: false,
+    };
+    const equivalentSingleMultiplier = calculateSpellFailureRate({
+      ...baseParams,
+      armour: "robe",
+      bodyArmourEgo: "resonance",
+    });
+
+    expect(calculateSpellFailureRate(vehumetParams)).toBe(
+      equivalentSingleMultiplier
+    );
+  });
+
+  test("Vehumet success passive requires rank 3, no penance, and a supported spell", () => {
+    const fireballParams = {
+      version: "trunk" as const,
+      species: "human" as const,
+      strength: 10,
+      equipmentStr: 0,
+      spellcasting: 8,
+      intelligence: 18,
+      equipmentInt: 0,
+      targetSpell: "Fireball" as const,
+      schoolSkills: { fire: 8, conjuration: 8 } as never,
+      spellDifficulty: 5 as const,
+      armour: "robe" as const,
+      shield: "none" as const,
+      armourSkill: 0,
+      shieldSkill: 0,
+    };
+    const swiftnessParams = {
+      ...fireballParams,
+      targetSpell: "Swiftness" as const,
+      schoolSkills: { air: 8 } as never,
+      spellDifficulty: 3 as const,
+    };
+    const withVehumet = {
+      god: "Vehumet",
+      godPietyRank: 3,
+      godUnderPenance: false,
+    };
+
+    expect(
+      calculateSpellFailureRate({
+        ...fireballParams,
+        god: "Vehumet",
+        godPietyRank: 2,
+        godUnderPenance: false,
+      })
+    ).toBe(calculateSpellFailureRate(fireballParams));
+    expect(
+      calculateSpellFailureRate({
+        ...fireballParams,
+        god: "Vehumet",
+        godPietyRank: 3,
+        godUnderPenance: true,
+      })
+    ).toBe(calculateSpellFailureRate(fireballParams));
+    expect(
+      calculateSpellFailureRate({
+        ...swiftnessParams,
+        ...withVehumet,
+      })
+    ).toBe(calculateSpellFailureRate(swiftnessParams));
+  });
+
   test("restored legacy wizardry saves count ring wizardry once for spell failure", () => {
     const legacy = buildDefaultCalculatorState("0.34");
 
