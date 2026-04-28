@@ -1018,6 +1018,8 @@ describe("morgue import mapper", () => {
       background: "Fighter",
       god: null,
       ...defaultGodState,
+      statusText: "ephemerally shielded",
+      statuses: [{ display: "ephemerally shielded", id: "ephemeral_shield" }],
       xl: 25,
       ac: 36,
       ev: 8,
@@ -1081,6 +1083,7 @@ describe("morgue import mapper", () => {
     expect(result.importedState.distortionField).toBe(3);
     expect(result.importedState.tenguFlight).toBe(1);
     expect(result.importedState.largeBonePlates).toBe(1);
+    expect(result.importedState).toMatchObject({ ephemeralShield: 1 });
     expect(result.importedState.icemail).toBe(2);
     expect(result.importedState.condensationShield).toBe(1);
     expect(result.importedState.deformedBody).toBe(true);
@@ -1089,7 +1092,7 @@ describe("morgue import mapper", () => {
     expect(result.importedState.gelatinousBody).toBe(3);
     expect(result.importedState.slowReflexes).toBe(1);
     expect(result.importedState.scalesAC).toBe(9);
-    expect(result.summary.skipped).toEqual(
+    expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           label: "Mutations & Traits",

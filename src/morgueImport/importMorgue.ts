@@ -550,6 +550,9 @@ const mutationLevel = (
   fallback = 1
 ) => mutation.level ?? fallback;
 
+const hasStatus = (record: ParsedMorgueTextRecord, id: string) =>
+  record.statuses.some((status) => status.id === id);
+
 const getMutationAc = (
   mutation: ParsedMorgueTextRecord["mutations"][number],
   xl: number
@@ -712,9 +715,14 @@ const applyMutationModifiers = (
     }
 
     if (mutation.name === "ephemeral shield") {
-      unsupported.push(
-        "ephemeral shield (@: ephemerally shielded status required)"
-      );
+      if (hasStatus(record, "ephemeral_shield")) {
+        state.ephemeralShield = mutationLevel(mutation);
+        applied.push("ephemeral shield");
+      } else {
+        unsupported.push(
+          "ephemeral shield (@: ephemerally shielded status required)"
+        );
+      }
       continue;
     }
 

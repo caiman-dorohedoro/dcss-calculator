@@ -172,6 +172,7 @@ export const calculateSHData = <V extends GameVersion>(
           amuletReflection,
           largeBonePlates: state.largeBonePlates,
           condensationShield: state.condensationShield,
+          ephemeralShield: state.ephemeralShield,
           reckless: state.reckless,
         }),
       };

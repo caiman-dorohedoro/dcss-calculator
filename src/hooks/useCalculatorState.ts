@@ -90,6 +90,7 @@ export interface CalculatorState<V extends GameVersion> {
   distortionField?: number;
   tenguFlight?: number;
   largeBonePlates?: number;
+  ephemeralShield?: number;
   icemail?: number;
   condensationShield?: number;
   deformedBody?: boolean;
@@ -613,6 +614,7 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.distortionField) ||
     !isOptionalNumber(state.tenguFlight) ||
     !isOptionalNumber(state.largeBonePlates) ||
+    !isOptionalNumber(state.ephemeralShield) ||
     !isOptionalNumber(state.icemail) ||
     !isOptionalNumber(state.condensationShield) ||
     !isOptionalBoolean(state.deformedBody) ||

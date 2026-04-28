@@ -51,6 +51,7 @@ const baseDefaultState = {
   distortionField: 0,
   tenguFlight: 0,
   largeBonePlates: 0,
+  ephemeralShield: 0,
   icemail: 0,
   condensationShield: 0,
   deformedBody: false,

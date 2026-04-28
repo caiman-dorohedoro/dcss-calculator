@@ -115,5 +115,20 @@ describe("SH Calculations", () => {
         reckless: true,
       })
     ).toBe(21);
+
+    expect(
+      calculateSH({
+        shield: "tower_shield",
+        shieldSkill: 19.5,
+        dexterity: 12,
+        equipmentDex: 6,
+        shieldEnchant: 8,
+        equipmentSH: 5,
+        largeBonePlates: 1,
+        condensationShield: 1,
+        ephemeralShield: 1,
+        reckless: true,
+      })
+    ).toBe(25);
   });
 });
