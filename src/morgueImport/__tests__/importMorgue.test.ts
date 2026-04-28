@@ -1083,7 +1083,10 @@ describe("morgue import mapper", () => {
     expect(result.importedState.distortionField).toBe(3);
     expect(result.importedState.tenguFlight).toBe(1);
     expect(result.importedState.largeBonePlates).toBe(1);
-    expect(result.importedState).toMatchObject({ ephemeralShield: 1 });
+    expect(result.importedState).toMatchObject({
+      activeStatusIds: ["ephemeral_shield"],
+      ephemeralShield: 1,
+    });
     expect(result.importedState.icemail).toBe(2);
     expect(result.importedState.condensationShield).toBe(1);
     expect(result.importedState.deformedBody).toBe(true);
@@ -1100,6 +1103,85 @@ describe("morgue import mapper", () => {
         }),
       ])
     );
+  });
+
+  test("stores current status ids separately from owned A-line traits", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.34.1",
+      species: "Demonspawn",
+      speciesVariant: null,
+      background: "Fighter",
+      god: null,
+      ...defaultGodState,
+      statusText: "icemail depleted",
+      statuses: [{ display: "icemail depleted", id: "icemail_depleted" }],
+      xl: 25,
+      ac: 28,
+      ev: 8,
+      sh: 19,
+      strength: 31,
+      intelligence: 2,
+      dexterity: 18,
+      bodyArmour: "plate armour",
+      shield: "tower shield",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("+7 plate armour", "plate armour"),
+      shieldDetails: makeItem("+8 tower shield", "tower shield"),
+      skills: baseSkills,
+      effectiveSkills: {
+        ...baseSkills,
+        armour: 22.2,
+        shields: 19.5,
+      },
+      spells: [],
+      mutations: [
+        { name: "icemail", level: 2 },
+        { name: "condensation shield" },
+        { name: "ephemeral shield" },
+      ],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      activeStatusIds: ["icemail_depleted"],
+      condensationShield: 1,
+      ephemeralShield: 1,
+      icemail: 2,
+    });
+
+    const currentAC = calculateAcData(result.importedState).find(
+      (point) => point.armour === 22.2
+    )?.ac;
+    const currentSH = calculateSHData(result.importedState).find(
+      (point) => point.shield === 19.5
+    )?.sh;
+    const unsuppressedState = {
+      ...result.importedState,
+      activeStatusIds: [],
+    };
+    const unsuppressedAC = calculateAcData(unsuppressedState).find(
+      (point) => point.armour === 22.2
+    )?.ac;
+    const unsuppressedSH = calculateSHData(unsuppressedState).find(
+      (point) => point.shield === 19.5
+    )?.sh;
+
+    expect(currentAC).toBe((unsuppressedAC ?? 0) - 8);
+    expect(currentSH).toBe((unsuppressedSH ?? 0) - 4);
   });
 
   test("keeps parser item properties that are display-only for calculations", () => {

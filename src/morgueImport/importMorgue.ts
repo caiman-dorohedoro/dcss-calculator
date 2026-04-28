@@ -31,6 +31,11 @@ import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import { getAggregatedEquipmentEffects } from "@/utils/equipmentModifiers";
+import {
+  collectActiveStatusIds,
+  statusAwareMutationRules,
+  type StatusAwareMutationStateKey,
+} from "@/utils/statusEffects";
 import { getVersionConfig } from "@/versioning/versionRegistry";
 
 export type MorgueImportSummaryEntry = {
@@ -550,9 +555,6 @@ const mutationLevel = (
   fallback = 1
 ) => mutation.level ?? fallback;
 
-const hasStatus = (record: ParsedMorgueTextRecord, id: string) =>
-  record.statuses.some((status) => status.id === id);
-
 const getMutationAc = (
   mutation: ParsedMorgueTextRecord["mutations"][number],
   xl: number
@@ -601,6 +603,14 @@ const getMutationAc = (
   }
 
   return 0;
+};
+
+const setNumericMutationState = (
+  state: CalculatorState<GameVersion>,
+  key: StatusAwareMutationStateKey,
+  value: number
+) => {
+  state[key] = value;
 };
 
 const applyMutationModifiers = (
@@ -663,15 +673,16 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "icemail") {
-      state.icemail = mutationLevel(mutation);
-      applied.push("icemail");
-      continue;
-    }
-
-    if (mutation.name === "condensation shield") {
-      state.condensationShield = mutationLevel(mutation);
-      applied.push("condensation shield");
+    const statusAwareRule = statusAwareMutationRules.find(
+      (rule) => rule.mutationName === mutation.name
+    );
+    if (statusAwareRule) {
+      setNumericMutationState(
+        state,
+        statusAwareRule.stateKey,
+        mutationLevel(mutation)
+      );
+      applied.push(mutation.name);
       continue;
     }
 
@@ -711,18 +722,6 @@ const applyMutationModifiers = (
     if (mutationAc !== 0) {
       state.scalesAC = (state.scalesAC ?? 0) + mutationAc;
       applied.push(mutation.name);
-      continue;
-    }
-
-    if (mutation.name === "ephemeral shield") {
-      if (hasStatus(record, "ephemeral_shield")) {
-        state.ephemeralShield = mutationLevel(mutation);
-        applied.push("ephemeral shield");
-      } else {
-        unsupported.push(
-          "ephemeral shield (@: ephemerally shielded status required)"
-        );
-      }
       continue;
     }
 
@@ -865,6 +864,7 @@ export const buildImportedCalculatorState = (
 
   const importedState =
     buildDefaultCalculatorState(detectedVersion) as CalculatorState<GameVersion>;
+  importedState.activeStatusIds = collectActiveStatusIds(record.statuses);
   const summary: MorgueImportSummary = {
     applied: [],
     skipped: [],

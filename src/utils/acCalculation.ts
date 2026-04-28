@@ -14,6 +14,7 @@ import {
   getHeadgearBaseAc,
   getHeadgearEnchantTotal,
 } from "./equipmentModifiers";
+import { hasActiveStatus, statusEffectIds } from "./statusEffects";
 
 export const calculateAC = (baseAC: number, skill: number): number => {
   return Math.floor(baseAC * (1 + skill / 22));
@@ -45,6 +46,7 @@ type MixedCalculationsParams<V extends GameVersion> = {
   scalesAC?: number;
   deformedBody?: boolean;
   icemail?: number;
+  activeStatusIds?: readonly string[];
   armourSkill: number;
 };
 
@@ -70,6 +72,7 @@ export const calculateMixedAC = <V extends GameVersion>({
   scalesAC = 0,
   deformedBody = false,
   icemail = 0,
+  activeStatusIds,
   armourSkill,
 }: MixedCalculationsParams<V>): number => {
   const isDeformed =
@@ -121,7 +124,11 @@ export const calculateMixedAC = <V extends GameVersion>({
       : scaledBodyAc;
   const scaledAuxAc = calculateScaledAC(auxBaseAc, armourSkill);
   const scaledBaseAc = Math.floor((adjustedBodyAc + scaledAuxAc) / 100);
-  const icemailAc = icemail > 0 ? icemail * 4 : 0;
+  const icemailAc =
+    icemail > 0 &&
+    !hasActiveStatus(activeStatusIds, statusEffectIds.icemailDepleted)
+      ? icemail * 4
+      : 0;
 
   return (
     scaledBaseAc +

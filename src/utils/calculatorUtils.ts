@@ -64,6 +64,7 @@ export const calculateAcData = <V extends GameVersion>(
           scalesAC: state.scalesAC,
           deformedBody: state.deformedBody,
           icemail: state.icemail,
+          activeStatusIds: state.activeStatusIds,
           armourSkill: armour,
         }),
       };
@@ -173,6 +174,7 @@ export const calculateSHData = <V extends GameVersion>(
           largeBonePlates: state.largeBonePlates,
           condensationShield: state.condensationShield,
           ephemeralShield: state.ephemeralShield,
+          activeStatusIds: state.activeStatusIds,
           reckless: state.reckless,
         }),
       };

@@ -59,6 +59,7 @@ const baseDefaultState = {
   sturdyFrame: 0,
   gelatinousBody: 0,
   slowReflexes: 0,
+  activeStatusIds: [],
   spellcasting: 0,
   wildMagic: 0,
   god: null,

@@ -98,6 +98,7 @@ export interface CalculatorState<V extends GameVersion> {
   sturdyFrame?: number;
   gelatinousBody?: number;
   slowReflexes?: number;
+  activeStatusIds?: string[];
   // spell mode
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;
@@ -622,6 +623,7 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.sturdyFrame) ||
     !isOptionalNumber(state.gelatinousBody) ||
     !isOptionalNumber(state.slowReflexes) ||
+    !isOptionalStringArray(state.activeStatusIds) ||
     !isOptionalNumber(state.spellcasting) ||
     !isOptionalNumber(state.wildMagic) ||
     !isOptionalNullableString(state.god) ||

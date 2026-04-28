@@ -1,4 +1,5 @@
 import {ShieldKey, shieldOptions} from "@/types/equipment.ts";
+import { hasActiveStatus, statusEffectIds } from "./statusEffects";
 
 type SHCalculationParams = {
   shield: ShieldKey;
@@ -11,6 +12,7 @@ type SHCalculationParams = {
   largeBonePlates?: number;
   condensationShield?: number;
   ephemeralShield?: number;
+  activeStatusIds?: readonly string[];
   reckless?: boolean;
 };
 
@@ -26,11 +28,16 @@ export const calculateSH = (params: SHCalculationParams) => {
     largeBonePlates = 0,
     condensationShield = 0,
     ephemeralShield = 0,
+    activeStatusIds,
     reckless = false,
   } = params;
   const baseSH = shieldOptions[shield].baseSH;
   const effectiveDexterity = dexterity + equipmentDex;
   const hasShield = shield !== "none";
+  const icemailDepleted = hasActiveStatus(
+    activeStatusIds,
+    statusEffectIds.icemailDepleted
+  );
 
   let sh = 0;
 
@@ -49,8 +56,12 @@ export const calculateSH = (params: SHCalculationParams) => {
   sh += equipmentSH * 200;
   sh += amuletReflection * 1000;
   sh += largeBonePlates > 0 ? largeBonePlates * 400 + 400 : 0;
-  sh += condensationShield > 0 ? 800 : 0;
-  sh += ephemeralShield > 0 ? ephemeralShield * 1400 : 0;
+  sh += condensationShield > 0 && !icemailDepleted ? 800 : 0;
+  sh +=
+    ephemeralShield > 0 &&
+    hasActiveStatus(activeStatusIds, statusEffectIds.ephemeralShield)
+      ? ephemeralShield * 1400
+      : 0;
 
   if (reckless) {
     sh = Math.floor(sh / 2);

@@ -173,6 +173,25 @@ describe("AC Calculations", () => {
         icemail: 2,
       })
     ).toBe(36);
+
+    expect(
+      calculateMixedAC({
+        version: "0.34",
+        species: "demonspawn",
+        armour: "plate",
+        armourSkill: 22.2,
+        bodyArmourEnchant: 7,
+        headgearSlots: [{ present: true, enchant: 1, kind: "hat" } as never],
+        boots: true,
+        bootsEnchant: 3,
+        cloak: true,
+        cloakBaseAc: 0,
+        equipmentAC: 3,
+        deformedBody: true,
+        icemail: 2,
+        activeStatusIds: ["icemail_depleted"],
+      })
+    ).toBe(28);
   });
 
   test("trunk gale centaur, pearl dragon scales, gloves, barding, armour skill 13.8, AC 17", () => {

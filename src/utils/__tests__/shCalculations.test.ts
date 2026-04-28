@@ -89,7 +89,7 @@ describe("SH Calculations", () => {
     ).toBe(15);
   });
 
-  test("applies condensation shield before reckless halves final SH", () => {
+  test("applies status-aware shield bonuses before reckless halves final SH", () => {
     expect(
       calculateSH({
         shield: "tower_shield",
@@ -129,6 +129,37 @@ describe("SH Calculations", () => {
         ephemeralShield: 1,
         reckless: true,
       })
+    ).toBe(21);
+
+    expect(
+      calculateSH({
+        shield: "tower_shield",
+        shieldSkill: 19.5,
+        dexterity: 12,
+        equipmentDex: 6,
+        shieldEnchant: 8,
+        equipmentSH: 5,
+        largeBonePlates: 1,
+        condensationShield: 1,
+        ephemeralShield: 1,
+        activeStatusIds: ["ephemeral_shield"],
+        reckless: true,
+      })
     ).toBe(25);
+
+    expect(
+      calculateSH({
+        shield: "tower_shield",
+        shieldSkill: 19.5,
+        dexterity: 12,
+        equipmentDex: 6,
+        shieldEnchant: 8,
+        equipmentSH: 5,
+        largeBonePlates: 1,
+        condensationShield: 1,
+        activeStatusIds: ["icemail_depleted"],
+        reckless: true,
+      })
+    ).toBe(19);
   });
 });
