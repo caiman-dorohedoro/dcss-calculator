@@ -19,7 +19,10 @@ import { GameVersion } from "@/types/game";
 import SpellModeHeader from "../SpellModeHeader";
 import { CartesianViewBox } from "recharts/types/util/types";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
-import { ENKINDLE_SPELL_FAILURE_COLOR } from "@/components/chart/spellFailureColors";
+import {
+  ENKINDLE_SPELL_FAILURE_COLOR,
+  VEHUMET_SPELL_FAILURE_COLOR,
+} from "@/components/chart/spellFailureColors";
 
 type SFChartProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -36,6 +39,23 @@ const SFChart = <V extends GameVersion>({
   const [sfTicks, setSfTicks] = useState<number[]>([]);
   const spellSchools = getSpellSchools<V>(state.version, state.targetSpell);
   const [firstSchool] = spellSchools;
+  const hasEnkindleLine =
+    state.species === "revenant" &&
+    spellCanBeEnkindled(state.version, state.targetSpell) &&
+    sfData.some((data) => data.enKindledSpellFailureRate !== 0);
+  const hasVehumetPreviewLine = sfData.some(
+    (data) => data.vehumetPreviewSpellFailureRate !== undefined
+  );
+  const optionalSpellFailureLineCount =
+    Number(hasEnkindleLine) + Number(hasVehumetPreviewLine);
+  const legendMarginLeft =
+    optionalSpellFailureLineCount === 2
+      ? "-55px"
+      : optionalSpellFailureLineCount === 1
+        ? "-100px"
+        : "-150px";
+  const skillAxisLabel =
+    spellSchools.length > 1 ? "Skill Average" : firstSchool;
 
   useEffect(() => {
     const firstSFData = calculateAvgSFData(state);
@@ -72,9 +92,7 @@ const SFChart = <V extends GameVersion>({
                   textAnchor="end" // text alignment (end means right-aligned)
                   fill="#eee"
                 >
-                  {spellSchools.length > 1
-                    ? "Skill Average"
-                    : `${firstSchool} Skill`}
+                  {skillAxisLabel}
                 </text>
               );
             }}
@@ -89,15 +107,17 @@ const SFChart = <V extends GameVersion>({
               if (name === " Enkindle") {
                 return [`${value}%`, "Spell Failure Rate (Enkindle)"];
               }
+              if (name === " Vehumet support preview") {
+                return [`${value}%`, "Spell Failure Rate (Vehumet support)"];
+              }
+              if (name === " Current failure") {
+                return [`${value}%`, "Current failure"];
+              }
 
               return [`${value}%`, name];
             }}
             labelFormatter={(value) =>
-              `${
-                spellSchools.length > 1
-                  ? "Skill Average"
-                  : `${firstSchool} Skill`
-              }: ${value}`
+              `${skillAxisLabel}: ${value}`
             }
             wrapperStyle={{
               backgroundColor: "hsl(var(--popover))",
@@ -118,14 +138,14 @@ const SFChart = <V extends GameVersion>({
             align="center"
             layout="horizontal"
             wrapperStyle={{
-              marginLeft: "-150px",
+              marginLeft: legendMarginLeft,
               marginBottom: "-10px",
             }}
           />
           <Line
             type="stepAfter"
             dataKey="spellFailureRate"
-            name=" Spell Failure Rate"
+            name=" Current failure"
             isAnimationActive={false}
             dot={renderDot(
               "spellSkill",
@@ -140,9 +160,7 @@ const SFChart = <V extends GameVersion>({
               ) / 10
             )}
           />
-          {state.species === "revenant" &&
-            spellCanBeEnkindled(state.version, state.targetSpell) &&
-            sfData.some((data) => data.enKindledSpellFailureRate !== 0) && (
+          {hasEnkindleLine && (
               <Line
                 type="stepAfter"
                 dataKey="enKindledSpellFailureRate"
@@ -163,6 +181,28 @@ const SFChart = <V extends GameVersion>({
                 )}
               />
             )}
+          {hasVehumetPreviewLine && (
+            <Line
+              type="stepAfter"
+              dataKey="vehumetPreviewSpellFailureRate"
+              name=" Vehumet support preview"
+              isAnimationActive={false}
+              stroke={VEHUMET_SPELL_FAILURE_COLOR}
+              strokeDasharray="4 4"
+              dot={renderDot(
+                "spellSkill",
+                Math.round(
+                  spellSchools.reduce(
+                    (acc, school) =>
+                      acc + (state.schoolSkills?.[school] ?? 0) * 200,
+                    0
+                  ) /
+                    spellSchools.length /
+                    20
+                ) / 10
+              )}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
     </>

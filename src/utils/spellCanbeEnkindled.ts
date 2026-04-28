@@ -1,25 +1,7 @@
 import { GameVersion } from "@/types/game";
-import {
-  VersionedSpellFlag,
-  VersionedSpellName,
-  VersionedSpellSchool,
-} from "@/types/spells";
+import { VersionedSpellName } from "@/types/spells";
 import { getVersionConfig } from "@/versioning/versionRegistry";
-import { getSpellFlags, getSpellSchools } from "./spellCalculation";
-
-// check if the spell school is conjuration by version
-const isConjuration = <V extends GameVersion>(
-  school: VersionedSpellSchool<V>
-): boolean => {
-  // compare with "conjuration" based on version
-  return school === ("conjuration" as VersionedSpellSchool<V>);
-};
-
-const isDestructive = <V extends GameVersion>(
-  flag: VersionedSpellFlag<V>
-): boolean => {
-  return flag === ("destructive" as VersionedSpellFlag<V>);
-};
+import { vehumetSupportsSpell } from "./spellCalculation";
 
 const explicitFalseSpells = new Set<VersionedSpellName<GameVersion>>([
   "Iskenderun's Battlesphere",
@@ -35,21 +17,6 @@ const explicitTrueSpells = new Set<VersionedSpellName<GameVersion>>([
   "Cigotuvi's Putrefaction",
   "Dispel Undead",
 ]);
-
-const vehumetSupportsSpell = <V extends GameVersion>(
-  version: V,
-  spellName: VersionedSpellName<V>
-) => {
-  if (getSpellSchools(version, spellName).some(isConjuration)) {
-    return true;
-  }
-
-  if (getSpellFlags(version, spellName).some(isDestructive)) {
-    return true;
-  }
-
-  return false;
-};
 
 export function spellCanBeEnkindled<V extends GameVersion>(
   version: V,

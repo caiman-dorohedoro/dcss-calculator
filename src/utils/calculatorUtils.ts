@@ -10,6 +10,7 @@ import {
   calculateSpellFailureRate,
   getSpellData,
   getSpellSchools,
+  vehumetSupportsSpell,
 } from "./spellCalculation";
 import { GameVersion } from "@/types/game";
 import { VersionedSchoolSkillLevels } from "@/types/spells";
@@ -193,6 +194,7 @@ export type FristSchoolSFDataPoint = {
   spellSkill: number;
   spellFailureRate: number;
   enKindledSpellFailureRate?: number;
+  vehumetPreviewSpellFailureRate?: number;
 };
 
 export const calculateAvgSFData = <V extends GameVersion>(
@@ -217,6 +219,11 @@ export const calculateAvgSFData = <V extends GameVersion>(
     throw new Error("Target spell not found");
   }
   const spellSchools = getSpellSchools<V>(state.version, targetSpell);
+  const shouldPreviewVehumet =
+    state.god === "Vehumet" &&
+    (state.godPietyRank ?? 0) < 3 &&
+    state.godUnderPenance !== true &&
+    vehumetSupportsSpell(state.version, targetSpell);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const schoolSkills = spellSchools.reduce((acc, school) => {
@@ -254,6 +261,45 @@ export const calculateAvgSFData = <V extends GameVersion>(
         godUnderPenance: state.godUnderPenance,
       });
 
+      const dataPoint = {
+        spellSkill: index / 10,
+        spellFailureRate,
+      };
+
+      const withVehumetPreview = shouldPreviewVehumet
+        ? {
+            ...dataPoint,
+            vehumetPreviewSpellFailureRate: calculateSpellFailureRate({
+              version: state.version,
+              species: state.species,
+              strength: state.strength,
+              equipmentStr: gear.str,
+              intelligence: state.intelligence,
+              equipmentInt: gear.int,
+              spellcasting: state.spellcasting ?? 0,
+              targetSpell: targetSpell,
+              schoolSkills: schoolSkills,
+              spellDifficulty,
+              armour: state.armour,
+              bodyArmourEgo: state.bodyArmour.ego ?? state.bodyArmourEgo,
+              orb: state.orb,
+              shield: state.shield,
+              armourSkill: state.armourSkill,
+              shieldSkill: state.shieldSkill,
+              wizardry: gear.wizardry,
+              ringWizardry: 0,
+              bigBrainWizardry: state.bigBrainWizardry,
+              subduedMagic: state.subduedMagic,
+              antiWizardry: state.antiWizardry,
+              runicMagic: state.runicMagic,
+              wildMagic: state.wildMagic,
+              god: "Vehumet",
+              godPietyRank: 3,
+              godUnderPenance: false,
+            }),
+          }
+        : dataPoint;
+
       if (
         state.species === "revenant" &&
         spellCanBeEnkindled(state.version, targetSpell)
@@ -289,16 +335,12 @@ export const calculateAvgSFData = <V extends GameVersion>(
         });
 
         return {
-          spellSkill: index / 10,
-          spellFailureRate,
+          ...withVehumetPreview,
           enKindledSpellFailureRate,
         };
       }
 
-      return {
-        spellSkill: index / 10,
-        spellFailureRate,
-      };
+      return withVehumetPreview;
     }
   );
 

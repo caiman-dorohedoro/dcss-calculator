@@ -112,4 +112,30 @@ describe("SpellModeHeader", () => {
     expect(enkindleMarker.style.color).toBe("rgb(182, 130, 47)");
     expect(enkindleMarker.className).not.toContain("text-[#60FDFF]");
   });
+
+  test("shows separate markers for Enkindle and Vehumet-supported spells", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "revenant";
+    state.god = "Vehumet";
+    state.godPietyRank = 1;
+    state.targetSpell = "Fireball";
+
+    await act(async () => {
+      root.render(
+        <SpellModeHeader state={state} setState={setState} />
+      );
+    });
+
+    const fireballOption = container.querySelector(
+      '[role="option"][data-value="Fireball"]'
+    ) as HTMLDivElement;
+
+    expect(fireballOption.textContent).toContain("Fireball**");
+    expect(
+      fireballOption.querySelector('[data-testid="enkindle-spell-marker"]')
+    ).not.toBeNull();
+    expect(
+      fireballOption.querySelector('[data-testid="vehumet-spell-marker"]')
+    ).not.toBeNull();
+  });
 });

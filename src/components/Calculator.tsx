@@ -99,6 +99,35 @@ const hasVehumetSpellSuccess = <V extends GameVersion>(
   (state.godPietyRank ?? 0) >= 3 &&
   state.godUnderPenance !== true;
 
+const getVehumetSpellSuccessStatus = <V extends GameVersion>(
+  state: CalculatorState<V>
+) => {
+  if (state.god !== "Vehumet") {
+    return null;
+  }
+
+  if (state.godUnderPenance === true) {
+    return {
+      className:
+        "border-amber-300/40 bg-amber-300/10 text-amber-200",
+      label: "Success bonus blocked",
+    };
+  }
+
+  if (hasVehumetSpellSuccess(state)) {
+    return {
+      className:
+        "border-emerald-400/40 bg-emerald-400/10 font-medium text-emerald-200",
+      label: "Vehumet support active",
+    };
+  }
+
+  return {
+    className: "border-border/70 text-muted-foreground",
+    label: "Success bonus at ***",
+  };
+};
+
 const Calculator = <V extends GameVersion>({
   state,
   setState,
@@ -106,6 +135,7 @@ const Calculator = <V extends GameVersion>({
   const [openPrimaryEquipment, setOpenPrimaryEquipment] =
     useState<OpenPrimaryEquipment | null>(null);
   const godDisplay = formatGodDisplay(state);
+  const vehumetSpellSuccessStatus = getVehumetSpellSuccessStatus(state);
   const selectedBodyArmourEgo =
     state.bodyArmour.ego ??
     (state.bodyArmourEgo !== undefined ? state.bodyArmourEgo : "none");
@@ -339,9 +369,11 @@ const Calculator = <V extends GameVersion>({
             <span className="min-w-0 break-words font-mono text-[#eaeaea]">
               {godDisplay}
             </span>
-            {hasVehumetSpellSuccess(state) ? (
-              <span className="rounded-sm border border-emerald-400/40 bg-emerald-400/10 px-1.5 py-0.5 text-xs font-medium text-emerald-200">
-                Success bonus active
+            {vehumetSpellSuccessStatus ? (
+              <span
+                className={`rounded-sm border px-1.5 py-0.5 text-xs ${vehumetSpellSuccessStatus.className}`}
+              >
+                {vehumetSpellSuccessStatus.label}
               </span>
             ) : null}
           </div>

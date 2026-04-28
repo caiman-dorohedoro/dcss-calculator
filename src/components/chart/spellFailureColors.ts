@@ -1,1 +1,2 @@
 export const ENKINDLE_SPELL_FAILURE_COLOR = "#b6822f";
+export const VEHUMET_SPELL_FAILURE_COLOR = "#34d399";

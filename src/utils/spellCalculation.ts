@@ -264,7 +264,7 @@ export const getSpellFlags = <V extends GameVersion>(
   return spell.flags;
 };
 
-const vehumetSupportsSpell = <V extends GameVersion>(
+export const vehumetSupportsSpell = <V extends GameVersion>(
   version: V,
   targetSpell: VersionedSpellName<V>
 ) => {

@@ -8,9 +8,12 @@ import {
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import { GameVersion } from "@/types/game";
 import { VersionedSpellName } from "@/types/spells";
-import { getSpellData } from "@/utils/spellCalculation";
+import { getSpellData, vehumetSupportsSpell } from "@/utils/spellCalculation";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
-import { ENKINDLE_SPELL_FAILURE_COLOR } from "@/components/chart/spellFailureColors";
+import {
+  ENKINDLE_SPELL_FAILURE_COLOR,
+  VEHUMET_SPELL_FAILURE_COLOR,
+} from "@/components/chart/spellFailureColors";
 
 type SpellModeHeaderProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -50,9 +53,23 @@ const SpellModeHeader = <V extends GameVersion>({
                       {state.species === "revenant" &&
                         spellCanBeEnkindled(state.version, spell.name) && (
                           <span
+                            aria-label="Enkindle eligible"
                             className="transform translate-y-0.5"
                             data-testid="enkindle-spell-marker"
                             style={{ color: ENKINDLE_SPELL_FAILURE_COLOR }}
+                            title="Enkindle eligible"
+                          >
+                            *
+                          </span>
+                        )}
+                      {state.god === "Vehumet" &&
+                        vehumetSupportsSpell(state.version, spell.name) && (
+                          <span
+                            aria-label="Vehumet supported"
+                            className="transform translate-y-0.5"
+                            data-testid="vehumet-spell-marker"
+                            style={{ color: VEHUMET_SPELL_FAILURE_COLOR }}
+                            title="Vehumet supported"
                           >
                             *
                           </span>

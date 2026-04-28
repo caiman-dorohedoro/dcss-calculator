@@ -322,14 +322,40 @@ describe("Calculator desktop layout", () => {
     );
     expect(godStatus.textContent).toContain("God:");
     expect(godStatus.textContent).toContain("Vehumet [***...]");
-    expect(godStatus.textContent).toContain("Success bonus active");
+    expect(godStatus.textContent).toContain("Vehumet support active");
     const activeBadge = Array.from(godStatus.querySelectorAll("span")).find(
-      (span) => span.textContent === "Success bonus active"
+      (span) => span.textContent === "Vehumet support active"
     ) as HTMLSpanElement;
     expect(activeBadge.className).toContain("text-emerald");
     expect(activeBadge.className).not.toContain("text-muted-foreground");
     expect(godStatus.querySelector("input")).toBeNull();
     expect(godStatus.querySelector('button[role="combobox"]')).toBeNull();
+  });
+
+  test("shows inactive Vehumet success timing before rank 3", async () => {
+    const state = {
+      ...buildDefaultCalculatorState("trunk"),
+      god: "Vehumet",
+      godPietyDisplay: "**....",
+      godPietyRank: 2,
+      godUnderPenance: false,
+    };
+
+    await act(async () => {
+      root.render(<Calculator state={state} setState={mockSetState} />);
+    });
+
+    const godStatus = container.querySelector(
+      '[data-testid="god-status"]'
+    ) as HTMLDivElement;
+
+    expect(godStatus.textContent).toContain("Vehumet [**....]");
+    expect(godStatus.textContent).toContain("Success bonus at ***");
+    const inactiveBadge = Array.from(godStatus.querySelectorAll("span")).find(
+      (span) => span.textContent === "Success bonus at ***"
+    ) as HTMLSpanElement;
+    expect(inactiveBadge.className).toContain("text-muted-foreground");
+    expect(inactiveBadge.className).not.toContain("text-emerald");
   });
 
   test("orders equipment rows like the supported subset of Crawl status equipment", async () => {
