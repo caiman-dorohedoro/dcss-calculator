@@ -30,6 +30,7 @@ export default function MorgueImportControls({
 }: MorgueImportControlsProps) {
   const [isPasteOpen, setIsPasteOpen] = useState(false);
   const [draftText, setDraftText] = useState("");
+  const [lastSuccessfulImportText, setLastSuccessfulImportText] = useState("");
   const [failure, setFailure] = useState<MorgueImportFailure | null>(null);
   const [pendingSuccess, setPendingSuccess] =
     useState<MorgueImportSuccess | null>(null);
@@ -51,15 +52,21 @@ export default function MorgueImportControls({
 
   const closePasteModal = () => {
     setIsPasteOpen(false);
-    setDraftText("");
     setFailure(null);
   };
 
   const applySuccess = (result: MorgueImportSuccess) => {
     onApplyImport(result.importedState);
+    setLastSuccessfulImportText(draftText);
     setShowImportedStatus(true);
     setPendingSuccess(null);
     closePasteModal();
+  };
+
+  const openPasteModal = () => {
+    setDraftText(lastSuccessfulImportText);
+    setFailure(null);
+    setIsPasteOpen(true);
   };
 
   const handleApply = () => {
@@ -159,7 +166,7 @@ export default function MorgueImportControls({
           aria-label="Import Morgue"
           title="Import Morgue"
           className="h-8 w-8 text-muted-foreground hover:!bg-transparent hover:text-foreground"
-          onClick={() => setIsPasteOpen(true)}
+          onClick={openPasteModal}
         >
           <ImportIcon />
         </Button>

@@ -166,6 +166,75 @@ describe("MorgueImportControls", () => {
     expect(trigger.className).toContain("hover:!bg-transparent");
   });
 
+  test("keeps the last successful morgue text when reopening the import modal", async () => {
+    const onApplyImport = jest.fn<(state: CalculatorState<GameVersion>) => void>();
+
+    await act(async () => {
+      root.render(
+        <MorgueImportControls
+          currentVersion="0.33"
+          onApplyImport={onApplyImport}
+        />
+      );
+    });
+
+    await act(async () => {
+      (
+        container.querySelector('[data-testid="open-morgue-import"]') as HTMLButtonElement
+      ).click();
+    });
+
+    let textarea = document.body.querySelector(
+      '[data-testid="morgue-import-textarea"]'
+    ) as HTMLTextAreaElement;
+
+    await act(async () => {
+      setTextareaValue(textarea, deepElfConjurer033Morgue);
+    });
+
+    await act(async () => {
+      (
+        document.body.querySelector('[data-testid="apply-morgue-import"]') as HTMLButtonElement
+      ).click();
+    });
+
+    expect(onApplyImport).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      (
+        container.querySelector('[data-testid="open-morgue-import"]') as HTMLButtonElement
+      ).click();
+    });
+
+    textarea = document.body.querySelector(
+      '[data-testid="morgue-import-textarea"]'
+    ) as HTMLTextAreaElement;
+    expect(textarea.value).toBe(deepElfConjurer033Morgue);
+
+    await act(async () => {
+      setTextareaValue(textarea, "not a morgue");
+    });
+
+    await act(async () => {
+      (
+        Array.from(document.body.querySelectorAll("button")).find(
+          (button) => button.textContent === "Cancel"
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      (
+        container.querySelector('[data-testid="open-morgue-import"]') as HTMLButtonElement
+      ).click();
+    });
+
+    textarea = document.body.querySelector(
+      '[data-testid="morgue-import-textarea"]'
+    ) as HTMLTextAreaElement;
+    expect(textarea.value).toBe(deepElfConjurer033Morgue);
+  });
+
   test("shows an inline parser failure without calling onApplyImport", async () => {
     const onApplyImport = jest.fn<(state: CalculatorState<GameVersion>) => void>();
 
