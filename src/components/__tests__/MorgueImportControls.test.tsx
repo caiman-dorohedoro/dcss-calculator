@@ -233,6 +233,38 @@ describe("MorgueImportControls", () => {
       '[data-testid="morgue-import-textarea"]'
     ) as HTMLTextAreaElement;
     expect(textarea.value).toBe(deepElfConjurer033Morgue);
+
+    const clearButton = document.body.querySelector(
+      '[data-testid="clear-morgue-import"]'
+    ) as HTMLButtonElement;
+
+    expect(clearButton.querySelector("svg")).not.toBeNull();
+
+    await act(async () => {
+      clearButton.click();
+    });
+
+    expect(clearButton.textContent).toContain("Clear");
+    expect(textarea.value).toBe("");
+
+    await act(async () => {
+      (
+        Array.from(document.body.querySelectorAll("button")).find(
+          (button) => button.textContent === "Cancel"
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    await act(async () => {
+      (
+        container.querySelector('[data-testid="open-morgue-import"]') as HTMLButtonElement
+      ).click();
+    });
+
+    textarea = document.body.querySelector(
+      '[data-testid="morgue-import-textarea"]'
+    ) as HTMLTextAreaElement;
+    expect(textarea.value).toBe("");
   });
 
   test("shows an inline parser failure without calling onApplyImport", async () => {

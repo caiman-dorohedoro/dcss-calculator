@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Import as ImportIcon } from "lucide-react";
+import { Import as ImportIcon, Trash2 } from "lucide-react";
 import type { CalculatorState } from "@/hooks/useCalculatorState";
 import { Button } from "@/components/ui/button";
 import type { GameVersion } from "@/types/game";
@@ -52,6 +52,12 @@ export default function MorgueImportControls({
 
   const closePasteModal = () => {
     setIsPasteOpen(false);
+    setFailure(null);
+  };
+
+  const clearPasteText = () => {
+    setDraftText("");
+    setLastSuccessfulImportText("");
     setFailure(null);
   };
 
@@ -111,13 +117,23 @@ export default function MorgueImportControls({
             {failure.detail ? <div className="mt-1">{failure.detail}</div> : null}
           </div>
         )}
-        <div className="mt-4 flex items-center justify-end gap-2">
-          <Button variant="ghost" onClick={closePasteModal}>
-            Cancel
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <Button
+            variant="ghost"
+            data-testid="clear-morgue-import"
+            onClick={clearPasteText}
+          >
+            <Trash2 aria-hidden="true" />
+            Clear
           </Button>
-          <Button data-testid="apply-morgue-import" onClick={handleApply}>
-            Apply
-          </Button>
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="ghost" onClick={closePasteModal}>
+              Cancel
+            </Button>
+            <Button data-testid="apply-morgue-import" onClick={handleApply}>
+              Apply
+            </Button>
+          </div>
         </div>
       </div>
     </div>
