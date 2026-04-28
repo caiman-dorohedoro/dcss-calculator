@@ -51,7 +51,7 @@ export const versionRegistry = {
     formulaProfile: "modern400",
     features: {
       secondGloves: true,
-      enkindle: false,
+      enkindle: true,
     },
     defaults: {
       species: "armataur",
@@ -64,7 +64,7 @@ export const versionRegistry = {
     formulaProfile: "modern400",
     features: {
       secondGloves: true,
-      enkindle: false,
+      enkindle: true,
     },
     defaults: {
       species: "armataur",

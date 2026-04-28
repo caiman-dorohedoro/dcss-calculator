@@ -41,14 +41,14 @@ describe("versionRegistry", () => {
     });
 
     expect(versionRegistry["0.33"].features.secondGloves).toBe(true);
-    expect(versionRegistry["0.33"].features.enkindle).toBe(false);
+    expect(versionRegistry["0.33"].features.enkindle).toBe(true);
     expect(versionRegistry["0.33"].defaults).toEqual({
       species: "armataur",
       targetSpell: "Airstrike",
     });
 
     expect(versionRegistry["0.34"].features.secondGloves).toBe(true);
-    expect(versionRegistry["0.34"].features.enkindle).toBe(false);
+    expect(versionRegistry["0.34"].features.enkindle).toBe(true);
     expect(versionRegistry["0.34"].defaults).toEqual({
       species: "armataur",
       targetSpell: "Airstrike",

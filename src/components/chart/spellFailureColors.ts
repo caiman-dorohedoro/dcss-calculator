@@ -1,0 +1,1 @@
+export const ENKINDLE_SPELL_FAILURE_COLOR = "#b6822f";

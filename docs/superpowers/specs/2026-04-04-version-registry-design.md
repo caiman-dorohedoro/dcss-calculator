@@ -90,7 +90,7 @@ export const versionRegistry = {
     formulaProfile: "modern400",
     features: {
       secondGloves: true,
-      enkindle: false,
+      enkindle: true,
       forgecraft: true,
     },
     defaults: {
@@ -192,6 +192,10 @@ Examples:
 - whether `secondGloves` should be shown
 - whether enkindle behavior is supported
 - whether forgecraft is part of the version
+
+Revenant and Enkindle are present from `0.33` onward in the supported app
+versions. `0.32` keeps `enkindle: false`; `0.33`, `0.34`, and `trunk` should
+enable Enkindle and use the Crawl `spell_can_be_enkindled` exception list.
 
 This keeps UI and state behavior consistent with version metadata.
 

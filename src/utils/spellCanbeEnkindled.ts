@@ -24,6 +24,7 @@ const isDestructive = <V extends GameVersion>(
 const explicitFalseSpells = new Set<VersionedSpellName<GameVersion>>([
   "Iskenderun's Battlesphere",
   "Spellforged Servitor",
+  "Spellspark Servitor",
   "Mephitic Cloud",
 ]);
 
@@ -32,6 +33,7 @@ const explicitTrueSpells = new Set<VersionedSpellName<GameVersion>>([
   "Vampiric Draining",
   "Borgnjor's Vile Clutch",
   "Cigotuvi's Putrefaction",
+  "Dispel Undead",
 ]);
 
 const vehumetSupportsSpell = <V extends GameVersion>(

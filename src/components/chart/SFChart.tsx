@@ -19,6 +19,7 @@ import { GameVersion } from "@/types/game";
 import SpellModeHeader from "../SpellModeHeader";
 import { CartesianViewBox } from "recharts/types/util/types";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
+import { ENKINDLE_SPELL_FAILURE_COLOR } from "@/components/chart/spellFailureColors";
 
 type SFChartProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -147,7 +148,7 @@ const SFChart = <V extends GameVersion>({
                 dataKey="enKindledSpellFailureRate"
                 name=" Enkindle"
                 isAnimationActive={false}
-                stroke="#b6822f"
+                stroke={ENKINDLE_SPELL_FAILURE_COLOR}
                 dot={renderDot(
                   "spellSkill",
                   Math.round(

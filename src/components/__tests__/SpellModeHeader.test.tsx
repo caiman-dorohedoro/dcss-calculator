@@ -10,9 +10,41 @@ import {
   test,
 } from "@jest/globals";
 import { act } from "react";
+import type { ReactNode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
-import SpellModeHeader from "../SpellModeHeader";
+
+type SelectMockProps = {
+  children?: ReactNode;
+  className?: string;
+  placeholder?: string;
+  value?: string;
+};
+
+const selectMockState = { value: "" };
+
+await jest.unstable_mockModule("@/components/ui/select", () => ({
+  Select: ({ children, value }: SelectMockProps) => {
+    selectMockState.value = value ?? "";
+    return <div>{children}</div>;
+  },
+  SelectContent: ({ children }: SelectMockProps) => <div>{children}</div>,
+  SelectItem: ({ children, value }: SelectMockProps) => (
+    <div role="option" data-value={value}>
+      {children}
+    </div>
+  ),
+  SelectTrigger: ({ children, className }: SelectMockProps) => (
+    <button className={className} role="combobox">
+      {children}
+    </button>
+  ),
+  SelectValue: ({ placeholder }: SelectMockProps) => (
+    <span>{selectMockState.value || placeholder}</span>
+  ),
+}));
+
+const { default: SpellModeHeader } = await import("../SpellModeHeader");
 
 describe("SpellModeHeader", () => {
   let container: HTMLDivElement;
@@ -56,5 +88,28 @@ describe("SpellModeHeader", () => {
     expect(container.textContent).not.toContain("wild magic (mutation)");
     expect(container.textContent).not.toContain("body armour ego");
     expect(container.querySelectorAll('[role="combobox"]')).toHaveLength(1);
+  });
+
+  test("uses the Enkindle graph color for eligible spell markers", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "revenant";
+    state.targetSpell = "Fireball";
+
+    await act(async () => {
+      root.render(
+        <SpellModeHeader state={state} setState={setState} />
+      );
+    });
+
+    const fireballOption = container.querySelector(
+      '[role="option"][data-value="Fireball"]'
+    ) as HTMLDivElement;
+    const enkindleMarker = fireballOption.querySelector(
+      '[data-testid="enkindle-spell-marker"]'
+    ) as HTMLSpanElement;
+
+    expect(enkindleMarker).not.toBeNull();
+    expect(enkindleMarker.style.color).toBe("rgb(182, 130, 47)");
+    expect(enkindleMarker.className).not.toContain("text-[#60FDFF]");
   });
 });

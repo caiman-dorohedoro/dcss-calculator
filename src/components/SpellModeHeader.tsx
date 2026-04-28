@@ -10,6 +10,7 @@ import { GameVersion } from "@/types/game";
 import { VersionedSpellName } from "@/types/spells";
 import { getSpellData } from "@/utils/spellCalculation";
 import { spellCanBeEnkindled } from "@/utils/spellCanbeEnkindled";
+import { ENKINDLE_SPELL_FAILURE_COLOR } from "@/components/chart/spellFailureColors";
 
 type SpellModeHeaderProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -48,7 +49,11 @@ const SpellModeHeader = <V extends GameVersion>({
                       <span>{spell.name}</span>
                       {state.species === "revenant" &&
                         spellCanBeEnkindled(state.version, spell.name) && (
-                          <span className="text-[#60FDFF] transform translate-y-0.5">
+                          <span
+                            className="transform translate-y-0.5"
+                            data-testid="enkindle-spell-marker"
+                            style={{ color: ENKINDLE_SPELL_FAILURE_COLOR }}
+                          >
                             *
                           </span>
                         )}
