@@ -371,6 +371,86 @@ describe("morgue import mapper", () => {
     );
   });
 
+  test("uses parser-reported acid dragon base for faerie dragon scales", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.34.1-3-ga2c7840dd7",
+      species: "Coglin",
+      speciesVariant: null,
+      background: "Hunter",
+      god: "Okawaru",
+      ...defaultGodState,
+      xl: 27,
+      ac: 30,
+      ev: 34,
+      sh: 0,
+      strength: 15,
+      intelligence: 11,
+      dexterity: 33,
+      bodyArmour: "faerie dragon scales",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: {
+        ...makeItem("faerie dragon scales", "acid dragon scales", {
+          booleanProps: { rElec: true, rCorr: true },
+          numeric: { rF: 1, Str: 2, Stlth: -1 },
+        }),
+        objectClass: "armour",
+        enchant: 7,
+        artifactKind: "unrand",
+        propertiesText: "rElec rF+ rCorr Str+2 Stlth- Hexes",
+        properties: {
+          numeric: { rF: 1, Str: 2, Stlth: -1 },
+          booleanProps: { rElec: true, rCorr: true },
+          opaqueTokens: ["Hexes"],
+        },
+      } as EquipmentItemSnapshot,
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [
+        {
+          name: "Apportation",
+          failurePercent: 4,
+          castable: true,
+          memorized: true,
+        },
+      ],
+      mutations: [],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.armour).toBe("acid_dragon");
+    expect(result.importedState.bodyArmour).toEqual(
+      expect.objectContaining({
+        kind: "acid_dragon",
+        enchant: 7,
+        displayName: "faerie dragon scales",
+        artifactKind: "unrand",
+        modifiers: {
+          flags: ["Hexes"],
+          rElec: 1,
+          rCorr: 1,
+          rF: 1,
+          str: 2,
+          stlth: -1,
+        },
+      })
+    );
+  });
+
   test("imports parser-reported armour egos for shield, orb, scarf, headgear, gloves, and footwear", () => {
     const orbOfEnergy = {
       ...makeItem("orb of energy", "orb", {
