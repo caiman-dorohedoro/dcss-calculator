@@ -2,6 +2,7 @@ import { useState } from "react";
 import AttrInput from "@/components/AttrInput";
 import EquipmentEditModal from "@/components/equipment/EquipmentEditModal";
 import EquipmentSummaryRow from "@/components/equipment/EquipmentSummaryRow";
+import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import type { FixedAuxItemState } from "@/types/equipmentItems";
@@ -56,6 +57,25 @@ const SectionHeading = ({ children }: { children: string }) => (
 
 const indexedSlotLabel = (label: string, count: number, index: number) =>
   count === 1 ? label : `${label} ${index + 1}`;
+
+const MutationCheckbox = ({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) => (
+  <label className="flex h-6 items-center gap-2 text-sm">
+    <Checkbox
+      aria-label={label}
+      checked={checked}
+      onCheckedChange={(value) => onChange(value === true)}
+    />
+    <span className="break-keep">{label}</span>
+  </label>
+);
 
 const bardingWearerSpecies = new Set(["armataur", "naga", "galeCentaur"]);
 
@@ -359,6 +379,23 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     }
   };
 
+  const renderMutationNumber = (
+    label: string,
+    value: number,
+    onChange: (value: number) => void,
+    options?: { min?: number; max?: number }
+  ) => (
+    <AttrInput
+      label={label}
+      ariaLabel={label}
+      value={value}
+      type="number"
+      min={options?.min}
+      max={options?.max}
+      onChange={onChange}
+    />
+  );
+
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
       <div data-testid="dynamic-equipment-list" className="flex flex-col gap-1">
@@ -409,80 +446,118 @@ const DynamicEquipmentControls = <V extends GameVersion>({
 
       {renderOpenEquipmentModal()}
 
-      <section data-testid="dynamic-equipment-mutations" className="flex flex-col gap-3">
+      <section
+        data-testid="dynamic-equipment-mutations"
+        className="flex flex-col gap-3"
+      >
         <SectionHeading>Mutations & Traits</SectionHeading>
         <div className="flex flex-wrap gap-4">
-          <AttrInput
-            label="wild magic"
-            value={state.wildMagic ?? 0}
-            type="number"
-            max={3}
+          {renderMutationNumber(
+            "wild magic",
+            state.wildMagic ?? 0,
+            (value) => setState((prev) => ({ ...prev, wildMagic: value })),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "subdued magic",
+            state.subduedMagic ?? 0,
+            (value) => setState((prev) => ({ ...prev, subduedMagic: value })),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "disrupted magic",
+            state.antiWizardry ?? 0,
+            (value) => setState((prev) => ({ ...prev, antiWizardry: value })),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "runic magic",
+            state.runicMagic ?? 0,
+            (value) => setState((prev) => ({ ...prev, runicMagic: value })),
+            { min: 0, max: 1 }
+          )}
+          {renderMutationNumber(
+            "big brain wizardry",
+            state.bigBrainWizardry ?? 0,
+            (value) =>
+              setState((prev) => ({ ...prev, bigBrainWizardry: value })),
+            { min: 0, max: 1 }
+          )}
+          {renderMutationNumber(
+            "mutation AC",
+            state.scalesAC ?? 0,
+            (value) => setState((prev) => ({ ...prev, scalesAC: value }))
+          )}
+          {renderMutationNumber(
+            "repulsion field",
+            state.distortionField ?? 0,
+            (value) => setState((prev) => ({ ...prev, distortionField: value })),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "evasive flight",
+            state.tenguFlight ?? 0,
+            (value) => setState((prev) => ({ ...prev, tenguFlight: value })),
+            { min: 0, max: 1 }
+          )}
+          {renderMutationNumber(
+            "large bone plates",
+            state.largeBonePlates ?? 0,
+            (value) => setState((prev) => ({ ...prev, largeBonePlates: value })),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "icemail",
+            state.icemail ?? 0,
+            (value) => setState((prev) => ({ ...prev, icemail: value })),
+            { min: 0, max: 2 }
+          )}
+          {renderMutationNumber(
+            "condensation shield",
+            state.condensationShield ?? 0,
+            (value) =>
+              setState((prev) => ({ ...prev, condensationShield: value })),
+            { min: 0, max: 1 }
+          )}
+          {renderMutationNumber(
+            "sturdy frame",
+            state.sturdyFrame ?? 0,
+            (value) => setState((prev) => ({ ...prev, sturdyFrame: value })),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "gelatinous body",
+            state.gelatinousBody ?? 0,
+            (value) =>
+              setState((prev) => {
+                const previousLevel = prev.gelatinousBody ?? 0;
+
+                return {
+                  ...prev,
+                  gelatinousBody: value,
+                  scalesAC: (prev.scalesAC ?? 0) + value - previousLevel,
+                };
+              }),
+            { min: 0, max: 3 }
+          )}
+          {renderMutationNumber(
+            "slow reflexes",
+            state.slowReflexes ?? 0,
+            (value) => setState((prev) => ({ ...prev, slowReflexes: value })),
+            { min: 0, max: 3 }
+          )}
+          <MutationCheckbox
+            label="deformed body"
+            checked={state.deformedBody === true}
             onChange={(value) =>
-              setState((prev) => ({ ...prev, wildMagic: value }))
+              setState((prev) => ({ ...prev, deformedBody: value }))
             }
           />
-          <AttrInput
-            label="subdued magic"
-            value={state.subduedMagic ?? 0}
-            type="number"
+          <MutationCheckbox
+            label="reckless"
+            checked={state.reckless === true}
             onChange={(value) =>
-              setState((prev) => ({ ...prev, subduedMagic: value }))
-            }
-          />
-          <AttrInput
-            label="anti-wizardry"
-            value={state.antiWizardry ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, antiWizardry: value }))
-            }
-          />
-          <AttrInput
-            label="runic magic"
-            value={state.runicMagic ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, runicMagic: value }))
-            }
-          />
-          <AttrInput
-            label="big brain wizardry"
-            value={state.bigBrainWizardry ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, bigBrainWizardry: value }))
-            }
-          />
-          <AttrInput
-            label="scales AC"
-            value={state.scalesAC ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, scalesAC: value }))
-            }
-          />
-          <AttrInput
-            label="distortion field"
-            value={state.distortionField ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, distortionField: value }))
-            }
-          />
-          <AttrInput
-            label="tengu flight"
-            value={state.tenguFlight ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, tenguFlight: value }))
-            }
-          />
-          <AttrInput
-            label="large bone plates"
-            value={state.largeBonePlates ?? 0}
-            type="number"
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, largeBonePlates: value }))
+              setState((prev) => ({ ...prev, reckless: value }))
             }
           />
         </div>

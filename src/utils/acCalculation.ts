@@ -19,6 +19,10 @@ export const calculateAC = (baseAC: number, skill: number): number => {
   return Math.floor(baseAC * (1 + skill / 22));
 };
 
+const calculateScaledAC = (baseAC: number, skill: number): number => {
+  return Math.floor(baseAC * 100 * (1 + skill / 22));
+};
+
 type MixedCalculationsParams<V extends GameVersion> = {
   version: V;
   species: SpeciesKey<V>;
@@ -35,9 +39,12 @@ type MixedCalculationsParams<V extends GameVersion> = {
   barding?: boolean;
   bardingEnchant?: number;
   secondGloves?: boolean;
+  cloakBaseAc?: number;
   ringProtection?: number;
   equipmentAC?: number;
   scalesAC?: number;
+  deformedBody?: boolean;
+  icemail?: number;
   armourSkill: number;
 };
 
@@ -57,57 +64,64 @@ export const calculateMixedAC = <V extends GameVersion>({
   barding,
   bardingEnchant = 0,
   secondGloves,
+  cloakBaseAc = miscellaneousOptions.cloak.baseAC,
   ringProtection = 0,
   equipmentAC = 0,
   scalesAC = 0,
+  deformedBody = false,
+  icemail = 0,
   armourSkill,
 }: MixedCalculationsParams<V>): number => {
-  const isDeformed = getVersionSpecies(version)[species].deformedBody === true;
+  const isDeformed =
+    getVersionSpecies(version)[species].deformedBody === true || deformedBody;
   const hasBodyArmour = armour !== undefined && armour !== "none";
-  let baseAC = 0;
+  const bodyBaseAc = hasBodyArmour ? armourOptions[armour].baseAC : 0;
+  let auxBaseAc = 0;
   const hasHeadgearSlots = headgearSlots !== undefined;
   const hasGloveSlots = gloveSlots !== undefined;
 
-  if (hasBodyArmour) {
-    baseAC += armourOptions[armour].baseAC;
-  }
-
   if (hasHeadgearSlots) {
-    baseAC +=
+    auxBaseAc +=
       getHeadgearBaseAc(headgearSlots) * headgearOptions.helmet.baseAC;
   } else if (helmet) {
-    baseAC += headgearOptions.helmet.baseAC;
+    auxBaseAc += headgearOptions.helmet.baseAC;
   }
 
   if (hasGloveSlots) {
-    baseAC += getAuxArmourBaseAc(gloveSlots, miscellaneousOptions.gloves.baseAC);
+    auxBaseAc += getAuxArmourBaseAc(
+      gloveSlots,
+      miscellaneousOptions.gloves.baseAC
+    );
   } else {
     if (gloves) {
-      baseAC += miscellaneousOptions.gloves.baseAC;
+      auxBaseAc += miscellaneousOptions.gloves.baseAC;
     }
 
     if (secondGloves) {
-      baseAC += miscellaneousOptions.gloves.baseAC;
+      auxBaseAc += miscellaneousOptions.gloves.baseAC;
     }
   }
 
   if (boots === true) {
-    baseAC += miscellaneousOptions.boots.baseAC;
+    auxBaseAc += miscellaneousOptions.boots.baseAC;
   }
 
   if (cloak === true) {
-    baseAC += miscellaneousOptions.cloak.baseAC;
+    auxBaseAc += cloakBaseAc;
   }
 
   if (barding === true) {
-    baseAC += miscellaneousOptions.barding.baseAC;
+    auxBaseAc += miscellaneousOptions.barding.baseAC;
   }
 
-  const scaledBaseAc = calculateAC(baseAC, armourSkill);
-  const deformedPenalty =
+  const scaledBodyAc = calculateScaledAC(bodyBaseAc, armourSkill);
+  const adjustedBodyAc =
     isDeformed && hasBodyArmour
-      ? Math.floor(armourOptions[armour].baseAC * 0.5)
-      : 0;
+      ? scaledBodyAc + Math.trunc((scaledBodyAc * -40) / 100)
+      : scaledBodyAc;
+  const scaledAuxAc = calculateScaledAC(auxBaseAc, armourSkill);
+  const scaledBaseAc = Math.floor((adjustedBodyAc + scaledAuxAc) / 100);
+  const icemailAc = icemail > 0 ? icemail * 4 : 0;
 
   return (
     scaledBaseAc +
@@ -119,7 +133,7 @@ export const calculateMixedAC = <V extends GameVersion>({
     (barding === true ? bardingEnchant : 0) +
     ringProtection +
     equipmentAC +
-    scalesAC -
-    deformedPenalty
+    scalesAC +
+    icemailAc
   );
 };

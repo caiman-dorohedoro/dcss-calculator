@@ -1,7 +1,11 @@
 import { describe, expect, test } from "@jest/globals";
 import type { EquipmentItemSnapshot, ParsedMorgueTextRecord } from "dcss-morgue-parser";
 import { parseMorgueText } from "dcss-morgue-parser";
-import { calculateEvData, calculateSHData } from "@/utils/calculatorUtils";
+import {
+  calculateAcData,
+  calculateEvData,
+  calculateSHData,
+} from "@/utils/calculatorUtils";
 import { deepElfConjurer033Morgue } from "../__fixtures__/deepElfConjurer033";
 import { oniMonkTrunkStatueFormMorgue } from "../__fixtures__/oniMonkTrunkStatueForm";
 import {
@@ -663,6 +667,7 @@ describe("morgue import mapper", () => {
         ego: "flying",
       })
     );
+    expect(calculateAcData(result.importedState)[0].ac).toBe(5);
 
     const orbResult = buildImportedCalculatorState({
       ...record,
@@ -998,6 +1003,96 @@ describe("morgue import mapper", () => {
       expect.objectContaining({ kind: "wizardry", plus: 0 }),
     ]);
     expect(result.importedState.unattributedGear).toBeUndefined();
+  });
+
+  test("applies transient A-line traits that affect current AC, EV, SH, and spell failure", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.34.1",
+      species: "Demonspawn",
+      speciesVariant: null,
+      background: "Fighter",
+      god: null,
+      ...defaultGodState,
+      xl: 25,
+      ac: 36,
+      ev: 8,
+      sh: 25,
+      strength: 31,
+      intelligence: 2,
+      dexterity: 18,
+      bodyArmour: "plate armour",
+      shield: "tower shield",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("+7 plate armour", "plate armour"),
+      shieldDetails: makeItem("+8 tower shield", "tower shield"),
+      skills: baseSkills,
+      effectiveSkills: {
+        ...baseSkills,
+        armour: 22.2,
+        shields: 19.5,
+      },
+      spells: [],
+      mutations: [
+        { name: "subdued magic", level: 2, transient: true },
+        { name: "wild magic", level: 1, transient: true },
+        { name: "disrupted magic", level: 2 },
+        { name: "runic magic", level: 1 },
+        { name: "big brain", level: 3 },
+        { name: "repulsion field", level: 3 },
+        { name: "evasive flight" },
+        { name: "large bone plates", level: 1 },
+        { name: "icemail", level: 2 },
+        { name: "condensation shield" },
+        { name: "deformed body", transient: true },
+        { name: "reckless", transient: true },
+        { name: "sturdy frame", level: 2 },
+        { name: "gelatinous body", level: 3 },
+        { name: "iridescent scales", level: 3 },
+        { name: "slow reflexes", level: 1 },
+        { name: "ephemeral shield" },
+        { name: "subdued magic", level: 3, suppressed: true },
+      ],
+    } as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.subduedMagic).toBe(2);
+    expect(result.importedState.wildMagic).toBe(1);
+    expect(result.importedState.antiWizardry).toBe(2);
+    expect(result.importedState.runicMagic).toBe(1);
+    expect(result.importedState.bigBrainWizardry).toBe(1);
+    expect(result.importedState.distortionField).toBe(3);
+    expect(result.importedState.tenguFlight).toBe(1);
+    expect(result.importedState.largeBonePlates).toBe(1);
+    expect(result.importedState.icemail).toBe(2);
+    expect(result.importedState.condensationShield).toBe(1);
+    expect(result.importedState.deformedBody).toBe(true);
+    expect(result.importedState.reckless).toBe(true);
+    expect(result.importedState.sturdyFrame).toBe(2);
+    expect(result.importedState.gelatinousBody).toBe(3);
+    expect(result.importedState.slowReflexes).toBe(1);
+    expect(result.importedState.scalesAC).toBe(9);
+    expect(result.summary.skipped).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Mutations & Traits",
+          detail: expect.stringContaining("ephemeral shield"),
+        }),
+      ])
+    );
   });
 
   test("keeps parser item properties that are display-only for calculations", () => {

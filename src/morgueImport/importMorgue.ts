@@ -541,8 +541,64 @@ const fillHeadgearSlots = (
   return mapped;
 };
 
-const isActiveMutation = (mutation: ParsedMorgueTextRecord["mutations"][number]) =>
-  mutation.suppressed !== true && mutation.transient !== true;
+const isSuppressedMutation = (
+  mutation: ParsedMorgueTextRecord["mutations"][number]
+) => mutation.suppressed === true;
+
+const mutationLevel = (
+  mutation: ParsedMorgueTextRecord["mutations"][number],
+  fallback = 1
+) => mutation.level ?? fallback;
+
+const getMutationAc = (
+  mutation: ParsedMorgueTextRecord["mutations"][number],
+  xl: number
+) => {
+  const level = mutationLevel(mutation);
+
+  if (
+    mutation.name === "gelatinous body" ||
+    mutation.name === "tough skin" ||
+    mutation.name === "shaggy fur" ||
+    mutation.name === "rugged brown scales" ||
+    mutation.name === "sharp scales"
+  ) {
+    return level;
+  }
+
+  if (mutation.name === "physical vulnerability") {
+    return -5 * level;
+  }
+
+  if (mutation.name === "iridescent scales") {
+    return 2 * level;
+  }
+
+  if (
+    mutation.name === "icy blue scales" ||
+    mutation.name === "molten scales" ||
+    mutation.name === "slimy green scales" ||
+    mutation.name === "thin metallic scales" ||
+    mutation.name === "yellow scales"
+  ) {
+    return level + 1;
+  }
+
+  if (mutation.name === "iron-fused scales") {
+    return 5;
+  }
+
+  if (mutation.name === "stone body") {
+    return Math.floor(
+      (200 +
+        Math.floor((100 * xl * 2) / 5) +
+        Math.floor((100 * Math.max(0, xl - 7) * 2) / 5)) /
+        100
+    );
+  }
+
+  return 0;
+};
 
 const applyMutationModifiers = (
   record: ParsedMorgueTextRecord,
@@ -552,7 +608,7 @@ const applyMutationModifiers = (
   const unsupported: string[] = [];
 
   for (const mutation of record.mutations) {
-    if (!isActiveMutation(mutation)) {
+    if (isSuppressedMutation(mutation)) {
       continue;
     }
 
@@ -562,9 +618,12 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "anti-wizardry") {
+    if (
+      mutation.name === "anti-wizardry" ||
+      mutation.name === "disrupted magic"
+    ) {
       state.antiWizardry = mutation.level ?? 0;
-      applied.push("anti-wizardry");
+      applied.push(mutation.name);
       continue;
     }
 
@@ -580,9 +639,12 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "distortion field") {
+    if (
+      mutation.name === "distortion field" ||
+      mutation.name === "repulsion field"
+    ) {
       state.distortionField = mutation.level ?? 0;
-      applied.push("distortion field");
+      applied.push(mutation.name);
       continue;
     }
 
@@ -592,15 +654,67 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "tengu flight") {
+    if (mutation.name === "tengu flight" || mutation.name === "evasive flight") {
       state.tenguFlight = mutation.level ?? 1;
-      applied.push("tengu flight");
+      applied.push(mutation.name);
       continue;
     }
 
-    if (mutation.name.endsWith(" scales")) {
-      state.scalesAC = (state.scalesAC ?? 0) + (mutation.level ?? 0);
+    if (mutation.name === "icemail") {
+      state.icemail = mutationLevel(mutation);
+      applied.push("icemail");
+      continue;
+    }
+
+    if (mutation.name === "condensation shield") {
+      state.condensationShield = mutationLevel(mutation);
+      applied.push("condensation shield");
+      continue;
+    }
+
+    if (mutation.name === "deformed body" || mutation.name === "pseudopods") {
+      state.deformedBody = true;
       applied.push(mutation.name);
+      continue;
+    }
+
+    if (mutation.name === "reckless") {
+      state.reckless = true;
+      applied.push("reckless");
+      continue;
+    }
+
+    if (mutation.name === "sturdy frame") {
+      state.sturdyFrame = mutation.level ?? 0;
+      applied.push("sturdy frame");
+      continue;
+    }
+
+    if (mutation.name === "gelatinous body") {
+      state.gelatinousBody = mutation.level ?? 0;
+      state.scalesAC =
+        (state.scalesAC ?? 0) + getMutationAc(mutation, record.xl);
+      applied.push("gelatinous body");
+      continue;
+    }
+
+    if (mutation.name === "slow reflexes") {
+      state.slowReflexes = mutation.level ?? 0;
+      applied.push("slow reflexes");
+      continue;
+    }
+
+    const mutationAc = getMutationAc(mutation, record.xl);
+    if (mutationAc !== 0) {
+      state.scalesAC = (state.scalesAC ?? 0) + mutationAc;
+      applied.push(mutation.name);
+      continue;
+    }
+
+    if (mutation.name === "ephemeral shield") {
+      unsupported.push(
+        "ephemeral shield (@: ephemerally shielded status required)"
+      );
       continue;
     }
 
@@ -650,7 +764,6 @@ const deriveWildMagic = (record: ParsedMorgueTextRecord) => {
     (mutation) =>
       mutation.name === "wild magic" &&
       mutation.suppressed !== true &&
-      mutation.transient !== true &&
       typeof mutation.level === "number"
   );
 

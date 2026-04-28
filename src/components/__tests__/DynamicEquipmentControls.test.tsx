@@ -450,6 +450,91 @@ describe("DynamicEquipmentControls", () => {
     expect(container.querySelector('input[type="checkbox"]')).toBeNull();
   });
 
+  test("renders expanded mutation controls with Crawl display labels", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const mutationSection = container.querySelector(
+      '[data-testid="dynamic-equipment-mutations"]'
+    ) as HTMLElement;
+
+    expect(mutationSection.textContent).toContain("disrupted magic");
+    expect(mutationSection.textContent).toContain("repulsion field");
+    expect(mutationSection.textContent).toContain("evasive flight");
+    expect(mutationSection.textContent).toContain("icemail");
+    expect(mutationSection.textContent).toContain("condensation shield");
+    expect(mutationSection.textContent).toContain("sturdy frame");
+    expect(mutationSection.textContent).toContain("gelatinous body");
+    expect(mutationSection.textContent).toContain("slow reflexes");
+    expect(mutationSection.textContent).not.toContain("anti-wizardry");
+    expect(mutationSection.textContent).not.toContain("distortion field");
+    expect(mutationSection.textContent).not.toContain("tengu flight");
+    expect(
+      mutationSection.querySelector('input[aria-label="icemail"]')
+    ).not.toBeNull();
+    expect(
+      mutationSection.querySelector('[aria-label="deformed body"]')
+    ).not.toBeNull();
+    expect(
+      mutationSection.querySelector('[aria-label="reckless"]')
+    ).not.toBeNull();
+  });
+
+  test("expanded mutation controls update new numeric and boolean state fields", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.gelatinousBody = 1;
+    state.scalesAC = 4;
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      setNumberInputValue(
+        container.querySelector(
+          'input[aria-label="sturdy frame"]'
+        ) as HTMLInputElement,
+        "2"
+      );
+    });
+
+    let updater = setState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+    expect(updater(state).sturdyFrame).toBe(2);
+    setState.mockReset();
+
+    await act(async () => {
+      setNumberInputValue(
+        container.querySelector(
+          'input[aria-label="gelatinous body"]'
+        ) as HTMLInputElement,
+        "3"
+      );
+    });
+
+    updater = setState.mock.calls[0][0] as (prev: typeof state) => typeof state;
+    expect(updater(state)).toMatchObject({
+      gelatinousBody: 3,
+      scalesAC: 6,
+    });
+    setState.mockReset();
+
+    await act(async () => {
+      (
+        container.querySelector(
+          '[aria-label="deformed body"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    updater = setState.mock.calls[0][0] as (prev: typeof state) => typeof state;
+    expect(updater(state).deformedBody).toBe(true);
+  });
+
   test("opens footwear row with a single modal backed by the active footwear item", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.boots = true;

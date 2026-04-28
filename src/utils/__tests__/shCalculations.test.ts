@@ -88,4 +88,32 @@ describe("SH Calculations", () => {
       })
     ).toBe(15);
   });
+
+  test("applies condensation shield before reckless halves final SH", () => {
+    expect(
+      calculateSH({
+        shield: "tower_shield",
+        shieldSkill: 19.5,
+        dexterity: 12,
+        equipmentDex: 6,
+        shieldEnchant: 8,
+        equipmentSH: 5,
+        largeBonePlates: 1,
+      })
+    ).toBe(39);
+
+    expect(
+      calculateSH({
+        shield: "tower_shield",
+        shieldSkill: 19.5,
+        dexterity: 12,
+        equipmentDex: 6,
+        shieldEnchant: 8,
+        equipmentSH: 5,
+        largeBonePlates: 1,
+        condensationShield: 1,
+        reckless: true,
+      })
+    ).toBe(21);
+  });
 });

@@ -34,6 +34,9 @@ export function calculateEV<V extends GameVersion>(params: {
   equipmentEV?: number;
   distortionField?: number;
   tenguFlight?: number;
+  sturdyFrame?: number;
+  gelatinousBody?: number;
+  slowReflexes?: number;
 }) {
   const {
     version,
@@ -52,6 +55,9 @@ export function calculateEV<V extends GameVersion>(params: {
     equipmentEV = 0,
     distortionField = 0,
     tenguFlight = 0,
+    sturdyFrame = 0,
+    gelatinousBody = 0,
+    slowReflexes = 0,
   } = params;
 
   const speciesOpts = speciesOptions(version);
@@ -62,7 +68,10 @@ export function calculateEV<V extends GameVersion>(params: {
   const sizeFactor = sizeToNumber[speciesOpts[species].size];
   const baseEV = 10 + sizeFactor;
   const shieldEncumbrance = shieldOptions[shield].encumbrance;
-  const armourEncumbrance = getArmourEncumbrance(version, armour);
+  const armourEncumbrance = Math.max(
+    0,
+    getArmourEncumbrance(version, armour) - sturdyFrame * 2
+  );
   const effectiveStrength = strength + equipmentStr;
   const effectiveDexterity = dexterity + equipmentDex;
 
@@ -86,8 +95,10 @@ export function calculateEV<V extends GameVersion>(params: {
   const directBonus =
     ringEvasion +
     equipmentEV +
+    gelatinousBody +
     (distortionField > 0 ? distortionField + 1 : 0) +
-    (tenguFlight > 0 ? 4 : 0);
+    (tenguFlight > 0 ? 4 : 0) -
+    slowReflexes * 5;
 
   // Calculate initial EV with dodge bonus
   let currentEV = baseEV + actualDodgeBonus;

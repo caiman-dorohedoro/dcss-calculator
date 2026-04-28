@@ -880,6 +880,39 @@ describe("Spell Calculations", () => {
     expect(modified).toBeLessThan(base);
   });
 
+  test("sturdy frame reduces the body-armour spell penalty", () => {
+    const baseParams = {
+      version: "0.34" as const,
+      species: "human" as const,
+      strength: 10,
+      equipmentStr: 0,
+      spellcasting: 10,
+      intelligence: 20,
+      equipmentInt: 0,
+      targetSpell: "Fireball" as const,
+      schoolSkills: { fire: 14, conjuration: 14 } as never,
+      spellDifficulty: 5 as const,
+      armour: "plate" as const,
+      shield: "none" as const,
+      armourSkill: 0,
+      shieldSkill: 0,
+      ringWizardry: 0,
+      bigBrainWizardry: 0,
+      subduedMagic: 0,
+      antiWizardry: 0,
+      runicMagic: 0,
+      wildMagic: 0,
+    };
+
+    const base = calculateSpellFailureRate(baseParams);
+    const modified = calculateSpellFailureRate({
+      ...baseParams,
+      sturdyFrame: 3,
+    });
+
+    expect(modified).toBeLessThan(base);
+  });
+
   // during personal gameplay
   test("formicid, leather armour, tower shield, 9 level Ice spell (Polar Vortex)", () => {
     const failureRate = calculateSpellFailureRate({

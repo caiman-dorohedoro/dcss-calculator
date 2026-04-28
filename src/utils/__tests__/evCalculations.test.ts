@@ -243,4 +243,23 @@ describe("EV Calculations", () => {
 
     expect(modified.finalEV - base.finalEV).toBe(17);
   });
+
+  test("sturdy frame reduces body armour encumbrance for EV", () => {
+    const result = calculateEV({
+      version: "0.34",
+      dodgingSkill: 0,
+      dexterity: 10,
+      strength: 10,
+      species: "human",
+      shield: "none",
+      armour: "plate",
+      barding: false,
+      shieldSkill: 0,
+      armourSkill: 0,
+      sturdyFrame: 3,
+    });
+
+    expect(result.armourPenalty).toBe(4);
+    expect(result.finalEV).toBe(6);
+  });
 });

@@ -9,6 +9,8 @@ type SHCalculationParams = {
   equipmentSH?: number;
   amuletReflection?: number;
   largeBonePlates?: number;
+  condensationShield?: number;
+  reckless?: boolean;
 };
 
 export const calculateSH = (params: SHCalculationParams) => {
@@ -21,6 +23,8 @@ export const calculateSH = (params: SHCalculationParams) => {
     equipmentSH = 0,
     amuletReflection = 0,
     largeBonePlates = 0,
+    condensationShield = 0,
+    reckless = false,
   } = params;
   const baseSH = shieldOptions[shield].baseSH;
   const effectiveDexterity = dexterity + equipmentDex;
@@ -43,6 +47,11 @@ export const calculateSH = (params: SHCalculationParams) => {
   sh += equipmentSH * 200;
   sh += amuletReflection * 1000;
   sh += largeBonePlates > 0 ? largeBonePlates * 400 + 400 : 0;
+  sh += condensationShield > 0 ? 800 : 0;
+
+  if (reckless) {
+    sh = Math.floor(sh / 2);
+  }
 
   return Math.floor(sh / 2 / 100);
 };

@@ -55,12 +55,15 @@ export const calculateAcData = <V extends GameVersion>(
           bootsEnchant: state.bootsEnchant,
           cloak: state.cloak,
           cloakEnchant: state.cloakEnchant,
+          cloakBaseAc: state.cloakItem.kind === "scarf" ? 0 : undefined,
           barding: state.barding,
           bardingEnchant: state.bardingEnchant,
           secondGloves: state.secondGloves,
           ringProtection: 0,
           equipmentAC: gear.ac,
           scalesAC: state.scalesAC,
+          deformedBody: state.deformedBody,
+          icemail: state.icemail,
           armourSkill: armour,
         }),
       };
@@ -94,6 +97,9 @@ export const calculateEvData = <V extends GameVersion>(
         equipmentEV: gear.ev,
         distortionField: state.distortionField,
         tenguFlight: state.tenguFlight,
+        sturdyFrame: state.sturdyFrame,
+        gelatinousBody: state.gelatinousBody,
+        slowReflexes: state.slowReflexes,
       });
 
       return {
@@ -165,6 +171,8 @@ export const calculateSHData = <V extends GameVersion>(
           equipmentSH: gear.sh,
           amuletReflection,
           largeBonePlates: state.largeBonePlates,
+          condensationShield: state.condensationShield,
+          reckless: state.reckless,
         }),
       };
     }
@@ -255,6 +263,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
         subduedMagic: state.subduedMagic,
         antiWizardry: state.antiWizardry,
         runicMagic: state.runicMagic,
+        sturdyFrame: state.sturdyFrame,
         wildMagic: state.wildMagic,
         god: state.god,
         godPietyRank: state.godPietyRank,
@@ -292,6 +301,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
               subduedMagic: state.subduedMagic,
               antiWizardry: state.antiWizardry,
               runicMagic: state.runicMagic,
+              sturdyFrame: state.sturdyFrame,
               wildMagic: state.wildMagic,
               god: "Vehumet",
               godPietyRank: 3,
@@ -327,6 +337,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
           subduedMagic: state.subduedMagic,
           antiWizardry: state.antiWizardry,
           runicMagic: state.runicMagic,
+          sturdyFrame: state.sturdyFrame,
           wildMagic: state.wildMagic,
           enkindle: true,
           god: state.god,

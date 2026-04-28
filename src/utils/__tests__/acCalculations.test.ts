@@ -1,5 +1,4 @@
 import { describe, expect, test } from "@jest/globals";
-import { armourOptions } from "@/types/equipment";
 import { calculateAC, calculateMixedAC } from "../acCalculation";
 
 describe("AC Calculations", () => {
@@ -73,7 +72,7 @@ describe("AC Calculations", () => {
         gloves: true,
         barding: true,
       })
-    ).toBe(34);
+    ).toBe(29);
 
     // while in personal gameplay
     expect(
@@ -83,7 +82,7 @@ describe("AC Calculations", () => {
         armour: "troll_leather",
         armourSkill: 11.9,
       })
-    ).toBe(3);
+    ).toBe(2);
 
     // This shows incorrect results, how is the serpent talisman being held in hand?
     // // https://underhound.eu/crawl/morgue/Ge0ff/morgue-Ge0ff-20240125-133758.txt
@@ -108,10 +107,10 @@ describe("AC Calculations", () => {
         gloves: true,
         barding: true,
       })
-    ).toBe(21);
+    ).toBe(18);
   });
 
-  test("trunk gale centaur keeps the deformed-body armour penalty", () => {
+  test("trunk gale centaur applies the deformed-body multiplier to body armour only", () => {
     expect(
       calculateMixedAC({
         version: "trunk",
@@ -121,10 +120,10 @@ describe("AC Calculations", () => {
         gloves: true,
         barding: true,
       })
-    ).toBe(21);
+    ).toBe(18);
   });
 
-  test("0.34 armataur keeps the deformed-body armour penalty", () => {
+  test("0.34 armataur applies the deformed-body multiplier to body armour only", () => {
     expect(
       calculateMixedAC({
         version: "0.34",
@@ -134,7 +133,7 @@ describe("AC Calculations", () => {
         gloves: true,
         barding: true,
       })
-    ).toBe(21);
+    ).toBe(18);
   });
 
   test("0.34 naga still keeps the deformed-body armour penalty", () => {
@@ -152,14 +151,31 @@ describe("AC Calculations", () => {
       armourSkill: 26.5,
     });
 
-    const expectedPenalty = Math.floor(armourOptions.acid_dragon.baseAC * 0.5);
-
     expect(minotaurAc).toBe(13);
-    expect(nagaAc).toBe(10);
-    expect(nagaAc).toBe(minotaurAc - expectedPenalty);
+    expect(nagaAc).toBe(7);
   });
 
-  test("trunk gale centaur, pearl dragon scales, gloves, barding, armour skill 13.8, AC 19", () => {
+  test("applies Crawl deformed body, scarf base AC, and icemail AC in the body-armour AC path", () => {
+    expect(
+      calculateMixedAC({
+        version: "0.34",
+        species: "demonspawn",
+        armour: "plate",
+        armourSkill: 22.2,
+        bodyArmourEnchant: 7,
+        headgearSlots: [{ present: true, enchant: 1, kind: "hat" } as never],
+        boots: true,
+        bootsEnchant: 3,
+        cloak: true,
+        cloakBaseAc: 0,
+        equipmentAC: 3,
+        deformedBody: true,
+        icemail: 2,
+      })
+    ).toBe(36);
+  });
+
+  test("trunk gale centaur, pearl dragon scales, gloves, barding, armour skill 13.8, AC 17", () => {
     expect(
       calculateMixedAC({
         version: "trunk",
@@ -169,10 +185,10 @@ describe("AC Calculations", () => {
         gloves: true,
         barding: true,
       })
-    ).toBe(19);
+    ).toBe(17);
   });
 
-  test.failing(
+  test(
     "trunk gale centaur shapeshifter dump: plate plus aux pieces should be 27 AC after removing enchantment bonuses",
     () => {
       // Dump AC 50 minus enchantment bonuses (+11 plate, +4 helmet,

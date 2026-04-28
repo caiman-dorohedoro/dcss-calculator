@@ -45,6 +45,7 @@ export type SpellCalculationParams<V extends GameVersion> = {
   subduedMagic?: number;
   antiWizardry?: number;
   runicMagic?: number;
+  sturdyFrame?: number;
   wildMagic?: number;
   enkindle?: boolean;
   god?: string | null;
@@ -115,6 +116,7 @@ type CalculateArmourPenaltyParams<V extends GameVersion> = {
   armourSkill: number;
   strength: number;
   SCALE: number;
+  sturdyFrame?: number;
 };
 
 function calculateArmourPenalty<V extends GameVersion>({
@@ -124,8 +126,12 @@ function calculateArmourPenalty<V extends GameVersion>({
   armourSkill,
   strength,
   SCALE,
+  sturdyFrame = 0,
 }: CalculateArmourPenaltyParams<V>) {
-  const baseEvPenalty = getArmourEncumbrance(version, armour);
+  const baseEvPenalty = Math.max(
+    0,
+    getArmourEncumbrance(version, armour) - sturdyFrame * 2
+  );
 
   const penalty = Math.floor(
     Math.floor(
@@ -180,6 +186,7 @@ type armourShieldSpellPenaltyParams<V extends GameVersion> = {
   shieldSkill: number;
   shield: ShieldKey;
   runicMagic?: number;
+  sturdyFrame?: number;
 };
 
 function calculateArmourShieldSpellPenalty<V extends GameVersion>({
@@ -191,6 +198,7 @@ function calculateArmourShieldSpellPenalty<V extends GameVersion>({
   shieldSkill,
   shield,
   runicMagic = 0,
+  sturdyFrame = 0,
 }: armourShieldSpellPenaltyParams<V>) {
   const SCALE = 100;
   let bodyArmourPenalty = calculateArmourPenalty({
@@ -200,6 +208,7 @@ function calculateArmourShieldSpellPenalty<V extends GameVersion>({
     armourSkill,
     strength,
     SCALE,
+    sturdyFrame,
   });
 
   if (runicMagic > 0) {
@@ -380,6 +389,7 @@ function rawSpellFail<V extends GameVersion>({
   subduedMagic = 0,
   antiWizardry = 0,
   runicMagic = 0,
+  sturdyFrame = 0,
   wildMagic = 0,
   enkindle = false,
   god,
@@ -417,6 +427,7 @@ function rawSpellFail<V extends GameVersion>({
     shieldSkill,
     shield,
     runicMagic,
+    sturdyFrame,
   });
 
   if (!enkindle) {

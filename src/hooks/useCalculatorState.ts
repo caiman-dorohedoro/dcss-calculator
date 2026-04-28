@@ -90,6 +90,13 @@ export interface CalculatorState<V extends GameVersion> {
   distortionField?: number;
   tenguFlight?: number;
   largeBonePlates?: number;
+  icemail?: number;
+  condensationShield?: number;
+  deformedBody?: boolean;
+  reckless?: boolean;
+  sturdyFrame?: number;
+  gelatinousBody?: number;
+  slowReflexes?: number;
   // spell mode
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;
@@ -313,6 +320,9 @@ const isOptionalNullableString = (value: unknown) =>
 
 const isOptionalNullableNumber = (value: unknown) =>
   value === undefined || value === null || typeof value === "number";
+
+const isOptionalBoolean = (value: unknown) =>
+  value === undefined || typeof value === "boolean";
 
 const isOptionalStringArray = (value: unknown) =>
   value === undefined ||
@@ -603,6 +613,13 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.distortionField) ||
     !isOptionalNumber(state.tenguFlight) ||
     !isOptionalNumber(state.largeBonePlates) ||
+    !isOptionalNumber(state.icemail) ||
+    !isOptionalNumber(state.condensationShield) ||
+    !isOptionalBoolean(state.deformedBody) ||
+    !isOptionalBoolean(state.reckless) ||
+    !isOptionalNumber(state.sturdyFrame) ||
+    !isOptionalNumber(state.gelatinousBody) ||
+    !isOptionalNumber(state.slowReflexes) ||
     !isOptionalNumber(state.spellcasting) ||
     !isOptionalNumber(state.wildMagic) ||
     !isOptionalNullableString(state.god) ||
