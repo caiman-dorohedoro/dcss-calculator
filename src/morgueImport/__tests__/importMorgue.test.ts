@@ -98,6 +98,8 @@ const defaultGodState = {
   godStatus: null,
   godUnderPenance: false,
   godHistory: [],
+  statusText: null,
+  statuses: [],
 };
 
 describe("morgue import mapper", () => {
@@ -389,6 +391,8 @@ describe("morgue import mapper", () => {
       godStatus: "Vehumet is pleased with you.",
       godUnderPenance: false,
       godHistory: [],
+      statusText: null,
+      statuses: [],
       xl: 12,
       ac: 5,
       ev: 10,
