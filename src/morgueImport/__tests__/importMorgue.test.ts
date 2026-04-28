@@ -1,6 +1,10 @@
 import { describe, expect, test } from "@jest/globals";
-import type { EquipmentItemSnapshot, ParsedMorgueTextRecord } from "dcss-morgue-parser";
-import { parseMorgueText } from "dcss-morgue-parser";
+import {
+  KNOWN_MUTATION_TRAIT_IDS,
+  parseMorgueText,
+  type EquipmentItemSnapshot,
+  type ParsedMorgueTextRecord,
+} from "dcss-morgue-parser";
 import {
   calculateAcData,
   calculateEvData,
@@ -277,7 +281,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [{ name: "wild magic", level: 2 }],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -349,7 +353,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -427,7 +431,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -504,7 +508,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -632,7 +636,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -679,7 +683,7 @@ describe("morgue import mapper", () => {
       shieldDetails: undefined,
       orb: "orb of energy",
       orbDetails: orbOfEnergy,
-    } as ParsedMorgueTextRecord);
+    } as unknown as ParsedMorgueTextRecord);
     expect(orbResult.ok).toBe(true);
     if (!orbResult.ok) {
       throw new Error("expected successful import");
@@ -739,7 +743,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -832,13 +836,21 @@ describe("morgue import mapper", () => {
       ],
       mutations: [
         { name: "subdued magic", level: 1 },
-        { name: "anti-wizardry", level: 2 },
-        { name: "distortion field", level: 3 },
+        {
+          name: "anti-wizardry",
+          level: 2,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.disruptedMagic,
+        },
+        {
+          name: "distortion field",
+          level: 3,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.repulsionField,
+        },
         { name: "large bone plates", level: 2 },
         { name: "big brain", level: 3 },
         { name: "runic magic", level: 1 },
       ],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -972,7 +984,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -1050,24 +1062,53 @@ describe("morgue import mapper", () => {
       mutations: [
         { name: "subdued magic", level: 2, transient: true },
         { name: "wild magic", level: 1, transient: true },
-        { name: "disrupted magic", level: 2 },
+        {
+          name: "disrupted magic",
+          level: 2,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.disruptedMagic,
+        },
         { name: "runic magic", level: 1 },
         { name: "big brain", level: 3 },
-        { name: "repulsion field", level: 3 },
-        { name: "evasive flight" },
+        {
+          name: "repulsion field",
+          level: 3,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.repulsionField,
+        },
+        {
+          name: "evasive flight",
+          traitId: KNOWN_MUTATION_TRAIT_IDS.evasiveFlight,
+        },
         { name: "large bone plates", level: 1 },
-        { name: "icemail", level: 2 },
-        { name: "condensation shield" },
-        { name: "deformed body", transient: true },
-        { name: "reckless", transient: true },
+        {
+          name: "icemail",
+          level: 2,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.icemail,
+        },
+        {
+          name: "condensation shield",
+          traitId: KNOWN_MUTATION_TRAIT_IDS.condensationShield,
+        },
+        {
+          name: "deformed body",
+          transient: true,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.deformedBody,
+        },
+        {
+          name: "reckless",
+          transient: true,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.reckless,
+        },
         { name: "sturdy frame", level: 2 },
         { name: "gelatinous body", level: 3 },
         { name: "iridescent scales", level: 3 },
         { name: "slow reflexes", level: 1 },
-        { name: "ephemeral shield" },
+        {
+          name: "ephemeral shield",
+          traitId: KNOWN_MUTATION_TRAIT_IDS.ephemeralShield,
+        },
         { name: "subdued magic", level: 3, suppressed: true },
       ],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -1144,11 +1185,21 @@ describe("morgue import mapper", () => {
       },
       spells: [],
       mutations: [
-        { name: "icemail", level: 2 },
-        { name: "condensation shield" },
-        { name: "ephemeral shield" },
+        {
+          name: "icemail",
+          level: 2,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.icemail,
+        },
+        {
+          name: "condensation shield",
+          traitId: KNOWN_MUTATION_TRAIT_IDS.condensationShield,
+        },
+        {
+          name: "ephemeral shield",
+          traitId: KNOWN_MUTATION_TRAIT_IDS.ephemeralShield,
+        },
       ],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -1182,6 +1233,82 @@ describe("morgue import mapper", () => {
 
     expect(currentAC).toBe((unsuppressedAC ?? 0) - 8);
     expect(currentSH).toBe((unsuppressedSH ?? 0) - 4);
+  });
+
+  test("uses parser trait ids for canonicalized A-line aliases", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.34.1",
+      species: "Demonspawn",
+      speciesVariant: null,
+      background: "Fighter",
+      god: null,
+      ...defaultGodState,
+      xl: 25,
+      ac: 36,
+      ev: 8,
+      sh: 25,
+      strength: 31,
+      intelligence: 2,
+      dexterity: 18,
+      bodyArmour: "plate armour",
+      shield: "tower shield",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("+7 plate armour", "plate armour"),
+      shieldDetails: makeItem("+8 tower shield", "tower shield"),
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [],
+      mutations: [
+        {
+          name: "renamed disruption display",
+          level: 2,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.disruptedMagic,
+        },
+        {
+          name: "renamed repulsion display",
+          level: 3,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.repulsionField,
+        },
+        {
+          name: "renamed flight display",
+          level: null,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.evasiveFlight,
+        },
+        {
+          name: "renamed body display",
+          level: null,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.deformedBody,
+        },
+        {
+          name: "renamed reckless display",
+          level: null,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.reckless,
+        },
+      ],
+    } as unknown as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      antiWizardry: 2,
+      deformedBody: true,
+      distortionField: 3,
+      reckless: true,
+      tenguFlight: 1,
+    });
   });
 
   test("keeps parser item properties that are display-only for calculations", () => {
@@ -1270,7 +1397,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -1365,7 +1492,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);
@@ -1503,7 +1630,7 @@ describe("morgue import mapper", () => {
         },
       ],
       mutations: [],
-    } as ParsedMorgueTextRecord;
+    } as unknown as ParsedMorgueTextRecord;
 
     const result = buildImportedCalculatorState(record);
     expect(result.ok).toBe(true);

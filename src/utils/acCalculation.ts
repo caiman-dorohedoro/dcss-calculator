@@ -7,6 +7,7 @@ import {
 import type { AuxArmourSlotState } from "@/types/equipmentSlots";
 import type { GameVersion } from "@/types/game";
 import type { SpeciesKey } from "@/types/species.ts";
+import type { KnownStatusId } from "dcss-morgue-parser";
 import { getVersionSpecies } from "@/versioning/versionRegistry";
 import {
   getAuxArmourBaseAc,
@@ -14,7 +15,7 @@ import {
   getHeadgearBaseAc,
   getHeadgearEnchantTotal,
 } from "./equipmentModifiers";
-import { hasActiveStatus, statusEffectIds } from "./statusEffects";
+import { hasActiveStatus, KNOWN_STATUS_IDS } from "./statusEffects";
 
 export const calculateAC = (baseAC: number, skill: number): number => {
   return Math.floor(baseAC * (1 + skill / 22));
@@ -46,7 +47,7 @@ type MixedCalculationsParams<V extends GameVersion> = {
   scalesAC?: number;
   deformedBody?: boolean;
   icemail?: number;
-  activeStatusIds?: readonly string[];
+  activeStatusIds?: readonly KnownStatusId[];
   armourSkill: number;
 };
 
@@ -126,7 +127,7 @@ export const calculateMixedAC = <V extends GameVersion>({
   const scaledBaseAc = Math.floor((adjustedBodyAc + scaledAuxAc) / 100);
   const icemailAc =
     icemail > 0 &&
-    !hasActiveStatus(activeStatusIds, statusEffectIds.icemailDepleted)
+    !hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.icemailDepleted)
       ? icemail * 4
       : 0;
 

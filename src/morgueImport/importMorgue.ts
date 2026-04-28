@@ -33,6 +33,7 @@ import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import { getAggregatedEquipmentEffects } from "@/utils/equipmentModifiers";
 import {
   collectActiveStatusIds,
+  KNOWN_MUTATION_TRAIT_IDS,
   statusAwareMutationRules,
   type StatusAwareMutationStateKey,
 } from "@/utils/statusEffects";
@@ -631,10 +632,7 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (
-      mutation.name === "anti-wizardry" ||
-      mutation.name === "disrupted magic"
-    ) {
+    if (mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.disruptedMagic) {
       state.antiWizardry = mutation.level ?? 0;
       applied.push(mutation.name);
       continue;
@@ -652,10 +650,7 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (
-      mutation.name === "distortion field" ||
-      mutation.name === "repulsion field"
-    ) {
+    if (mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.repulsionField) {
       state.distortionField = mutation.level ?? 0;
       applied.push(mutation.name);
       continue;
@@ -667,14 +662,14 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "tengu flight" || mutation.name === "evasive flight") {
+    if (mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.evasiveFlight) {
       state.tenguFlight = mutation.level ?? 1;
       applied.push(mutation.name);
       continue;
     }
 
     const statusAwareRule = statusAwareMutationRules.find(
-      (rule) => rule.mutationName === mutation.name
+      (rule) => rule.traitId === mutation.traitId
     );
     if (statusAwareRule) {
       setNumericMutationState(
@@ -686,13 +681,13 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "deformed body" || mutation.name === "pseudopods") {
+    if (mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.deformedBody) {
       state.deformedBody = true;
       applied.push(mutation.name);
       continue;
     }
 
-    if (mutation.name === "reckless") {
+    if (mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.reckless) {
       state.reckless = true;
       applied.push("reckless");
       continue;

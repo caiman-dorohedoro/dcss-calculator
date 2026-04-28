@@ -1,36 +1,46 @@
-export const statusEffectIds = {
-  ephemeralShield: "ephemeral_shield",
-  icemailDepleted: "icemail_depleted",
-  icyArmour: "icy_armour",
-  vertigo: "vertigo",
-} as const;
+import {
+  KNOWN_MUTATION_TRAIT_IDS,
+  KNOWN_STATUS_IDS,
+  type KnownMutationTraitId,
+  type KnownStatusId,
+} from "dcss-morgue-parser";
 
 export const hasActiveStatus = (
-  activeStatusIds: readonly string[] | undefined,
-  statusId: string
+  activeStatusIds: readonly KnownStatusId[] | undefined,
+  statusId: KnownStatusId
 ) => activeStatusIds?.includes(statusId) === true;
 
 export const collectActiveStatusIds = (
-  statuses: readonly { id: string | null }[]
-) => Array.from(new Set(statuses.flatMap((status) => (status.id ? [status.id] : []))));
+  statuses: readonly { id: KnownStatusId | null }[]
+) =>
+  Array.from(
+    new Set(statuses.flatMap((status) => (status.id ? [status.id] : [])))
+  );
 
 export const statusAwareMutationRules = [
   {
-    mutationName: "ephemeral shield",
+    traitId: KNOWN_MUTATION_TRAIT_IDS.ephemeralShield,
     stateKey: "ephemeralShield",
-    activeStatusId: statusEffectIds.ephemeralShield,
+    activeStatusId: KNOWN_STATUS_IDS.ephemeralShield,
   },
   {
-    mutationName: "icemail",
+    traitId: KNOWN_MUTATION_TRAIT_IDS.icemail,
     stateKey: "icemail",
-    suppressedByStatusId: statusEffectIds.icemailDepleted,
+    suppressedByStatusId: KNOWN_STATUS_IDS.icemailDepleted,
   },
   {
-    mutationName: "condensation shield",
+    traitId: KNOWN_MUTATION_TRAIT_IDS.condensationShield,
     stateKey: "condensationShield",
-    suppressedByStatusId: statusEffectIds.icemailDepleted,
+    suppressedByStatusId: KNOWN_STATUS_IDS.icemailDepleted,
   },
-] as const;
+] as const satisfies readonly {
+  traitId: KnownMutationTraitId;
+  stateKey: string;
+  activeStatusId?: KnownStatusId;
+  suppressedByStatusId?: KnownStatusId;
+}[];
 
 export type StatusAwareMutationStateKey =
   (typeof statusAwareMutationRules)[number]["stateKey"];
+
+export { KNOWN_MUTATION_TRAIT_IDS, KNOWN_STATUS_IDS };

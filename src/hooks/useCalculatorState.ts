@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import type { KnownStatusId } from "dcss-morgue-parser";
 import {
   ArmourKey,
   armourOptions,
@@ -98,7 +99,7 @@ export interface CalculatorState<V extends GameVersion> {
   sturdyFrame?: number;
   gelatinousBody?: number;
   slowReflexes?: number;
-  activeStatusIds?: string[];
+  activeStatusIds?: KnownStatusId[];
   // spell mode
   schoolSkills?: VersionedSchoolSkillLevels<V>;
   targetSpell?: VersionedSpellName<V>;

@@ -1,5 +1,6 @@
 import {ShieldKey, shieldOptions} from "@/types/equipment.ts";
-import { hasActiveStatus, statusEffectIds } from "./statusEffects";
+import type { KnownStatusId } from "dcss-morgue-parser";
+import { hasActiveStatus, KNOWN_STATUS_IDS } from "./statusEffects";
 
 type SHCalculationParams = {
   shield: ShieldKey;
@@ -12,7 +13,7 @@ type SHCalculationParams = {
   largeBonePlates?: number;
   condensationShield?: number;
   ephemeralShield?: number;
-  activeStatusIds?: readonly string[];
+  activeStatusIds?: readonly KnownStatusId[];
   reckless?: boolean;
 };
 
@@ -36,7 +37,7 @@ export const calculateSH = (params: SHCalculationParams) => {
   const hasShield = shield !== "none";
   const icemailDepleted = hasActiveStatus(
     activeStatusIds,
-    statusEffectIds.icemailDepleted
+    KNOWN_STATUS_IDS.icemailDepleted
   );
 
   let sh = 0;
@@ -59,7 +60,7 @@ export const calculateSH = (params: SHCalculationParams) => {
   sh += condensationShield > 0 && !icemailDepleted ? 800 : 0;
   sh +=
     ephemeralShield > 0 &&
-    hasActiveStatus(activeStatusIds, statusEffectIds.ephemeralShield)
+    hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.ephemeralShield)
       ? ephemeralShield * 1400
       : 0;
 
