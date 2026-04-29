@@ -47,6 +47,7 @@ export function calculateEV<V extends GameVersion>(params: {
   statusEV?: number;
   effectiveSize?: Size;
   formEV?: number;
+  formEVScaled?: number;
   evMultiplier?: { numerator: number; denominator: number };
 }) {
   const {
@@ -72,6 +73,7 @@ export function calculateEV<V extends GameVersion>(params: {
     statusEV = 0,
     effectiveSize,
     formEV = 0,
+    formEVScaled = formEV * CRAWL_STAT_SCALE,
     evMultiplier,
   } = params;
 
@@ -171,7 +173,7 @@ export function calculateEV<V extends GameVersion>(params: {
     shieldPenaltyScaled -
     armourPenaltyScaled -
     auxiliaryArmourPenalty * CRAWL_STAT_SCALE +
-    formEV * CRAWL_STAT_SCALE +
+    formEVScaled +
     directBonus * CRAWL_STAT_SCALE;
   const multipliedEVScaled = evMultiplier
     ? Math.trunc((currentEVScaled * evMultiplier.numerator) / evMultiplier.denominator)

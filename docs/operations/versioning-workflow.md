@@ -201,11 +201,15 @@ Update `src/versioning/formData.ts` when any supported version changes:
 - `size`
 - `str`, `dex`, or `int`
 - `ac`, `ev`, or `body_ac_mult`
-- special cases such as dragon draconian AC, statue EV multiplier, or blade parry
+- special cases such as dragon draconian AC, statue EV multiplier, or active-status-gated blade parry
 
 Imported morgue defense tests must continue to derive calculator output from
 state and formulas. Do not copy morgue top-line AC, EV, or SH into calculator
 state.
+
+When validating form EV parity, preserve Crawl's 100x scaled form EV value until
+the final EV floor. Pre-truncating a form EV bonus such as `21.92` to `21` can
+make the displayed EV one point too low.
 
 ## Required Verification
 

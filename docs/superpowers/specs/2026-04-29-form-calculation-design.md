@@ -33,7 +33,7 @@ scaled_value = base * 100 + (level * 100 - min_skill * 100) * scaling / (max_ski
 scaled_value = base * 100 + scaling * XL * 100 / 27
 ```
 
-AC는 Crawl `player::base_ac`에서 melded equipment를 제외한 뒤 `get_form()->get_ac_bonus()`를 더한다. Body armour base AC에는 `get_form()->get_body_ac_mult()`가 적용된다. EV는 current form size를 `you.body_size(..., base = false)`로 읽고, form EV bonus를 더한다. Statue form은 natural EV에 `* 4 / 5`를 추가로 적용한다. SH에는 별도 YAML `sh` 필드는 없지만, offhand meld는 shield/orb를 제거하고 blade form은 parrying SH를 추가한다.
+AC는 Crawl `player::base_ac`에서 melded equipment를 제외한 뒤 `get_form()->get_ac_bonus()`를 더한다. Body armour base AC에는 `get_form()->get_body_ac_mult()`가 적용된다. EV는 current form size를 `you.body_size(..., base = false)`로 읽고, form EV bonus를 더한다. Statue form은 natural EV에 `* 4 / 5`를 추가로 적용한다. SH에는 별도 YAML `sh` 필드는 없지만, offhand meld는 shield/orb를 제거하고 blade form parry는 active `parrying` status일 때만 추가한다.
 
 ## Parser와 앱 책임 경계
 
@@ -156,6 +156,7 @@ EV는 기존 formula에 다음을 추가한다.
 
 - species size 대신 effective body size를 사용한다.
 - form EV bonus를 natural EV에 더한다.
+- form EV bonus는 Crawl의 100배 scaled 값으로 final EV rounding까지 보존한다. `21.92` 같은 값을 `21`로 먼저 자르면 displayed EV가 1 낮아질 수 있다.
 - effective body armour/shield/aux penalty만 적용한다.
 - form stat bonus를 포함한 effective Str/Dex를 사용한다.
 - statue form은 natural EV에 `* 4 / 5`를 적용한다.
@@ -175,9 +176,9 @@ SH는 effective offhand model을 사용한다.
 - offhand meld 시 shield/orb는 없는 것으로 계산한다.
 - melded shield enchant, shield ego, shield SH artifact modifier는 제외한다.
 - melded jewellery의 reflection/shielding modifier도 제외한다.
-- blade form은 Crawl `player_parrying()`의 form contribution을 추가한다.
+- blade form은 Crawl `player_parrying()`의 form contribution을 active `parrying` status일 때만 추가한다.
 
-첫 구현은 imported defense parity에 필요한 offhand meld 처리와 gear exclusion을 우선한다. Blade parrying은 별도 fixture가 생기면 같은 form data helper로 추가한다.
+Blade form morgue가 `blade parry` mutation text를 포함하더라도 top-line `SH`에는 active `parrying` status가 없으면 parry contribution을 포함하지 않는다.
 
 ## Spell Failure Interaction
 

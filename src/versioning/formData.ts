@@ -139,7 +139,7 @@ const noForm: FormDefinition = {
   melds: [],
 };
 
-const trunkForms: FormDefinitionMap = {
+const crawl034Forms: FormDefinitionMap = {
   "aqua-form": {
     key: "aqua-form",
     minSkill: 12,
@@ -403,8 +403,8 @@ const trunkForms: FormDefinitionMap = {
 export const formDefinitions: Record<GameVersion, FormDefinitionMap> = {
   "0.32": {},
   "0.33": {},
-  "0.34": {},
-  trunk: trunkForms,
+  "0.34": crawl034Forms,
+  trunk: crawl034Forms,
 };
 
 const toSkillScale = (skill: number) => Math.trunc(skill * 100);
@@ -425,7 +425,7 @@ export const getFormDefinition = (
 export const isFormKey = (value: unknown): value is FormKey =>
   typeof value === "string" && formKeys.includes(value as FormKey);
 
-export const getFormValue = (
+export const getFormValueScaled = (
   scaling: FormScaling | undefined,
   { shapeshiftingSkill, experienceLevel, form }: FormValueParams
 ) => {
@@ -438,11 +438,11 @@ export const getFormValue = (
   const scale = 100;
 
   if (scaling.xlBased) {
-    return base + truncDiv(scalingValue * experienceLevel, 27);
+    return base * scale + truncDiv(scalingValue * experienceLevel * scale, 27);
   }
 
   if (form.maxSkill === form.minSkill) {
-    return base;
+    return base * scale;
   }
 
   const level = Math.min(
@@ -454,8 +454,13 @@ export const getFormValue = (
     base * scale +
     truncDiv(overMin * scalingValue, form.maxSkill - form.minSkill);
 
-  return truncDiv(raw, scale);
+  return raw;
 };
+
+export const getFormValue = (
+  scaling: FormScaling | undefined,
+  params: FormValueParams
+) => truncDiv(getFormValueScaled(scaling, params), 100);
 
 export const formMeldsSlot = (
   form: FormDefinition,

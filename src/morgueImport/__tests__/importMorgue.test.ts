@@ -12,7 +12,9 @@ import {
   calculateSHData,
 } from "@/utils/calculatorUtils";
 import { deepElfConjurer033Morgue } from "../__fixtures__/deepElfConjurer033";
+import { mattekudasai034StormFormMorgue } from "../__fixtures__/mattekudasai034StormForm";
 import { oniMonkTrunkStatueFormMorgue } from "../__fixtures__/oniMonkTrunkStatueForm";
+import { quixfoxTrunkBladeFormMorgue } from "../__fixtures__/quixfoxTrunkBladeForm";
 import { triskalTrunkDragonFormMorgue } from "../__fixtures__/triskalTrunkDragonForm";
 import {
   buildImportedCalculatorState,
@@ -2163,6 +2165,62 @@ Jewellery
 
     expect(parsed.record.ev).toBe(22);
     expect(point?.finalEV).toBe(22);
+  });
+
+  test("calculates imported 0.34 storm-form AC and EV from scaled form bonuses", () => {
+    const parsed = parseMorgueText(mattekudasai034StormFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    const acPoint = calculateAcData(result.importedState).find(
+      (candidate) =>
+        candidate.armour === parsed.record.effectiveSkills.armour
+    );
+    const evPoint = calculateEvData(result.importedState).find(
+      (candidate) =>
+        candidate.dodgingSkill === parsed.record.effectiveSkills.dodging
+    );
+
+    expect(parsed.record.form).toBe("storm-form");
+    expect(result.importedState.form).toBe("storm-form");
+    expect(parsed.record.ac).toBe(12);
+    expect(acPoint?.ac).toBe(12);
+    expect(parsed.record.ev).toBe(69);
+    expect(evPoint?.finalEV).toBe(69);
+  });
+
+  test("does not include inactive blade parry in imported top-line SH", () => {
+    const parsed = parseMorgueText(quixfoxTrunkBladeFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    const shPoint = calculateSHData(result.importedState).find(
+      (candidate) =>
+        candidate.shield === parsed.record.effectiveSkills.shields
+    );
+
+    expect(parsed.record.form).toBe("blade-form");
+    expect(parsed.record.statuses).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: "parrying" })])
+    );
+    expect(parsed.record.sh).toBe(25);
+    expect(shPoint?.sh).toBe(25);
   });
 
   test("parses compact title-line dumps using the notes descriptor fallback", () => {

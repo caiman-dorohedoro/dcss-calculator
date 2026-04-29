@@ -180,4 +180,25 @@ describe("SH Calculations", () => {
 
     expect(current?.sh).toBe(0);
   });
+
+  test("applies blade parry only while parrying is active", () => {
+    expect(
+      calculateSH({
+        shield: "none",
+        shieldSkill: 0,
+        dexterity: 10,
+        bladeParry: 12,
+      })
+    ).toBe(0);
+
+    expect(
+      calculateSH({
+        shield: "none",
+        shieldSkill: 0,
+        dexterity: 10,
+        activeStatusIds: ["parrying"],
+        bladeParry: 12,
+      })
+    ).toBe(12);
+  });
 });

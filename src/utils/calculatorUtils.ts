@@ -7,7 +7,11 @@ import {
   getAmuletReflectionCount,
   getEffectiveEquipmentState,
 } from "./equipmentModifiers";
-import { getFormDefinition, getFormValue } from "@/versioning/formData";
+import {
+  getFormDefinition,
+  getFormValue,
+  getFormValueScaled,
+} from "@/versioning/formData";
 import {
   calculateSpellFailureRate,
   getSpellData,
@@ -105,7 +109,7 @@ export const calculateEvData = <V extends GameVersion>(
     experienceLevel: state.experienceLevel ?? 1,
     form,
   };
-  const formEV = getFormValue(form.ev, formValueParams);
+  const formEVScaled = getFormValueScaled(form.ev, formValueParams);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const dodgingSkill = index / 10;
@@ -131,7 +135,7 @@ export const calculateEvData = <V extends GameVersion>(
         slowReflexes: state.slowReflexes,
         statusEV: state.statusEV,
         effectiveSize: form.size,
-        formEV,
+        formEVScaled,
         evMultiplier: form.special?.statueEvMultiplier,
       });
 

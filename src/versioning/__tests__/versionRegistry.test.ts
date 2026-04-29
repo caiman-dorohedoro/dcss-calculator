@@ -66,6 +66,8 @@ describe("versionRegistry", () => {
     expect(versionRegistry.trunk.forms["dragon-form"]?.key).toBe(
       "dragon-form"
     );
-    expect(versionRegistry["0.34"].forms["dragon-form"]).toBeUndefined();
+    expect(versionRegistry["0.34"].forms["dragon-form"]?.key).toBe(
+      "dragon-form"
+    );
   });
 });

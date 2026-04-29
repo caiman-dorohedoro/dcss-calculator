@@ -5,6 +5,7 @@ import {
   getFormDefinition,
   getFormStatModifiers,
   getFormValue,
+  getFormValueScaled,
 } from "../formData";
 
 describe("formData", () => {
@@ -61,7 +62,27 @@ describe("formData", () => {
   });
 
   test("falls back to no form for unsupported versions or unknown form labels", () => {
-    expect(getFormDefinition("0.34", "dragon-form").key).toBe("none");
+    expect(getFormDefinition("0.32", "dragon-form").key).toBe("none");
     expect(getFormDefinition("trunk", "unknown-form").key).toBe("none");
+  });
+
+  test("keeps 0.34 form EV on Crawl's scaled path", () => {
+    const storm = getFormDefinition("0.34", "storm-form");
+
+    expect(storm.key).toBe("storm-form");
+    expect(
+      getFormValueScaled(storm.ev, {
+        shapeshiftingSkill: 24.1,
+        experienceLevel: 25,
+        form: storm,
+      })
+    ).toBe(2192);
+    expect(
+      getFormValue(storm.ev, {
+        shapeshiftingSkill: 24.1,
+        experienceLevel: 25,
+        form: storm,
+      })
+    ).toBe(21);
   });
 });

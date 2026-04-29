@@ -60,7 +60,9 @@ export const calculateSH = (params: SHCalculationParams) => {
   sh += amuletReflection * 1000;
   sh += largeBonePlates > 0 ? largeBonePlates * 400 + 400 : 0;
   sh += condensationShield > 0 && !icemailDepleted ? 800 : 0;
-  sh += bladeParry * 100;
+  if (hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.parrying)) {
+    sh += bladeParry * 200;
+  }
   sh +=
     ephemeralShield > 0 &&
     hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.ephemeralShield)

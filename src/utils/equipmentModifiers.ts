@@ -115,7 +115,19 @@ export const slotIsEffectivelyMelded = <V extends GameVersion>(
 export const getEffectiveEquipmentState = <V extends GameVersion>(
   state: CalculatorState<V>
 ): CalculatorState<V> => {
-  const effective = structuredClone(state) as CalculatorState<V>;
+  const effective = {
+    ...state,
+    bodyArmour: { ...state.bodyArmour },
+    shieldItem: { ...state.shieldItem },
+    orbItem: { ...state.orbItem },
+    cloakItem: { ...state.cloakItem },
+    bootsItem: { ...state.bootsItem },
+    bardingItem: { ...state.bardingItem },
+    headgearSlots: [...state.headgearSlots],
+    gloveSlots: [...state.gloveSlots],
+    ringSlots: [...state.ringSlots],
+    amuletSlots: [...state.amuletSlots],
+  } as CalculatorState<V>;
 
   if (
     slotIsEffectivelyMelded(state, "body") ||
