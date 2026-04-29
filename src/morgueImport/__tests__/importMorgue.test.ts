@@ -2072,6 +2072,31 @@ Jewellery
     );
   });
 
+  test("calculates imported statue-form AC and EV from form rules", () => {
+    const parsed = parseMorgueText(oniMonkTrunkStatueFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    const acPoint = calculateAcData(result.importedState).find(
+      (point) => point.armour === parsed.record.effectiveSkills.armour
+    );
+    const evPoint = calculateEvData(result.importedState).find(
+      (point) => point.dodgingSkill === parsed.record.effectiveSkills.dodging
+    );
+
+    expect(parsed.record.form).toBe("statue-form");
+    expect(acPoint?.ac).toBe(parsed.record.ac);
+    expect(evPoint?.finalEV).toBe(parsed.record.ev);
+  });
+
   test("imports trunk dragon form and melded equipment states", () => {
     const parsed = parseMorgueText(triskalTrunkDragonFormMorgue);
     expect(parsed.ok).toBe(true);
