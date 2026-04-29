@@ -61,4 +61,11 @@ describe("versionRegistry", () => {
       targetSpell: "Airstrike",
     });
   });
+
+  test("exposes versioned form definitions", () => {
+    expect(versionRegistry.trunk.forms["dragon-form"]?.key).toBe(
+      "dragon-form"
+    );
+    expect(versionRegistry["0.34"].forms["dragon-form"]).toBeUndefined();
+  });
 });

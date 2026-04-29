@@ -10,6 +10,7 @@ import type {
   VersionedSpellDatum,
   VersionedSpellName,
 } from "@/types/spells";
+import { formDefinitions, type FormDefinitionMap } from "./formData";
 import { species032, species033, species034, speciesTrunk } from "./speciesData";
 
 type VersionFeatures = {
@@ -20,6 +21,7 @@ type VersionFeatures = {
 type VersionConfig<V extends GameVersion> = {
   spells: readonly VersionedSpellDatum<V>[];
   species: Record<SpeciesKey<V>, SpeciesOption>;
+  forms: FormDefinitionMap;
   formulaProfile: FormulaProfileName;
   features: VersionFeatures;
   defaults: {
@@ -35,6 +37,7 @@ export const versionRegistry = {
   "0.32": defineVersionConfig<"0.32">({
     spells: spells032 as readonly VersionedSpellDatum<"0.32">[],
     species: species032,
+    forms: formDefinitions["0.32"],
     formulaProfile: "legacy210",
     features: {
       secondGloves: false,
@@ -48,6 +51,7 @@ export const versionRegistry = {
   "0.33": defineVersionConfig<"0.33">({
     spells: spells033 as readonly VersionedSpellDatum<"0.33">[],
     species: species033,
+    forms: formDefinitions["0.33"],
     formulaProfile: "modern400",
     features: {
       secondGloves: true,
@@ -61,6 +65,7 @@ export const versionRegistry = {
   "0.34": defineVersionConfig<"0.34">({
     spells: spells034 as readonly VersionedSpellDatum<"0.34">[],
     species: species034,
+    forms: formDefinitions["0.34"],
     formulaProfile: "modern400",
     features: {
       secondGloves: true,
@@ -74,6 +79,7 @@ export const versionRegistry = {
   trunk: defineVersionConfig<"trunk">({
     spells: spellsTrunk as readonly VersionedSpellDatum<"trunk">[],
     species: speciesTrunk,
+    forms: formDefinitions.trunk,
     formulaProfile: "modern400",
     features: {
       secondGloves: true,
