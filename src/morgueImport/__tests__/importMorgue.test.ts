@@ -2097,6 +2097,27 @@ Jewellery
     });
   });
 
+  test("calculates imported Triskal dragon-form AC from form AC instead of melded armour", () => {
+    const parsed = parseMorgueText(triskalTrunkDragonFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    const point = calculateAcData(result.importedState).find(
+      (candidate) => candidate.armour === parsed.record.effectiveSkills.armour
+    );
+
+    expect(parsed.record.ac).toBe(18);
+    expect(point?.ac).toBe(18);
+  });
+
   test("parses compact title-line dumps using the notes descriptor fallback", () => {
     const abbreviatedMorgue = oniMonkTrunkStatueFormMorgue.replace(
       "(Oni Monk)",

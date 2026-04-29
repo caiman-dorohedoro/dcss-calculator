@@ -264,6 +264,19 @@ describe("AC Calculations", () => {
     ).toBe(15);
   });
 
+  test("adds form AC and body armour base multiplier to mixed AC", () => {
+    expect(
+      calculateMixedAC({
+        version: "trunk",
+        species: "human",
+        armour: "plate",
+        armourSkill: 0,
+        formAC: 3,
+        bodyArmourBaseAcMultiplier: 50,
+      })
+    ).toBe(18);
+  });
+
   test("applies barding enchant only when barding is equipped", () => {
     expect(
       calculateMixedAC({

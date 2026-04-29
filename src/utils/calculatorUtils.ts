@@ -5,7 +5,9 @@ import { calculateSH } from "./shCalculation";
 import {
   getAggregatedEquipmentEffects,
   getAmuletReflectionCount,
+  getEffectiveEquipmentState,
 } from "./equipmentModifiers";
+import { getFormDefinition, getFormValue } from "@/versioning/formData";
 import {
   calculateSpellFailureRate,
   getSpellData,
@@ -37,6 +39,18 @@ export const calculateAcData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): ACDataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
+  const effectiveState = getEffectiveEquipmentState(state);
+  const form = getFormDefinition(state.version, state.form);
+  const formValueParams = {
+    shapeshiftingSkill: state.shapeshiftingSkill ?? 0,
+    experienceLevel: state.experienceLevel ?? 1,
+    form,
+  };
+  const formAC = getFormValue(form.ac, formValueParams);
+  const bodyArmourBaseAcMultiplier = getFormValue(
+    form.bodyAcMult,
+    formValueParams
+  );
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const armour = index / 10;
@@ -46,22 +60,25 @@ export const calculateAcData = <V extends GameVersion>(
         ac: calculateMixedAC({
           version: state.version,
           species: state.species,
-          armour: state.armour,
-          bodyArmourEnchant: state.bodyArmourEnchant,
-          headgearSlots: state.headgearSlots,
-          gloveSlots: state.gloveSlots,
-          helmet: state.helmet,
-          gloves: state.gloves,
-          boots: state.boots,
-          bootsEnchant: state.bootsEnchant,
-          cloak: state.cloak,
-          cloakEnchant: state.cloakEnchant,
-          cloakBaseAc: state.cloakItem.kind === "scarf" ? 0 : undefined,
-          barding: state.barding,
-          bardingEnchant: state.bardingEnchant,
-          secondGloves: state.secondGloves,
+          armour: effectiveState.armour,
+          bodyArmourEnchant: effectiveState.bodyArmourEnchant,
+          headgearSlots: effectiveState.headgearSlots,
+          gloveSlots: effectiveState.gloveSlots,
+          helmet: effectiveState.helmet,
+          gloves: effectiveState.gloves,
+          boots: effectiveState.boots,
+          bootsEnchant: effectiveState.bootsEnchant,
+          cloak: effectiveState.cloak,
+          cloakEnchant: effectiveState.cloakEnchant,
+          cloakBaseAc:
+            effectiveState.cloakItem.kind === "scarf" ? 0 : undefined,
+          barding: effectiveState.barding,
+          bardingEnchant: effectiveState.bardingEnchant,
+          secondGloves: effectiveState.secondGloves,
           ringProtection: 0,
           equipmentAC: gear.ac,
+          formAC,
+          bodyArmourBaseAcMultiplier,
           scalesAC: state.scalesAC,
           deformedBody: state.deformedBody,
           icemail: state.icemail,

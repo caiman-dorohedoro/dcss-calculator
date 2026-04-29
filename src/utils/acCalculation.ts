@@ -44,6 +44,8 @@ type MixedCalculationsParams<V extends GameVersion> = {
   cloakBaseAc?: number;
   ringProtection?: number;
   equipmentAC?: number;
+  formAC?: number;
+  bodyArmourBaseAcMultiplier?: number;
   scalesAC?: number;
   deformedBody?: boolean;
   icemail?: number;
@@ -72,6 +74,8 @@ export const calculateMixedAC = <V extends GameVersion>({
   cloakBaseAc = miscellaneousOptions.cloak.baseAC,
   ringProtection = 0,
   equipmentAC = 0,
+  formAC = 0,
+  bodyArmourBaseAcMultiplier = 0,
   scalesAC = 0,
   deformedBody = false,
   icemail = 0,
@@ -123,10 +127,18 @@ export const calculateMixedAC = <V extends GameVersion>({
   }
 
   const scaledBodyAc = calculateScaledAC(bodyBaseAc, armourSkill);
+  const formAdjustedBodyAc =
+    hasBodyArmour && bodyArmourBaseAcMultiplier !== 0
+      ? Math.max(
+          0,
+          scaledBodyAc +
+            Math.trunc((scaledBodyAc * bodyArmourBaseAcMultiplier) / 100)
+        )
+      : scaledBodyAc;
   const adjustedBodyAc =
     isDeformed && hasBodyArmour
-      ? scaledBodyAc + Math.trunc((scaledBodyAc * -40) / 100)
-      : scaledBodyAc;
+      ? formAdjustedBodyAc + Math.trunc((formAdjustedBodyAc * -40) / 100)
+      : formAdjustedBodyAc;
   const scaledAuxAc = calculateScaledAC(auxBaseAc, armourSkill);
   const scaledBaseAc = Math.floor((adjustedBodyAc + scaledAuxAc) / 100);
   const icemailAc =
@@ -150,6 +162,7 @@ export const calculateMixedAC = <V extends GameVersion>({
     (barding === true ? bardingEnchant : 0) +
     ringProtection +
     equipmentAC +
+    formAC +
     scalesAC +
     icemailAc +
     sanguineArmourAc +
