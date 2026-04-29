@@ -3,6 +3,7 @@ import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import {
   getAggregatedEquipmentEffects,
   getAmuletReflectionCount,
+  getEffectiveEquipmentState,
 } from "../equipmentModifiers";
 
 describe("getAggregatedEquipmentEffects", () => {
@@ -56,5 +57,52 @@ describe("getAggregatedEquipmentEffects", () => {
     expect(
       getAmuletReflectionCount([{ kind: "reflection", modifiers: { sh: 5 } }])
     ).toBe(0);
+  });
+});
+
+describe("form-aware equipment effects", () => {
+  test("excludes parser-melded body armour and cloak modifiers", () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.bodyArmour = {
+      ...state.bodyArmour,
+      equipState: "melded",
+      modifiers: { ac: 3, str: 2 },
+    };
+    state.cloakItem = {
+      ...state.cloakItem,
+      present: true,
+      equipState: "melded",
+      modifiers: { ev: 4 },
+    };
+
+    expect(getAggregatedEquipmentEffects(state)).toMatchObject({
+      ac: 0,
+      ev: 0,
+      str: 0,
+    });
+  });
+
+  test("dragon form physical meld excludes offhand but keeps rings", () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.form = "dragon-form";
+    state.shield = "kite_shield";
+    state.shieldItem = {
+      ...state.shieldItem,
+      kind: "kite_shield",
+      enchant: 2,
+      modifiers: { sh: 5 },
+    };
+    state.ringSlots[0] = {
+      ...state.ringSlots[0],
+      kind: "evasion",
+      plus: 5,
+    };
+
+    const effective = getEffectiveEquipmentState(state);
+    const gear = getAggregatedEquipmentEffects(state);
+
+    expect(effective.shield).toBe("none");
+    expect(gear.ev).toBe(5);
+    expect(gear.sh).toBe(0);
   });
 });

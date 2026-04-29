@@ -6,6 +6,11 @@ import type {
   AuxArmourSlotState,
   RingSlotState,
 } from "@/types/equipmentSlots";
+import {
+  formMeldsSlot,
+  getFormDefinition,
+  type EquipmentSlotForMeld,
+} from "@/versioning/formData";
 
 export const getRingProtectionBonus = (ringSlots: RingSlotState[] = []) =>
   ringSlots
@@ -96,11 +101,132 @@ const applyModifierBag = (
   totals.wizardry += modifiers.wizardry ?? 0;
 };
 
+const itemIsMelded = (equipState?: string) => equipState === "melded";
+
+export const slotIsEffectivelyMelded = <V extends GameVersion>(
+  state: CalculatorState<V>,
+  slot: EquipmentSlotForMeld
+) => {
+  const form = getFormDefinition(state.version, state.form);
+
+  return formMeldsSlot(form, slot);
+};
+
+export const getEffectiveEquipmentState = <V extends GameVersion>(
+  state: CalculatorState<V>
+): CalculatorState<V> => {
+  const effective = structuredClone(state) as CalculatorState<V>;
+
+  if (
+    slotIsEffectivelyMelded(state, "body") ||
+    itemIsMelded(state.bodyArmour.equipState)
+  ) {
+    effective.armour = "none";
+    effective.bodyArmour = {
+      ...effective.bodyArmour,
+      kind: "none",
+      enchant: 0,
+      modifiers: undefined,
+    };
+    effective.bodyArmourEnchant = 0;
+  }
+
+  if (
+    slotIsEffectivelyMelded(state, "offhand") ||
+    itemIsMelded(state.shieldItem.equipState) ||
+    itemIsMelded(state.orbItem.equipState)
+  ) {
+    effective.shield = "none";
+    effective.orb = "none";
+    effective.shieldItem = {
+      ...effective.shieldItem,
+      kind: "none",
+      enchant: 0,
+      modifiers: undefined,
+    };
+    effective.orbItem = {
+      ...effective.orbItem,
+      kind: "none",
+      modifiers: undefined,
+    };
+    effective.shieldEnchant = 0;
+  }
+
+  if (
+    slotIsEffectivelyMelded(state, "cloak") ||
+    itemIsMelded(state.cloakItem.equipState)
+  ) {
+    effective.cloak = false;
+    effective.cloakItem = {
+      ...effective.cloakItem,
+      present: false,
+      enchant: 0,
+      modifiers: undefined,
+    };
+    effective.cloakEnchant = 0;
+  }
+
+  if (
+    slotIsEffectivelyMelded(state, "boots") ||
+    itemIsMelded(state.bootsItem.equipState)
+  ) {
+    effective.boots = false;
+    effective.bootsItem = {
+      ...effective.bootsItem,
+      present: false,
+      enchant: 0,
+      modifiers: undefined,
+    };
+    effective.bootsEnchant = 0;
+  }
+
+  if (
+    slotIsEffectivelyMelded(state, "barding") ||
+    itemIsMelded(state.bardingItem.equipState)
+  ) {
+    effective.barding = false;
+    effective.bardingItem = {
+      ...effective.bardingItem,
+      present: false,
+      enchant: 0,
+      modifiers: undefined,
+    };
+    effective.bardingEnchant = 0;
+  }
+
+  effective.headgearSlots = effective.headgearSlots.map((slot) =>
+    slotIsEffectivelyMelded(state, "helmet") || itemIsMelded(slot.equipState)
+      ? { ...slot, present: false, enchant: 0, modifiers: undefined }
+      : slot
+  );
+
+  effective.gloveSlots = effective.gloveSlots.map((slot) =>
+    slotIsEffectivelyMelded(state, "gloves") || itemIsMelded(slot.equipState)
+      ? { ...slot, present: false, enchant: 0, modifiers: undefined }
+      : slot
+  );
+
+  effective.ringSlots = effective.ringSlots.map((slot) =>
+    slotIsEffectivelyMelded(state, "ring") || itemIsMelded(slot.equipState)
+      ? { ...slot, kind: "none", plus: 0, modifiers: undefined }
+      : slot
+  );
+
+  effective.amuletSlots = effective.amuletSlots.map((slot) =>
+    slotIsEffectivelyMelded(state, "amulet") || itemIsMelded(slot.equipState)
+      ? { ...slot, kind: "none", modifiers: undefined }
+      : slot
+  );
+
+  return effective;
+};
+
 export const getAggregatedEquipmentEffects = <V extends GameVersion>(
   state: CalculatorState<V>
 ): AggregatedEquipmentEffects => {
   const totals = createEmptyAggregatedEffects();
-  const legacy = state as CalculatorState<V> & LegacyGearState;
+  const effective = getEffectiveEquipmentState(state);
+  const legacy = effective as CalculatorState<V> & LegacyGearState;
 
   totals.str += legacy.equipmentStr ?? 0;
   totals.dex += legacy.equipmentDex ?? 0;
@@ -110,15 +236,15 @@ export const getAggregatedEquipmentEffects = <V extends GameVersion>(
   totals.sh += legacy.equipmentSH ?? 0;
   totals.wizardry += legacy.wizardry ?? 0;
 
-  applyModifierBag(totals, state.bodyArmour.modifiers);
-  applyModifierBag(totals, state.shieldItem.modifiers);
-  applyModifierBag(totals, state.orbItem.modifiers);
-  applyModifierBag(totals, state.cloakItem.modifiers);
-  applyModifierBag(totals, state.bootsItem.modifiers);
-  applyModifierBag(totals, state.bardingItem.modifiers);
-  applyModifierBag(totals, state.unattributedGear?.modifiers);
+  applyModifierBag(totals, effective.bodyArmour.modifiers);
+  applyModifierBag(totals, effective.shieldItem.modifiers);
+  applyModifierBag(totals, effective.orbItem.modifiers);
+  applyModifierBag(totals, effective.cloakItem.modifiers);
+  applyModifierBag(totals, effective.bootsItem.modifiers);
+  applyModifierBag(totals, effective.bardingItem.modifiers);
+  applyModifierBag(totals, effective.unattributedGear?.modifiers);
 
-  for (const ring of state.ringSlots) {
+  for (const ring of effective.ringSlots) {
     if (ring.kind === "protection") {
       totals.ac += ring.plus;
     }
@@ -134,15 +260,15 @@ export const getAggregatedEquipmentEffects = <V extends GameVersion>(
     applyModifierBag(totals, ring.modifiers);
   }
 
-  for (const amulet of state.amuletSlots) {
+  for (const amulet of effective.amuletSlots) {
     applyModifierBag(totals, amulet.modifiers);
   }
 
-  for (const slot of state.headgearSlots) {
+  for (const slot of effective.headgearSlots) {
     applyModifierBag(totals, slot.modifiers);
   }
 
-  for (const slot of state.gloveSlots) {
+  for (const slot of effective.gloveSlots) {
     applyModifierBag(totals, slot.modifiers);
   }
 
