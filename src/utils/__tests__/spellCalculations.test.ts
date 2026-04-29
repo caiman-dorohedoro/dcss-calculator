@@ -1,10 +1,39 @@
 import { describe, expect, test } from "@jest/globals";
 import { parseSavedState } from "@/hooks/useCalculatorState";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+import { calculateAvgSFData } from "../calculatorUtils";
 import { getRingWizardryCount } from "../equipmentModifiers";
 import { calculateSpellFailureRate } from "../spellCalculation";
 
 describe("Spell Calculations", () => {
+  test("melded body armour and shield do not add spell failure penalties", () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.form = "dragon-form";
+    state.shapeshiftingSkill = 25;
+    state.experienceLevel = 25;
+    state.armour = "plate";
+    state.bodyArmour = {
+      ...state.bodyArmour,
+      kind: "plate",
+      equipState: "melded",
+    };
+    state.shield = "tower_shield";
+    state.shieldItem = {
+      ...state.shieldItem,
+      kind: "tower_shield",
+      equipState: "melded",
+    };
+    state.targetSpell = "Blink";
+    state.spellcasting = 11.3;
+    state.schoolSkills = { ...state.schoolSkills, translocation: 4 };
+
+    const point = calculateAvgSFData(state).find(
+      (entry) => entry.spellSkill === 4
+    );
+
+    expect(point?.spellFailureRate).toBeLessThan(50);
+  });
+
   test("robe, low level, stat, 4 level conj/alchemy spell (Fullminant Prism)", () => {
     const failureRate = calculateSpellFailureRate({
       version: "0.32",

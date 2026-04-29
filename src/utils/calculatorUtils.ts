@@ -189,18 +189,26 @@ export const calculateSHData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): SHDataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
-  const amuletReflection = getAmuletReflectionCount(state.amuletSlots);
+  const effectiveState = getEffectiveEquipmentState(state);
+  const form = getFormDefinition(state.version, state.form);
+  const formValueParams = {
+    shapeshiftingSkill: state.shapeshiftingSkill ?? 0,
+    experienceLevel: state.experienceLevel ?? 1,
+    form,
+  };
+  const bladeParry = getFormValue(form.special?.bladeParry, formValueParams);
+  const amuletReflection = getAmuletReflectionCount(effectiveState.amuletSlots);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const shield = index / 10;
       return {
         shield,
         sh: calculateSH({
-          shield: state.shield,
+          shield: effectiveState.shield,
           shieldSkill: shield,
           dexterity: state.dexterity,
           equipmentDex: gear.dex,
-          shieldEnchant: state.shieldEnchant,
+          shieldEnchant: effectiveState.shieldEnchant,
           equipmentSH: gear.sh,
           amuletReflection,
           largeBonePlates: state.largeBonePlates,
@@ -208,6 +216,7 @@ export const calculateSHData = <V extends GameVersion>(
           ephemeralShield: state.ephemeralShield,
           activeStatusIds: state.activeStatusIds,
           reckless: state.reckless,
+          bladeParry,
         }),
       };
     }
@@ -274,6 +283,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): FristSchoolSFDataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
+  const effectiveState = getEffectiveEquipmentState(state);
   const targetSpell = state.targetSpell;
 
   if (targetSpell === undefined) {
@@ -338,10 +348,11 @@ export const calculateAvgSFData = <V extends GameVersion>(
         equipmentInt: gear.int,
         targetSpell: targetSpell,
         spellDifficulty,
-        armour: state.armour,
-        bodyArmourEgo: state.bodyArmour.ego ?? state.bodyArmourEgo,
-        orb: state.orb,
-        shield: state.shield,
+        armour: effectiveState.armour,
+        bodyArmourEgo:
+          effectiveState.bodyArmour.ego ?? effectiveState.bodyArmourEgo,
+        orb: effectiveState.orb,
+        shield: effectiveState.shield,
         armourSkill: state.armourSkill,
         shieldSkill: state.shieldSkill,
         wizardry: gear.wizardry,

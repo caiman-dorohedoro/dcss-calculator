@@ -1,4 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
+import { buildDefaultCalculatorState } from "@/versioning/defaultState";
+import { calculateSHData } from "../calculatorUtils";
 import { calculateSH } from "../shCalculation";
 
 describe("SH Calculations", () => {
@@ -161,5 +163,21 @@ describe("SH Calculations", () => {
         reckless: true,
       })
     ).toBe(19);
+  });
+
+  test("dragon form melds shield and removes shield SH", () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.form = "dragon-form";
+    state.shield = "kite_shield";
+    state.shieldItem = {
+      ...state.shieldItem,
+      kind: "kite_shield",
+      enchant: 2,
+    };
+    state.shieldSkill = 15;
+
+    const current = calculateSHData(state).find((point) => point.shield === 15);
+
+    expect(current?.sh).toBe(0);
   });
 });

@@ -15,6 +15,7 @@ type SHCalculationParams = {
   ephemeralShield?: number;
   activeStatusIds?: readonly KnownStatusId[];
   reckless?: boolean;
+  bladeParry?: number;
 };
 
 export const calculateSH = (params: SHCalculationParams) => {
@@ -31,6 +32,7 @@ export const calculateSH = (params: SHCalculationParams) => {
     ephemeralShield = 0,
     activeStatusIds,
     reckless = false,
+    bladeParry = 0,
   } = params;
   const baseSH = shieldOptions[shield].baseSH;
   const effectiveDexterity = dexterity + equipmentDex;
@@ -58,6 +60,7 @@ export const calculateSH = (params: SHCalculationParams) => {
   sh += amuletReflection * 1000;
   sh += largeBonePlates > 0 ? largeBonePlates * 400 + 400 : 0;
   sh += condensationShield > 0 && !icemailDepleted ? 800 : 0;
+  sh += bladeParry * 100;
   sh +=
     ephemeralShield > 0 &&
     hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.ephemeralShield)

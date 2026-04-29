@@ -126,9 +126,11 @@ export const getEffectiveEquipmentState = <V extends GameVersion>(
       ...effective.bodyArmour,
       kind: "none",
       enchant: 0,
+      ego: "none",
       modifiers: undefined,
     };
     effective.bodyArmourEnchant = 0;
+    effective.bodyArmourEgo = "none";
   }
 
   if (
@@ -142,11 +144,13 @@ export const getEffectiveEquipmentState = <V extends GameVersion>(
       ...effective.shieldItem,
       kind: "none",
       enchant: 0,
+      ego: "none",
       modifiers: undefined,
     };
     effective.orbItem = {
       ...effective.orbItem,
       kind: "none",
+      ego: "none",
       modifiers: undefined,
     };
     effective.shieldEnchant = 0;
