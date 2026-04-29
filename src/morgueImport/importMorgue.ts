@@ -34,6 +34,7 @@ import { getAggregatedEquipmentEffects } from "@/utils/equipmentModifiers";
 import {
   collectActiveStatusIds,
   KNOWN_MUTATION_TRAIT_IDS,
+  KNOWN_STATUS_IDS,
   statusAwareMutationRules,
   type StatusAwareMutationStateKey,
 } from "@/utils/statusEffects";
@@ -561,40 +562,64 @@ const getMutationAc = (
   xl: number
 ) => {
   const level = mutationLevel(mutation);
+  const name = mutation.name.toLowerCase();
 
   if (
-    mutation.name === "gelatinous body" ||
-    mutation.name === "tough skin" ||
-    mutation.name === "shaggy fur" ||
-    mutation.name === "rugged brown scales" ||
-    mutation.name === "sharp scales"
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.gelatinousBody ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.toughSkin ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.shaggyFur ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.ruggedBrownScales ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.sharpScales ||
+    name === "gelatinous body" ||
+    name === "tough skin" ||
+    name === "shaggy fur" ||
+    name === "rugged brown scales" ||
+    name === "sharp scales"
   ) {
     return level;
   }
 
-  if (mutation.name === "physical vulnerability") {
+  if (
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.reducedAc ||
+    name === "physical vulnerability" ||
+    name === "reduced ac"
+  ) {
     return -5 * level;
   }
 
-  if (mutation.name === "iridescent scales") {
+  if (
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.iridescentScales ||
+    name === "iridescent scales"
+  ) {
     return 2 * level;
   }
 
   if (
-    mutation.name === "icy blue scales" ||
-    mutation.name === "molten scales" ||
-    mutation.name === "slimy green scales" ||
-    mutation.name === "thin metallic scales" ||
-    mutation.name === "yellow scales"
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.icyBlueScales ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.moltenScales ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.slimyGreenScales ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.thinMetallicScales ||
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.yellowScales ||
+    name === "icy blue scales" ||
+    name === "molten scales" ||
+    name === "slimy green scales" ||
+    name === "thin metallic scales" ||
+    name === "yellow scales"
   ) {
     return level + 1;
   }
 
-  if (mutation.name === "iron-fused scales") {
+  if (
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.ironFusedScales ||
+    name === "iron-fused scales"
+  ) {
     return 5;
   }
 
-  if (mutation.name === "stone body") {
+  if (
+    mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.stoneBody ||
+    name === "stone body"
+  ) {
     return Math.floor(
       (200 +
         Math.floor((100 * xl * 2) / 5) +
@@ -625,6 +650,7 @@ const applyMutationModifiers = (
     if (isSuppressedMutation(mutation)) {
       continue;
     }
+    const name = mutation.name.toLowerCase();
 
     if (mutation.name === "subdued magic") {
       state.subduedMagic = mutation.level ?? 0;
@@ -656,9 +682,12 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "large bone plates") {
+    if (
+      mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.largeBonePlates ||
+      name === "large bone plates"
+    ) {
       state.largeBonePlates = mutation.level ?? 0;
-      applied.push("large bone plates");
+      applied.push(mutation.name);
       continue;
     }
 
@@ -693,23 +722,33 @@ const applyMutationModifiers = (
       continue;
     }
 
-    if (mutation.name === "sturdy frame") {
+    if (
+      mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.sturdyFrame ||
+      name === "sturdy frame"
+    ) {
       state.sturdyFrame = mutation.level ?? 0;
-      applied.push("sturdy frame");
+      applied.push(mutation.name);
       continue;
     }
 
-    if (mutation.name === "gelatinous body") {
+    if (
+      mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.gelatinousBody ||
+      name === "gelatinous body"
+    ) {
       state.gelatinousBody = mutation.level ?? 0;
       state.scalesAC =
         (state.scalesAC ?? 0) + getMutationAc(mutation, record.xl);
-      applied.push("gelatinous body");
+      applied.push(mutation.name);
       continue;
     }
 
-    if (mutation.name === "slow reflexes") {
+    if (
+      mutation.traitId === KNOWN_MUTATION_TRAIT_IDS.reducedEv ||
+      name === "slow reflexes" ||
+      name === "reduced ev"
+    ) {
       state.slowReflexes = mutation.level ?? 0;
-      applied.push("slow reflexes");
+      applied.push(mutation.name);
       continue;
     }
 
@@ -726,6 +765,54 @@ const applyMutationModifiers = (
   }
 
   return { applied, unsupported };
+};
+
+const applyStatusModifiers = (
+  record: ParsedMorgueTextRecord,
+  state: CalculatorState<GameVersion>
+) => {
+  let statusAC = 0;
+  let statusEV = 0;
+  const applied = new Set<string>();
+
+  for (const status of record.statuses) {
+    const hasExplicitAC = typeof status.values?.ac === "number";
+
+    if (hasExplicitAC) {
+      statusAC += status.values?.ac ?? 0;
+      applied.add(status.display);
+    }
+
+    if (typeof status.values?.corrosion === "number") {
+      statusAC += status.values.corrosion;
+      applied.add(status.display);
+    }
+
+    if (!hasExplicitAC) {
+      if (status.id === KNOWN_STATUS_IDS.fieryArmour) {
+        statusAC += 7;
+        applied.add(status.display);
+      }
+      if (status.id === KNOWN_STATUS_IDS.protectedFromPhysicalDamage) {
+        statusAC += 3;
+        applied.add(status.display);
+      }
+    }
+
+    if (status.id === KNOWN_STATUS_IDS.acrobatic) {
+      statusEV += 15;
+      applied.add(status.display);
+    }
+    if (status.id === KNOWN_STATUS_IDS.vertigo) {
+      statusEV -= 5;
+      applied.add(status.display);
+    }
+  }
+
+  state.statusAC = statusAC;
+  state.statusEV = statusEV;
+
+  return { applied: Array.from(applied) };
 };
 
 const deriveBodyArmourEgo = (
@@ -919,6 +1006,14 @@ export const buildImportedCalculatorState = (
     summary.applied.push({
       label: "God",
       detail: godSummary,
+    });
+  }
+
+  const statusMapping = applyStatusModifiers(record, importedState);
+  if (statusMapping.applied.length > 0) {
+    summary.applied.push({
+      label: "Current statuses",
+      detail: statusMapping.applied.join(", "),
     });
   }
 

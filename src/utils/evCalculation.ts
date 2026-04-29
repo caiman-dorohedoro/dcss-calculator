@@ -9,13 +9,20 @@ import { Size, SpeciesKey, speciesOptions } from "@/types/species.ts";
 import { getArmourEncumbrance } from "@/versioning/equipmentData";
 
 const sizeToNumber: Record<Size, number> = {
-  tiny: 2,
+  tiny: 6,
   little: 4,
   small: 2,
   medium: 0,
   large: -2,
-  giant: 12,
+  giant: -4,
 };
+
+const CRAWL_STAT_SCALE = 100;
+
+const divTrunc = (numerator: number, denominator: number) =>
+  Math.trunc(numerator / denominator);
+
+const skillToTenth = (skill: number) => Math.round(skill * 10);
 
 export function calculateEV<V extends GameVersion>(params: {
   version: V;
@@ -37,6 +44,7 @@ export function calculateEV<V extends GameVersion>(params: {
   sturdyFrame?: number;
   gelatinousBody?: number;
   slowReflexes?: number;
+  statusEV?: number;
 }) {
   const {
     version,
@@ -58,6 +66,7 @@ export function calculateEV<V extends GameVersion>(params: {
     sturdyFrame = 0,
     gelatinousBody = 0,
     slowReflexes = 0,
+    statusEV = 0,
   } = params;
 
   const speciesOpts = speciesOptions(version);
@@ -74,69 +83,101 @@ export function calculateEV<V extends GameVersion>(params: {
   );
   const effectiveStrength = strength + equipmentStr;
   const effectiveDexterity = dexterity + equipmentDex;
+  const crawlStrength = Math.max(1, effectiveStrength);
+  const dodgingSkillTenth = skillToTenth(dodgingSkill);
+  const armourSkillTenth = skillToTenth(armourSkill);
+  const shieldSkillTenth = skillToTenth(shieldSkill);
 
-  // Calculate dodge bonus with armor penalty modifier
-  const armorPenaltyForDodge = armourEncumbrance - 3;
-  let dodgeModifier = 1;
-
-  if (armorPenaltyForDodge > 0) {
-    if (armorPenaltyForDodge >= effectiveStrength) {
-      dodgeModifier = effectiveStrength / (armorPenaltyForDodge * 2);
-    } else {
-      dodgeModifier = 1 - armorPenaltyForDodge / (effectiveStrength * 2);
-    }
-  }
-
-  const rawDodgeBonus = Math.floor(
-    (8 + dodgingSkill * effectiveDexterity * 0.8) / (20 - sizeFactor)
+  const rawDodgeBonusScaled = divTrunc(
+    divTrunc(
+      divTrunc(
+        (800 + dodgingSkillTenth * effectiveDexterity * 8) * CRAWL_STAT_SCALE,
+        20 - sizeFactor
+      ),
+      10
+    ),
+    10
   );
-  const modifiedDodgeBonus = rawDodgeBonus * dodgeModifier;
-  const actualDodgeBonus = Math.floor(modifiedDodgeBonus);
+  const armourPenaltyForDodge = armourEncumbrance - 3;
+  const actualDodgeBonusScaled =
+    armourPenaltyForDodge <= 0
+      ? rawDodgeBonusScaled
+      : armourPenaltyForDodge >= crawlStrength
+        ? divTrunc(
+            rawDodgeBonusScaled * crawlStrength,
+            armourPenaltyForDodge * 2
+          )
+        : rawDodgeBonusScaled -
+          divTrunc(
+            rawDodgeBonusScaled * armourPenaltyForDodge,
+            crawlStrength * 2
+          );
+  const rawDodgeBonus = Math.floor(rawDodgeBonusScaled / CRAWL_STAT_SCALE);
+  const actualDodgeBonus = Math.floor(
+    actualDodgeBonusScaled / CRAWL_STAT_SCALE
+  );
+  const dodgeModifier =
+    rawDodgeBonusScaled === 0
+      ? 1
+      : actualDodgeBonusScaled / rawDodgeBonusScaled;
   const directBonus =
     ringEvasion +
     equipmentEV +
     gelatinousBody +
     (distortionField > 0 ? distortionField + 1 : 0) +
     (tenguFlight > 0 ? 4 : 0) -
-    slowReflexes * 5;
-
-  // Calculate initial EV with dodge bonus
-  let currentEV = baseEV + actualDodgeBonus;
+    slowReflexes * 5 +
+    statusEV;
 
   // Shield penalty
-  const shieldPenalty =
-    (((2 / 5) * Math.pow(shieldEncumbrance, 2)) / (effectiveStrength + 5)) *
-    ((27 - shieldSkill) / 27);
+  const shieldPenaltyScaled = divTrunc(
+    divTrunc(
+      2 *
+        shieldEncumbrance *
+        shieldEncumbrance *
+        (270 - shieldSkillTenth) *
+        CRAWL_STAT_SCALE,
+      25 + 5 * crawlStrength
+    ),
+    270
+  );
 
   // Armour penalty
-  const armourPenalty = Math.floor(
-    ((1 / 225) *
-      Math.pow(armourEncumbrance, 2) *
-      (90 - 2 * armourSkill)) /
-      (effectiveStrength + 3)
+  const armourPenaltyScaled = divTrunc(
+    divTrunc(
+      2 *
+        armourEncumbrance *
+        armourEncumbrance *
+        (450 - armourSkillTenth) *
+        CRAWL_STAT_SCALE,
+      5 * (crawlStrength + 3)
+    ),
+    450
   );
 
   const auxiliaryArmourPenalty = barding
     ? Math.max(0, Math.floor(-miscellaneousOptions.barding.encumbrance / 3))
     : 0;
 
-  // Apply penalties
-  currentEV =
-    baseEV +
-    actualDodgeBonus -
-    shieldPenalty -
-    armourPenalty -
-    auxiliaryArmourPenalty +
-    directBonus;
-  currentEV = Math.max(1, Math.floor(currentEV));
+  const currentEVScaled =
+    baseEV * CRAWL_STAT_SCALE +
+    actualDodgeBonusScaled -
+    shieldPenaltyScaled -
+    armourPenaltyScaled -
+    auxiliaryArmourPenalty * CRAWL_STAT_SCALE +
+    directBonus * CRAWL_STAT_SCALE;
+  const currentEV = Math.max(
+    1,
+    Math.floor(currentEVScaled / CRAWL_STAT_SCALE)
+  );
 
   return {
     baseEV,
     rawDodgeBonus,
     actualDodgeBonus,
     dodgeModifier,
-    shieldPenalty,
-    armourPenalty,
+    shieldPenalty: shieldPenaltyScaled / CRAWL_STAT_SCALE,
+    armourPenalty: Math.floor(armourPenaltyScaled / CRAWL_STAT_SCALE),
     finalEV: currentEV,
   };
 }

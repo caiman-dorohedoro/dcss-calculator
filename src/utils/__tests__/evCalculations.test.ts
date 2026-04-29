@@ -202,6 +202,22 @@ describe("EV Calculations", () => {
     }
   );
 
+  test("uses Crawl's scaled dodge bonus until final EV rounding", () => {
+    const result = calculateEV({
+      version: "trunk",
+      dodgingSkill: 15.2,
+      dexterity: 24,
+      strength: 29,
+      species: "demonspawn",
+      shield: "buckler",
+      armour: "plate",
+      shieldSkill: 15.7,
+      armourSkill: 14,
+    });
+
+    expect(result.finalEV).toBe(18);
+  });
+
   test("equipment stats, evasion rings, and EV mutations stack into EV", () => {
     const base = calculateEV({
       version: "trunk",
@@ -260,6 +276,6 @@ describe("EV Calculations", () => {
     });
 
     expect(result.armourPenalty).toBe(4);
-    expect(result.finalEV).toBe(6);
+    expect(result.finalEV).toBe(5);
   });
 });

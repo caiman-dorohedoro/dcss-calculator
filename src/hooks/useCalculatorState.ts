@@ -94,6 +94,9 @@ export interface CalculatorState<V extends GameVersion> {
   ephemeralShield?: number;
   icemail?: number;
   condensationShield?: number;
+  sanguineArmour?: number;
+  statusAC?: number;
+  statusEV?: number;
   deformedBody?: boolean;
   reckless?: boolean;
   sturdyFrame?: number;
@@ -619,6 +622,9 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.ephemeralShield) ||
     !isOptionalNumber(state.icemail) ||
     !isOptionalNumber(state.condensationShield) ||
+    !isOptionalNumber(state.sanguineArmour) ||
+    !isOptionalNumber(state.statusAC) ||
+    !isOptionalNumber(state.statusEV) ||
     !isOptionalBoolean(state.deformedBody) ||
     !isOptionalBoolean(state.reckless) ||
     !isOptionalNumber(state.sturdyFrame) ||

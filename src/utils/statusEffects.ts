@@ -33,6 +33,11 @@ export const statusAwareMutationRules = [
     stateKey: "condensationShield",
     suppressedByStatusId: KNOWN_STATUS_IDS.icemailDepleted,
   },
+  {
+    traitId: KNOWN_MUTATION_TRAIT_IDS.sanguineArmour,
+    stateKey: "sanguineArmour",
+    activeStatusId: KNOWN_STATUS_IDS.sanguineArmoured,
+  },
 ] as const satisfies readonly {
   traitId: KnownMutationTraitId;
   stateKey: string;

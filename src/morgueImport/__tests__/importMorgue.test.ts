@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import {
   KNOWN_MUTATION_TRAIT_IDS,
+  KNOWN_STATUS_IDS,
   parseMorgueText,
   type EquipmentItemSnapshot,
   type ParsedMorgueTextRecord,
@@ -298,6 +299,385 @@ describe("morgue import mapper", () => {
       })
     );
     expect(result.importedState.wildMagic).toBe(2);
+  });
+
+  test("imports parser semantic ids for reduced AC and reduced EV traits", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Human",
+      speciesVariant: null,
+      background: "Fighter",
+      god: null,
+      ...defaultGodState,
+      xl: 12,
+      ac: 0,
+      ev: 0,
+      sh: 0,
+      strength: 10,
+      intelligence: 10,
+      dexterity: 10,
+      bodyArmour: "robe",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("robe", "robe"),
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [],
+      mutations: [
+        {
+          name: "reduced AC",
+          level: 2,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.reducedAc,
+        },
+        {
+          name: "reduced EV",
+          level: 3,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.reducedEv,
+        },
+      ],
+    } as unknown as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      scalesAC: -10,
+      slowReflexes: 3,
+    });
+  });
+
+  test("imports current stat statuses reported by parser 0.6.9", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-181-g84ebf06",
+      species: "Human",
+      speciesVariant: null,
+      background: "Fighter",
+      god: null,
+      ...defaultGodState,
+      statusText:
+        "fiery-armoured, protected from physical damage, corroded, trickster, acrobatic, vertigo",
+      statuses: [
+        { display: "fiery-armoured", id: KNOWN_STATUS_IDS.fieryArmour },
+        {
+          display: "protected from physical damage",
+          id: KNOWN_STATUS_IDS.protectedFromPhysicalDamage,
+        },
+        {
+          display: "corroded",
+          id: KNOWN_STATUS_IDS.corrosion,
+          values: { corrosion: -4 },
+        },
+        {
+          display: "trickster",
+          id: KNOWN_STATUS_IDS.trickster,
+          values: { ac: 14 },
+        },
+        { display: "acrobatic", id: KNOWN_STATUS_IDS.acrobatic },
+        { display: "vertigo", id: KNOWN_STATUS_IDS.vertigo },
+      ],
+      xl: 12,
+      ac: 0,
+      ev: 0,
+      sh: 0,
+      strength: 10,
+      intelligence: 10,
+      dexterity: 10,
+      bodyArmour: "robe",
+      shield: "none",
+      helmets: [],
+      gloves: [],
+      footwear: [],
+      cloaks: [],
+      orb: "none",
+      amulets: [],
+      rings: [],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("robe", "robe"),
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [],
+      mutations: [],
+    } as unknown as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      statusAC: 20,
+      statusEV: 10,
+    });
+  });
+
+  test("imports sanguine armour as an active AC status instead of raw armour", () => {
+    const record = {
+      playerName: "JaaP",
+      version: "0.35-a0-312-gb5bb446ab7",
+      species: "Demonspawn",
+      speciesVariant: null,
+      background: "Gladiator",
+      god: "Uskayaw",
+      ...defaultGodState,
+      statusText: "mighty, sanguine armoured, fragile",
+      statuses: [
+        {
+          display: "sanguine armoured",
+          id: KNOWN_STATUS_IDS.sanguineArmoured,
+        },
+      ],
+      xl: 23,
+      ac: 34,
+      ev: 18,
+      sh: 11,
+      strength: 29,
+      intelligence: 11,
+      dexterity: 24,
+      bodyArmour:
+        "the +3 plate armour of Experimentation {rElec rF+ Regen+ Int-2}",
+      shield: "+2 buckler of reflection",
+      helmets: [],
+      gloves: [
+        'the +0 pair of gloves "Fuyrph" {Hurl, rN+ Int+4 Dex+2 Slay+3}',
+      ],
+      footwear: ["+0 pair of boots of flying"],
+      cloaks: [
+        "the scarf of Toishrov {Repulsion, rElec rPois rF- Will++}",
+      ],
+      orb: "none",
+      amulets: ["the amulet of Woinluch {Acrobat rF+ Slay+6}"],
+      rings: [
+        "the ring of the Elephant {rF+ rC++ Str+5}",
+        "+6 ring of strength",
+      ],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: {
+        ...makeItem(
+          "the +3 plate armour of Experimentation {rElec rF+ Regen+ Int-2}",
+          "plate armour",
+          {
+            booleanProps: { rElec: true },
+            numeric: { rF: 1, Regen: 1, Int: -2 },
+          }
+        ),
+        objectClass: "armour",
+        enchant: 3,
+        artifactKind: "randart",
+      } as EquipmentItemSnapshot,
+      shieldDetails: {
+        ...makeItem("+2 buckler of reflection", "buckler", {
+          booleanProps: { Reflect: true },
+        }),
+        objectClass: "armour",
+        enchant: 2,
+        ego: "reflection",
+        egoProperties: {
+          numeric: {},
+          booleanProps: { Reflect: true },
+          opaqueTokens: [],
+        },
+      } as EquipmentItemSnapshot,
+      glovesDetails: [
+        {
+          ...makeItem(
+            'the +0 pair of gloves "Fuyrph" {Hurl, rN+ Int+4 Dex+2 Slay+3}',
+            "gloves",
+            {
+              booleanProps: { Hurl: true },
+              numeric: { rN: 1, Int: 4, Dex: 2, Slay: 3 },
+            }
+          ),
+          objectClass: "armour",
+          enchant: 0,
+          artifactKind: "randart",
+        } as EquipmentItemSnapshot,
+      ],
+      footwearDetails: [
+        {
+          ...makeItem("+0 pair of boots of flying", "boots", {
+            booleanProps: { Fly: true },
+          }),
+          objectClass: "armour",
+          enchant: 0,
+          ego: "flying",
+        } as EquipmentItemSnapshot,
+      ],
+      cloakDetails: [
+        {
+          ...makeItem(
+            "the scarf of Toishrov {Repulsion, rElec rPois rF- Will++}",
+            "scarf",
+            {
+              booleanProps: {
+                Repulsion: true,
+                rElec: true,
+                rPois: true,
+              },
+              numeric: { rF: -1, Will: 2 },
+            }
+          ),
+          objectClass: "armour",
+          artifactKind: "randart",
+        } as EquipmentItemSnapshot,
+      ],
+      amuletDetails: [
+        makeItem("the amulet of Woinluch {Acrobat rF+ Slay+6}", "amulet", {
+          booleanProps: { Acrobat: true },
+          numeric: { rF: 1, Slay: 6 },
+        }),
+      ],
+      ringDetails: [
+        makeItem("the ring of the Elephant {rF+ rC++ Str+5}", "ring", {
+          numeric: { rF: 1, rC: 2, Str: 5 },
+        }),
+        makeItem("+6 ring of strength", "ring", {
+          numeric: { Str: 6 },
+        }),
+      ],
+      skills: {
+        ...baseSkills,
+        armour: 14,
+        dodging: 15.2,
+        shields: 15.7,
+      },
+      effectiveSkills: {
+        ...baseSkills,
+        armour: 14,
+        dodging: 15.2,
+        shields: 15.7,
+        spellcasting: 7.3,
+      },
+      spells: [],
+      mutations: [
+        {
+          name: "sanguine armour",
+          level: 3,
+          traitId: KNOWN_MUTATION_TRAIT_IDS.sanguineArmour,
+        },
+      ],
+    } as unknown as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      activeStatusIds: [KNOWN_STATUS_IDS.sanguineArmoured],
+      sanguineArmour: 3,
+    });
+
+    const acAtImportedSkill = calculateAcData(result.importedState).find(
+      (point) => point.armour === 14
+    );
+    const evAtImportedSkill = calculateEvData(result.importedState).find(
+      (point) => point.dodgingSkill === 15.2
+    );
+    const shAtImportedSkill = calculateSHData(result.importedState).find(
+      (point) => point.shield === 15.7
+    );
+
+    expect(acAtImportedSkill?.ac).toBe(34);
+    expect(evAtImportedSkill?.finalEV).toBe(18);
+    expect(shAtImportedSkill?.sh).toBe(11);
+  });
+
+  test("parses wrapped sanguine armour status from an actual morgue snippet", () => {
+    const morgueText = `Dungeon Crawl Stone Soup version 0.35-a0-312-gb5bb446ab7 (webtiles) character file.
+
+461635 JaaP the Impassioned (level 23, -8/186 HPs)
+             Began as a Demonspawn Gladiator on Apr 27, 2026.
+             Was the Champion of Uskayaw.
+             Mangled by an iron troll (19 damage)
+             ... on level 3 of the Depths on Apr 28, 2026.
+             The game lasted 02:09:24 (68091 turns).
+
+JaaP the Impassioned (Demonspawn Gladiator)        Turns: 68091, Time: 02:09:25
+
+Health: -8/186     AC: 34    Str: 29    XL:     23   Next: 8%
+Magic:  36/36      EV: 18    Int: 11    God:    Uskayaw [******]
+Gold:   1991       SH: 11    Dex: 24    Spells: 28/36 levels left
+
+rFire   + + .  (33%)    E - +9 demon blade (vamp)
+rCold   + + .  (33%)    r - +2 buckler {Reflect}
+rNeg    + . .  (50%)    X - +3 plate armour of Experimentation {rElec rF+ Regen+ Int-2}
+rPois   +      (33%)    a - scarf of Toishrov {Repulsion, rElec rPois rF- Will++}
+rElec   +      (33%)    w - +0 pair of gloves "Fuyrph" {Hurl, rN+ Int+4 Dex+2 Slay+3}
+rCorr   .      (100%)   J - +0 pair of boots {Fly}
+SInv    +               K - amulet of Woinluch {Acrobat rF+ Slay+6}
+Will    +++..           F - ring of the Elephant {rF+ rC++ Str+5}
+Stlth                   m - +6 ring of strength
+HPRegen 1.31/turn
+MPRegen 0.25/turn
+
+%: repel missiles, reflection, acrobat
+@: mighty, sanguine armoured, fragile (+50% incoming damage), flying, wreathed
+by umbra, studying Shields
+A: antennae 3, powered by pain 3, augmentation 3, sanguine armour 3, foul shadow
+3
+}: 3/15 runes: decaying, serpentine, silver
+a: Renounce Religion (0%), Stomp (0%), Line Pass (0%), Grand Finale (0%)
+
+Inventory:
+
+Hand Weapons
+ E - a +9 vampiric demon blade (weapon)
+Armour
+ a - the scarf of Toishrov (worn) {Repulsion, rElec rPois rF- Will++}
+ r - a +2 buckler of reflection (worn)
+ w - the +0 pair of gloves "Fuyrph" (worn) {Hurl, rN+ Int+4 Dex+2 Slay+3}
+ J - a +0 pair of boots of flying (worn)
+ X - the +3 plate armour of Experimentation (worn) {rElec rF+ Regen+ Int-2}
+Jewellery
+ F - the ring of the Elephant (worn) {rF+ rC++ Str+5}
+ K - the amulet of Woinluch (worn) {Acrobat rF+ Slay+6}
+ m - a +6 ring of strength (worn)
+
+   Skills:
+ + Level 16.8 Fighting
+ + Level 15.1(15.3) Long Blades
+ + Level 17.5 Throwing
+ + Level 14.0 Armour
+ + Level 15.2 Dodging
+ + Level 15.7 Shields
+ + Level 7.3 Spellcasting
+ - Level 3.3 Translocations
+ - Level 3.3 Air Magic
+ + Level 19.2 Invocations
+ + Level 6.1 Evocations
+`;
+
+    const result = parseImportedMorgue(morgueText);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState).toMatchObject({
+      activeStatusIds: [KNOWN_STATUS_IDS.sanguineArmoured],
+      sanguineArmour: 3,
+    });
+    expect(
+      calculateAcData(result.importedState).find((point) => point.armour === 14)
+        ?.ac
+    ).toBe(34);
   });
 
   test("imports parser-reported normal body armour ego without translating it to none", () => {

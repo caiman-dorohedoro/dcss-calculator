@@ -64,6 +64,8 @@ export const calculateAcData = <V extends GameVersion>(
           scalesAC: state.scalesAC,
           deformedBody: state.deformedBody,
           icemail: state.icemail,
+          sanguineArmour: state.sanguineArmour,
+          statusAC: state.statusAC,
           activeStatusIds: state.activeStatusIds,
           armourSkill: armour,
         }),
@@ -101,6 +103,7 @@ export const calculateEvData = <V extends GameVersion>(
         sturdyFrame: state.sturdyFrame,
         gelatinousBody: state.gelatinousBody,
         slowReflexes: state.slowReflexes,
+        statusEV: state.statusEV,
       });
 
       return {

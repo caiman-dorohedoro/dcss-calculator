@@ -47,6 +47,8 @@ type MixedCalculationsParams<V extends GameVersion> = {
   scalesAC?: number;
   deformedBody?: boolean;
   icemail?: number;
+  sanguineArmour?: number;
+  statusAC?: number;
   activeStatusIds?: readonly KnownStatusId[];
   armourSkill: number;
 };
@@ -73,6 +75,8 @@ export const calculateMixedAC = <V extends GameVersion>({
   scalesAC = 0,
   deformedBody = false,
   icemail = 0,
+  sanguineArmour = 0,
+  statusAC = 0,
   activeStatusIds,
   armourSkill,
 }: MixedCalculationsParams<V>): number => {
@@ -130,6 +134,11 @@ export const calculateMixedAC = <V extends GameVersion>({
     !hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.icemailDepleted)
       ? icemail * 4
       : 0;
+  const sanguineArmourAc =
+    sanguineArmour > 0 &&
+    hasActiveStatus(activeStatusIds, KNOWN_STATUS_IDS.sanguineArmoured)
+      ? 3 + sanguineArmour * 3
+      : 0;
 
   return (
     scaledBaseAc +
@@ -142,6 +151,8 @@ export const calculateMixedAC = <V extends GameVersion>({
     ringProtection +
     equipmentAC +
     scalesAC +
-    icemailAc
+    icemailAc +
+    sanguineArmourAc +
+    statusAC
   );
 };
