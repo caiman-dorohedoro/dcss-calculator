@@ -12,6 +12,7 @@ import {
   getSpellSchools,
   vehumetSupportsSpell,
 } from "./spellCalculation";
+import type { SpellCalculationParams } from "./spellCalculation";
 import { GameVersion } from "@/types/game";
 import { VersionedSchoolSkillLevels } from "@/types/spells";
 import { spellCanBeEnkindled } from "./spellCanbeEnkindled";
@@ -207,8 +208,38 @@ export const calculateShTicks = <V extends GameVersion>(
 export type FristSchoolSFDataPoint = {
   spellSkill: number;
   spellFailureRate: number;
+  spellFailureRange: [number, number];
+  spellFailureRangeMin: number;
+  spellFailureRangeMax: number;
   enKindledSpellFailureRate?: number;
   vehumetPreviewSpellFailureRate?: number;
+};
+
+const CRAWL_MAX_SKILL = 27;
+const CRAWL_DISPLAY_SKILL_SCALE = 10;
+const CRAWL_SPELL_SCHOOL_SCALE = 200;
+const CRAWL_SPELLCASTING_SCALE = 50;
+
+const getDisplayedSkillBucketBounds = (
+  displayedSkill: number,
+  calculationScale: number
+): [number, number] => {
+  const displayedUnits = Math.min(
+    CRAWL_MAX_SKILL * CRAWL_DISPLAY_SKILL_SCALE,
+    Math.max(0, Math.round(displayedSkill * CRAWL_DISPLAY_SKILL_SCALE))
+  );
+  const unitsPerDisplayedDecimal =
+    calculationScale / CRAWL_DISPLAY_SKILL_SCALE;
+  const lowerScaledSkill = displayedUnits * unitsPerDisplayedDecimal;
+  const upperScaledSkill = Math.min(
+    CRAWL_MAX_SKILL * calculationScale,
+    lowerScaledSkill + unitsPerDisplayedDecimal - 1
+  );
+
+  return [
+    lowerScaledSkill / calculationScale,
+    upperScaledSkill / calculationScale,
+  ];
 };
 
 export const calculateAvgSFData = <V extends GameVersion>(
@@ -240,22 +271,44 @@ export const calculateAvgSFData = <V extends GameVersion>(
     vehumetSupportsSpell(state.version, targetSpell);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
+      const displayedSpellSkill = index / 10;
       const schoolSkills = spellSchools.reduce((acc, school) => {
-        acc[school] = index / 10;
+        acc[school] = displayedSpellSkill;
 
         return acc;
       }, {} as VersionedSchoolSkillLevels<V>);
 
-      const spellFailureRate = calculateSpellFailureRate({
+      const [schoolSkillMin, schoolSkillMax] = getDisplayedSkillBucketBounds(
+        displayedSpellSkill,
+        CRAWL_SPELL_SCHOOL_SCALE
+      );
+      const [spellcastingMin, spellcastingMax] =
+        getDisplayedSkillBucketBounds(
+          state.spellcasting ?? 0,
+          CRAWL_SPELLCASTING_SCALE
+        );
+      const rangeMinSchoolSkills = spellSchools.reduce((acc, school) => {
+        acc[school] = schoolSkillMax;
+
+        return acc;
+      }, {} as VersionedSchoolSkillLevels<V>);
+      const rangeMaxSchoolSkills = spellSchools.reduce((acc, school) => {
+        acc[school] = schoolSkillMin;
+
+        return acc;
+      }, {} as VersionedSchoolSkillLevels<V>);
+
+      const baseSpellFailureParams: Omit<
+        SpellCalculationParams<V>,
+        "schoolSkills" | "spellcasting"
+      > = {
         version: state.version,
         species: state.species,
         strength: state.strength,
         equipmentStr: gear.str,
         intelligence: state.intelligence,
         equipmentInt: gear.int,
-        spellcasting: state.spellcasting ?? 0,
         targetSpell: targetSpell,
-        schoolSkills: schoolSkills,
         spellDifficulty,
         armour: state.armour,
         bodyArmourEgo: state.bodyArmour.ego ?? state.bodyArmourEgo,
@@ -274,41 +327,50 @@ export const calculateAvgSFData = <V extends GameVersion>(
         god: state.god,
         godPietyRank: state.godPietyRank,
         godUnderPenance: state.godUnderPenance,
+      };
+
+      const spellFailureRate = calculateSpellFailureRate({
+        ...baseSpellFailureParams,
+        spellcasting: state.spellcasting ?? 0,
+        schoolSkills,
       });
+      const rangeMinCandidate = calculateSpellFailureRate({
+        ...baseSpellFailureParams,
+        spellcasting: spellcastingMax,
+        schoolSkills: rangeMinSchoolSkills,
+      });
+      const rangeMaxCandidate = calculateSpellFailureRate({
+        ...baseSpellFailureParams,
+        spellcasting: spellcastingMin,
+        schoolSkills: rangeMaxSchoolSkills,
+      });
+      const spellFailureRangeMin = Math.min(
+        rangeMinCandidate,
+        rangeMaxCandidate
+      );
+      const spellFailureRangeMax = Math.max(
+        rangeMinCandidate,
+        rangeMaxCandidate
+      );
 
       const dataPoint = {
-        spellSkill: index / 10,
+        spellSkill: displayedSpellSkill,
         spellFailureRate,
+        spellFailureRange: [spellFailureRangeMin, spellFailureRangeMax] as [
+          number,
+          number,
+        ],
+        spellFailureRangeMin,
+        spellFailureRangeMax,
       };
 
       const withVehumetPreview = shouldPreviewVehumet
         ? {
             ...dataPoint,
             vehumetPreviewSpellFailureRate: calculateSpellFailureRate({
-              version: state.version,
-              species: state.species,
-              strength: state.strength,
-              equipmentStr: gear.str,
-              intelligence: state.intelligence,
-              equipmentInt: gear.int,
+              ...baseSpellFailureParams,
               spellcasting: state.spellcasting ?? 0,
-              targetSpell: targetSpell,
               schoolSkills: schoolSkills,
-              spellDifficulty,
-              armour: state.armour,
-              bodyArmourEgo: state.bodyArmour.ego ?? state.bodyArmourEgo,
-              orb: state.orb,
-              shield: state.shield,
-              armourSkill: state.armourSkill,
-              shieldSkill: state.shieldSkill,
-              wizardry: gear.wizardry,
-              ringWizardry: 0,
-              bigBrainWizardry: state.bigBrainWizardry,
-              subduedMagic: state.subduedMagic,
-              antiWizardry: state.antiWizardry,
-              runicMagic: state.runicMagic,
-              sturdyFrame: state.sturdyFrame,
-              wildMagic: state.wildMagic,
               god: "Vehumet",
               godPietyRank: 3,
               godUnderPenance: false,
@@ -321,34 +383,10 @@ export const calculateAvgSFData = <V extends GameVersion>(
         spellCanBeEnkindled(state.version, targetSpell)
       ) {
         const enKindledSpellFailureRate = calculateSpellFailureRate({
-          version: state.version,
-          species: state.species,
-          strength: state.strength,
-          equipmentStr: gear.str,
-          intelligence: state.intelligence,
-          equipmentInt: gear.int,
+          ...baseSpellFailureParams,
           spellcasting: state.spellcasting ?? 0,
-          targetSpell: targetSpell,
           schoolSkills: schoolSkills,
-          spellDifficulty,
-          armour: state.armour,
-          bodyArmourEgo: state.bodyArmour.ego ?? state.bodyArmourEgo,
-          orb: state.orb,
-          shield: state.shield,
-          armourSkill: state.armourSkill,
-          shieldSkill: state.shieldSkill,
-          wizardry: gear.wizardry,
-          ringWizardry: 0,
-          bigBrainWizardry: state.bigBrainWizardry,
-          subduedMagic: state.subduedMagic,
-          antiWizardry: state.antiWizardry,
-          runicMagic: state.runicMagic,
-          sturdyFrame: state.sturdyFrame,
-          wildMagic: state.wildMagic,
           enkindle: true,
-          god: state.god,
-          godPietyRank: state.godPietyRank,
-          godUnderPenance: state.godUnderPenance,
         });
 
         return {

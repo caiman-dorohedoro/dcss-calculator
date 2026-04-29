@@ -44,6 +44,12 @@ await jest.unstable_mockModule("recharts", () => ({
   LineChart: ({ children }: { children?: ReactNode }) => (
     <div data-testid="line-chart">{children}</div>
   ),
+  Area: ({ dataKey, name }: { dataKey?: string; name?: string }) => (
+    <div data-testid="chart-area" data-key={dataKey} data-name={name} />
+  ),
+  ComposedChart: ({ children }: { children?: ReactNode }) => (
+    <div data-testid="composed-chart">{children}</div>
+  ),
   ResponsiveContainer: ({ children }: { children?: ReactNode }) => (
     <div data-testid="responsive-container">{children}</div>
   ),
@@ -196,6 +202,22 @@ describe("SFChart layout", () => {
         "data-margin-left"
       )
     ).toBe("-150px");
+  });
+
+  test("renders a precision range band behind the current failure line", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.targetSpell = "Swiftness";
+
+    await act(async () => {
+      root.render(<SFChart state={state} setState={setState} />);
+    });
+
+    const precisionBand = container.querySelector(
+      '[data-testid="chart-area"][data-key="spellFailureRange"]'
+    ) as HTMLDivElement;
+
+    expect(precisionBand).not.toBeNull();
+    expect(precisionBand.dataset.name).toBe(" Precision range");
   });
 
   test("uses a middle legend offset when one optional line is visible", async () => {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
-  LineChart,
+  Area,
+  ComposedChart,
   Line,
   XAxis,
   YAxis,
@@ -67,7 +68,7 @@ const SFChart = <V extends GameVersion>({
     <>
       <SpellModeHeader state={state} setState={setState} />
       <ResponsiveContainer width="100%" height={350}>
-        <LineChart
+        <ComposedChart
           data={sfData}
           margin={{ left: 10, right: 10, top: 10, bottom: 10 }}
         >
@@ -104,6 +105,13 @@ const SFChart = <V extends GameVersion>({
           <YAxis allowDecimals={false} width={30} tick={{ fill: "#eee" }} />
           <Tooltip
             formatter={(value, name) => {
+              if (name === " Precision range" && Array.isArray(value)) {
+                const [min, max] = value;
+                return [
+                  min === max ? `${min}%` : `${min}-${max}%`,
+                  "Possible failure range",
+                ];
+              }
               if (name === " Enkindle") {
                 return [`${value}%`, "Spell Failure Rate (Enkindle)"];
               }
@@ -141,6 +149,17 @@ const SFChart = <V extends GameVersion>({
               marginLeft: legendMarginLeft,
               marginBottom: "-10px",
             }}
+          />
+          <Area
+            type="stepAfter"
+            dataKey="spellFailureRange"
+            name=" Precision range"
+            stroke="none"
+            fill="#94a3b8"
+            fillOpacity={0.22}
+            legendType="none"
+            activeDot={false}
+            isAnimationActive={false}
           />
           <Line
             type="stepAfter"
@@ -203,7 +222,7 @@ const SFChart = <V extends GameVersion>({
               )}
             />
           )}
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </>
   );
