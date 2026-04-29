@@ -567,6 +567,7 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     ...(slotCounts.ringSlots > 2 ? [`${slotCounts.ringSlots} rings`] : []),
     ...(slotCounts.gloveSlots > 1 ? [`${slotCounts.gloveSlots} glove slots`] : []),
   ];
+  const importedMutationNotes = state.importedMutationNotes ?? [];
 
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
@@ -633,6 +634,26 @@ const DynamicEquipmentControls = <V extends GameVersion>({
                 <span key={trait} className="inline-flex gap-1">
                   <span className="font-medium text-foreground">{trait}</span>
                   <span>already included</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        {importedMutationNotes.length > 0 && (
+          <div
+            data-testid="imported-mutation-traits"
+            className="flex flex-col gap-1 text-xs text-muted-foreground"
+          >
+            <div className="font-semibold uppercase tracking-[0.18em]">
+              Imported traits
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {importedMutationNotes.map((note, index) => (
+                <span
+                  key={`${note.label}-${index}`}
+                  className="inline-flex items-baseline gap-1 rounded-md border border-border/60 px-2 py-1"
+                >
+                  <span className="font-medium text-foreground">{note.label}</span>
                 </span>
               ))}
             </div>

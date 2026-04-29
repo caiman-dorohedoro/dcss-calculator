@@ -519,6 +519,33 @@ describe("DynamicEquipmentControls", () => {
     ).toBeNull();
   });
 
+  test("renders imported morgue traits as read-only context", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "demonspawn";
+    state.importedMutationNotes = [
+      { label: "blade aux", detail: "from morgue" },
+      { label: "hooves 3", detail: "from morgue" },
+    ];
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const mutationSection = container.querySelector(
+      '[data-testid="dynamic-equipment-mutations"]'
+    ) as HTMLElement;
+
+    expect(mutationSection.textContent).toContain("Imported traits");
+    expect(mutationSection.textContent).toContain("blade aux");
+    expect(mutationSection.textContent).toContain("hooves 3");
+    expect(
+      mutationSection.querySelector('button[aria-label="Remove blade aux"]')
+    ).toBeNull();
+    expect(
+      mutationSection.querySelector('input[aria-label="blade aux"]')
+    ).toBeNull();
+  });
+
   test("adds an editable mutation control from the selector", async () => {
     const state = buildDefaultCalculatorState("trunk");
     state.species = "human";

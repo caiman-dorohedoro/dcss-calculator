@@ -5,7 +5,10 @@ import {
   type EquipmentNumericPropertyKey,
   type ParsedMorgueTextRecord,
 } from "dcss-morgue-parser";
-import type { CalculatorState } from "@/hooks/useCalculatorState.ts";
+import type {
+  CalculatorState,
+  ImportedMutationNote,
+} from "@/hooks/useCalculatorState.ts";
 import type { EquipmentModifierBag } from "@/types/equipmentItems";
 import {
   createDefaultAmuletSlot,
@@ -686,12 +689,19 @@ const setNumericMutationState = (
   state[key] = value;
 };
 
+const formatImportedMutationLabel = (
+  mutation: ParsedMorgueTextRecord["mutations"][number]
+) =>
+  typeof mutation.level === "number" && mutation.level > 0
+    ? `${mutation.name} ${mutation.level}`
+    : mutation.name;
+
 const applyMutationModifiers = (
   record: ParsedMorgueTextRecord,
   state: CalculatorState<GameVersion>
 ) => {
   const applied: string[] = [];
-  const unsupported: string[] = [];
+  const readOnlyNotes: ImportedMutationNote[] = [];
 
   for (const mutation of record.mutations) {
     if (isSuppressedMutation(mutation)) {
@@ -818,11 +828,14 @@ const applyMutationModifiers = (
     }
 
     if (mutation.name !== "wild magic") {
-      unsupported.push(mutation.name);
+      readOnlyNotes.push({
+        label: formatImportedMutationLabel(mutation),
+        detail: "from morgue",
+      });
     }
   }
 
-  return { applied, unsupported };
+  return { applied, readOnlyNotes };
 };
 
 const applyStatusModifiers = (
@@ -1291,20 +1304,19 @@ export const buildImportedCalculatorState = (
   }
 
   const mutationMapping = applyMutationModifiers(record, importedState);
-  importedState.importedMutationNotes = [];
+  importedState.importedMutationNotes = mutationMapping.readOnlyNotes;
   if (mutationMapping.applied.length > 0) {
     summary.applied.push({
       label: "Mutations & Traits",
       detail: mutationMapping.applied.join(", "),
     });
   }
-  if (mutationMapping.unsupported.length > 0) {
-    summary.skipped.push({
-      label: "Mutations & Traits",
-      detail: `Unsupported A: traits skipped: ${mutationMapping.unsupported.join(", ")}`,
+  if (mutationMapping.readOnlyNotes.length > 0) {
+    summary.applied.push({
+      label: "Imported traits",
+      detail: mutationMapping.readOnlyNotes.map((note) => note.label).join(", "),
     });
   }
-
   normalizeImportedBaseStats(importedState, record);
 
   const wildMagic = deriveWildMagic(record);

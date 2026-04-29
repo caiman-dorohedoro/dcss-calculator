@@ -164,15 +164,12 @@ describe("morgue import mapper", () => {
         expect.objectContaining({ label: "Stats" }),
         expect.objectContaining({ label: "Skills" }),
         expect.objectContaining({ label: "Target spell" }),
+        expect.objectContaining({ label: "Imported traits" }),
       ])
     );
-    expect(result.summary.skipped).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          label: "Mutations & Traits",
-          detail: expect.stringContaining("Unsupported A: traits skipped"),
-        }),
-      ])
+    expect(result.importedState.importedMutationNotes.length).toBeGreaterThan(0);
+    expect(result.summary.skipped).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ label: "Mutations & Traits" })])
     );
     expect(result.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Rings" })])
@@ -2305,6 +2302,41 @@ Jewellery
     );
     expect(parsed.record.sh).toBe(25);
     expect(shPoint?.sh).toBe(25);
+  });
+
+  test("keeps imported unmodeled A-line traits visible as read-only notes", () => {
+    const parsed = parseMorgueText(quixfoxTrunkBladeFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    expect(result.importedState.agileMutation).toBe(1);
+    expect(result.importedState.importedMutationNotes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: "blade aux" }),
+        expect.objectContaining({ label: "blade parry" }),
+        expect.objectContaining({ label: "blade armour" }),
+        expect.objectContaining({ label: "hooves 3" }),
+        expect.objectContaining({ label: "horns 3" }),
+        expect.objectContaining({ label: "aura of silence" }),
+        expect.objectContaining({ label: "weakness stinger 3" }),
+      ])
+    );
+    expect(result.summary.skipped).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Mutations & Traits",
+          detail: expect.stringContaining("blade aux"),
+        }),
+      ])
+    );
   });
 
   test("parses compact title-line dumps using the notes descriptor fallback", () => {
