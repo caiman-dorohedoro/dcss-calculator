@@ -26,6 +26,7 @@ When adding or updating a version, check these files first:
 - `src/versioning/speciesData.ts`
 - `src/versioning/versionRegistry.ts`
 - `src/versioning/defaultState.ts`
+- `src/versioning/formData.ts` when forms, melds, or Shapeshifting scaling change
 - `src/versioning/uiOptions.ts`
 - `src/versioning/formulaProfiles.ts` when the spell-failure formula changes
 
@@ -186,6 +187,25 @@ Audit checklist:
 - update `README.md` if the supported versions or maintenance links changed
 
 Write the results into a dated audit doc under `docs/operations/`. The current example is `docs/operations/crawl-0.34.1-to-trunk-audit.md`.
+
+### Form data audit
+
+When updating Crawl versions, inspect `crawl/crawl-ref/source/dat/forms/*.yaml`,
+`crawl/crawl-ref/source/transform.cc`, and the AC/EV/SH paths in
+`crawl/crawl-ref/source/player.cc`.
+
+Update `src/versioning/formData.ts` when any supported version changes:
+
+- form `skill` min/max
+- `melds`
+- `size`
+- `str`, `dex`, or `int`
+- `ac`, `ev`, or `body_ac_mult`
+- special cases such as dragon draconian AC, statue EV multiplier, or blade parry
+
+Imported morgue defense tests must continue to derive calculator output from
+state and formulas. Do not copy morgue top-line AC, EV, or SH into calculator
+state.
 
 ## Required Verification
 

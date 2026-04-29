@@ -1,7 +1,7 @@
 # 메타 카탈로그
 
 작성일: 2026-04-05  
-최종 업데이트: 2026-04-28
+최종 업데이트: 2026-04-29
 
 ## 목적
 
@@ -72,6 +72,7 @@
 | `/src/versioning/versionRegistry.ts` | 버전별 주문 데이터, 종족 데이터, defaults, feature flags, formula profile 등록 지점 |
 | `/src/versioning/speciesData.ts` | 버전별 종족 목록과 옵션 정의 |
 | `/src/versioning/defaultState.ts` | 버전별 calculator 초기 상태 생성 |
+| `/src/versioning/formData.ts` | Crawl form별 meld, size, stat, AC/EV/SH scaling 데이터 정의 |
 | `/src/versioning/uiOptions.ts` | 버전별 장비 토글 노출 규칙 |
 | `/src/versioning/formulaProfiles.ts` | spell fail cap 등 계산식 프로필 정의 |
 | `/src/utils/` | AC, EV, SH, spell failure 계산 구현과 회귀 테스트가 묶이는 영역 |
