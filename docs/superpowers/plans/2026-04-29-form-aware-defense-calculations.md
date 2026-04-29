@@ -12,6 +12,7 @@
 
 ## File Structure
 
+- External prerequisite: release or consume a `dcss-morgue-parser` build that fixes `skull of Zonguldrok {Reaping Hat+ ...}` being duplicated as headgear. Local parser source already has this focused fix; the app must not depend on the published `0.6.9` behavior when adding Triskal-style fixtures.
 - Create `src/versioning/formData.ts`: parser-facing form keys, form definitions, scaling helpers, form lookup.
 - Create `src/versioning/__tests__/formData.test.ts`: unit coverage for scaling, meld groups, form size/stat data, and special cases.
 - Modify `src/versioning/versionRegistry.ts`: expose `forms` on each version config.
@@ -30,6 +31,128 @@
 - Add `src/morgueImport/__fixtures__/triskalTrunkDragonForm.ts`: focused fixture for the pasted Triskal morgue.
 - Modify `docs/operations/versioning-workflow.md`: record form-data update checklist.
 - Modify `docs/meta--catalog.md`: add the implementation plan to the document catalog.
+
+## Task 0: Verify Parser Boundary Before App Work
+
+**Files:**
+- External: `/Users/hyeon/playground/dcss-morgue-parser/packages/parser/src/extractEquipment.ts`
+- External test: `/Users/hyeon/playground/dcss-morgue-parser/apps/pipeline/test/parser/extractEquipment.test.ts`
+- Modify after parser release: `package.json`
+- Modify after parser release: `pnpm-lock.yaml`
+
+- [ ] **Step 1: Confirm parser output needed by this app**
+
+Run focused parser checks against the app dependency:
+
+```bash
+npm view dcss-morgue-parser version dist-tags --json
+```
+
+```bash
+node --input-type=module <<'NODE'
+import { parseMorgueText } from 'dcss-morgue-parser';
+import { readFileSync } from 'node:fs';
+
+const text = readFileSync('src/morgueImport/__fixtures__/oniMonkTrunkStatueForm.ts', 'utf8')
+  .match(/String.raw`([\s\S]*)`;\s*$/)?.[1];
+if (!text) throw new Error('fixture string not found');
+
+const parsed = parseMorgueText(text);
+if (!parsed.ok) throw new Error(JSON.stringify(parsed.failure));
+
+const record = parsed.record;
+console.log(JSON.stringify({
+  form: record.form,
+  ac: record.ac,
+  ev: record.ev,
+  sh: record.sh,
+  xl: record.xl,
+  shapeshifting: record.effectiveSkills.shapeshifting,
+  bodyArmourDetails: record.bodyArmourDetails && {
+    baseType: record.bodyArmourDetails.baseType,
+    equipState: record.bodyArmourDetails.equipState,
+  },
+  talismanDetails: record.talismanDetails && {
+    baseType: record.talismanDetails.baseType,
+    equipState: record.talismanDetails.equipState,
+  },
+}, null, 2));
+NODE
+```
+
+Expected: parser exposes `form`, top-line AC/EV/SH, XL, effective Shapeshifting, talisman details, and `equipState` for melded equipment. These are sufficient inputs for app-side formulas.
+
+- [ ] **Step 2: Confirm the parser should not own form formulas**
+
+Record this boundary before implementing:
+
+- Parser owns: structured morgue facts, current `form`, `talismanDetails`, equipment `equipState`, top-line displayed AC/EV/SH for regression evidence.
+- App owns: versioned Crawl form definitions, Shapeshifting scaling, effective equipment, and AC/EV/SH/spell penalty formulas.
+- Do not copy `record.ac`, `record.ev`, `record.sh`, or `spell.failurePercent` into calculator output.
+
+- [ ] **Step 3: Resolve the skull of Zonguldrok parser bug before adding Triskal fixture**
+
+Published `dcss-morgue-parser@0.6.9` currently parses this focused sample incorrectly:
+
+```bash
+node --input-type=module <<'NODE'
+import { extractEquipment } from 'dcss-morgue-parser';
+
+const parsed = extractEquipment(`
+Health: 197/238    AC: 17    Str:  8    XL:     27
+Magic:  39/63      EV: 15    Int: 38    God:    Vehumet [******]
+Gold:   5060       SH:  0    Dex:  9    Spells: 30/79 levels left
+
+rFire   + + +  (20%)    d - skull of Zonguldrok {Reaping Hat+ rN+ Int+4}
+rCold   + + +  (20%)    C - +2 hat {SInv}
+
+Inventory:
+
+Armour
+ d - the skull of Zonguldrok (worn) {Reaping Hat+ rN+ Int+4}
+ C - a +2 hat of see invisible (worn)
+`);
+
+console.log(JSON.stringify({
+  orb: parsed.orb,
+  helmets: parsed.helmets,
+  helmetDetails: parsed.helmetDetails?.map((item) => ({
+    rawName: item.rawName,
+    baseType: item.baseType,
+  })),
+}, null, 2));
+NODE
+```
+
+Expected after parser fix: `helmets` contains only `hat of see invisible`; `skull of Zonguldrok` appears only as `orb`.
+
+The local parser repo already contains a focused source/test change for this:
+
+```bash
+npm test -w apps/pipeline -- extractEquipment.test.ts -t "Hat\\+|melded equipment"
+```
+
+Expected: pass. Publish or otherwise consume that parser fix before app Task 3 uses a Triskal dragon-form fixture. Do not mix parser source edits into this app repo.
+
+- [ ] **Step 4: Bump parser dependency after release**
+
+Once the parser fix is released, update the app dependency and lockfile:
+
+```bash
+pnpm up dcss-morgue-parser@latest
+pnpm test --runInBand --runTestsByPath src/morgueImport/__tests__/importMorgue.test.ts
+```
+
+Expected: import tests pass, and parser output no longer duplicates `skull of Zonguldrok` as headgear.
+
+- [ ] **Step 5: Commit parser dependency bump separately**
+
+Run:
+
+```bash
+git add package.json pnpm-lock.yaml
+git commit -m "chore: update morgue parser"
+```
 
 ## Task 1: Add Versioned Form Data And Pure Helpers
 
