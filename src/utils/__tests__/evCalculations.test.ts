@@ -1,4 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
+import { Size } from "@/types/species";
 import { calculateEV } from "../evCalculation";
 
 describe("EV Calculations", () => {
@@ -277,5 +278,37 @@ describe("EV Calculations", () => {
 
     expect(result.armourPenalty).toBe(4);
     expect(result.finalEV).toBe(5);
+  });
+
+  test("uses form size, form EV bonus, and EV multiplier", () => {
+    const giantWithBonus = calculateEV({
+      version: "trunk",
+      dodgingSkill: 0,
+      dexterity: 10,
+      strength: 10,
+      species: "human",
+      shield: "none",
+      armour: "none",
+      shieldSkill: 0,
+      armourSkill: 0,
+      effectiveSize: Size.GIANT,
+      formEV: 4,
+    });
+    const multiplied = calculateEV({
+      version: "trunk",
+      dodgingSkill: 0,
+      dexterity: 10,
+      strength: 10,
+      species: "human",
+      shield: "none",
+      armour: "none",
+      shieldSkill: 0,
+      armourSkill: 0,
+      evMultiplier: { numerator: 4, denominator: 5 },
+    });
+
+    expect(giantWithBonus.baseEV).toBe(6);
+    expect(giantWithBonus.finalEV).toBe(10);
+    expect(multiplied.finalEV).toBe(8);
   });
 });

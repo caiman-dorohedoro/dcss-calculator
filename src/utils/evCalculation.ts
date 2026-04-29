@@ -45,6 +45,9 @@ export function calculateEV<V extends GameVersion>(params: {
   gelatinousBody?: number;
   slowReflexes?: number;
   statusEV?: number;
+  effectiveSize?: Size;
+  formEV?: number;
+  evMultiplier?: { numerator: number; denominator: number };
 }) {
   const {
     version,
@@ -67,6 +70,9 @@ export function calculateEV<V extends GameVersion>(params: {
     gelatinousBody = 0,
     slowReflexes = 0,
     statusEV = 0,
+    effectiveSize,
+    formEV = 0,
+    evMultiplier,
   } = params;
 
   const speciesOpts = speciesOptions(version);
@@ -74,7 +80,7 @@ export function calculateEV<V extends GameVersion>(params: {
     throw new Error(`Invalid species: ${species}, version: ${version}`);
   }
 
-  const sizeFactor = sizeToNumber[speciesOpts[species].size];
+  const sizeFactor = sizeToNumber[effectiveSize ?? speciesOpts[species].size];
   const baseEV = 10 + sizeFactor;
   const shieldEncumbrance = shieldOptions[shield].encumbrance;
   const armourEncumbrance = Math.max(
@@ -165,10 +171,14 @@ export function calculateEV<V extends GameVersion>(params: {
     shieldPenaltyScaled -
     armourPenaltyScaled -
     auxiliaryArmourPenalty * CRAWL_STAT_SCALE +
+    formEV * CRAWL_STAT_SCALE +
     directBonus * CRAWL_STAT_SCALE;
+  const multipliedEVScaled = evMultiplier
+    ? Math.trunc((currentEVScaled * evMultiplier.numerator) / evMultiplier.denominator)
+    : currentEVScaled;
   const currentEV = Math.max(
     1,
-    Math.floor(currentEVScaled / CRAWL_STAT_SCALE)
+    Math.floor(multipliedEVScaled / CRAWL_STAT_SCALE)
   );
 
   return {

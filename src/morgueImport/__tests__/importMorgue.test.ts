@@ -2118,6 +2118,28 @@ Jewellery
     expect(point?.ac).toBe(18);
   });
 
+  test("calculates imported Triskal dragon-form EV using giant size and form-aware equipment", () => {
+    const parsed = parseMorgueText(triskalTrunkDragonFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    const point = calculateEvData(result.importedState).find(
+      (candidate) =>
+        candidate.dodgingSkill === parsed.record.effectiveSkills.dodging
+    );
+
+    expect(parsed.record.ev).toBe(22);
+    expect(point?.finalEV).toBe(22);
+  });
+
   test("parses compact title-line dumps using the notes descriptor fallback", () => {
     const abbreviatedMorgue = oniMonkTrunkStatueFormMorgue.replace(
       "(Oni Monk)",

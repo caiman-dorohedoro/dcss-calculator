@@ -98,6 +98,14 @@ export const calculateEvData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): DataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
+  const effectiveState = getEffectiveEquipmentState(state);
+  const form = getFormDefinition(state.version, state.form);
+  const formValueParams = {
+    shapeshiftingSkill: state.shapeshiftingSkill ?? 0,
+    experienceLevel: state.experienceLevel ?? 1,
+    form,
+  };
+  const formEV = getFormValue(form.ev, formValueParams);
   const result = Array.from({ length: 271 }, (_, i) => i / 10).map(
     (_, index) => {
       const dodgingSkill = index / 10;
@@ -109,9 +117,9 @@ export const calculateEvData = <V extends GameVersion>(
         strength: state.strength,
         equipmentStr: gear.str,
         species: state.species,
-        shield: state.shield,
-        armour: state.armour,
-        barding: state.barding,
+        shield: effectiveState.shield,
+        armour: effectiveState.armour,
+        barding: effectiveState.barding,
         shieldSkill: state.shieldSkill,
         armourSkill: state.armourSkill,
         ringEvasion: 0,
@@ -122,6 +130,9 @@ export const calculateEvData = <V extends GameVersion>(
         gelatinousBody: state.gelatinousBody,
         slowReflexes: state.slowReflexes,
         statusEV: state.statusEV,
+        effectiveSize: form.size,
+        formEV,
+        evMultiplier: form.special?.statueEvMultiplier,
       });
 
       return {
