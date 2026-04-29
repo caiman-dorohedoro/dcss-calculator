@@ -31,6 +31,7 @@ import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import { getAggregatedEquipmentEffects } from "@/utils/equipmentModifiers";
+import { getFormDefinition, getFormStatModifiers } from "@/versioning/formData";
 import {
   collectActiveStatusIds,
   KNOWN_MUTATION_TRAIT_IDS,
@@ -339,6 +340,9 @@ const buildModifierBagFromItem = (
   return Object.keys(modifiers).length > 0 ? modifiers : undefined;
 };
 
+const getEquipState = (detail: EquipmentItemSnapshot | null | undefined) =>
+  detail?.equipState ?? undefined;
+
 const fillRingSlots = (
   ringSlots: RingSlotState[],
   details: EquipmentItemSnapshot[] | undefined
@@ -380,6 +384,7 @@ const fillRingSlots = (
         propertiesText: detail.propertiesText ?? undefined,
         artifactKind: detail.artifactKind,
         source: "imported",
+        equipState: getEquipState(detail),
       };
     } else if (evasionMatch) {
       nextSlot = {
@@ -392,6 +397,7 @@ const fillRingSlots = (
         propertiesText: detail.propertiesText ?? undefined,
         artifactKind: detail.artifactKind,
         source: "imported",
+        equipState: getEquipState(detail),
       };
     } else if (hasBooleanProperty(detail, "Wiz")) {
       nextSlot = {
@@ -404,6 +410,7 @@ const fillRingSlots = (
         propertiesText: detail.propertiesText ?? undefined,
         artifactKind: detail.artifactKind,
         source: "imported",
+        equipState: getEquipState(detail),
       };
     } else {
       const modifiers = buildModifierBagFromItem(detail);
@@ -416,6 +423,7 @@ const fillRingSlots = (
           propertiesText: detail.propertiesText ?? undefined,
           artifactKind: detail.artifactKind,
           source: "imported",
+          equipState: getEquipState(detail),
         };
       }
     }
@@ -459,6 +467,7 @@ const fillAmuletSlots = (
           propertiesText: detail.propertiesText ?? undefined,
           artifactKind: detail.artifactKind,
           source: "imported",
+          equipState: getEquipState(detail),
         }
       : modifiers
         ? {
@@ -468,6 +477,7 @@ const fillAmuletSlots = (
             propertiesText: detail.propertiesText ?? undefined,
             artifactKind: detail.artifactKind,
             source: "imported",
+            equipState: getEquipState(detail),
           }
         : null;
 
@@ -510,6 +520,7 @@ const fillAuxArmourSlots = (
       propertiesText: detail.propertiesText ?? undefined,
       artifactKind: detail.artifactKind,
       source: "imported",
+      equipState: getEquipState(detail),
     };
     nextIndex += 1;
     mapped += 1;
@@ -540,6 +551,7 @@ const fillHeadgearSlots = (
       propertiesText: detail.propertiesText ?? undefined,
       artifactKind: detail.artifactKind,
       source: "imported",
+      equipState: getEquipState(detail),
     };
     nextIndex += 1;
     mapped += 1;
@@ -874,10 +886,12 @@ const normalizeImportedBaseStats = (
   record: ParsedMorgueTextRecord
 ) => {
   const itemModifiers = getAggregatedEquipmentEffects(state);
+  const form = getFormDefinition(state.version, state.form);
+  const formStats = getFormStatModifiers(form);
 
-  state.strength = record.strength - itemModifiers.str;
-  state.dexterity = record.dexterity - itemModifiers.dex;
-  state.intelligence = record.intelligence - itemModifiers.int;
+  state.strength = record.strength - itemModifiers.str - formStats.str;
+  state.dexterity = record.dexterity - itemModifiers.dex - formStats.dex;
+  state.intelligence = record.intelligence - itemModifiers.int - formStats.int;
 };
 
 const chooseTargetSpell = (
@@ -955,6 +969,10 @@ export const buildImportedCalculatorState = (
   importedState.version = detectedVersion;
   importedState.species =
     speciesKey as CalculatorState<GameVersion>["species"];
+  const importedForm = getFormDefinition(detectedVersion, record.form);
+  importedState.form = importedForm.key;
+  importedState.shapeshiftingSkill = record.effectiveSkills.shapeshifting;
+  importedState.experienceLevel = record.xl;
   const slotCounts = getDynamicSlotCounts(detectedVersion, importedState.species);
   importedState.ringSlots = coerceSlotArrayLength(
     importedState.ringSlots,
@@ -997,7 +1015,7 @@ export const buildImportedCalculatorState = (
     },
     {
       label: "Skills",
-      detail: `Armour ${record.effectiveSkills.armour}, Shields ${record.effectiveSkills.shields}, Dodging ${record.effectiveSkills.dodging}, Spellcasting ${record.effectiveSkills.spellcasting}`,
+      detail: `Armour ${record.effectiveSkills.armour}, Shields ${record.effectiveSkills.shields}, Dodging ${record.effectiveSkills.dodging}, Spellcasting ${record.effectiveSkills.spellcasting}, Shapeshifting ${record.effectiveSkills.shapeshifting}`,
     }
   );
 
@@ -1032,6 +1050,7 @@ export const buildImportedCalculatorState = (
       propertiesText: record.bodyArmourDetails?.propertiesText ?? undefined,
       artifactKind: record.bodyArmourDetails?.artifactKind,
       source: record.bodyArmourDetails ? "imported" : undefined,
+      equipState: getEquipState(record.bodyArmourDetails),
     };
     summary.applied.push({ label: "Body armour", detail: record.bodyArmour });
   }
@@ -1050,14 +1069,15 @@ export const buildImportedCalculatorState = (
       propertiesText: record.shieldDetails?.propertiesText ?? undefined,
       artifactKind: record.shieldDetails?.artifactKind,
       source: record.shieldDetails ? "imported" : undefined,
+      equipState: getEquipState(record.shieldDetails),
     };
   }
 
   const orb = mapOrbDetail(record.orbDetails, record.orb);
-  if (orb) {
-    importedState.orb = orb;
+  if (orb || record.orbDetails) {
+    importedState.orb = orb ?? "none";
     importedState.orbItem = {
-      kind: orb,
+      kind: orb ?? "none",
       ego: deriveArmourClassEgo(record.orbDetails),
       modifiers: record.orbDetails
         ? buildModifierBagFromItem(record.orbDetails, {
@@ -1068,6 +1088,7 @@ export const buildImportedCalculatorState = (
       propertiesText: record.orbDetails?.propertiesText ?? undefined,
       artifactKind: record.orbDetails?.artifactKind,
       source: record.orbDetails ? "imported" : undefined,
+      equipState: getEquipState(record.orbDetails),
     };
   }
 
@@ -1082,6 +1103,7 @@ export const buildImportedCalculatorState = (
       propertiesText: undefined,
       artifactKind: undefined,
       source: undefined,
+      equipState: undefined,
     };
   }
   if (importedState.orb !== "none") {
@@ -1096,6 +1118,7 @@ export const buildImportedCalculatorState = (
       propertiesText: undefined,
       artifactKind: undefined,
       source: undefined,
+      equipState: undefined,
     };
   }
 
@@ -1136,6 +1159,7 @@ export const buildImportedCalculatorState = (
     propertiesText: bootsDetail?.propertiesText ?? undefined,
     artifactKind: bootsDetail?.artifactKind,
     source: bootsDetail ? "imported" : undefined,
+    equipState: getEquipState(bootsDetail),
   };
   importedState.bardingItem = {
     kind: "barding",
@@ -1147,6 +1171,7 @@ export const buildImportedCalculatorState = (
     propertiesText: bardingDetail?.propertiesText ?? undefined,
     artifactKind: bardingDetail?.artifactKind,
     source: bardingDetail ? "imported" : undefined,
+    equipState: getEquipState(bardingDetail),
   };
   importedState.cloakItem = {
     kind: cloakDetail?.baseType === "scarf" ? "scarf" : "cloak",
@@ -1158,6 +1183,7 @@ export const buildImportedCalculatorState = (
     propertiesText: cloakDetail?.propertiesText ?? undefined,
     artifactKind: cloakDetail?.artifactKind,
     source: cloakDetail ? "imported" : undefined,
+    equipState: getEquipState(cloakDetail),
   };
   fillHeadgearSlots(
     importedState.headgearSlots,
@@ -1244,16 +1270,23 @@ export const buildImportedCalculatorState = (
     });
   }
   if (record.talisman !== "none") {
-    summary.skipped.push({
+    summary.applied.push({
       label: "Talisman",
-      detail: "Talismans are not modeled by this calculator.",
+      detail:
+        importedForm.key === "none"
+          ? "Talisman item imported without a supported form."
+          : "Talisman/form state is modeled for defense calculations.",
     });
   }
   if (record.form) {
-    summary.skipped.push({
-      label: "Form",
-      detail: "Form state is not modeled by this calculator.",
-    });
+    if (importedForm.key === "none") {
+      summary.skipped.push({
+        label: "Form",
+        detail: "This form is not supported by the calculator.",
+      });
+    } else {
+      summary.applied.push({ label: "Form", detail: record.form });
+    }
   }
   const mutationMapping = applyMutationModifiers(record, importedState);
   if (mutationMapping.applied.length > 0) {

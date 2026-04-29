@@ -13,6 +13,7 @@ import {
 } from "@/utils/calculatorUtils";
 import { deepElfConjurer033Morgue } from "../__fixtures__/deepElfConjurer033";
 import { oniMonkTrunkStatueFormMorgue } from "../__fixtures__/oniMonkTrunkStatueForm";
+import { triskalTrunkDragonFormMorgue } from "../__fixtures__/triskalTrunkDragonForm";
 import {
   buildImportedCalculatorState,
   normalizeMorgueVersion,
@@ -2069,6 +2070,31 @@ Jewellery
     expect(imported.summary.skipped).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ label: "Rings" })])
     );
+  });
+
+  test("imports trunk dragon form and melded equipment states", () => {
+    const parsed = parseMorgueText(triskalTrunkDragonFormMorgue);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) {
+      throw new Error(`fixture should parse: ${parsed.failure.reason}`);
+    }
+
+    const result = buildImportedCalculatorState(parsed.record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error(`import should succeed: ${result.kind}`);
+    }
+
+    expect(result.importedState.form).toBe("dragon-form");
+    expect(result.importedState.shapeshiftingSkill).toBe(25);
+    expect(result.importedState.experienceLevel).toBe(25);
+    expect(result.importedState.bodyArmour.equipState).toBe("melded");
+    expect(result.importedState.cloakItem.equipState).toBe("melded");
+    expect(result.importedState.orbItem.equipState).toBe("melded");
+    expect(result.summary.skipped).not.toContainEqual({
+      label: "Form",
+      detail: "Form state is not modeled by this calculator.",
+    });
   });
 
   test("parses compact title-line dumps using the notes descriptor fallback", () => {
