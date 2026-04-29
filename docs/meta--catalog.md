@@ -45,6 +45,7 @@
 | `2026-04-25-parser-aligned-equipment-ego-design.md` | 장비 ego를 dcss-morgue-parser/Crawl 의미에 맞추고 spell-failure ego subset을 파생값으로 분리하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-25-equipment-ego-availability-design.md` | base item별 가능한 장비 ego 목록과 weight를 이용해 전체 armour-class 장비의 ego selector를 필터링하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-29-spell-failure-precision-range-design.md` | morgue 1자리 소수 스킬과 Crawl 내부 spell failure scale 차이로 생기는 실패율 범위를 그래프에 표시하는 설계 문서 | `/docs/superpowers/specs` |
+| `2026-04-29-form-calculation-design.md` | Crawl form data, Shapeshifting scaling, melded equipment를 AC/EV/SH/spell failure 계산에 반영하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-11-desktop-layout-design.md` | PC에서 그래프는 좌측, 컨트롤은 우측 sticky 패널로 분리하는 데스크톱 레이아웃 설계 | `/docs/superpowers/specs` |
 | `2026-04-11-spell-controls-sidebar-design.md` | 주문 선택만 좌측에 남기고 spell 관련 입력을 우측 sidebar로 재배치하는 설계 문서 | `/docs/superpowers/specs` |
 | `2026-04-04-version-registry-refactor.md` | version registry 리팩터링 구현 계획 | `/docs/superpowers/plans` |
