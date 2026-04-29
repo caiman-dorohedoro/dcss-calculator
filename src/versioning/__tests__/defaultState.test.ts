@@ -1,6 +1,9 @@
 import { describe, expect, test } from "@jest/globals";
 import { buildDefaultCalculatorState } from "../defaultState";
-import { getStartupSavedState } from "@/hooks/useCalculatorState";
+import {
+  getStartupSavedState,
+  parseSavedState,
+} from "@/hooks/useCalculatorState";
 
 describe("buildDefaultCalculatorState", () => {
   test("adds forgecraft to 0.33 school defaults because the spell dataset includes it", () => {
@@ -26,6 +29,14 @@ describe("buildDefaultCalculatorState", () => {
     const state = buildDefaultCalculatorState("trunk");
 
     expect(state.accordionOrder).toEqual(["sf", "ac", "ev", "sh"]);
+  });
+
+  test("defaults form-related state to untransformed values", () => {
+    const state = buildDefaultCalculatorState("trunk");
+
+    expect(state.form).toBe("none");
+    expect(state.shapeshiftingSkill).toBe(0);
+    expect(state.experienceLevel).toBe(1);
   });
 
   test("does not expose secondGloves on 0.32 defaults", () => {
@@ -284,6 +295,48 @@ describe("buildDefaultCalculatorState", () => {
 
     expect(restored?.version).toBe("trunk");
     expect(restored?.orb).toBe("none");
+  });
+
+  test("restores imported form and equipment equip states", () => {
+    const savedState = {
+      ...buildDefaultCalculatorState("trunk"),
+      form: "dragon-form",
+      shapeshiftingSkill: 25,
+      experienceLevel: 25,
+      bodyArmour: {
+        ...buildDefaultCalculatorState("trunk").bodyArmour,
+        equipState: "melded",
+      },
+    };
+
+    const state = parseSavedState(JSON.stringify(savedState));
+
+    expect(state?.form).toBe("dragon-form");
+    expect(state?.shapeshiftingSkill).toBe(25);
+    expect(state?.experienceLevel).toBe(25);
+    expect(state?.bodyArmour.equipState).toBe("melded");
+  });
+
+  test("rejects malformed form and equipment equip states", () => {
+    const defaultState = buildDefaultCalculatorState("trunk");
+
+    expect(
+      parseSavedState(
+        JSON.stringify({
+          ...defaultState,
+          form: "mystery-form",
+        })
+      )
+    ).toBeNull();
+
+    expect(
+      parseSavedState(
+        JSON.stringify({
+          ...defaultState,
+          ringSlots: [{ kind: "none", plus: 0, equipState: "imaginary" }],
+        })
+      )
+    ).toBeNull();
   });
 
   test("migrates a legacy channel toggle into an orb selection", () => {

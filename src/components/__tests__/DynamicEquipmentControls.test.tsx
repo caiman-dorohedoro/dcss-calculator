@@ -192,6 +192,7 @@ describe("DynamicEquipmentControls", () => {
         displayName: "ring of wizardry",
         artifactKind: "randart",
         source: "imported",
+        equipState: "melded",
       })
     ).toEqual({
       kind: "wizardry",
@@ -199,6 +200,7 @@ describe("DynamicEquipmentControls", () => {
       displayName: undefined,
       artifactKind: undefined,
       source: undefined,
+      equipState: undefined,
     });
 
     expect(
@@ -207,12 +209,14 @@ describe("DynamicEquipmentControls", () => {
         displayName: "amulet of reflection",
         artifactKind: "normal",
         source: "imported",
+        equipState: "worn",
       })
     ).toEqual({
       kind: "reflection",
       displayName: undefined,
       artifactKind: undefined,
       source: undefined,
+      equipState: undefined,
     });
 
     expect(
@@ -223,6 +227,7 @@ describe("DynamicEquipmentControls", () => {
           displayName: "helmet",
           artifactKind: "unrand",
           source: "imported",
+          equipState: "melded",
         },
         false
       )
@@ -235,6 +240,7 @@ describe("DynamicEquipmentControls", () => {
       propertiesText: undefined,
       artifactKind: undefined,
       source: undefined,
+      equipState: undefined,
     });
   });
 

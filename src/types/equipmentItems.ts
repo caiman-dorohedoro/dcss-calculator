@@ -8,6 +8,7 @@ import type {
 
 type ArtifactKind = "normal" | "randart" | "unrand";
 type EquipmentSource = "manual" | "imported" | "legacy";
+export type EquipmentEquipState = "worn" | "haunted" | "melded" | "installed";
 
 export type EquipmentModifierBag = {
   rF?: number;
@@ -39,6 +40,7 @@ type EquipmentItemMeta = {
   propertiesText?: string;
   artifactKind?: ArtifactKind;
   source?: EquipmentSource;
+  equipState?: EquipmentEquipState;
 };
 
 export type BodyArmourItemState = EquipmentItemMeta & {

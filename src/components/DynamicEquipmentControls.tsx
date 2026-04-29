@@ -84,6 +84,7 @@ const clearImportedItemMetadata = <T extends {
   propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: string;
+  equipState?: string;
 }>(
   item: T,
   changed: boolean
@@ -95,6 +96,7 @@ const clearImportedItemMetadata = <T extends {
         propertiesText: undefined,
         artifactKind: undefined,
         source: undefined,
+        equipState: undefined,
       }
     : item;
 

@@ -29,8 +29,10 @@ import {
 } from "@/versioning/dynamicSlotCounts";
 import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { getVersionConfig } from "@/versioning/versionRegistry";
+import { isFormKey, type FormKey } from "@/versioning/formData";
 import type {
   BodyArmourItemState,
+  EquipmentEquipState,
   EquipmentModifierBag,
   FixedAuxItemState,
   OrbItemState,
@@ -53,6 +55,9 @@ export interface CalculatorState<V extends GameVersion> {
   strength: number;
   intelligence: number;
   species: SpeciesKey<V>;
+  form?: FormKey;
+  shapeshiftingSkill?: number;
+  experienceLevel?: number;
   bodyArmour: BodyArmourItemState;
   shieldItem: ShieldItemState;
   orbItem: OrbItemState;
@@ -134,6 +139,15 @@ const isArtifactKind = (
 const isSlotSource = (value: unknown): value is "manual" | "imported" =>
   value === "manual" || value === "imported";
 
+const isEquipmentEquipState = (
+  value: unknown
+): value is EquipmentEquipState | undefined =>
+  value === undefined ||
+  value === "worn" ||
+  value === "haunted" ||
+  value === "melded" ||
+  value === "installed";
+
 const isRingSlot = (value: unknown): value is RingSlotState => {
   if (!isObject(value)) return false;
 
@@ -145,7 +159,8 @@ const isRingSlot = (value: unknown): value is RingSlotState => {
     typeof value.plus === "number" &&
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
-    (value.source === undefined || isSlotSource(value.source))
+    (value.source === undefined || isSlotSource(value.source)) &&
+    isEquipmentEquipState(value.equipState)
   );
 };
 
@@ -157,7 +172,8 @@ const isDefaultRingSlot = (value: unknown): boolean => {
     value.plus === 0 &&
     value.displayName === undefined &&
     value.artifactKind === undefined &&
-    value.source === undefined
+    value.source === undefined &&
+    value.equipState === undefined
   );
 };
 
@@ -178,7 +194,8 @@ const isAmuletSlot = (value: unknown): value is AmuletSlotState => {
     (value.kind === "none" || value.kind === "reflection") &&
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
-    (value.source === undefined || isSlotSource(value.source))
+    (value.source === undefined || isSlotSource(value.source)) &&
+    isEquipmentEquipState(value.equipState)
   );
 };
 
@@ -189,7 +206,8 @@ const isDefaultAmuletSlot = (value: unknown): boolean => {
     value.kind === "none" &&
     value.displayName === undefined &&
     value.artifactKind === undefined &&
-    value.source === undefined
+    value.source === undefined &&
+    value.equipState === undefined
   );
 };
 
@@ -205,7 +223,8 @@ const isAuxArmourSlot = (value: unknown): value is AuxArmourSlotState => {
     (value.ego === undefined || typeof value.ego === "string") &&
     (value.displayName === undefined || typeof value.displayName === "string") &&
     (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
-    (value.source === undefined || isSlotSource(value.source))
+    (value.source === undefined || isSlotSource(value.source)) &&
+    isEquipmentEquipState(value.equipState)
   );
 };
 
@@ -219,7 +238,8 @@ const isDefaultAuxArmourSlot = (value: unknown): boolean => {
     (value.ego === undefined || value.ego === "none") &&
     value.displayName === undefined &&
     value.artifactKind === undefined &&
-    value.source === undefined
+    value.source === undefined &&
+    value.equipState === undefined
   );
 };
 
@@ -378,6 +398,7 @@ const isEquipmentMeta = (
   (value.propertiesText === undefined || typeof value.propertiesText === "string") &&
   (value.artifactKind === undefined || isArtifactKind(value.artifactKind)) &&
   (value.source === undefined || isEquipmentItemSource(value.source)) &&
+  isEquipmentEquipState(value.equipState) &&
   (value.modifiers === undefined || isModifierBag(value.modifiers));
 
 const isBodyArmourItem = (value: unknown): value is BodyArmourItemState => {
@@ -537,6 +558,17 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     state.targetSpell !== undefined &&
     (typeof state.targetSpell !== "string" ||
       !config.spells.some((spell) => spell.name === state.targetSpell))
+  ) {
+    return false;
+  }
+
+  if (!isFormKey(state.form)) {
+    return false;
+  }
+
+  if (
+    !isOptionalNumber(state.shapeshiftingSkill) ||
+    !isOptionalNumber(state.experienceLevel)
   ) {
     return false;
   }

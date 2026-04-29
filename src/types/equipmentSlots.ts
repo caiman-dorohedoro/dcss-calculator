@@ -1,4 +1,7 @@
-import type { EquipmentModifierBag } from "@/types/equipmentItems";
+import type {
+  EquipmentEquipState,
+  EquipmentModifierBag,
+} from "@/types/equipmentItems";
 import type { EquipmentEgoKey } from "@/types/equipment";
 
 export type RingSlotKind = "none" | "wizardry" | "protection" | "evasion";
@@ -11,6 +14,7 @@ export type RingSlotState = {
   propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
+  equipState?: EquipmentEquipState;
 };
 
 export type AmuletSlotKind = "none" | "reflection";
@@ -22,6 +26,7 @@ export type AmuletSlotState = {
   propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
+  equipState?: EquipmentEquipState;
 };
 
 export type HeadgearKind = "helmet" | "hat";
@@ -36,6 +41,7 @@ export type AuxArmourSlotState = {
   propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
+  equipState?: EquipmentEquipState;
 };
 
 const clearSlotMetadata = <T extends {
@@ -43,6 +49,7 @@ const clearSlotMetadata = <T extends {
   propertiesText?: string;
   artifactKind?: "normal" | "randart" | "unrand";
   source?: "manual" | "imported";
+  equipState?: EquipmentEquipState;
 }>(
   slot: T
 ): T => ({
@@ -51,6 +58,7 @@ const clearSlotMetadata = <T extends {
   propertiesText: undefined,
   artifactKind: undefined,
   source: undefined,
+  equipState: undefined,
 });
 
 export const createDefaultRingSlot = (): RingSlotState => ({

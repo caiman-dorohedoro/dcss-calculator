@@ -1,38 +1,41 @@
 import type { GameVersion } from "@/types/game";
 import { Size } from "@/types/species";
 
-export type FormKey =
-  | "none"
-  | "aqua-form"
-  | "bat-form"
-  | "bat-swarm-form"
-  | "blade-form"
-  | "crab-form"
-  | "death-form"
-  | "dragon-form"
-  | "eel-form"
-  | "flux-form"
-  | "fungus-form"
-  | "hive-form"
-  | "jelly-form"
-  | "maw-form"
-  | "medusa-form"
-  | "pig-form"
-  | "quill-form"
-  | "scarab-form"
-  | "scroll-form"
-  | "serpent-form"
-  | "sphinx-form"
-  | "spider-form"
-  | "spore-form"
-  | "statue-form"
-  | "storm-form"
-  | "tree-form"
-  | "vampire-form"
-  | "werewolf-form"
-  | "wisp-form"
-  | "yak-form"
-  | "amphisbaena-form";
+export const formKeys = [
+  "none",
+  "aqua-form",
+  "bat-form",
+  "bat-swarm-form",
+  "blade-form",
+  "crab-form",
+  "death-form",
+  "dragon-form",
+  "eel-form",
+  "flux-form",
+  "fungus-form",
+  "hive-form",
+  "jelly-form",
+  "maw-form",
+  "medusa-form",
+  "pig-form",
+  "quill-form",
+  "scarab-form",
+  "scroll-form",
+  "serpent-form",
+  "sphinx-form",
+  "spider-form",
+  "spore-form",
+  "statue-form",
+  "storm-form",
+  "tree-form",
+  "vampire-form",
+  "werewolf-form",
+  "wisp-form",
+  "yak-form",
+  "amphisbaena-form",
+] as const;
+
+export type FormKey = (typeof formKeys)[number];
 
 export type EquipmentSlotForMeld =
   | "weapon"
@@ -418,6 +421,9 @@ export const getFormDefinition = (
 
   return formDefinitions[version][formKey as FormKey] ?? noForm;
 };
+
+export const isFormKey = (value: unknown): value is FormKey =>
+  typeof value === "string" && formKeys.includes(value as FormKey);
 
 export const getFormValue = (
   scaling: FormScaling | undefined,
