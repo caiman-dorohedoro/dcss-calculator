@@ -22,6 +22,12 @@ describe("buildDefaultCalculatorState", () => {
     expect(state.targetSpell).toBe("Airstrike");
   });
 
+  test("orders the default panels as spell failure, AC, EV, then SH", () => {
+    const state = buildDefaultCalculatorState("trunk");
+
+    expect(state.accordionOrder).toEqual(["sf", "ac", "ev", "sh"]);
+  });
+
   test("does not expose secondGloves on 0.32 defaults", () => {
     const state = buildDefaultCalculatorState("0.32");
 

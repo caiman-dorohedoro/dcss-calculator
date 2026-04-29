@@ -17,7 +17,7 @@ import { getVersionConfig } from "./versionRegistry";
 
 const baseDefaultState = {
   accordionValue: ["sf"],
-  accordionOrder: ["sf", "ev", "ac", "sh"],
+  accordionOrder: ["sf", "ac", "ev", "sh"],
   dexterity: 10,
   strength: 10,
   intelligence: 10,
