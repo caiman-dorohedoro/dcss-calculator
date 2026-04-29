@@ -22,6 +22,7 @@ import type { SpellCalculationParams } from "./spellCalculation";
 import { GameVersion } from "@/types/game";
 import { VersionedSchoolSkillLevels } from "@/types/spells";
 import { spellCanBeEnkindled } from "./spellCanbeEnkindled";
+import { getMutationStatModifiers } from "./statMutations";
 
 type DataPoint = {
   dodgingSkill: number;
@@ -102,6 +103,7 @@ export const calculateEvData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): DataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
+  const mutationStats = getMutationStatModifiers(state);
   const effectiveState = getEffectiveEquipmentState(state);
   const form = getFormDefinition(state.version, state.form);
   const formValueParams = {
@@ -116,9 +118,9 @@ export const calculateEvData = <V extends GameVersion>(
       const calcResult = calculateEV({
         version: state.version,
         dodgingSkill,
-        dexterity: state.dexterity,
+        dexterity: state.dexterity + mutationStats.dex,
         equipmentDex: gear.dex,
-        strength: state.strength,
+        strength: state.strength + mutationStats.str,
         equipmentStr: gear.str,
         species: state.species,
         shield: effectiveState.shield,
@@ -193,6 +195,7 @@ export const calculateSHData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): SHDataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
+  const mutationStats = getMutationStatModifiers(state);
   const effectiveState = getEffectiveEquipmentState(state);
   const form = getFormDefinition(state.version, state.form);
   const formValueParams = {
@@ -210,7 +213,7 @@ export const calculateSHData = <V extends GameVersion>(
         sh: calculateSH({
           shield: effectiveState.shield,
           shieldSkill: shield,
-          dexterity: state.dexterity,
+          dexterity: state.dexterity + mutationStats.dex,
           equipmentDex: gear.dex,
           shieldEnchant: effectiveState.shieldEnchant,
           equipmentSH: gear.sh,
@@ -287,6 +290,7 @@ export const calculateAvgSFData = <V extends GameVersion>(
   state: CalculatorState<V>
 ): FristSchoolSFDataPoint[] => {
   const gear = getAggregatedEquipmentEffects(state);
+  const mutationStats = getMutationStatModifiers(state);
   const effectiveState = getEffectiveEquipmentState(state);
   const targetSpell = state.targetSpell;
 
@@ -346,9 +350,9 @@ export const calculateAvgSFData = <V extends GameVersion>(
       > = {
         version: state.version,
         species: state.species,
-        strength: state.strength,
+        strength: state.strength + mutationStats.str,
         equipmentStr: gear.str,
-        intelligence: state.intelligence,
+        intelligence: state.intelligence + mutationStats.int,
         equipmentInt: gear.int,
         targetSpell: targetSpell,
         spellDifficulty,

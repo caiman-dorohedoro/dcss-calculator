@@ -107,6 +107,14 @@ export interface CalculatorState<V extends GameVersion> {
   sturdyFrame?: number;
   gelatinousBody?: number;
   slowReflexes?: number;
+  strongMutation?: number;
+  cleverMutation?: number;
+  agileMutation?: number;
+  weakMutation?: number;
+  dopeyMutation?: number;
+  clumsyMutation?: number;
+  thinSkeletalStructure?: number;
+  importedMutationNotes: ImportedMutationNote[];
   activeStatusIds?: KnownStatusId[];
   // spell mode
   schoolSkills?: VersionedSchoolSkillLevels<V>;
@@ -118,6 +126,11 @@ export interface CalculatorState<V extends GameVersion> {
   godPietyRank?: number | null;
   godUnderPenance?: boolean;
 }
+
+export type ImportedMutationNote = {
+  label: string;
+  detail: string;
+};
 
 export const isSchoolSkillKey = <V extends GameVersion>(
   version: V,
@@ -353,6 +366,17 @@ const isOptionalBoolean = (value: unknown) =>
 const isOptionalStringArray = (value: unknown) =>
   value === undefined ||
   (Array.isArray(value) && value.every((item) => typeof item === "string"));
+
+const isImportedMutationNotes = (
+  value: unknown
+): value is ImportedMutationNote[] =>
+  Array.isArray(value) &&
+  value.every(
+    (item) =>
+      isObject(item) &&
+      typeof item.label === "string" &&
+      typeof item.detail === "string"
+  );
 
 const isModifierBag = (value: unknown): value is EquipmentModifierBag => {
   if (!isObject(value)) return false;
@@ -662,6 +686,14 @@ const validateState = (state: unknown): state is CalculatorState<GameVersion> =>
     !isOptionalNumber(state.sturdyFrame) ||
     !isOptionalNumber(state.gelatinousBody) ||
     !isOptionalNumber(state.slowReflexes) ||
+    !isOptionalNumber(state.strongMutation) ||
+    !isOptionalNumber(state.cleverMutation) ||
+    !isOptionalNumber(state.agileMutation) ||
+    !isOptionalNumber(state.weakMutation) ||
+    !isOptionalNumber(state.dopeyMutation) ||
+    !isOptionalNumber(state.clumsyMutation) ||
+    !isOptionalNumber(state.thinSkeletalStructure) ||
+    !isImportedMutationNotes(state.importedMutationNotes) ||
     !isOptionalStringArray(state.activeStatusIds) ||
     !isOptionalNumber(state.spellcasting) ||
     !isOptionalNumber(state.wildMagic) ||
@@ -873,6 +905,9 @@ export const parseSavedState = (
       unattributedGear: isUnattributedGear(parsed.unattributedGear)
         ? parsed.unattributedGear
         : buildLegacyUnattributedGear(parsed),
+      importedMutationNotes: isImportedMutationNotes(parsed.importedMutationNotes)
+        ? parsed.importedMutationNotes
+        : defaultState.importedMutationNotes,
     };
 
     return validateState(normalized) ? normalized : null;

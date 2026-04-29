@@ -31,6 +31,7 @@ import { buildDefaultCalculatorState } from "@/versioning/defaultState";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
 import { getSpellBoostBodyArmourEgo } from "@/utils/bodyArmourEgos";
 import { getAggregatedEquipmentEffects } from "@/utils/equipmentModifiers";
+import { getMutationStatModifiers } from "@/utils/statMutations";
 import { getFormDefinition, getFormStatModifiers } from "@/versioning/formData";
 import {
   collectActiveStatusIds,
@@ -643,6 +644,40 @@ const getMutationAc = (
   return 0;
 };
 
+type StatMutationStateKey =
+  | "strongMutation"
+  | "cleverMutation"
+  | "agileMutation"
+  | "weakMutation"
+  | "dopeyMutation"
+  | "clumsyMutation"
+  | "thinSkeletalStructure";
+
+const statMutationStateByName: Record<string, StatMutationStateKey> = {
+  strong: "strongMutation",
+  clever: "cleverMutation",
+  agile: "agileMutation",
+  weak: "weakMutation",
+  dopey: "dopeyMutation",
+  clumsy: "clumsyMutation",
+  "thin skeletal structure": "thinSkeletalStructure",
+};
+
+const ignoredAlineTraits = new Set([
+  "fire resistance",
+  "cold resistance",
+  "negative energy resistance",
+  "poison resistance",
+  "electricity resistance",
+  "heat vulnerability",
+  "cold vulnerability",
+  "electricity vulnerability",
+  "robust",
+  "frail",
+  "high mp",
+  "low mp",
+]);
+
 const setNumericMutationState = (
   state: CalculatorState<GameVersion>,
   key: StatusAwareMutationStateKey,
@@ -663,6 +698,13 @@ const applyMutationModifiers = (
       continue;
     }
     const name = mutation.name.toLowerCase();
+    const statMutationKey = statMutationStateByName[name];
+
+    if (statMutationKey) {
+      state[statMutationKey] = mutationLevel(mutation);
+      applied.push(mutation.name);
+      continue;
+    }
 
     if (mutation.name === "subdued magic") {
       state.subduedMagic = mutation.level ?? 0;
@@ -768,6 +810,10 @@ const applyMutationModifiers = (
     if (mutationAc !== 0) {
       state.scalesAC = (state.scalesAC ?? 0) + mutationAc;
       applied.push(mutation.name);
+      continue;
+    }
+
+    if (ignoredAlineTraits.has(name)) {
       continue;
     }
 
@@ -888,10 +934,14 @@ const normalizeImportedBaseStats = (
   const itemModifiers = getAggregatedEquipmentEffects(state);
   const form = getFormDefinition(state.version, state.form);
   const formStats = getFormStatModifiers(form);
+  const mutationStats = getMutationStatModifiers(state);
 
-  state.strength = record.strength - itemModifiers.str - formStats.str;
-  state.dexterity = record.dexterity - itemModifiers.dex - formStats.dex;
-  state.intelligence = record.intelligence - itemModifiers.int - formStats.int;
+  state.strength =
+    record.strength - itemModifiers.str - formStats.str - mutationStats.str;
+  state.dexterity =
+    record.dexterity - itemModifiers.dex - formStats.dex - mutationStats.dex;
+  state.intelligence =
+    record.intelligence - itemModifiers.int - formStats.int - mutationStats.int;
 };
 
 const chooseTargetSpell = (
@@ -1240,6 +1290,21 @@ export const buildImportedCalculatorState = (
     });
   }
 
+  const mutationMapping = applyMutationModifiers(record, importedState);
+  importedState.importedMutationNotes = [];
+  if (mutationMapping.applied.length > 0) {
+    summary.applied.push({
+      label: "Mutations & Traits",
+      detail: mutationMapping.applied.join(", "),
+    });
+  }
+  if (mutationMapping.unsupported.length > 0) {
+    summary.skipped.push({
+      label: "Mutations & Traits",
+      detail: `Unsupported A: traits skipped: ${mutationMapping.unsupported.join(", ")}`,
+    });
+  }
+
   normalizeImportedBaseStats(importedState, record);
 
   const wildMagic = deriveWildMagic(record);
@@ -1288,20 +1353,6 @@ export const buildImportedCalculatorState = (
       summary.applied.push({ label: "Form", detail: record.form });
     }
   }
-  const mutationMapping = applyMutationModifiers(record, importedState);
-  if (mutationMapping.applied.length > 0) {
-    summary.applied.push({
-      label: "Mutations & Traits",
-      detail: mutationMapping.applied.join(", "),
-    });
-  }
-  if (mutationMapping.unsupported.length > 0) {
-    summary.skipped.push({
-      label: "Mutations & Traits",
-      detail: `Unsupported A: traits skipped: ${mutationMapping.unsupported.join(", ")}`,
-    });
-  }
-
   return {
     ok: true,
     sourceVersion: record.version,

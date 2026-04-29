@@ -1,8 +1,9 @@
 import { useState } from "react";
-import AttrInput from "@/components/AttrInput";
+import { X } from "lucide-react";
 import EquipmentEditModal from "@/components/equipment/EquipmentEditModal";
 import EquipmentSummaryRow from "@/components/equipment/EquipmentSummaryRow";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { CalculatorState } from "@/hooks/useCalculatorState";
 import type { FixedAuxItemState } from "@/types/equipmentItems";
@@ -24,6 +25,7 @@ import {
   formatRingSummary,
 } from "@/utils/equipmentSummaryText";
 import { coerceSlotArrayLength, getDynamicSlotCounts } from "@/versioning/dynamicSlotCounts";
+import { getVersionSpecies } from "@/versioning/versionRegistry";
 
 type DynamicEquipmentControlsProps<V extends GameVersion> = {
   state: CalculatorState<V>;
@@ -46,6 +48,92 @@ type OpenEquipment =
   | { type: "gloves"; index: number }
   | { type: "fixedAux"; config: FixedAuxEquipmentConfig };
 
+type NumericMutationKey =
+  | "wildMagic"
+  | "subduedMagic"
+  | "antiWizardry"
+  | "runicMagic"
+  | "bigBrainWizardry"
+  | "scalesAC"
+  | "distortionField"
+  | "tenguFlight"
+  | "largeBonePlates"
+  | "ephemeralShield"
+  | "icemail"
+  | "condensationShield"
+  | "sturdyFrame"
+  | "gelatinousBody"
+  | "slowReflexes"
+  | "strongMutation"
+  | "cleverMutation"
+  | "agileMutation"
+  | "weakMutation"
+  | "dopeyMutation"
+  | "clumsyMutation"
+  | "thinSkeletalStructure";
+
+type BooleanMutationKey = "deformedBody" | "reckless";
+
+type MutationOption =
+  | {
+      key: NumericMutationKey;
+      label: string;
+      kind: "number";
+      min?: number;
+      max?: number;
+      defaultValue?: number;
+    }
+  | {
+      key: BooleanMutationKey;
+      label: string;
+      kind: "boolean";
+    };
+
+const mutationOptions: MutationOption[] = [
+  { key: "wildMagic", label: "wild magic", kind: "number", min: 0, max: 3 },
+  { key: "subduedMagic", label: "subdued magic", kind: "number", min: 0, max: 3 },
+  { key: "antiWizardry", label: "disrupted magic", kind: "number", min: 0, max: 3 },
+  { key: "runicMagic", label: "runic magic", kind: "number", min: 0, max: 1 },
+  {
+    key: "bigBrainWizardry",
+    label: "big brain wizardry",
+    kind: "number",
+    min: 0,
+    max: 1,
+  },
+  { key: "scalesAC", label: "mutation AC", kind: "number", defaultValue: 1 },
+  { key: "distortionField", label: "repulsion field", kind: "number", min: 0, max: 3 },
+  { key: "tenguFlight", label: "evasive flight", kind: "number", min: 0, max: 1 },
+  { key: "largeBonePlates", label: "large bone plates", kind: "number", min: 0, max: 3 },
+  { key: "ephemeralShield", label: "ephemeral shield", kind: "number", min: 0, max: 1 },
+  { key: "icemail", label: "icemail", kind: "number", min: 0, max: 2 },
+  {
+    key: "condensationShield",
+    label: "condensation shield",
+    kind: "number",
+    min: 0,
+    max: 1,
+  },
+  { key: "sturdyFrame", label: "sturdy frame", kind: "number", min: 0, max: 3 },
+  { key: "gelatinousBody", label: "gelatinous body", kind: "number", min: 0, max: 3 },
+  { key: "slowReflexes", label: "slow reflexes", kind: "number", min: 0, max: 3 },
+  { key: "strongMutation", label: "strong", kind: "number", min: 0, max: 2 },
+  { key: "cleverMutation", label: "clever", kind: "number", min: 0, max: 2 },
+  { key: "agileMutation", label: "agile", kind: "number", min: 0, max: 2 },
+  { key: "weakMutation", label: "weak", kind: "number", min: 0, max: 2 },
+  { key: "dopeyMutation", label: "dopey", kind: "number", min: 0, max: 2 },
+  { key: "clumsyMutation", label: "clumsy", kind: "number", min: 0, max: 2 },
+  {
+    key: "thinSkeletalStructure",
+    label: "thin skeletal structure",
+    kind: "number",
+    min: 0,
+    max: 3,
+  },
+  { key: "deformedBody", label: "deformed body", kind: "boolean" },
+  { key: "reckless", label: "reckless", kind: "boolean" },
+];
+
 const SectionHeading = ({ children }: { children: string }) => (
   <div className="flex items-center gap-3">
     <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
@@ -57,6 +145,9 @@ const SectionHeading = ({ children }: { children: string }) => (
 
 const indexedSlotLabel = (label: string, count: number, index: number) =>
   count === 1 ? label : `${label} ${index + 1}`;
+
+const formatSignedPart = (label: string, value: number) =>
+  value === 0 ? null : `${label}${value > 0 ? "+" : ""}${value}`;
 
 const MutationCheckbox = ({
   label,
@@ -381,22 +472,101 @@ const DynamicEquipmentControls = <V extends GameVersion>({
     }
   };
 
-  const renderMutationNumber = (
-    label: string,
-    value: number,
-    onChange: (value: number) => void,
-    options?: { min?: number; max?: number }
-  ) => (
-    <AttrInput
-      label={label}
-      ariaLabel={label}
-      value={value}
-      type="number"
-      min={options?.min}
-      max={options?.max}
-      onChange={onChange}
-    />
+  const setMutationNumber = (key: NumericMutationKey, value: number) => {
+    setState((prev) => {
+      if (key === "gelatinousBody") {
+        const previousLevel = prev.gelatinousBody ?? 0;
+
+        return {
+          ...prev,
+          gelatinousBody: value,
+          scalesAC: (prev.scalesAC ?? 0) + value - previousLevel,
+        };
+      }
+
+      return { ...prev, [key]: value };
+    });
+  };
+
+  const addMutationOption = (key: string) => {
+    const option = mutationOptions.find((candidate) => candidate.key === key);
+    if (!option) {
+      return;
+    }
+
+    if (option.kind === "boolean") {
+      setState((prev) => ({ ...prev, [option.key]: true }));
+      return;
+    }
+
+    setMutationNumber(option.key, option.defaultValue ?? 1);
+  };
+
+  const removeMutationOption = (option: MutationOption) => {
+    if (option.kind === "boolean") {
+      setState((prev) => ({ ...prev, [option.key]: false }));
+      return;
+    }
+
+    setMutationNumber(option.key, 0);
+  };
+
+  const activeMutationOptions = mutationOptions.filter((option) =>
+    option.kind === "boolean"
+      ? state[option.key] === true
+      : (state[option.key] ?? 0) !== 0
   );
+  const getMutationEffectText = (key: NumericMutationKey) => {
+    const value = state[key] ?? 0;
+    let parts: Array<string | null> = [];
+
+    switch (key) {
+      case "strongMutation":
+        parts = [
+          formatSignedPart("Str", value * 4),
+          formatSignedPart("Dex", -value),
+          formatSignedPart("Int", -value),
+        ];
+        break;
+      case "cleverMutation":
+        parts = [
+          formatSignedPart("Int", value * 4),
+          formatSignedPart("Str", -value),
+          formatSignedPart("Dex", -value),
+        ];
+        break;
+      case "agileMutation":
+        parts = [
+          formatSignedPart("Dex", value * 4),
+          formatSignedPart("Str", -value),
+          formatSignedPart("Int", -value),
+        ];
+        break;
+      case "weakMutation":
+        parts = [formatSignedPart("Str", -value * 3)];
+        break;
+      case "dopeyMutation":
+        parts = [formatSignedPart("Int", -value * 3)];
+        break;
+      case "clumsyMutation":
+        parts = [formatSignedPart("Dex", -value * 3)];
+        break;
+      case "thinSkeletalStructure":
+        parts = [formatSignedPart("Dex", value * 2)];
+        break;
+      case "scalesAC":
+        parts = [formatSignedPart("AC", value)];
+        break;
+    }
+
+    return parts.filter(Boolean).join(" ");
+  };
+  const speciesData = getVersionSpecies(state.version)[state.species];
+  const speciesTraits = [
+    ...(speciesData.deformedBody ? ["deformed body"] : []),
+    ...(slotCounts.ringSlots > 2 ? [`${slotCounts.ringSlots} rings`] : []),
+    ...(slotCounts.gloveSlots > 1 ? [`${slotCounts.gloveSlots} glove slots`] : []),
+  ];
 
   return (
     <div data-testid={testId} className={cn("flex flex-col gap-4", className)}>
@@ -453,116 +623,116 @@ const DynamicEquipmentControls = <V extends GameVersion>({
         className="flex flex-col gap-3"
       >
         <SectionHeading>Mutations & Traits</SectionHeading>
-        <div className="flex flex-wrap gap-4">
-          {renderMutationNumber(
-            "wild magic",
-            state.wildMagic ?? 0,
-            (value) => setState((prev) => ({ ...prev, wildMagic: value })),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "subdued magic",
-            state.subduedMagic ?? 0,
-            (value) => setState((prev) => ({ ...prev, subduedMagic: value })),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "disrupted magic",
-            state.antiWizardry ?? 0,
-            (value) => setState((prev) => ({ ...prev, antiWizardry: value })),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "runic magic",
-            state.runicMagic ?? 0,
-            (value) => setState((prev) => ({ ...prev, runicMagic: value })),
-            { min: 0, max: 1 }
-          )}
-          {renderMutationNumber(
-            "big brain wizardry",
-            state.bigBrainWizardry ?? 0,
-            (value) =>
-              setState((prev) => ({ ...prev, bigBrainWizardry: value })),
-            { min: 0, max: 1 }
-          )}
-          {renderMutationNumber(
-            "mutation AC",
-            state.scalesAC ?? 0,
-            (value) => setState((prev) => ({ ...prev, scalesAC: value }))
-          )}
-          {renderMutationNumber(
-            "repulsion field",
-            state.distortionField ?? 0,
-            (value) => setState((prev) => ({ ...prev, distortionField: value })),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "evasive flight",
-            state.tenguFlight ?? 0,
-            (value) => setState((prev) => ({ ...prev, tenguFlight: value })),
-            { min: 0, max: 1 }
-          )}
-          {renderMutationNumber(
-            "large bone plates",
-            state.largeBonePlates ?? 0,
-            (value) => setState((prev) => ({ ...prev, largeBonePlates: value })),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "icemail",
-            state.icemail ?? 0,
-            (value) => setState((prev) => ({ ...prev, icemail: value })),
-            { min: 0, max: 2 }
-          )}
-          {renderMutationNumber(
-            "condensation shield",
-            state.condensationShield ?? 0,
-            (value) =>
-              setState((prev) => ({ ...prev, condensationShield: value })),
-            { min: 0, max: 1 }
-          )}
-          {renderMutationNumber(
-            "sturdy frame",
-            state.sturdyFrame ?? 0,
-            (value) => setState((prev) => ({ ...prev, sturdyFrame: value })),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "gelatinous body",
-            state.gelatinousBody ?? 0,
-            (value) =>
-              setState((prev) => {
-                const previousLevel = prev.gelatinousBody ?? 0;
+        {speciesTraits.length > 0 && (
+          <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+            <div className="font-semibold uppercase tracking-[0.18em]">
+              Species traits
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1">
+              {speciesTraits.map((trait) => (
+                <span key={trait} className="inline-flex gap-1">
+                  <span className="font-medium text-foreground">{trait}</span>
+                  <span>already included</span>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        <label className="flex max-w-xs flex-col gap-1 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">Add mutation or trait</span>
+          <select
+            aria-label="Add mutation or trait"
+            className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground"
+            value=""
+            onChange={(event) => addMutationOption(event.currentTarget.value)}
+          >
+            <option value="">Choose...</option>
+            {mutationOptions.map((option) => (
+              <option key={option.key} value={option.key}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        {activeMutationOptions.length > 0 && (
+          <div className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))]">
+            {activeMutationOptions.map((option) => {
+              const effectText =
+                option.kind === "number" ? getMutationEffectText(option.key) : "";
 
-                return {
-                  ...prev,
-                  gelatinousBody: value,
-                  scalesAC: (prev.scalesAC ?? 0) + value - previousLevel,
-                };
-              }),
-            { min: 0, max: 3 }
-          )}
-          {renderMutationNumber(
-            "slow reflexes",
-            state.slowReflexes ?? 0,
-            (value) => setState((prev) => ({ ...prev, slowReflexes: value })),
-            { min: 0, max: 3 }
-          )}
-          <MutationCheckbox
-            label="deformed body"
-            checked={state.deformedBody === true}
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, deformedBody: value }))
-            }
-          />
-          <MutationCheckbox
-            label="reckless"
-            checked={state.reckless === true}
-            onChange={(value) =>
-              setState((prev) => ({ ...prev, reckless: value }))
-            }
-          />
-        </div>
+              if (option.kind === "boolean") {
+                return (
+                  <div
+                    key={option.key}
+                    data-testid={`mutation-control-${option.key}`}
+                    className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md border border-border/60 px-3 py-2"
+                  >
+                    <MutationCheckbox
+                      label={option.label}
+                      checked={state[option.key] === true}
+                      onChange={(value) =>
+                        setState((prev) => ({ ...prev, [option.key]: value }))
+                      }
+                    />
+                    <button
+                      type="button"
+                      aria-label={`Remove ${option.label}`}
+                      className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                      onClick={() => removeMutationOption(option)}
+                    >
+                      <X aria-hidden="true" className="h-4 w-4" />
+                    </button>
+                  </div>
+                );
+              }
+
+              return (
+                <div
+                  key={option.key}
+                  data-testid={`mutation-control-${option.key}`}
+                  className="grid min-h-12 grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-2 gap-y-1 rounded-md border border-border/60 px-3 py-2"
+                >
+                  <span className="min-w-0 text-sm font-medium text-foreground">
+                    {option.label}
+                  </span>
+                  <Input
+                    aria-label={option.label}
+                    type="number"
+                    className="h-7 w-14"
+                    min={option.min}
+                    max={option.max}
+                    value={state[option.key] ?? 0}
+                    onChange={(event) => {
+                      const value = Number(event.currentTarget.value);
+                      setMutationNumber(
+                        option.key,
+                        option.max !== undefined
+                          ? Math.min(value, option.max)
+                          : value
+                      );
+                    }}
+                  />
+                  <button
+                    type="button"
+                    aria-label={`Remove ${option.label}`}
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground"
+                    onClick={() => removeMutationOption(option)}
+                  >
+                    <X aria-hidden="true" className="h-4 w-4" />
+                  </button>
+                  {effectText && (
+                    <div
+                      data-testid={`mutation-effect-${option.key}`}
+                      className="col-span-3 text-left text-xs font-semibold leading-none text-foreground whitespace-nowrap"
+                    >
+                      {effectText}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
     </div>

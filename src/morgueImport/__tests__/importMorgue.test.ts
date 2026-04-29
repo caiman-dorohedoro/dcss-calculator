@@ -1291,6 +1291,90 @@ Jewellery
     );
   });
 
+  test("imports calculator-relevant stat mutations and ignores unrelated A-line traits", () => {
+    const record = {
+      playerName: "tester",
+      version: "0.35-a0-326-g9da0311f7a",
+      species: "Demigod",
+      speciesVariant: null,
+      background: "Hunter",
+      god: null,
+      ...defaultGodState,
+      xl: 27,
+      ac: 25,
+      ev: 50,
+      sh: 0,
+      strength: 15,
+      intelligence: 16,
+      dexterity: 49,
+      bodyArmour: "ring mail",
+      shield: "none",
+      helmets: ["+2 hat"],
+      gloves: ["+2 pair of gloves"],
+      footwear: ["+1 pair of boots"],
+      cloaks: ["+2 cloak"],
+      orb: "none",
+      amulets: ["amulet of Vitality"],
+      rings: ["ring of poison resistance", "ring of slaying +8"],
+      talisman: "none",
+      form: null,
+      bodyArmourDetails: makeItem("+5 ring mail", "ring mail"),
+      shieldDetails: null,
+      orbDetails: null,
+      helmetDetails: [],
+      gloveDetails: [],
+      footwearDetails: [],
+      cloakDetails: [],
+      amuletDetails: [],
+      ringDetails: [],
+      skills: baseSkills,
+      effectiveSkills: baseSkills,
+      spells: [],
+      mutations: [
+        { name: "agile", level: 1 },
+        { name: "cold resistance", level: 1 },
+        { name: "high MP", level: 1 },
+        { name: "robust", level: 1 },
+      ],
+    } as unknown as ParsedMorgueTextRecord;
+
+    const result = buildImportedCalculatorState(record);
+    expect(result.ok).toBe(true);
+    if (!result.ok) {
+      throw new Error("expected successful import");
+    }
+
+    expect(result.importedState.agileMutation).toBe(1);
+    expect(result.importedState.strength).toBe(16);
+    expect(result.importedState.dexterity).toBe(45);
+    expect(result.importedState.intelligence).toBe(17);
+    expect(result.importedState.importedMutationNotes).toEqual([]);
+    expect(result.summary.skipped).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Mutations & Traits",
+          detail: expect.stringContaining("cold resistance"),
+        }),
+      ])
+    );
+    expect(result.summary.skipped).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Mutations & Traits",
+          detail: expect.stringContaining("high MP"),
+        }),
+      ])
+    );
+    expect(result.summary.skipped).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: "Mutations & Traits",
+          detail: expect.stringContaining("robust"),
+        }),
+      ])
+    );
+  });
+
   test("maps parser detail modifiers onto the owning equipment item", () => {
     const record = {
       playerName: "tester",

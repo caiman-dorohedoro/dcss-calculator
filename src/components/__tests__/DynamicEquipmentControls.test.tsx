@@ -57,6 +57,20 @@ const setTextInputValue = (input: HTMLInputElement, value: string) => {
   input.dispatchEvent(new Event("input", { bubbles: true }));
 };
 
+const setSelectValue = (select: HTMLSelectElement, value: string) => {
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    HTMLSelectElement.prototype,
+    "value"
+  )?.set;
+
+  if (!valueSetter) {
+    throw new Error("Could not find select value setter");
+  }
+
+  valueSetter.call(select, value);
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+};
+
 const {
   default: DynamicEquipmentControls,
 } = await import("../DynamicEquipmentControls");
@@ -456,8 +470,9 @@ describe("DynamicEquipmentControls", () => {
     expect(container.querySelector('input[type="checkbox"]')).toBeNull();
   });
 
-  test("renders expanded mutation controls with Crawl display labels", async () => {
+  test("keeps mutation controls collapsed until a calculator-relevant trait is present", async () => {
     const state = buildDefaultCalculatorState("trunk");
+    state.species = "human";
 
     await act(async () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
@@ -467,32 +482,142 @@ describe("DynamicEquipmentControls", () => {
       '[data-testid="dynamic-equipment-mutations"]'
     ) as HTMLElement;
 
-    expect(mutationSection.textContent).toContain("disrupted magic");
-    expect(mutationSection.textContent).toContain("repulsion field");
-    expect(mutationSection.textContent).toContain("evasive flight");
-    expect(mutationSection.textContent).toContain("icemail");
-    expect(mutationSection.textContent).toContain("condensation shield");
-    expect(mutationSection.textContent).toContain("sturdy frame");
-    expect(mutationSection.textContent).toContain("gelatinous body");
-    expect(mutationSection.textContent).toContain("slow reflexes");
-    expect(mutationSection.textContent).not.toContain("anti-wizardry");
-    expect(mutationSection.textContent).not.toContain("distortion field");
-    expect(mutationSection.textContent).not.toContain("tengu flight");
     expect(
       mutationSection.querySelector('input[aria-label="icemail"]')
-    ).not.toBeNull();
+    ).toBeNull();
+    expect(
+      mutationSection.querySelector('input[aria-label="agile"]')
+    ).toBeNull();
     expect(
       mutationSection.querySelector('[aria-label="deformed body"]')
-    ).not.toBeNull();
+    ).toBeNull();
     expect(
       mutationSection.querySelector('[aria-label="reckless"]')
+    ).toBeNull();
+    expect(
+      mutationSection.querySelector('select[aria-label="Add mutation or trait"]')
     ).not.toBeNull();
+  });
+
+  test("renders species calculator traits as read-only context", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "naga";
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const mutationSection = container.querySelector(
+      '[data-testid="dynamic-equipment-mutations"]'
+    ) as HTMLElement;
+
+    expect(mutationSection.textContent).toContain("Species traits");
+    expect(mutationSection.textContent).toContain("deformed body");
+    expect(mutationSection.textContent).toContain("already included");
+    expect(
+      mutationSection.querySelector('[aria-label="deformed body"]')
+    ).toBeNull();
+  });
+
+  test("adds an editable mutation control from the selector", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "human";
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      setSelectValue(
+        container.querySelector(
+          'select[aria-label="Add mutation or trait"]'
+        ) as HTMLSelectElement,
+        "agileMutation"
+      );
+    });
+
+    const updater = setState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+
+    expect(updater(state).agileMutation).toBe(1);
+  });
+
+  test("shows concrete stat deltas for active stat mutations", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "human";
+    state.agileMutation = 1;
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    const effect = container.querySelector(
+      '[data-testid="mutation-effect-agileMutation"]'
+    ) as HTMLDivElement;
+    const control = container.querySelector(
+      '[data-testid="mutation-control-agileMutation"]'
+    ) as HTMLDivElement;
+
+    expect(effect.textContent).toBe("Dex+4 Str-1 Int-1");
+    expect(effect.className).toContain("whitespace-nowrap");
+    expect(effect.className).toContain("text-xs");
+    expect(control.className).toContain("grid");
+  });
+
+  test("shows currently active mutation controls without selector interaction", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "human";
+    state.agileMutation = 1;
+    state.icemail = 1;
+    state.deformedBody = true;
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    expect(
+      container.querySelector('input[aria-label="agile"]')
+    ).not.toBeNull();
+    expect(
+      container.querySelector('input[aria-label="icemail"]')
+    ).not.toBeNull();
+    expect(
+      container.querySelector('[aria-label="deformed body"]')
+    ).not.toBeNull();
+  });
+
+  test("removes a manually active mutation control", async () => {
+    const state = buildDefaultCalculatorState("trunk");
+    state.species = "human";
+    state.agileMutation = 1;
+
+    await act(async () => {
+      root.render(<DynamicEquipmentControls state={state} setState={setState} />);
+    });
+
+    await act(async () => {
+      (
+        container.querySelector(
+          'button[aria-label="Remove agile"]'
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    const updater = setState.mock.calls[0][0] as (
+      prev: typeof state
+    ) => typeof state;
+
+    expect(updater(state).agileMutation).toBe(0);
   });
 
   test("expanded mutation controls update new numeric and boolean state fields", async () => {
     const state = buildDefaultCalculatorState("trunk");
+    state.species = "human";
+    state.sturdyFrame = 1;
     state.gelatinousBody = 1;
     state.scalesAC = 4;
+    state.deformedBody = true;
 
     await act(async () => {
       root.render(<DynamicEquipmentControls state={state} setState={setState} />);
@@ -538,7 +663,7 @@ describe("DynamicEquipmentControls", () => {
     });
 
     updater = setState.mock.calls[0][0] as (prev: typeof state) => typeof state;
-    expect(updater(state).deformedBody).toBe(true);
+    expect(updater(state).deformedBody).toBe(false);
   });
 
   test("opens footwear row with a single modal backed by the active footwear item", async () => {
